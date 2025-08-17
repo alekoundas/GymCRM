@@ -12,6 +12,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Test Secret
+        run: echo "${{ secrets.SSH_PRIVATE_KEY }}"
+        shell: bash
+  
       # Deploy to DigitalOcean Droplet using SSH
       - name: Deploy to DigitalOcean Droplet
         uses: appleboy/ssh-action@v1.0.3
