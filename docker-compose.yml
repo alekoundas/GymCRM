@@ -24,7 +24,7 @@ services:
       context: .
       dockerfile: Client/Dockerfile
     ports:
-      - "8080"  # Internal HTTP port
+      - "3000:8080"   # Map client to external port 3000
       # - "8081"  # Internal HTTPS port
     environment:
       - CLIENT_API_URL=http://api:8080/api/
