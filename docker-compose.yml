@@ -1,0 +1,81 @@
+version: '3.8'
+services:
+
+  api:
+    container_name: api
+    image: ${DOCKER_REGISTRY-}api
+    build:
+      context: ./API
+      dockerfile: Dockerfile
+    ports:
+      - "8080" # Internal HTTP port
+    # volumes:
+      # - /mnt/tvsercivecrmvolume:/app/VolumeDB
+      # - test1:/app/VolumeDB
+    environment:
+      - ASPNETCORE_URLS=http://*:8080
+    networks:
+      - app-network
+
+
+  client:
+    build:
+      context: ./Client
+      dockerfile: Dockerfile
+    ports:
+      - "8080"  # Internal HTTP port
+      # - "8081"  # Internal HTTPS port
+    environment:
+      - CLIENT_API_URL=http://api:8080/api/
+    depends_on:
+      - api
+    networks:
+      - app-network
+
+
+
+
+
+  nginx:
+    image: nginx:stable-alpine 
+    ports:
+        - "80:80"    # External HTTP
+        - 443:443    # External HTTPS
+    volumes:
+      - ./API/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./API/Certbot/conf:/etc/letsencrypt
+      - ./API/Certbot/www:/var/www/certbot
+    environment:
+        - NGINX_HOST=alexps.gr
+    depends_on:
+        - api
+        - client
+    networks:
+      - app-network
+
+            # run Nginx in the foreground and periodically reloading its configuration in the background.
+            # The loop which reloads Nginx every 6 hours runs in the background, while nginx -g "daemon off;" runs in the foreground as the primary process.
+            # The result is that Nginx serves traffic continuously, and every 6 hours, it reloads its configuration to pick up changes (e.g., new SSL certificates from Certbot).
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+
+
+
+
+
+  certbot:
+    image: certbot/certbot
+    volumes: 
+      - ./API/Certbot/config:/etc/letsencrypt/:rw
+      - ./API/Certbot/www:/usr/share/nginx/html/:rw
+
+                # Runs Certbot in a loop to check for certificate renewals every 12 hours.
+                # Ensures the container exits cleanly when stopped by Docker (via the trap).
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+
+
+
+networks:
+  app-network:
+      driver: bridge

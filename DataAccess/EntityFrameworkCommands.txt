@@ -1,0 +1,43 @@
+﻿
+
+
+dotnet ef migrations script --project DataAccess
+
+ dotnet ef migrations add InitialMigration --project DataAccess --startup-project API
+
+dotnet ef database update --project DataAccess --startup-project API
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Create vite react app
+	npm create vite@latest my-react-app -- --template react
+
+
+ cd my-react-app
+  npm install
+  npm run dev
+
+
+
+
+
+  Test connection string in powershell
+PS C:\Users\psych> $conn = New-Object System.Data.SqlClient.SqlConnection
+PS C:\Users\psych> $conn.ConnectionString = "Server=localhost, 1433;Initial Catalog=TVServiceDB;Persist Security Info=False;User ID=sa;Password=P@ssw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+PS C:\Users\psych> $conn.Open()
+PS C:\Users\psych> $conn.Close()
+
+
+
+
+
