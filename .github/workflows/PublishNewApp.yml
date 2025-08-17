@@ -12,9 +12,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Test Secret
-        run: echo "${{ secrets.SSH_PRIVATE_KEY }}"
-        shell: bash
   
       # Deploy to DigitalOcean Droplet using SSH
       - name: Deploy to DigitalOcean Droplet
@@ -54,13 +51,17 @@ jobs:
             echo "Building and starting Docker Compose..."
             docker-compose -f docker-compose.yml up -d --build
 
+            # Wait for services to start
+            sleep 10  # Give time for containers to initialize
+
             # Set up Certbot for SSL certificates (first-time setup)
             echo "Setting up Certbot for SSL certificates..."
             # Install Certbot with Nginx plugin
             apt-get install -y certbot python3-certbot-nginx
 
             # Obtain and install SSL certificate for the domain
-            certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos --email psychoson_alex3@hotmail.com -m
+            certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos --email psychoson_alex3@hotmail.com
+            certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com
 
             # Reload Nginx to apply certificates
             docker exec nginx nginx -s reload
