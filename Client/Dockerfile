@@ -1,29 +1,25 @@
 FROM node:18-alpine
 
-WORKDIR /app/Client
+WORKDIR /app
 
-# Copy package files for caching.
-COPY package.json ./
-COPY package-lock.json* ./
+# Copy package files for caching
+COPY Client/package.json .
+COPY Client/package-lock.json* .
 
-# Install dependencies.
+# Install dependencies
 RUN npm install
 
-# Copy the rest of the application.
-COPY . .
+# Copy the rest of the application
+COPY Client/ .
 
-# Build the React app.
+# Build the React app
 RUN npm run build
 
-
-# Expose ports for HTTP and HTTPS.
-EXPOSE 8080
-#EXPOSE 8081
-
-
-# No install and CMD needed, Nginx will serve the build.
 # Install serve to serve the build statically
 RUN npm install -g serve
 
-# Serve the build on port 8080 (Nginx will handle HTTPS redirection)
+# Expose port for HTTP
+EXPOSE 8080
+
+# Serve the build on port 8080
 CMD ["serve", "-s", "build", "-l", "8080"]
