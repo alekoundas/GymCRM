@@ -23,7 +23,7 @@ EXPOSE 8080
 
 # No install and CMD needed, Nginx will serve the build.
 # Install serve to serve the build statically
-#RUN npm install -g serve
+RUN npm install -g serve
 
 # Serve the build on port 8080 (Nginx will handle HTTPS redirection)
-#CMD ["serve", "-s", "build", "-l", "8080"]
+CMD ["serve", "-s", "build", "-l", "8080"]

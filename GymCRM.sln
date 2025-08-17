@@ -13,26 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business", "Business\Busine
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Client", "Client\", "{F03FED76-20DB-B30E-51FF-188119B1BFB7}"
-	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_51463"
-		Debug.AspNetCompiler.PhysicalPath = "Client\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51463\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_51463"
-		Release.AspNetCompiler.PhysicalPath = "Client\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51463\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "51463"
-		SlnRelativePath = "Client\"
-	EndProjectSection
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Client", "Client\Client.shproj", "{40D6491C-4A31-4A02-95B1-DCCB728B6730}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,15 +41,14 @@ Global
 		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F03FED76-20DB-B30E-51FF-188119B1BFB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F03FED76-20DB-B30E-51FF-188119B1BFB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F03FED76-20DB-B30E-51FF-188119B1BFB7}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{F03FED76-20DB-B30E-51FF-188119B1BFB7}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B81926EF-823E-4D79-9E68-39490F8DB9C4}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Client\Client.projitems*{40d6491c-4a31-4a02-95b1-dccb728b6730}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal
