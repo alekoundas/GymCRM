@@ -73,6 +73,12 @@ jobs:
               echo "Error: Nginx container failed to start!"
               exit 1
             fi
+            if ! docker ps | grep -q "nginx"; then
+              echo "Error: Nginx container failed to start!"
+              docker logs nginx
+              exit 1
+            fi
+            
 
             # Set up Certbot for SSL certificates (first-time setup)
             echo "Setting up Certbot for SSL certificates..."
