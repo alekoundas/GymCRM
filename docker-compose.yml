@@ -19,6 +19,7 @@ services:
 
 
   client:
+    container_name: client
     build:
       context: ./Client
       dockerfile: Dockerfile
@@ -37,6 +38,7 @@ services:
 
 
   nginx:
+    container_name: nginx
     image: nginx:stable-alpine 
     ports:
         - "80:80"    # External HTTP
@@ -47,6 +49,7 @@ services:
       - ./API/Certbot/www:/var/www/certbot
     environment:
         - NGINX_HOST=alexps.gr
+        # - NGINX_HOST=localhost  
     depends_on:
         - api
         - client
@@ -63,15 +66,15 @@ services:
 
 
 
-  certbot:
-    image: certbot/certbot
-    volumes: 
-      - ./API/Certbot/config:/etc/letsencrypt/:rw
-      - ./API/Certbot/www:/usr/share/nginx/html/:rw
+  # certbot:
+  #   image: certbot/certbot
+  #   volumes: 
+  #     - ./API/Certbot/config:/etc/letsencrypt/:rw
+  #     - ./API/Certbot/www:/usr/share/nginx/html/:rw
 
-                # Runs Certbot in a loop to check for certificate renewals every 12 hours.
-                # Ensures the container exits cleanly when stopped by Docker (via the trap).
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+  #               # Runs Certbot in a loop to check for certificate renewals every 12 hours.
+  #               # Ensures the container exits cleanly when stopped by Docker (via the trap).
+  #   entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 
 

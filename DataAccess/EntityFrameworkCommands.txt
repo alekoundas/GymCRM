@@ -41,3 +41,10 @@ PS C:\Users\psych> $conn.Close()
 
 
 
+Github secrets
+
+SSH_PRIVATE_KEY: Your SSH private key.
+SSH_HOST: Your Droplet’s IP (e.g., your-droplet-ip).
+SSH_USER: Typically root for a new Droplet.
+DOMAIN: Your domain (e.g., your-domain.com).
+
