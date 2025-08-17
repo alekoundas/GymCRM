@@ -1,6 +1,6 @@
 FROM node:18-alpine
 
-WORKDIR /app
+WORKDIR /app/Client
 
 # Copy package files for caching.
 COPY package.json ./
