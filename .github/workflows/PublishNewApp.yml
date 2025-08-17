@@ -45,6 +45,7 @@ jobs:
               git checkout master
             else
               git pull origin master
+              git reset --hard origin/master
             fi
 
 
@@ -56,10 +57,22 @@ jobs:
 
             # Build and start Docker Compose
             echo "Building and starting Docker Compose..."
+            docker-compose -f docker-compose.yml down
             docker-compose -f docker-compose.yml up -d --build
 
             # Wait for services to start
             sleep 10  # Give time for containers to initialize
+
+
+            # Verify containers are running
+            if ! docker ps | grep -q "api"; then
+              echo "Error: API container failed to start!"
+              exit 1
+            fi
+            if ! docker ps | grep -q "nginx"; then
+              echo "Error: Nginx container failed to start!"
+              exit 1
+            fi
 
             # Set up Certbot for SSL certificates (first-time setup)
             echo "Setting up Certbot for SSL certificates..."
