@@ -41,10 +41,17 @@ jobs:
             if [ ! -d .git ]; then
               git init
               git remote add origin https://github.com/${{ github.repository }}.git
-              git fetch origin main
-              git checkout main
+              git fetch origin master
+              git checkout master
             else
-              git pull origin main
+              git pull origin master
+            fi
+
+
+            # Verify docker-compose.yml exists
+            if [ ! -f docker-compose.yml ]; then
+              echo "Error: docker-compose.yml not found!"
+              exit 1
             fi
 
             # Build and start Docker Compose
