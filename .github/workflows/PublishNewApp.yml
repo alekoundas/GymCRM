@@ -54,6 +54,18 @@ jobs:
               echo "Error: docker-compose.yml not found!"
               exit 1
             fi
+            # Check and free port 80
+            if netstat -tulnp | grep :80; then
+              echo "Port 80 is in use, attempting to free it..."
+              fuser -k 80/tcp || true
+            fi
+            # Check and free port 443
+            if netstat -tulnp | grep :443; then
+              echo "Port 443 is in use, attempting to free it..."
+              fuser -k 443/tcp || true
+            fi
+
+            
 
             # Build and start Docker Compose
             echo "Building and starting Docker Compose..."
