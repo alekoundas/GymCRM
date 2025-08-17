@@ -5,8 +5,8 @@ services:
     container_name: api
     image: ${DOCKER_REGISTRY-}api
     build:
-      context: ./API
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: API/Dockerfile
     ports:
       - "8080" # Internal HTTP port
     # volumes:
@@ -21,8 +21,8 @@ services:
   client:
     container_name: client
     build:
-      context: ./Client
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Client/Dockerfile
     ports:
       - "8080"  # Internal HTTP port
       # - "8081"  # Internal HTTPS port
