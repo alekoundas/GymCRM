@@ -60,7 +60,7 @@ jobs:
             apt-get install -y certbot python3-certbot-nginx
 
             # Obtain and install SSL certificate for the domain
-            certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos --email psychoson_alex3@hotmail.com
+            #certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos --email psychoson_alex3@hotmail.com
             certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com
 
             # Reload Nginx to apply certificates
