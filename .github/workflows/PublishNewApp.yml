@@ -1,0 +1,66 @@
+name: Deploy to DigitalOcean Droplet
+
+on:
+  workflow_dispatch: # Allows manual triggering of the workflow.
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Deploy to DigitalOcean Droplet using SSH
+      - name: Deploy to DigitalOcean Droplet
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}  
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Update and install required packages
+            echo "Updating system and installing dependencies..."
+            apt-get update
+            apt-get install -y git docker.io docker-compose curl
+
+            # Ensure Docker service is running and enabled
+            systemctl start docker
+            systemctl enable docker
+            usermod -aG docker root  # Add root to docker group (optional for root)
+
+            # Create deployment directory
+            echo "Setting up deployment directory..."
+            mkdir -p /root/app
+            cd /root/app
+
+            # Initialize Git and pull the repository
+            echo "Setting up Git and pulling code..."
+            if [ ! -d .git ]; then
+              git init
+              git remote add origin https://github.com/${{ github.repository }}.git
+              git fetch origin main
+              git checkout main
+            else
+              git pull origin main
+            fi
+
+            # Build and start Docker Compose
+            echo "Building and starting Docker Compose..."
+            docker-compose -f docker-compose.yml up -d --build
+
+            # Set up Certbot for SSL certificates (first-time setup)
+            echo "Setting up Certbot for SSL certificates..."
+            # Install Certbot with Nginx plugin
+            apt-get install -y certbot python3-certbot-nginx
+
+            # Obtain and install SSL certificate for the domain
+            certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos --email psychoson_alex3@hotmail.com -m
+
+            # Reload Nginx to apply certificates
+            docker exec nginx nginx -s reload
+
+            # Clean up unused Docker resources
+            echo "Cleaning up Docker resources..."
+            docker system prune -f
