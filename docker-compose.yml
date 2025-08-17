@@ -44,7 +44,7 @@ services:
         - "80:80"    # External HTTP
         - 443:443    # External HTTPS
     volumes:
-      - ./API/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./API/Nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./API/Certbot/conf:/etc/letsencrypt
       - ./API/Certbot/www:/var/www/certbot
     environment:
