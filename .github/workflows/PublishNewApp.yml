@@ -131,7 +131,7 @@ jobs:
 
             # Reload Nginx to apply certificates
             echo "[INFO]: Reload Nginx to apply certificates."
-            docker exec nginx nginx -s reload
+            docker exec Nginx nginx -s reload
 
             # Clean up unused Docker resources
             echo "[INFO]: Cleaning up Docker resources."
