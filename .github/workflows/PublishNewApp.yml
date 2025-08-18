@@ -72,12 +72,6 @@ jobs:
             echo "[INFO]: Obtaining SSL certificate..."
             if [ ! -f /etc/letsencrypt/live/${{ secrets.DOMAIN }}/fullchain.pem ]; then
               certbot certonly --standalone -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --http-01-port=80 
-              || 
-              {
-                echo "[ERROR]: Certbot failed to obtain certificate!"
-                cat /var/log/letsencrypt/letsencrypt.log
-                exit 1
-              }
             fi
 
 
