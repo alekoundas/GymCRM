@@ -44,8 +44,7 @@ services:
         - 443:443    # External HTTPS
     volumes:
       - /root/app/API/Nginx/nginx.conf:/etc/nginx/nginx.conf
-      - /root/app/API/Certbot/conf:/etc/letsencrypt
-      - /root/app/API/Certbot/www:/var/www/certbot
+      - /etc/letsencrypt:/etc/letsencrypt
     environment:
         - NGINX_HOST=alexps.gr
     depends_on:
@@ -67,8 +66,8 @@ services:
   certbot:
     image: certbot/certbot
     volumes: 
-      - ./API/Certbot/config:/etc/letsencrypt/:rw
-      - ./API/Certbot/www:/usr/share/nginx/html/:rw
+      - /etc/letsencrypt:/etc/letsencrypt/:rw
+      - /root/app/API/Certbot/www:/usr/share/nginx/html/:rw
 
                 # Runs Certbot in a loop to check for certificate renewals every 12 hours.
                 # Ensures the container exits cleanly when stopped by Docker (via the trap).
