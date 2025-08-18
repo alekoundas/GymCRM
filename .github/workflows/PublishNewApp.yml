@@ -26,6 +26,12 @@ jobs:
             apt-get update
             apt-get install -y git docker.io docker-compose curl net-tools rclone
 
+            # Create new user alek
+            echo "[INFO]: Create new user alek"
+            id alek || sudo adduser --gecos "" --disabled-password --uid 1000 alek
+
+
+
             # Ensure Docker service is running and enabled
             systemctl start docker
             systemctl enable docker
