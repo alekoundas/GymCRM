@@ -60,6 +60,9 @@ jobs:
               exit 1
             fi
 
+            echo "[INFO]: Give rw permitions on sqlite.db"
+            chmod 666 /root/app/sqlite.db
+
 
 
 
