@@ -157,6 +157,14 @@ function NavTop() {
           navigate("/users/login");
         },
       });
+
+      (items[0].items as MenuItem[])?.push({
+        label: "Register",
+        icon: "pi pi-user",
+        command: () => {
+          navigate("/users/register");
+        },
+      });
     }
 
     return items;

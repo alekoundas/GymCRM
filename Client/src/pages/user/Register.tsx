@@ -5,7 +5,7 @@ import ApiService from "../../services/ApiService";
 import { UserLoginRequestDto } from "../../model/UserLoginRequestDto";
 import { useAuth } from "../../contexts/AuthContext";
 
-export default function Login() {
+export default function Register() {
   const { login } = useAuth();
 
   const [userLoginDto, setUserLoginDto] = useState(new UserLoginRequestDto());
@@ -17,8 +17,8 @@ export default function Login() {
     setUserLoginDto({ ...userLoginDto });
   };
 
-  const onLogin = () => {
-    ApiService.login(userLoginDto, login);
+  const onRegister = () => {
+    ApiService.register(userLoginDto, login);
   };
   return (
     <>
@@ -31,18 +31,26 @@ export default function Login() {
               height={50}
               className="mb-3"
             />
-            <div className="text-900 text-3xl font-medium mb-3">
-              Welcome Back
-            </div>
-            <span className="text-600 font-medium line-height-3">
-              Don't have an account?
-            </span>
-            <a className="font-medium no-underline ml-2 text-blue-500 cursor-pointer">
-              Create today!
-            </a>
+            <div className="text-900 text-3xl font-medium mb-3">Join us</div>
           </div>
 
           <div>
+            <label
+              htmlFor="userName"
+              className="block text-900 font-medium mb-2"
+            >
+              User Name
+            </label>
+            <InputText
+              id="userName"
+              name="userName"
+              type="text"
+              placeholder="userName"
+              className="w-full mb-3"
+              value={userLoginDto.userName}
+              onChange={handleChange}
+            />
+
             <label
               htmlFor="email"
               className="block text-900 font-medium mb-2"
@@ -53,7 +61,7 @@ export default function Login() {
               id="email"
               name="email"
               type="text"
-              placeholder="Username / Email address"
+              placeholder="Email address"
               className="w-full mb-3"
               value={userLoginDto.email}
               onChange={handleChange}
@@ -85,15 +93,12 @@ export default function Login() {
                 /> */}
                 {/* <label htmlFor="rememberme">Remember me</label> */}
               </div>
-              <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">
-                Forgot your password?
-              </a>
             </div>
 
             <Button
-              label="Sign In"
+              label="Register"
               className="w-full"
-              onClick={onLogin}
+              onClick={onRegister}
             />
           </div>
         </div>

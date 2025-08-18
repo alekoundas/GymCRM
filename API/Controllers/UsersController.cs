@@ -209,7 +209,6 @@ namespace API.Controllers
 
         // POST: api/Users/Login
         [HttpPost("Login")]
-        [AllowAnonymous]    // Allow access without authentication
         public async Task<ApiResponse<UserLoginResponseDto>> Login(UserLoginRequestDto request)
         {
             ApplicationUser? user = await _userManager.FindByEmailAsync(request.Email);
