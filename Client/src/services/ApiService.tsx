@@ -79,6 +79,19 @@ export default class ApiService {
     });
   }
 
+  public static async register(
+    data: UserLoginRequestDto,
+    authLogin: () => void
+  ) {
+    const url = this.serverUrl + "users/register";
+    await this.apiRequest(url, "POST", data).then((result) => {
+      if (result) {
+        ToastService.showInfo("ssss");
+        this.login(data, authLogin);
+      }
+    });
+  }
+
   public static async logout(authLogout: () => void) {
     const url = this.serverUrl + "users/logout";
     await this.apiRequest<ApiResponse<boolean>>(url, "POST").then((result) => {
@@ -117,13 +130,7 @@ export default class ApiService {
               )
             );
           }
-          //  else {
-          //   ToastService.showError(
-          //     "Something unexpected happend! API call was not successfull..."
-          //   );
-          //   console.log(2);
-          // }
-          return null;
+          return response?.isSucceed;
         }
 
         // Loop in dictionary to display errors.

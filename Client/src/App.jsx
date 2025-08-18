@@ -17,6 +17,7 @@ import Roles from "./pages/role/Roles.tsx";
 import Users from "./pages/user/Users.tsx";
 import Makers from "./pages/maker/Makers.tsx";
 import MakerModels from "./pages/maker-model/MakerModels.tsx";
+import Register from "./pages/user/Register.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -28,8 +29,6 @@ export default function App() {
     ThemeService.setRef(theme);
     ThemeService.setDefaultTheme();
     ThemeService.setDefaultThemeScale();
-
-    ApiService.test();
   }, []);
 
   return (
@@ -40,9 +39,11 @@ export default function App() {
         rel="stylesheet"
         type="text/css"
       />
+
+      {/* Display messages */}
       <Toast ref={toast} />
 
-      <div className="grid   ">
+      <div className="grid">
         <div className="col-12 ">
           <NavTop />
         </div>
@@ -85,6 +86,10 @@ export default function App() {
               <Route
                 path="/users/login"
                 element={<Login />}
+              />
+              <Route
+                path="/users/register"
+                element={<Register />}
               />
               <Route
                 path="/users"

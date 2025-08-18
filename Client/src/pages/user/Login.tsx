@@ -53,7 +53,7 @@ export default function Login() {
               id="email"
               name="email"
               type="text"
-              placeholder="Email address"
+              placeholder="Username / Email address"
               className="w-full mb-3"
               value={userLoginDto.email}
               onChange={handleChange}
