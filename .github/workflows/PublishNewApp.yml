@@ -79,19 +79,19 @@ jobs:
             fi
             # Check and free port 80
             if netstat -tulnp | grep :80; then
-              echo "[INFO]: Port 80 is in use, attempting to free it..."
+              echo "[INFO]: Port 80 is in use, attempting to free it."
               fuser -k 80/tcp || true
             fi
             # Check and free port 443
             if netstat -tulnp | grep :443; then
-              echo "[INFO]: Port 443 is in use, attempting to free it..."
+              echo "[INFO]: Port 443 is in use, attempting to free it."
               fuser -k 443/tcp || true
             fi
 
             
 
             # Build and start Docker Compose
-            echo "[INFO]: Building and starting Docker Compose..."
+            echo "[INFO]: Building and starting Docker Compose."
             docker-compose -f docker-compose.yml down
             docker-compose -f docker-compose.yml up -d --build
 
@@ -116,17 +116,23 @@ jobs:
             
 
             # Set up Certbot for SSL certificates (first-time setup)
-            echo "[INFO]: Setting up Certbot for SSL certificates..."
+            echo "[INFO]: Setting up Certbot for SSL certificates.
             # Install Certbot with Nginx plugin
             apt-get install -y certbot python3-certbot-nginx
 
-            # Obtain and install SSL certificate for the domain
-            #certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos --email psychoson_alex3@hotmail.com
-            certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com
+            # Set up Certbot for SSL certificates (only if certificates don't exist)
+            echo "[INFO]: Setting up Certbot for SSL certificates."
+            apt-get install -y certbot python3-certbot-nginx
+            if [ ! -f /etc/letsencrypt/live/${{ secrets.DOMAIN }}/fullchain.pem ]; then
+              # Obtain and install SSL certificate for the domain
+              certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com
+            fi
+
 
             # Reload Nginx to apply certificates
+            echo "[INFO]: Reload Nginx to apply certificates."
             docker exec nginx nginx -s reload
 
             # Clean up unused Docker resources
-            echo "[INFO]: Cleaning up Docker resources..."
+            echo "[INFO]: Cleaning up Docker resources."
             docker system prune -f
