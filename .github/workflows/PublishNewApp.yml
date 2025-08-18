@@ -22,9 +22,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             # Update and install required packages
-            echo "Updating system and installing dependencies..."
+            echo "[INFO]: Updating system and installing dependencies..."
             apt-get update
-            apt-get install -y git docker.io docker-compose curl
+            apt-get install -y git docker.io docker-compose curl net-tools rclone
 
             # Ensure Docker service is running and enabled
             systemctl start docker
@@ -32,12 +32,12 @@ jobs:
             usermod -aG docker root  # Add root to docker group (optional for root)
 
             # Create deployment directory
-            echo "Setting up deployment directory..."
+            echo "[INFO]: Setting up deployment directory..."
             mkdir -p /root/app
             cd /root/app
 
             # Initialize Git and pull the repository
-            echo "Setting up Git and pulling code..."
+            echo "[INFO]: Setting up Git and pulling code..."
             if [ ! -d .git ]; then
               git init
               git remote add origin https://github.com/${{ github.repository }}.git
@@ -49,26 +49,40 @@ jobs:
             fi
 
 
+
+            # Clone DB file
+            echo "[INFO]: Setting up rclone config"
+            echo "${{ secrets.RCLONE_CONFIG }}" | base64 -d > ~/.config/rclone/rclone.conf
+            echo "[INFO]: Download db from gdrive"
+            rclone copy gdrive:/DB_Backups/Damianakos/sqlite.db /root/app/
+            if [ ! -f sqlite.db ]; then
+              echo "[INFO]: Error: sqlite.db not found!"
+              exit 1
+            fi
+
+
+
+
             # Verify docker-compose.yml exists
             if [ ! -f docker-compose.yml ]; then
-              echo "Error: docker-compose.yml not found!"
+              echo "[INFO]: Error: docker-compose.yml not found!"
               exit 1
             fi
             # Check and free port 80
             if netstat -tulnp | grep :80; then
-              echo "Port 80 is in use, attempting to free it..."
+              echo "[INFO]: Port 80 is in use, attempting to free it..."
               fuser -k 80/tcp || true
             fi
             # Check and free port 443
             if netstat -tulnp | grep :443; then
-              echo "Port 443 is in use, attempting to free it..."
+              echo "[INFO]: Port 443 is in use, attempting to free it..."
               fuser -k 443/tcp || true
             fi
 
             
 
             # Build and start Docker Compose
-            echo "Building and starting Docker Compose..."
+            echo "[INFO]: Building and starting Docker Compose..."
             docker-compose -f docker-compose.yml down
             docker-compose -f docker-compose.yml up -d --build
 
@@ -78,22 +92,22 @@ jobs:
 
             # Verify containers are running
             if ! docker ps | grep -q "api"; then
-              echo "Error: API container failed to start!"
+              echo "[INFO]: Error: API container failed to start!"
               exit 1
             fi
             if ! docker ps | grep -q "nginx"; then
-              echo "Error: Nginx container failed to start!"
+              echo "[INFO]: Error: Nginx container failed to start!"
               exit 1
             fi
             if ! docker ps | grep -q "nginx"; then
-              echo "Error: Nginx container failed to start!"
+              echo "[INFO]: Error: Nginx container failed to start!"
               docker logs nginx
               exit 1
             fi
             
 
             # Set up Certbot for SSL certificates (first-time setup)
-            echo "Setting up Certbot for SSL certificates..."
+            echo "[INFO]: Setting up Certbot for SSL certificates..."
             # Install Certbot with Nginx plugin
             apt-get install -y certbot python3-certbot-nginx
 
@@ -105,5 +119,5 @@ jobs:
             docker exec nginx nginx -s reload
 
             # Clean up unused Docker resources
-            echo "Cleaning up Docker resources..."
+            echo "[INFO]: Cleaning up Docker resources..."
             docker system prune -f
