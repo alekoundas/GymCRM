@@ -116,7 +116,7 @@ jobs:
             
 
             # Set up Certbot for SSL certificates (first-time setup)
-            echo "[INFO]: Setting up Certbot for SSL certificates.
+            echo "[INFO]: Setting up Certbot for SSL certificates."
             # Install Certbot with Nginx plugin
             apt-get install -y certbot python3-certbot-nginx
 
@@ -125,13 +125,14 @@ jobs:
             apt-get install -y certbot python3-certbot-nginx
             if [ ! -f /etc/letsencrypt/live/${{ secrets.DOMAIN }}/fullchain.pem ]; then
               # Obtain and install SSL certificate for the domain
-              certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com
+              #certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com
+              certbot --nginx -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --expand
             fi
 
 
             # Reload Nginx to apply certificates
             echo "[INFO]: Reload Nginx to apply certificates."
-            docker exec nginx nginx -s reload
+            docker exec Nginx nginx -s reload
 
             # Clean up unused Docker resources
             echo "[INFO]: Cleaning up Docker resources."
