@@ -10,7 +10,7 @@ services:
     ports:
       - "8080" # Internal HTTP port
     volumes:
-        - DatabaseFile:/app/sqlite.db # Instead of a bind mount, use a named volume to let Docker manage the file, ensuring the container user has write access.
+        - api-db-file:/app/sqlite.db # Instead of a bind mount, use a named volume to let Docker manage the file, ensuring the container user has write access.
     environment:
       - ASPNETCORE_URLS=http://*:8080
     networks:
@@ -80,3 +80,12 @@ services:
 networks:
   app-network:
       driver: bridge
+
+
+volumes:
+  api-db-file:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /root/app/sqlite.db
