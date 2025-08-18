@@ -26,6 +26,12 @@ jobs:
             apt-get update
             apt-get install -y git docker.io docker-compose curl net-tools rclone
 
+            # Create new user alek
+            echo "[INFO]: Create new user alek"
+            id alek || sudo adduser --gecos "" --disabled-password --uid 1000 alek
+
+
+
             # Ensure Docker service is running and enabled
             systemctl start docker
             systemctl enable docker
@@ -60,9 +66,9 @@ jobs:
               exit 1
             fi
 
-            echo "[INFO]: Give rw permitions on sqlite.db"
-            chmod 666 /root/app/sqlite.db
-
+            echo "[INFO]: Give rw for owner and group on sqlite.db"
+            chown alek:alek /root/app/sqlite.db
+            chmod 660 /root/app/sqlite.db  
 
 
 
