@@ -45,6 +45,7 @@ services:
     volumes:
       - /root/app/API/Nginx/nginx.conf:/etc/nginx/nginx.conf
       - /etc/letsencrypt:/etc/letsencrypt
+      - /root/app/API/Certbot/www:/var/www/certbot
     environment:
         - NGINX_HOST=alexps.gr
     depends_on:
