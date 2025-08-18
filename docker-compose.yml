@@ -9,9 +9,8 @@ services:
       dockerfile: API/Dockerfile
     ports:
       - "8080" # Internal HTTP port
-    # volumes:
-      # - /mnt/tvsercivecrmvolume:/app/VolumeDB
-      # - test1:/app/VolumeDB
+    volumes:
+        - /root/app/sqlite.db:/app/API/sqlite.db
     environment:
       - ASPNETCORE_URLS=http://*:8080
     networks:
