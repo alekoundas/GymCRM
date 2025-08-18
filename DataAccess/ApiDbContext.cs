@@ -29,7 +29,7 @@ namespace Business
 
 
             //optionsBuilder.UseSqlite("Data Source=TVServiceCRM.db");
-            optionsBuilder.UseSqlite("Data Source=" + Directory.GetCurrentDirectory() + "/DevDB.db");
+            optionsBuilder.UseSqlite("Data Source=" + Directory.GetCurrentDirectory() + "/sqlite.db");
 
             optionsBuilder.EnableSensitiveDataLogging();
             optionsBuilder.EnableDetailedErrors();

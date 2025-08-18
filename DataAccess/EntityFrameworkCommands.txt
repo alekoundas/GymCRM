@@ -47,4 +47,33 @@ SSH_PRIVATE_KEY: Your SSH private key.
 SSH_HOST: Your Droplet’s IP (e.g., your-droplet-ip).
 SSH_USER: Typically root for a new Droplet.
 DOMAIN: Your domain (e.g., your-domain.com).
+RCLONE_CONFIG: rclone configuration in base64 format.
 
+
+
+
+
+
+
+Rclone configure for Google Drive
+
+run command:
+rclone config
+
+Choose n for new remote.
+Name it gdrive.
+Select drive (Google Drive) as the storage type (type drive or select the number).
+Leave client_id and client_secret empty (press Enter).
+Choose 1 for full access scope.
+Leave root_folder_id and service_account_file empty.
+Choose n for no advanced config.
+Choose y to auto-configure (opens a browser to authenticate).
+Log in to your Google account, grant permissions, and copy the token if prompted.
+Choose y to confirm.
+
+Locate config file:
+C:\Users\psych\AppData\Roaming\rclone
+
+
+Encode rclone.conf as base64: (powershell)
+[Convert]::ToBase64String([System.IO.File]::ReadAllBytes("C:\Users\<YourUsername>\AppData\Roaming\rclone\rclone.conf"))
