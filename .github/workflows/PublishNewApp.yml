@@ -21,15 +21,12 @@ jobs:
           username: ${{ secrets.SSH_USER }}  
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+
+            
             # Update and install required packages
             echo "[INFO]: Updating system and installing dependencies..."
             apt-get update
             apt-get install -y git docker.io docker-compose curl net-tools rclone
-
-            # Create new user alek
-            #echo "[INFO]: Create new user alek"
-            #id alek || sudo adduser --gecos "" --disabled-password --uid 1000 alek
-
 
 
             # Ensure Docker service is running and enabled
@@ -37,10 +34,12 @@ jobs:
             systemctl enable docker
             usermod -aG docker root  # Add root to docker group (optional for root)
 
+
             # Create deployment directory
             echo "[INFO]: Setting up deployment directory..."
             mkdir -p /root/app
             cd /root/app
+
 
             # Initialize Git and pull the repository
             echo "[INFO]: Setting up Git and pulling code..."
@@ -66,18 +65,20 @@ jobs:
               exit 1
             fi
 
-            echo "[INFO]: Give rw for owner and group on sqlite.db"
-            chown alek:alek /root/app/sqlite.db
-            chmod 660 /root/app/sqlite.db  
 
 
-
-
-
-
-
-
-
+            echo "[INFO]: Setting up Certbot for SSL certificates."
+            apt-get install -y certbot python3-certbot-nginx
+            echo "[INFO]: Obtaining SSL certificate..."
+            if [ ! -f /etc/letsencrypt/live/${{ secrets.DOMAIN }}/fullchain.pem ]; then
+              certbot certonly --standalone -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --http-01-port=80 
+              || 
+              {
+                echo "[ERROR]: Certbot failed to obtain certificate!"
+                cat /var/log/letsencrypt/letsencrypt.log
+                exit 1
+              }
+            fi
 
 
 
@@ -130,13 +131,13 @@ jobs:
             
             # Certificates
             # Set up Certbot for SSL certificates (only if certificates don't exist)
-            echo "[INFO]: Setting up Certbot for SSL certificates."
-            apt-get install -y certbot python3-certbot-nginx
-            if [ ! -f /etc/letsencrypt/live/${{ secrets.DOMAIN }}/fullchain.pem ]; then
-              # Obtain and install SSL certificate for the domains
-              echo "[INFO]: Obtain and install SSL certificate for the domains."
-              certbot --nginx -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --expand
-            fi
+            #echo "[INFO]: Setting up Certbot for SSL certificates."
+            #apt-get install -y certbot python3-certbot-nginx
+            #if [ ! -f /etc/letsencrypt/live/${{ secrets.DOMAIN }}/fullchain.pem ]; then
+            #  # Obtain and install SSL certificate for the domains
+            #  echo "[INFO]: Obtain and install SSL certificate for the domains."
+            #  certbot --nginx -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --expand
+            #fi
 
 
 
