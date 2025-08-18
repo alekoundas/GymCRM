@@ -22,4 +22,4 @@ RUN npm install -g serve
 EXPOSE 8080
 
 # Serve the build on port 8080
-CMD ["serve", "-s", "build", "-l", "8080"]
+CMD ["serve", "-s", "dist", "-l", "8080"]
