@@ -2,7 +2,7 @@ version: '3.8'
 services:
 
   api:
-    container_name: api
+    container_name: Api
     image: ${DOCKER_REGISTRY-}api
     build:
       context: .
@@ -10,7 +10,7 @@ services:
     ports:
       - "8080" # Internal HTTP port
     volumes:
-        - /root/app/sqlite.db:/app/sqlite.db
+        - DatabaseFile:/app/sqlite.db # Instead of a bind mount, use a named volume to let Docker manage the file, ensuring the container user has write access.
     environment:
       - ASPNETCORE_URLS=http://*:8080
     networks:
@@ -18,7 +18,7 @@ services:
 
 
   client:
-    container_name: client
+    container_name: Client
     build:
       context: .
       dockerfile: Client/Dockerfile
@@ -37,7 +37,7 @@ services:
 
 
   nginx:
-    container_name: nginx
+    container_name: Nginx
     image: nginx:stable-alpine 
     ports:
         - "80:80"    # External HTTP
