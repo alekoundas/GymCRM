@@ -72,6 +72,29 @@ jobs:
 
 
 
+
+            # Certificates
+            # Set up Certbot for SSL certificates (only if certificates don't exist)
+            echo "[INFO]: Setting up Certbot for SSL certificates."
+            apt-get install -y certbot python3-certbot-nginx
+            if [ ! -f /etc/letsencrypt/live/${{ secrets.DOMAIN }}/fullchain.pem ]; then
+              # Obtain and install SSL certificate for the domains
+              echo "[INFO]: Obtain and install SSL certificate for the domains."
+              certbot --nginx -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --expand
+            fi
+
+
+
+
+
+
+
+
+
+
+
+
+
             # Verify docker-compose.yml exists
             if [ ! -f docker-compose.yml ]; then
               echo "[INFO]: Error: docker-compose.yml not found!"
@@ -114,21 +137,6 @@ jobs:
               exit 1
             fi
             
-
-            # Set up Certbot for SSL certificates (first-time setup)
-            echo "[INFO]: Setting up Certbot for SSL certificates."
-            # Install Certbot with Nginx plugin
-            apt-get install -y certbot python3-certbot-nginx
-
-            # Set up Certbot for SSL certificates (only if certificates don't exist)
-            echo "[INFO]: Setting up Certbot for SSL certificates."
-            apt-get install -y certbot python3-certbot-nginx
-            if [ ! -f /etc/letsencrypt/live/${{ secrets.DOMAIN }}/fullchain.pem ]; then
-              # Obtain and install SSL certificate for the domain
-              #certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com
-              certbot --nginx -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --expand
-            fi
-
 
             # Reload Nginx to apply certificates
             echo "[INFO]: Reload Nginx to apply certificates."
