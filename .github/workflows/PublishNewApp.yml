@@ -116,7 +116,7 @@ jobs:
             
 
             # Set up Certbot for SSL certificates (first-time setup)
-            echo "[INFO]: Setting up Certbot for SSL certificates.
+            echo "[INFO]: Setting up Certbot for SSL certificates."
             # Install Certbot with Nginx plugin
             apt-get install -y certbot python3-certbot-nginx
 
