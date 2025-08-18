@@ -10,7 +10,7 @@ services:
     ports:
       - "8080" # Internal HTTP port
     volumes:
-        - /root/app/sqlite.db:/app/API/sqlite.db
+        - /root/app/sqlite.db:/app/sqlite.db
     environment:
       - ASPNETCORE_URLS=http://*:8080
     networks:
