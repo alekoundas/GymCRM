@@ -54,7 +54,7 @@ jobs:
             echo "[INFO]: Setting up rclone config"
             echo "${{ secrets.RCLONE_CONFIG }}" | base64 -d > ~/.config/rclone/rclone.conf
             echo "[INFO]: Download db from gdrive"
-            rclone copy gdrive:/DB_Backups/Damianakos/sqlite.db /root/app/API/sqlite.db
+            rclone copy gdrive:/DB_Backups/Damianakos/sqlite.db /root/app/API/
             if [ ! -f API/sqlite.db ]; then
               echo "[INFO]: Error: sqlite.db not found!"
               exit 1
