@@ -65,6 +65,7 @@ services:
 
 
   certbot:
+    container_name: Certbot
     image: certbot/certbot
     volumes: 
       - /etc/letsencrypt:/etc/letsencrypt/:rw
