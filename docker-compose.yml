@@ -68,7 +68,8 @@ services:
     image: certbot/certbot
     volumes: 
       - /etc/letsencrypt:/etc/letsencrypt/:rw
-      - /root/app/API/Certbot/www:/usr/share/nginx/html/:rw
+      # - /root/app/API/Certbot/www:/usr/share/nginx/html/:rw
+      - /root/app/API/Certbot/www:/var/www/certbot/:rw
 
                 # Runs Certbot in a loop to check for certificate renewals every 12 hours.
                 # Ensures the container exits cleanly when stopped by Docker (via the trap).
