@@ -110,35 +110,28 @@ jobs:
 
 
             # Verify containers are running
-            if ! docker ps | grep -q "api"; then
+            if ! docker ps | grep -q "Api"; then
               echo "[INFO]: Error: API container failed to start!"
+              docker logs Api
               exit 1
             fi
-            if ! docker ps | grep -q "nginx"; then
+            if ! docker ps | grep -q "Client"; then
               echo "[INFO]: Error: Nginx container failed to start!"
+              docker logs Client
               exit 1
             fi
-            if ! docker ps | grep -q "nginx"; then
+            if ! docker ps | grep -q "Nginx"; then
               echo "[INFO]: Error: Nginx container failed to start!"
-              docker logs nginx
+              docker logs Nginx
               exit 1
             fi
 
 
 
+          
             
-            # Certificates
-            # Set up Certbot for SSL certificates (only if certificates don't exist)
             #echo "[INFO]: Setting up Certbot for SSL certificates."
-            #apt-get install -y certbot python3-certbot-nginx
-            #if [ ! -f /etc/letsencrypt/live/${{ secrets.DOMAIN }}/fullchain.pem ]; then
-            #  # Obtain and install SSL certificate for the domains
-            #  echo "[INFO]: Obtain and install SSL certificate for the domains."
-            #fi
-
-            
-            echo "[INFO]: Setting up Certbot for SSL certificates."
-            certbot --nginx -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --expand
+            #certbot --nginx -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --expand
 
 
 
