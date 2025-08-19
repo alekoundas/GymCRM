@@ -21,15 +21,12 @@ jobs:
           username: ${{ secrets.SSH_USER }}  
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+
+            
             # Update and install required packages
             echo "[INFO]: Updating system and installing dependencies..."
             apt-get update
             apt-get install -y git docker.io docker-compose curl net-tools rclone
-
-            # Create new user alek
-            #echo "[INFO]: Create new user alek"
-            #id alek || sudo adduser --gecos "" --disabled-password --uid 1000 alek
-
 
 
             # Ensure Docker service is running and enabled
@@ -37,10 +34,12 @@ jobs:
             systemctl enable docker
             usermod -aG docker root  # Add root to docker group (optional for root)
 
+
             # Create deployment directory
             echo "[INFO]: Setting up deployment directory..."
             mkdir -p /root/app
             cd /root/app
+
 
             # Initialize Git and pull the repository
             echo "[INFO]: Setting up Git and pulling code..."
@@ -54,22 +53,9 @@ jobs:
               git reset --hard origin/master
             fi
 
-
-
-            # Clone DB file
-            echo "[INFO]: Setting up rclone config"
-            echo "${{ secrets.RCLONE_CONFIG }}" | base64 -d > ~/.config/rclone/rclone.conf
-            echo "[INFO]: Download db from gdrive"
-            rclone copy gdrive:/DB_Backups/Damianakos/sqlite.db /root/app/
-            if [ ! -f sqlite.db ]; then
-              echo "[INFO]: Error: sqlite.db not found!"
-              exit 1
-            fi
-
-            echo "[INFO]: Give rw for owner and group on sqlite.db"
-            chown alek:alek /root/app/sqlite.db
-            chmod 660 /root/app/sqlite.db  
-
+            # Close already running containers
+            echo "[INFO]: Close already running containers"
+            docker-compose -f docker-compose.yml down
 
 
             # Verify docker-compose.yml exists
@@ -88,7 +74,31 @@ jobs:
               fuser -k 443/tcp || true
             fi
 
-            
+
+
+            # Clone DB file
+            echo "[INFO]: Setting up rclone config"
+            echo "${{ secrets.RCLONE_CONFIG }}" | base64 -d > ~/.config/rclone/rclone.conf
+            echo "[INFO]: Download db from gdrive"
+            rclone copy gdrive:/DB_Backups/Damianakos/sqlite.db /root/app/
+            if [ ! -f sqlite.db ]; then
+              echo "[INFO]: Error: sqlite.db not found!"
+              exit 1
+            fi
+
+
+
+            echo "[INFO]: Setting up Certbot for SSL certificates."
+            apt-get install -y certbot python3-certbot-nginx
+            echo "[INFO]: Obtaining SSL certificate..."
+            if [ ! -f /etc/letsencrypt/live/${{ secrets.DOMAIN }}/fullchain.pem ]; then
+              certbot certonly --standalone -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --http-01-port=80 
+            fi
+
+
+
+
+           
 
             # Build and start Docker Compose
             echo "[INFO]: Building and starting Docker Compose."
@@ -100,34 +110,30 @@ jobs:
 
 
             # Verify containers are running
-            if ! docker ps | grep -q "api"; then
+            if ! docker ps | grep -q "Api"; then
               echo "[INFO]: Error: API container failed to start!"
+              docker logs Api
               exit 1
             fi
-            if ! docker ps | grep -q "nginx"; then
+            if ! docker ps | grep -q "Client"; then
               echo "[INFO]: Error: Nginx container failed to start!"
+              docker logs Client
               exit 1
             fi
-            if ! docker ps | grep -q "nginx"; then
+            if ! docker ps | grep -q "Nginx"; then
               echo "[INFO]: Error: Nginx container failed to start!"
-              docker logs nginx
+              docker logs Nginx
               exit 1
             fi
+
+
+
+          
             
+            #echo "[INFO]: Setting up Certbot for SSL certificates."
+            #certbot --nginx -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --expand
 
-            # Set up Certbot for SSL certificates (first-time setup)
-            echo "[INFO]: Setting up Certbot for SSL certificates."
-            # Install Certbot with Nginx plugin
-            apt-get install -y certbot python3-certbot-nginx
 
-            # Set up Certbot for SSL certificates (only if certificates don't exist)
-            echo "[INFO]: Setting up Certbot for SSL certificates."
-            apt-get install -y certbot python3-certbot-nginx
-            if [ ! -f /etc/letsencrypt/live/${{ secrets.DOMAIN }}/fullchain.pem ]; then
-              # Obtain and install SSL certificate for the domain
-              #certbot --nginx -d ${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com
-              certbot --nginx -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --expand
-            fi
 
 
             # Reload Nginx to apply certificates
