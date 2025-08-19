@@ -133,7 +133,9 @@ jobs:
             #echo "[INFO]: Setting up Certbot for SSL certificates."
             #certbot --nginx -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --expand
 
-
+            # Verify certificate covers both domains
+            echo "[INFO]: Verifying certificate..."
+            certbot certificates | grep -E "Domains|Expiry"
 
 
             # Reload Nginx to apply certificates
