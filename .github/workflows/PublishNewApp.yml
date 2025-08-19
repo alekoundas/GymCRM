@@ -53,6 +53,27 @@ jobs:
               git reset --hard origin/master
             fi
 
+            # Close already running containers
+            echo "[INFO]: Close already running containers"
+            docker-compose -f docker-compose.yml down
+
+
+            # Verify docker-compose.yml exists
+            if [ ! -f docker-compose.yml ]; then
+              echo "[INFO]: Error: docker-compose.yml not found!"
+              exit 1
+            fi
+            # Check and free port 80
+            if netstat -tulnp | grep :80; then
+              echo "[INFO]: Port 80 is in use, attempting to free it."
+              fuser -k 80/tcp || true
+            fi
+            # Check and free port 443
+            if netstat -tulnp | grep :443; then
+              echo "[INFO]: Port 443 is in use, attempting to free it."
+              fuser -k 443/tcp || true
+            fi
+
 
 
             # Clone DB file
@@ -77,24 +98,7 @@ jobs:
 
 
 
-
-            # Verify docker-compose.yml exists
-            if [ ! -f docker-compose.yml ]; then
-              echo "[INFO]: Error: docker-compose.yml not found!"
-              exit 1
-            fi
-            # Check and free port 80
-            if netstat -tulnp | grep :80; then
-              echo "[INFO]: Port 80 is in use, attempting to free it."
-              fuser -k 80/tcp || true
-            fi
-            # Check and free port 443
-            if netstat -tulnp | grep :443; then
-              echo "[INFO]: Port 443 is in use, attempting to free it."
-              fuser -k 443/tcp || true
-            fi
-
-            
+           
 
             # Build and start Docker Compose
             echo "[INFO]: Building and starting Docker Compose."
@@ -130,8 +134,11 @@ jobs:
             #if [ ! -f /etc/letsencrypt/live/${{ secrets.DOMAIN }}/fullchain.pem ]; then
             #  # Obtain and install SSL certificate for the domains
             #  echo "[INFO]: Obtain and install SSL certificate for the domains."
-            #  certbot --nginx -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --expand
             #fi
+
+            
+            echo "[INFO]: Setting up Certbot for SSL certificates."
+            certbot --nginx -d ${{ secrets.DOMAIN }} -d www.${{ secrets.DOMAIN }} --non-interactive --agree-tos -m psychoson_alex3@hotmail.com --expand
 
 
 
