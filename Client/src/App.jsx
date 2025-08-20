@@ -7,7 +7,6 @@ import { Toast } from "primereact/toast";
 
 import NavTop from "./components/navbar-top/NavTop.tsx";
 import Home from "./pages/home/Home.tsx";
-import ScrollVideo from "./pages/home/ScrollVideo.tsx";
 import Customers from "./pages/customer/Customers.tsx";
 import CustomerForm from "./pages/customer/CustomerForm.tsx";
 import Login from "./pages/user/Login.tsx";
@@ -64,11 +63,6 @@ export default function App() {
               <Route
                 path="/appointment"
                 element={<Appointment />}
-              />
-
-              <Route
-                path="/scrollvideo"
-                element={<ScrollVideo />}
               />
 
               {/* Administrator */}
