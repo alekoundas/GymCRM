@@ -33,8 +33,8 @@ const HomePage: React.FC = () => {
       let tl = gsap.timeline({
         scrollTrigger: {
           trigger: "video",
-          start: "top top",
-          // end: "bottom center",
+          start: "center 60%",
+          // end: "bottom top",
           end: "+=400%", // Extend scrub duration for smooth pacing (adjust based on video length)
           scrub: 1,
           pin: true,
