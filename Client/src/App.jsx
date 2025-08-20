@@ -6,18 +6,18 @@ import { useEffect, useRef } from "react";
 import { Toast } from "primereact/toast";
 
 import NavTop from "./components/navbar-top/NavTop.tsx";
-import NavLeft from "./components/navbar-left/NavLeft.tsx";
 import Home from "./pages/home/Home.tsx";
+import ScrollVideo from "./pages/home/ScrollVideo.tsx";
 import Customers from "./pages/customer/Customers.tsx";
 import CustomerForm from "./pages/customer/CustomerForm.tsx";
-import Tickets from "./pages/ticket/Tickets.tsx";
 import Login from "./pages/user/Login.tsx";
-import ApiService from "./services/ApiService.tsx";
 import Roles from "./pages/role/Roles.tsx";
 import Users from "./pages/user/Users.tsx";
 import Makers from "./pages/maker/Makers.tsx";
 import MakerModels from "./pages/maker-model/MakerModels.tsx";
 import Register from "./pages/user/Register.tsx";
+import Administrator from "./pages/administrator/administrator.tsx";
+import Appointment from "./pages/appointment/Appointment.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -47,10 +47,10 @@ export default function App() {
         <div className="col-12 ">
           <NavTop />
         </div>
-        <div className="col-2 ">
+        {/* <div className="col-2 ">
           <NavLeft />
-        </div>
-        <div className="col-10 ">
+        </div> */}
+        <div className="col-12">
           <ScrollPanel
             style={{ height: "100%", width: "100%" }}
             className="custombar2"
@@ -62,27 +62,67 @@ export default function App() {
               />
 
               <Route
-                path="/customers"
-                element={<Customers />}
-              />
-              <Route
-                path="/customers/add"
-                element={<CustomerForm />}
-              />
-              <Route
-                path="/customers/:id/edit"
-                element={<CustomerForm />}
-              />
-              <Route
-                path="/customers/:id/view"
-                element={<CustomerForm />}
+                path="/appointment"
+                element={<Appointment />}
               />
 
               <Route
-                path="/tickets"
-                element={<Tickets />}
+                path="/scrollvideo"
+                element={<ScrollVideo />}
               />
 
+              {/* Administrator */}
+              <Route
+                path="/administrator"
+                element={<Administrator />}
+              >
+                <Route
+                  path="customers"
+                  element={<Customers />}
+                />
+                <Route
+                  path="customers/add"
+                  element={<CustomerForm />}
+                />
+                <Route
+                  path="customers/:id/edit"
+                  element={<CustomerForm />}
+                />
+                <Route
+                  path="customers/:id/view"
+                  element={<CustomerForm />}
+                />
+
+                {/* Users */}
+                <Route
+                  path="users/login"
+                  element={<Login />}
+                />
+                <Route
+                  path="users/register"
+                  element={<Register />}
+                />
+                <Route
+                  path="users"
+                  element={<Users />}
+                />
+                <Route
+                  path="roles"
+                  element={<Roles />}
+                />
+
+                {/* Lookups */}
+                <Route
+                  path="makers"
+                  element={<Makers />}
+                />
+                <Route
+                  path="makermodels"
+                  element={<MakerModels />}
+                />
+              </Route>
+
+              {/* Users */}
               <Route
                 path="/users/login"
                 element={<Login />}
@@ -90,25 +130,6 @@ export default function App() {
               <Route
                 path="/users/register"
                 element={<Register />}
-              />
-              <Route
-                path="/users"
-                element={<Users />}
-              />
-
-              <Route
-                path="/roles"
-                element={<Roles />}
-              />
-
-              <Route
-                path="/makers"
-                element={<Makers />}
-              />
-
-              <Route
-                path="/makermodels"
-                element={<MakerModels />}
               />
             </Routes>
           </ScrollPanel>

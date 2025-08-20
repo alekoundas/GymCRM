@@ -16,28 +16,28 @@ export default function NavLeft() {
           label: "Customers",
           icon: "pi pi-user",
           command: () => {
-            navigate("/customers");
+            navigate("/administrator/customers");
           },
         },
-        {
-          label: "Tickets",
-          icon: "pi pi-ticket",
-          command: () => {
-            navigate("/tickets");
-          },
-        },
+        // {
+        //   label: "Tickets",
+        //   icon: "pi pi-ticket",
+        //   command: () => {
+        //     navigate("/administrator/tickets");
+        //   },
+        // },
         {
           label: "Users",
           icon: "pi pi-users",
           command: () => {
-            navigate("/users");
+            navigate("/administrator/users");
           },
         },
         {
           label: "Roles",
           icon: "pi pi-key",
           command: () => {
-            navigate("/roles");
+            navigate("/administrator/roles");
           },
         },
       ],
@@ -45,20 +45,20 @@ export default function NavLeft() {
     {
       label: "Lookups",
       items: [
-        {
-          label: "Makers",
-          icon: "pi pi-database",
-          command: () => {
-            navigate("/makers");
-          },
-        },
-        {
-          label: "Maker Models",
-          icon: "pi pi-database",
-          command: () => {
-            navigate("/makermodels");
-          },
-        },
+        // {
+        //   label: "Makers",
+        //   icon: "pi pi-database",
+        //   command: () => {
+        //     navigate("/administrator/makers");
+        //   },
+        // },
+        // {
+        //   label: "Maker Models",
+        //   icon: "pi pi-database",
+        //   command: () => {
+        //     navigate("/administrator/makermodels");
+        //   },
+        // },
       ],
     },
   ];
