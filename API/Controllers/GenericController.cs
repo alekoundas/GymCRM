@@ -27,7 +27,7 @@ namespace API.Controllers
                 return Unauthorized();
 
 
-            TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FindByIdAsync(id);
+            TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FindAsync(id);
             if (entity == null)
             {
                 string className = typeof(TEntity).Name;
@@ -45,14 +45,14 @@ namespace API.Controllers
                 return Unauthorized();
 
 
-            TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FindByIdAsync(id);
+            TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FindAsync(id);
             if (entity == null)
             {
                 string className = typeof(TEntity).Name;
                 return new ApiResponse<TEntity>().SetErrorResponse(className, $"Requested {className} not found!");
             }
 
-             await _dataService.GetGenericRepository<TEntity>().SaveChangesAsync();
+             //await _dataService.GetGenericRepository<TEntity>().SaveChangesAsync();
             return new ApiResponse<TEntity>().SetSuccessResponse(entity);
         }
 

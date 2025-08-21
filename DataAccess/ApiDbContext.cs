@@ -4,14 +4,20 @@ using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
-namespace Business
+namespace DataAccess
 {
-    public class ApiDbContext : IdentityDbContext<ApplicationUser>, IDataProtectionKeyContext
+    public class ApiDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>, IDataProtectionKeyContext
     {
-        public ApiDbContext() { }
-        public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
+        private readonly IConfiguration _configuration;
+        private readonly ApiDbContextInitialiser _apiDbContextInitialiser;
+
+        public ApiDbContext(DbContextOptions<ApiDbContext> options, IConfiguration configuration, ApiDbContextInitialiser apiDbContextInitialiser)
+        : base(options)
         {
+            _configuration = configuration;
+            _apiDbContextInitialiser = apiDbContextInitialiser;
         }
 
         public DbSet<Customer> Customers { get; set; }
@@ -22,14 +28,9 @@ namespace Business
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            ///Enable for ef update.
-            //optionsBuilder.UseSqlServer("Server=localhost, 1433;Initial Catalog=TVServiceDB;Persist Security Info=False;User ID=sa;Password=P@ssw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
+            //optionsBuilder.UseSqlite("Data Source=" + Directory.GetCurrentDirectory() + "/sqlite.db");
+            optionsBuilder.UseSqlite(_configuration.GetConnectionString("DefaultConnection"));
 
-            //optionsBuilder.UseSqlServer("Server=host.docker.internal, 1433;Initial Catalog=TVServiceDB;Persist Security Info=False;User ID=sa;Password=P@ssw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
-
-
-            //optionsBuilder.UseSqlite("Data Source=TVServiceCRM.db");
-            optionsBuilder.UseSqlite("Data Source=" + Directory.GetCurrentDirectory() + "/sqlite.db");
 
             optionsBuilder.EnableSensitiveDataLogging();
             optionsBuilder.EnableDetailedErrors();
@@ -41,6 +42,17 @@ namespace Business
 
             builder.ApplyConfiguration(new CustomerConfiguration());
             builder.ApplyConfiguration(new ContactInformationConfiguration());
+            builder.ApplyConfiguration(new ApplicationUserConfiguration());
+        }
+
+        public void RunMigrations()
+        {
+            this.Database.Migrate();
+        }
+
+        public async Task TrySeedInitialData()
+        {
+            await _apiDbContextInitialiser.SeedAsync();
         }
     }
 }

@@ -14,7 +14,6 @@
         }
         public ApiResponse<TEntity> SetSuccessResponse(string key, string value)
         {
-            IsSucceed = false;
             Messages.Add(key, [value]);
             return this;
         }
@@ -36,6 +35,9 @@
             Messages.Add(key, value);
             return this;
         }
+
+
+
         public ApiResponse<TEntity> SetErrorResponse(string key, string value)
         {
             IsSucceed = false;
