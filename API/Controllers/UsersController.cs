@@ -3,10 +3,12 @@ using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.Identity;
+using Core.Enums;
 using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 
 namespace API.Controllers
 {
@@ -86,27 +88,64 @@ namespace API.Controllers
         [HttpPost("GetDataTable")]
         public async Task<ApiResponse<DataTableDto<UserDto>>> GetDataTable([FromBody] DataTableDto<UserDto> dataTable)
         {
+            List<Expression<Func<User, bool>>>? filterQuery = new List<Expression<Func<User, bool>>>();
+
+            var query = _dataService.Users;
+
+            // Handle Sorting of DataTable.
+            if (dataTable.MultiSortMeta?.Count() > 0)
+            {
+                // Create the first OrderBy().
+                DataTableSortDto? dataTableSort = dataTable.MultiSortMeta.First();
+                if (dataTableSort.Order > 0)
+                    query.OrderBy(dataTableSort.Field, OrderDirectionEnum.ASCENDING);
+                else if (dataTableSort.Order < 0)
+                    query.OrderBy(dataTableSort.Field, OrderDirectionEnum.DESCENDING);
+
+                // Create the rest OrderBy methods as ThenBy() if any.
+                foreach (var sortInfo in dataTable.MultiSortMeta.Skip(1))
+                {
+                    if (dataTableSort.Order > 0)
+                        query.ThenBy(sortInfo.Field, OrderDirectionEnum.ASCENDING);
+                    else if (dataTableSort.Order < 0)
+                        query.ThenBy(sortInfo.Field, OrderDirectionEnum.DESCENDING);
+                }
+            }
+
+
+            // Handle Filtering of DataTable.
+            if (dataTable.Filters?.FirstName?.Value != null && dataTable.Filters?.FirstName.Value.Length > 0)
+                filterQuery.Add(x => x.FirstName.Contains(dataTable.Filters.FirstName.Value));
+
+            if (dataTable.Filters?.LastName?.Value != null && dataTable.Filters?.LastName.Value.Length > 0)
+                filterQuery.Add(x => x.LastName.Contains(dataTable.Filters.LastName.Value));
+
+
+            // Handle Includes.
+            //query.inclure.Add(x => x.Include(y => y.ContactInformations));
+
+
+            // Handle pagination.
+            int skip = (dataTable.Page - 1) * dataTable.Rows;
+            int take = dataTable.Rows;
+
+            query.AddPagging(skip, take);
+
 
             // Retrieve Data.
-            List<User> applicationUsers = await _dataService.Users.ToListAsync();
-            applicationUsers.ForEach(async x =>
-            {
-                List<string> rolelist = (await _userManager.GetRolesAsync(x)).ToList();
+            List<User> result = await query.ToListAsync();
+            List<UserDto> customerDto = _mapper.Map<List<UserDto>>(result);
 
-                if (rolelist.Count > 0)
-                {
-                    string userRole = (await _userManager.GetRolesAsync(x)).First();
-                    IdentityRole<Guid>? role = await _roleManager.FindByNameAsync(userRole);
-                    //if (role != null)
-                    //    x.RoleId = role.Id;
-                }
-            });
-            List<UserDto> userDto = _mapper.Map<List<UserDto>>(applicationUsers);
+            //customerDto.SelectMany(x => x.ContactInformations).ToList().ForEach(x => x.Customer = null);
 
+            //TODDO add filter
+            int rows = await _dataService.Users.CountAsync();
 
-            dataTable.Data = userDto;
-            dataTable.PageCount = 0;
+            dataTable.Data = customerDto;
+            dataTable.PageCount = rows;
+
             return new ApiResponse<DataTableDto<UserDto>>().SetSuccessResponse(dataTable);
+
         }
 
         // POST: api/Users/Register
@@ -133,7 +172,7 @@ namespace API.Controllers
         {
 
             User? user = await _userManager.FindByEmailAsync(request.UserNameOrEmail);
-            if(user == null)
+            if (user == null)
                 user = await _userManager.FindByNameAsync(request.UserNameOrEmail);
 
             if (user == null)
@@ -156,7 +195,7 @@ namespace API.Controllers
         {
             return await _userService.RefreshToken(request);
         }
-         
+
 
         // POST: api/Users/Logout
         [HttpPost("Logout")]
