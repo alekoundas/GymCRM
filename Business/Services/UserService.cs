@@ -43,7 +43,7 @@ namespace Business.Services
 
         public async Task<string?> SignOutUser(User user)
         {
-            IdentityResult result =  await _userManager.UpdateSecurityStampAsync(user);
+            IdentityResult result = await _userManager.UpdateSecurityStampAsync(user);
 
             if (!result.Succeeded)
                 return "Logout unsuccessful!";
@@ -64,7 +64,8 @@ namespace Business.Services
         public async Task AssignSingleRoleAsync(User user, string roleName)
         {
             List<string> userRoles = (await _userManager.GetRolesAsync(user)).ToList();
-            await _userManager.RemoveFromRolesAsync(user, userRoles);
+            if (userRoles.Count() > 0)
+                await _userManager.RemoveFromRolesAsync(user, userRoles);
 
 
             // create role if it does not exist

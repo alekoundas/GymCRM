@@ -8,6 +8,7 @@ using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace API.Controllers
@@ -58,11 +59,11 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<ApiResponse<bool>> Update(Guid id, UserUpdateRequestDto request)
         {
-            if (id.ToString() != request.Id)
+            if (id != request.Id)
                 return new ApiResponse<bool>().SetErrorResponse("errors", "ID mismatch");
 
 
-            User? user = await _dataService.Users.FirstOrDefaultAsync(x => x.Id.ToString() == request.Id);
+            User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == request.Id);
             if (user == null)
                 return new ApiResponse<bool>().SetErrorResponse("errors", "User not found");
 
@@ -121,9 +122,6 @@ namespace API.Controllers
                 filterQuery.Add(x => x.LastName.Contains(dataTable.Filters.LastName.Value));
 
 
-            // Handle Includes.
-            //query.inclure.Add(x => x.Include(y => y.ContactInformations));
-
 
             // Handle pagination.
             int skip = (dataTable.Page - 1) * dataTable.Rows;
@@ -134,14 +132,24 @@ namespace API.Controllers
 
             // Retrieve Data.
             List<User> result = await query.ToListAsync();
-            List<UserDto> customerDto = _mapper.Map<List<UserDto>>(result);
+            List<UserDto> resultDto = _mapper.Map<List<UserDto>>(result);
 
-            //customerDto.SelectMany(x => x.ContactInformations).ToList().ForEach(x => x.Customer = null);
+
+            // Assign Id to RoleId
+            for (int i = 0; i < result.Count(); i++)
+            {
+                string? roleName = (await _userManager.GetRolesAsync(result[i])).FirstOrDefault();
+                IdentityRole<Guid>? role = _roleManager.Roles.FirstOrDefault(x => x.Name == roleName);
+                if (role != null)
+                    resultDto[i].RoleId = role.Id.ToString();
+            }
+
+
 
             //TODDO add filter
             int rows = await _dataService.Users.CountAsync();
 
-            dataTable.Data = customerDto;
+            dataTable.Data = resultDto;
             dataTable.PageCount = rows;
 
             return new ApiResponse<DataTableDto<UserDto>>().SetSuccessResponse(dataTable);
