@@ -65,7 +65,7 @@ builder.Services.AddSwaggerGen(config =>
 // DB context and factory.
 builder.Services.AddDbContext<ApiDbContext>();
 builder.Services.AddTransient<IDbContextFactory<ApiDbContext>, ApiDbContextFactory>();
-builder.Services.AddSingleton<ApiDbContextInitialiser>();
+builder.Services.AddScoped<ApiDbContextInitialiser>();
 
 // AutoMapper.
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -79,7 +79,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddSingleton(appSettings); // appsettings.json
-builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 
 
@@ -88,12 +88,15 @@ builder.Services.AddDataProtection().PersistKeysToDbContext<ApiDbContext>();
 
 
 // Add Identity.
-builder.Services.AddIdentityCore<User>()
-               .AddRoles<IdentityRole<Guid>>()
-               .AddRoleManager<RoleManager<IdentityRole<Guid>>>()
-               .AddSignInManager()
-               .AddEntityFrameworkStores<ApiDbContext>()
-               .AddTokenProvider<DataProtectorTokenProvider<User>>("REFRESHTOKENPROVIDER");
+builder.Services.AddIdentityCore<User>(options =>
+    {
+        options.User.RequireUniqueEmail = true;
+    })
+    .AddRoles<IdentityRole<Guid>>()
+    .AddRoleManager<RoleManager<IdentityRole<Guid>>>()
+    .AddSignInManager()
+    .AddEntityFrameworkStores<ApiDbContext>()
+    .AddTokenProvider<DataProtectorTokenProvider<User>>("REFRESHTOKENPROVIDER");
 
 
 
@@ -213,11 +216,20 @@ app.MapFallbackToFile("/index.html");
 
 
 // Run migrations and seed initial data.
-var apiDbContext = app.Services.GetService<ApiDbContext>();
-if (apiDbContext != null)
+//var apiDbContext = app.Services.GetService<ApiDbContext>();
+//if (apiDbContext != null)
+//{
+//    apiDbContext.RunMigrations();
+//    await apiDbContext.TrySeedInitialData();
+//}
+
+
+// Run migrations and seed data
+using (var scope = app.Services.CreateScope())
 {
-    apiDbContext.RunMigrations();
-    await apiDbContext.TrySeedInitialData();
+    var initialiser = scope.ServiceProvider.GetRequiredService<ApiDbContextInitialiser>();
+    await initialiser.RunMigrationsAsync();
+    await initialiser.SeedAsync();
 }
 
 if (app.Environment.IsDevelopment())

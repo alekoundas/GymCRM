@@ -4,9 +4,11 @@ import { useState } from "react";
 import ApiService from "../../services/ApiService";
 import { UserLoginRequestDto } from "../../model/UserLoginRequestDto";
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const [userLoginDto, setUserLoginDto] = useState(new UserLoginRequestDto());
   const handleChange = (event: React.ChangeEvent<any>) => {
@@ -18,7 +20,11 @@ export default function Login() {
   };
 
   const onLogin = () => {
-    ApiService.login(userLoginDto, login);
+    ApiService.login(userLoginDto, login).then((isSuccessful) => {
+      if (isSuccessful) {
+        navigate("/");
+      }
+    });
   };
   return (
     <>
@@ -44,18 +50,18 @@ export default function Login() {
 
           <div>
             <label
-              htmlFor="email"
+              htmlFor="userNameOrEmail"
               className="block text-900 font-medium mb-2"
             >
-              Email
+              Username / Email
             </label>
             <InputText
-              id="email"
-              name="email"
+              id="userNameOrEmail"
+              name="userNameOrEmail"
               type="text"
               placeholder="Username / Email address"
               className="w-full mb-3"
-              value={userLoginDto.email}
+              value={userLoginDto.userNameOrEmail}
               onChange={handleChange}
             />
 
