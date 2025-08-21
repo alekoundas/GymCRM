@@ -4,6 +4,7 @@ using DataAccess;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using System.Security.Claims;
 
 namespace Business.Services
 {

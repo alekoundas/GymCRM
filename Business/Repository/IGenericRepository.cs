@@ -8,6 +8,8 @@ namespace Business.Repository
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {
+        GenericRepository<TEntity> Include<TProperty>(Expression<Func<TEntity, TProperty>> navigationProperty);
+
         GenericRepository<User> Select<TResult>(Expression<Func<TEntity, User>> selector);
         GenericRepository<ContactInformation> Select<TResult>(Expression<Func<TEntity, ContactInformation>> selector);
         GenericRepository<Customer> Select<TResult>(Expression<Func<TEntity, Customer>> selector);

@@ -42,7 +42,7 @@ namespace DataAccess
 
             builder.ApplyConfiguration(new CustomerConfiguration());
             builder.ApplyConfiguration(new ContactInformationConfiguration());
-            builder.ApplyConfiguration(new ApplicationUserConfiguration());
+            builder.ApplyConfiguration(new UserConfiguration());
         }
 
         public void RunMigrations()

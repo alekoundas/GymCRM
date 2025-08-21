@@ -76,7 +76,7 @@ namespace API.Controllers
             if (lookupDto.Filter?.Id != null && lookupDto.Filter?.Id.Length>0)
             {
                 lookupOptions = await _roleManager.Roles
-                    .Where(x=>lookupDto.Filter.Id.Contains(x.Id.ToString()))
+                    .Where(x => lookupDto.Filter.Id.ToLower().Contains(x.Id.ToString().ToLower()))
                     .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.Name ?? "" })
                     .ToListAsync();
             }
