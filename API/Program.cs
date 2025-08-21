@@ -1,4 +1,4 @@
-using Business;
+using Business.Repository;
 using Business.Services;
 using Core.Models;
 using Core.System;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
@@ -17,7 +18,6 @@ var builder = WebApplication.CreateBuilder(args);
 var appSettings = builder.Configuration.GetSection("TokenSettings").Get<TokenSettings>() ?? default!;
 
 // Add services to the container.
-
 builder.Services
     .AddControllers()
     .AddJsonOptions(x =>
@@ -32,7 +32,7 @@ builder.Services
         x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Swagger/OpenAPI configuration
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(config =>
 {
@@ -62,28 +62,53 @@ builder.Services.AddSwaggerGen(config =>
         });
 });
 
-
-
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+// DB context and factory.
 builder.Services.AddDbContext<ApiDbContext>();
-builder.Services.AddScoped<ApiDbContextInitialiser>();
+builder.Services.AddTransient<IDbContextFactory<ApiDbContext>, ApiDbContextFactory>();
+builder.Services.AddSingleton<ApiDbContextInitialiser>();
+
+// AutoMapper.
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
 builder.Services.AddSingleton<ClaimsIdentity>();
 builder.Services.AddSingleton(TimeProvider.System);
 
 // Add services.
+//builder.Services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IDataService, DataService>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddSingleton(appSettings); // appsettings.json
+builder.Services.AddSingleton<IUserService, UserService>();
+
+
 
 
 builder.Services.AddDataProtection().PersistKeysToDbContext<ApiDbContext>();
 
 
 // Add Identity.
-builder.Services.AddIdentityCore<ApplicationUser>()
-               .AddRoles<IdentityRole>()
+builder.Services.AddIdentityCore<User>()
+               .AddRoles<IdentityRole<Guid>>()
+               .AddRoleManager<RoleManager<IdentityRole<Guid>>>()
                .AddSignInManager()
                .AddEntityFrameworkStores<ApiDbContext>()
-               .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("REFRESHTOKENPROVIDER");
+               .AddTokenProvider<DataProtectorTokenProvider<User>>("REFRESHTOKENPROVIDER");
+
+
+
+// Identity with Guid key type
+//builder.Services.AddIdentityCore<User>(options =>
+//{
+//    options.User.RequireUniqueEmail = true;
+//})
+//.AddRoles<IdentityRole<Guid>>()
+//.AddRoleManager<RoleManager<IdentityRole<Guid>>>()
+//.AddSignInManager<SignInManager<User>>()
+//.AddUserStore<UserStore<User, IdentityRole<Guid>, ApiDbContext, Guid>>()
+//.AddRoleStore<RoleStore<IdentityRole<Guid>, ApiDbContext, Guid>>()
+//.AddEntityFrameworkStores<ApiDbContext>()
+//.AddTokenProvider<DataProtectorTokenProvider<User>>("REFRESHTOKENPROVIDER");
 
 // Configure JWT Bearer token and refresh token.
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
@@ -134,27 +159,27 @@ app.Use(async (context, next) =>
 });
 
 // Exception handling
-app.UseExceptionHandler(errorApp =>
-{
-    errorApp.Run(async context =>
-    {
-        var exceptionHandlerPathFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
-        if (exceptionHandlerPathFeature?.Error != null)
-        {
-            var exception = exceptionHandlerPathFeature.Error;
-            Console.WriteLine($"Error: {exception.Message}");
-            Console.WriteLine($"Stack Trace: {exception.StackTrace}");
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync(
-                System.Text.Json.JsonSerializer.Serialize(new
-                {
-                    error = "Internal Server Error",
-                    message = exception.Message
-                }));
-        }
-    });
-});
+//app.UseExceptionHandler(errorApp =>
+//{
+//    errorApp.Run(async context =>
+//    {
+//        var exceptionHandlerPathFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
+//        if (exceptionHandlerPathFeature?.Error != null)
+//        {
+//            var exception = exceptionHandlerPathFeature.Error;
+//            Console.WriteLine($"Error: {exception.Message}");
+//            Console.WriteLine($"Stack Trace: {exception.StackTrace}");
+//            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+//            context.Response.ContentType = "application/json";
+//            await context.Response.WriteAsync(
+//                System.Text.Json.JsonSerializer.Serialize(new
+//                {
+//                    error = "Internal Server Error",
+//                    message = exception.Message
+//                }));
+//        }
+//    });
+//});
 
 
 
@@ -187,20 +212,19 @@ app.MapControllers();
 app.MapFallbackToFile("/index.html");
 
 
-
-// Run migrations to DB and add initial roles to DB.
-using (var scope = app.Services.CreateScope())
+// Run migrations and seed initial data.
+var apiDbContext = app.Services.GetService<ApiDbContext>();
+if (apiDbContext != null)
 {
-    var initialiser = scope.ServiceProvider.GetRequiredService<ApiDbContextInitialiser>();
-    await initialiser.RunMigrationsAsync();
-    await initialiser.SeedAsync();
+    apiDbContext.RunMigrations();
+    await apiDbContext.TrySeedInitialData();
 }
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    // No HTTPS.
+    // HTTPS.
     //app.UseHttpsRedirection();
 }
 

@@ -21,27 +21,18 @@ namespace API.Controllers
         private readonly IDataService _dataService;
         private readonly ILogger<RolesController> _logger;
         private readonly IMapper _mapper;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly TokenSettings _tokenSettings;
 
         public RolesController(
             IDataService dataService,
             ILogger<RolesController> logger,
             IMapper mapper,
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            RoleManager<IdentityRole> roleManager,
-            TokenSettings tokenSettings)
+            RoleManager<IdentityRole> roleManager)
         {
             _dataService = dataService;
             _logger = logger;
             _mapper = mapper;
-            _userManager = userManager;
-            _signInManager = signInManager;
             _roleManager = roleManager;
-            _tokenSettings = tokenSettings;
         }
 
         // GET: api/Roles
@@ -151,7 +142,7 @@ namespace API.Controllers
 
 
             // Retrieve Data.
-            List<IdentityRole> result = await _dataService.Query.Roles.ToListAsync();
+            List<IdentityRole<Guid>> result = await _dataService.Roles.ToListAsync();
 
 
 

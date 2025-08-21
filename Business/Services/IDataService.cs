@@ -1,21 +1,27 @@
 ﻿using Business.Repository;
 using Core.Models;
-using DataAccess;
+using Microsoft.AspNetCore.Identity;
 
 namespace Business.Services
 {
-    public interface IDataService : IDisposable 
+    public interface IDataService
     {
-        ApiDbContext Query { get; }
-        GenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : class;
 
-        GenericRepository<Customer> Customers { get; }
-        GenericRepository<ApplicationUser> Users { get; }
-        GenericRepository<ContactInformation> ContactInformations { get; }
+        IGenericRepository<Customer> Customers { get; }
+        IGenericRepository<User> Users { get; }
+        IGenericRepository<ContactInformation> ContactInformations { get; }
+        IGenericRepository<IdentityRole<Guid>> Roles { get; }
+        IGenericRepository<IdentityUserRole<Guid>> UserRoles { get; }
+        IGenericRepository<IdentityRoleClaim<Guid>> RoleClaims { get; }
+
+        IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : class;
 
 
+        void Update<TEntity>(TEntity model);
+        void UpdateRange<TEntity>(List<TEntity> models);
+        Task UpdateRangeAsync<TEntity>(List<TEntity> models);
 
-        Task<int> SaveChangesAsync();
-        int SaveChanges();
+
+        Task UpdateAsync<TEntity>(TEntity model);
     }
 }

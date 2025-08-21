@@ -1,51 +1,62 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
+﻿using Core.Enums;
+using Core.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Business.Repository
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {
-        IQueryable<TEntity> Query { get; }
-        
-        bool Any(Expression<Func<TEntity, bool>>? predicate);
-        Task<bool> AnyAsync(Expression<Func<TEntity, bool>>? predicate);
-        IQueryable<TEntity> Where(Expression<Func<TEntity, bool>> expression);
+        GenericRepository<User> Select<TResult>(Expression<Func<TEntity, User>> selector);
+        GenericRepository<ContactInformation> Select<TResult>(Expression<Func<TEntity, ContactInformation>> selector);
+        GenericRepository<Customer> Select<TResult>(Expression<Func<TEntity, Customer>> selector);
+
+        GenericRepository<User> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<User>>> selector);
+        GenericRepository<ContactInformation> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<ContactInformation>>> selector);
+        GenericRepository<Customer> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<Customer>>> selector);
+
+
+        GenericRepository<TEntity> OrderBy<TKey>(Expression<Func<TEntity, TKey>> keySelector);
+        GenericRepository<TEntity> OrderBy(string propertyName, OrderDirectionEnum orderDirection);
+        GenericRepository<TEntity> ThenBy(string propertyName, OrderDirectionEnum orderDirection);
+
+      
+        GenericRepository<TEntity> Contains(string propertyName, string value);
+        GenericRepository<TEntity> Where(Expression<Func<TEntity, bool>> predicate);
+        GenericRepository<TEntity> AddPagging(int skip = 10, int take = 1);
+
+
+
+        bool Any(Expression<Func<TEntity, bool>> predicate);
+        Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate);
+
+        int Count();
         Task<int> CountAsync();
-        Task<int> CountAsyncFiltered(List<Expression<Func<TEntity, bool>>> filters);
 
-        // CRUD operations.
+
+
         void Add(TEntity entity);
+        Task AddAsync(TEntity entity);
         void AddRange(IEnumerable<TEntity> entities);
-        void Update(TEntity model);
-        void UpdateRange(List<TEntity> models);
+        Task AddRangeAsync(IEnumerable<TEntity> entities);
+
+
         void Remove(TEntity entity);
+        Task RemoveAsync(TEntity entity);
+
         void RemoveRange(IEnumerable<TEntity> entities);
+        Task RemoveRangeAsync(IEnumerable<TEntity> entities);
 
-        // First.
-        Task<TEntity?> FindByIdAsync(int id);
-        Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
-        Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> filter, List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>>? includes = null);
 
-        // Select.
-        void Select(Func<TEntity, TEntity> predicate);
-        void Select(Expression<Func<TEntity, bool>> predicate);
-        Task<List<TResult>> SelectAllAsync<TResult>(Expression<Func<TEntity, TResult>> selector);
-        Task<List<TResult>> SelectAllAsyncFiltered<TResult>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, TResult>> selector);
+        TEntity? Find(int id);
+        Task<TEntity?> FindAsync(int id);
 
-        // Filtered list.
-        Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter);
-        Task<List<TEntity>> GetPaggingWithFilterAndSort(
-            List<Expression<Func<TEntity, bool>>>? filters,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderingInfo,
-            List<Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>>>? thenOrderingInfos,
-            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>>? includes = null,
-            int pageSize = 10,
-            int pageIndex = 1);
+        Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> filter);
+        TEntity? FirstOrDefault(Expression<Func<TEntity, bool>>? predicate);
+        Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? predicate);
 
-        IQueryable<TEntity> GetLookup(
-                    List<Expression<Func<TEntity, bool>>>? filters,
-                    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderingInfo,
-                    int skip = 10,
-                    int take = 1);
+        List<TEntity> ToList();
+        Task<List<TEntity>> ToListAsync();
     }
 }

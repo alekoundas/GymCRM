@@ -1,235 +1,417 @@
-﻿using Business.Repository;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Expressions;
-using Microsoft.AspNetCore.Identity;
+﻿using Core.Enums;
+using Core.Models;
 using DataAccess;
-
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using System.Linq.Dynamic.Core;
+using System.Linq;
 namespace Business.Repository
 {
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
-        protected readonly ApiDbContext Context;
-        protected readonly DbSet<TEntity> _set;
+        private readonly IDbContextFactory<ApiDbContext> _contextFactory;
+        protected ApiDbContext _context;
+        protected IQueryable<TEntity>? _query;
 
-        public GenericRepository(ApiDbContext context)
+        public GenericRepository(IDbContextFactory<ApiDbContext> contextFactory)
         {
-            Context = context;
-            _set = Context.Set<TEntity>();
+            _context = contextFactory.CreateDbContext();
         }
 
-        public IQueryable<TEntity> Query => Context.Set<TEntity>();
+        public IQueryable<TEntity> Query => _context.Set<TEntity>();
 
 
-        public bool Any(Expression<Func<TEntity, bool>>? predicate)
+
+
+        public GenericRepository<TEntity> Include<TProperty>(Expression<Func<TEntity, TProperty>> navigationProperty)
         {
-            if (predicate != null)
-                return _set.Any(predicate);
+            if (_query == null)
+                _query = _context.Set<TEntity>();
 
-            return _set.Any();
+            _query = _query.Include(navigationProperty);
+            return this;
         }
 
-        public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>>? predicate)
+        //TODO: Find a way to combine Select methods.
+        public GenericRepository<User> Select<TResult>(Expression<Func<TEntity, User>> selector)
         {
-               if (predicate != null)
-                return await _set.AnyAsync(predicate);
+            if (_query == null)
+                _query = _context.Set<TEntity>();
 
-            return await _set.AnyAsync();
+            var newQuery = _query.Select(selector);
+            return new GenericRepository<User>(_contextFactory)
+            {
+                _context = _context,
+                _query = newQuery
+            };
+        }
+        public GenericRepository<ContactInformation> Select<TResult>(Expression<Func<TEntity, ContactInformation>> selector)
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            var newQuery = _query.Select(selector);
+            return new GenericRepository<ContactInformation>(_contextFactory)
+            {
+                _context = _context,
+                _query = newQuery
+            };
+        }
+        public GenericRepository<Customer> Select<TResult>(Expression<Func<TEntity, Customer>> selector)
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            var newQuery = _query.Select(selector);
+            return new GenericRepository<Customer>(_contextFactory)
+            {
+                _context = _context,
+                _query = newQuery
+            };
         }
 
-        public IQueryable<TEntity> Where(Expression<Func<TEntity, bool>> expression)
+
+        //TODO: Find a way to combine Select Many methods.
+        public GenericRepository<User> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<User>>> selector)
         {
-            return _set.Where(expression);
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            var newQuery = _query.SelectMany(selector);
+            return new GenericRepository<User>(_contextFactory)
+            {
+                _context = _context,
+                _query = newQuery
+            };
+        }
+        public GenericRepository<ContactInformation> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<ContactInformation>>> selector)
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            var newQuery = _query.SelectMany(selector);
+            return new GenericRepository<ContactInformation>(_contextFactory)
+            {
+                _context = _context,
+                _query = newQuery
+            };
+        }
+        public GenericRepository<Customer> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<Customer>>> selector)
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            var newQuery = _query.SelectMany(selector);
+            return new GenericRepository<Customer>(_contextFactory)
+            {
+                _context = _context,
+                _query = newQuery
+            };
         }
 
+
+
+
+
+
+
+        public GenericRepository<TEntity> OrderBy<TKey>(Expression<Func<TEntity, TKey>> keySelector)
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            _query = _query.OrderBy(keySelector);
+
+            return this;
+        }
+
+        public GenericRepository<TEntity> OrderBy(string propertyName, OrderDirectionEnum orderDirection)
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            if (orderDirection == OrderDirectionEnum.ASCENDING)
+                _query = _query.OrderByColumn(propertyName);
+            else
+                _query = _query.OrderByColumnDescending(propertyName);
+
+            return this;
+        }
+
+        public GenericRepository<TEntity> ThenBy(string propertyName, OrderDirectionEnum orderDirection)
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            if (orderDirection == OrderDirectionEnum.ASCENDING)
+                _query = (_query as IOrderedQueryable<TEntity>).ThenByColumn(propertyName);
+            else
+                _query = (_query as IOrderedQueryable<TEntity>).ThenByColumnDescending(propertyName);
+
+            return this;
+        }
+
+        public GenericRepository<TEntity> Contains(string propertyName, string value)
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            if (string.IsNullOrEmpty(propertyName) || value == null)
+                return this;
+
+            _query = _query.Where($"{propertyName}.Contains(@0)", value);
+
+            return this;
+        }
+
+
+        public GenericRepository<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            _query = _query.Where(predicate);
+            return this;
+        }
+
+        public GenericRepository<TEntity> AddPagging(int skip = 10, int take = 1)
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            if (skip >= 0 && take >= 0)
+                _query = _query.Skip(skip).Take(take);
+
+            return this;
+        }
+
+
+
+
+        public bool Any(Expression<Func<TEntity, bool>> predicate)
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            var result = _query.Any(predicate);
+            Dispose();
+            return result;
+        }
+
+        public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            var result = await _query.AnyAsync(predicate);
+            Dispose();
+            return result;
+        }
+
+
+
+
+
+
+        public int Count()
+        {
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            var result = _query.Count();
+            Dispose();
+            return result;
+        }
         public async Task<int> CountAsync()
         {
-            return await _set.CountAsync();
+            if (_query == null)
+                _query = _context.Set<TEntity>();
+
+            var result = await _query.CountAsync();
+            Dispose();
+            return result;
         }
 
-        public async Task<int> CountAsyncFiltered(List<Expression<Func<TEntity, bool>>> filters)
-        {
-            var qry = (IQueryable<TEntity>)_set;
 
-            if (filters != null)
-                foreach (var filter in filters)
-                    qry = qry.Where(filter);
 
-            return await _set.CountAsync();
-        }
 
-        // CRUD operations.
 
         public void Add(TEntity entity)
         {
-            _set.Add(entity);
+            _context.Set<TEntity>().Add(entity);
+            _context.SaveChanges();
+            Dispose();
         }
+
+        public async Task AddAsync(TEntity entity)
+        {
+            await _context.AddAsync(entity);
+            await _context.SaveChangesAsync();
+            Dispose();
+        }
+
 
         public void AddRange(IEnumerable<TEntity> entities)
         {
-            _set.AddRange(entities);
+            _context.Set<TEntity>().AddRange(entities);
+            _context.SaveChanges();
+            Dispose();
         }
-
-        public void Update(TEntity model)
+        public async Task AddRangeAsync(IEnumerable<TEntity> entities)
         {
-            if (model != null)
-                Context.Entry(model).State = EntityState.Modified;
-        }
-
-        public void UpdateRange(List<TEntity> models)
-        {
-            foreach (var model in models)
-                if (model != null)
-                    Context.Entry(model).State = EntityState.Modified;
+            await _context.Set<TEntity>().AddRangeAsync(entities);
+            await _context.SaveChangesAsync();
+            Dispose();
         }
 
         public void Remove(TEntity entity)
         {
-            _set.Remove(entity);
+            _context.Set<TEntity>().Remove(entity);
+            _context.SaveChanges();
+            Dispose();
+        }
+        public async Task RemoveAsync(TEntity entity)
+        {
+            _context.Set<TEntity>().Remove(entity);
+            await _context.SaveChangesAsync();
+            Dispose();
         }
 
         public void RemoveRange(IEnumerable<TEntity> entities)
         {
-            _set.RemoveRange(entities);
+            _context.Set<TEntity>().RemoveRange(entities);
+            _context.SaveChangesAsync();
+            Dispose();
         }
-
-
-
-        // First.
-        public async Task<TEntity?> FindByIdAsync(int id)
+        public async Task RemoveRangeAsync(IEnumerable<TEntity> entities)
         {
-            return await _set.FindAsync(id);
+            _context.Set<TEntity>().RemoveRange(entities);
+            await _context.SaveChangesAsync();
+            Dispose();
         }
 
-        public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+
+        public TEntity? Find(int id)
         {
-            return await _set.FirstOrDefaultAsync(predicate);
-        }
+            TEntity? result = _context.Set<TEntity>().Find(id);
 
-        public async Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> filter,
-            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>>? includes = null)
+            Dispose();
+            return result;
+        }
+        public async Task<TEntity?> FindAsync(int id)
         {
-            var qry = (IQueryable<TEntity>)_set;
+            TEntity? result = await _context.Set<TEntity>().FindAsync(id);
 
-            if (includes != null)
-                foreach (var include in includes)
-                    qry = include(qry);
-
-            return await qry.FirstOrDefaultAsync(filter);
+            Dispose();
+            return result;
         }
 
 
 
-        // Select. 
-        public void Select(Func<TEntity, TEntity> predicate)
+        public async Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> filter)
         {
-            _set.Select(predicate);
+            TEntity? result = null;
+
+            if (_query == null)
+                result = await _context.Set<TEntity>().AsNoTracking().FirstAsync(filter);
+            else
+                result = await _query.AsNoTracking().FirstAsync(filter);
+
+            Dispose();
+            return result;
         }
 
-        public void Select(Expression<Func<TEntity, bool>> predicate)
+
+        public TEntity? FirstOrDefault(Expression<Func<TEntity, bool>>? filter = null)
         {
-            _set.Select(predicate);
+            TEntity? result = null;
+            if (filter != null)
+            {
+                if (_query == null)
+                    result = _context.Set<TEntity>().AsNoTracking().FirstOrDefault(filter);
+                else
+                    result = _query.AsNoTracking().FirstOrDefault(filter);
+            }
+            else
+            {
+                if (_query == null)
+                    result = _context.Set<TEntity>().AsNoTracking().FirstOrDefault();
+                else
+                    result = _query.AsNoTracking().FirstOrDefault();
+            }
+
+            Dispose();
+            return result;
         }
 
-        public async Task<List<TResult>> SelectAllAsync<TResult>(Expression<Func<TEntity, TResult>> selector)
+        public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? filter = null)
         {
-            return await _set.Select(selector).ToListAsync();
-        }
-
-        public async Task<List<TResult>> SelectAllAsyncFiltered<TResult>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, TResult>> selector)
-        {
-            return await _set.Where(predicate).Select(selector).ToListAsync();
-        }
-
-
-
-        // Filtered list.
-        public async Task<List<TEntity>> GetPaggingWithFilterAndSort(
-            List<Expression<Func<TEntity, bool>>>? filters,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderingInfo,
-            List<Func<IOrderedQueryable<TEntity>, IOrderedQueryable<TEntity>>>? thenOrderingInfos,
-            List<Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>>? includes = null,
-            int pageSize = 10,
-            int pageIndex = 1)
-        {
-            var qry = (IQueryable<TEntity>)_set;
-
-            if (includes != null)
-                foreach (var include in includes)
-                    qry = include(qry);
-
-            if (filters != null)
-                foreach (var filter in filters)
-                    qry = qry.Where(filter);
-
-            if (orderingInfo != null)
-                qry = orderingInfo(qry);
-
-            if (thenOrderingInfos != null)
-                foreach (var thenOrderingInfo in thenOrderingInfos)
-                    qry = thenOrderingInfo((IOrderedQueryable<TEntity>)qry);
-
-            if (pageSize != -1 && pageSize != 0)
-                qry = qry.Skip((pageIndex - 1) * pageSize).Take(pageSize);
-
-            return await qry.ToListAsync();
-        }
-
-        public IQueryable<TEntity> GetLookup(
-            List<Expression<Func<TEntity, bool>>>? filters,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderingInfo,
-            int skip = 10,
-            int take = 1)
-        {
-            var qry = (IQueryable<TEntity>)_set;
-
-
-            if (filters != null)
-                foreach (var filter in filters)
-                    qry = qry.Where(filter);
-
-            if (orderingInfo != null)
-                qry = orderingInfo(qry);
-
-            if (skip >= 0 && take >= 0)
-                qry = qry.Skip(skip).Take(take);
-
-            return qry;
-        }
-
-        public async Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter)
-        {
-            return await _set.Where(filter).ToListAsync();
-        }
-
-        // Save.
-        public async Task<int> SaveChangesAsync()
-        {
-            return await Context.SaveChangesAsync();
-        }
-        public int SaveChanges()
-        {
-            return Context.SaveChanges();
+            TEntity? result = null;
+            if (filter != null)
+            {
+                if (_query == null)
+                    result = await _context.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(filter);
+                else
+                    result = await _query.AsNoTracking().FirstOrDefaultAsync(filter);
+            }
+            else
+            {
+                if (_query == null)
+                    result = await _context.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync();
+                else
+                    result = await _query.AsNoTracking().FirstOrDefaultAsync();
+            }
+            Dispose();
+            return result;
         }
 
 
-        //// Dispose.
-        //private bool disposed = false;
-
-        //protected virtual void Dispose(bool disposing)
+        //public async Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter)
         //{
-        //    if (!this.disposed)
-        //        if (disposing)
-        //            Context.Dispose();
-
-        //    this.disposed = true;
+        //    using var context = _contextFactory.CreateDbContext();
+        //    return await context.Set<TEntity>().Where(filter).ToListAsync();
         //}
 
-        //public void Dispose()
+        //public IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> expression)
         //{
-        //    Dispose(true);
-        //    GC.SuppressFinalize(this);
+        //    using var context = _contextFactory.CreateDbContext();
+        //    return context.Set<TEntity>().Where(expression).ToList();
         //}
 
+
+        public List<TEntity> ToList()
+        {
+            List<TEntity>? result = null;
+
+            if (_query == null)
+                result = _context.Set<TEntity>().AsNoTracking().ToList();
+            else
+                result = _query.AsNoTracking().ToList();
+
+
+            Dispose();
+            return result;
+        }
+
+        public async Task<List<TEntity>> ToListAsync()
+        {
+            List<TEntity>? result = null;
+
+            if (_query == null)
+                result = await _context.Set<TEntity>().AsNoTracking().ToListAsync();
+            else
+                result = await _query.AsNoTracking().ToListAsync();
+
+
+            Dispose();
+            return result;
+        }
+
+
+        public void Dispose()
+        {
+            _context = null;
+            _query = null;
+        }
     }
 }

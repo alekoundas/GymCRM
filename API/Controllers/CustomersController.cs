@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Linq.Expressions;
-using AutoMapper;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore;
-using Core.Models;
-using Business.Services;
-using Core.Dtos.DataTable;
-using Core.Dtos;
+﻿using AutoMapper;
 using Business;
+using Business.Services;
+using Core.Dtos;
+using Core.Dtos.DataTable;
+using Core.Enums;
+using Core.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace API.Controllers
 {
@@ -30,7 +32,7 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IEnumerable<Customer>> GetAll()
         {
-            List<Customer> result = await _dataService.Customers.GetPaggingWithFilterAndSort(null, null, null);
+            List<Customer> result = await _dataService.Customers.ToListAsync();
             return result;
         }
 
@@ -43,6 +45,7 @@ namespace API.Controllers
             List<Expression<Func<Customer, bool>>>? filterQuery = new List<Expression<Func<Customer, bool>>>();
             List<Func<IQueryable<Customer>, IIncludableQueryable<Customer, object>>>? includesQuery = new List<Func<IQueryable<Customer>, IIncludableQueryable<Customer, object>>>();
 
+            var query = _dataService.ContactInformations;
 
             // Handle Sorting of DataTable.
             if (dataTable.MultiSortMeta?.Count() > 0)
@@ -50,17 +53,17 @@ namespace API.Controllers
                 // Create the first OrderBy().
                 DataTableSortDto? dataTableSort = dataTable.MultiSortMeta.First();
                 if (dataTableSort.Order > 0)
-                    orderByQuery = x => x.OrderByColumn(dataTableSort.Field);
+                    query.OrderBy(dataTableSort.Field, OrderDirectionEnum.ASCENDING);
                 else if (dataTableSort.Order < 0)
-                    orderByQuery = x => x.OrderByColumnDescending(dataTableSort.Field);
+                    query.OrderBy(dataTableSort.Field, OrderDirectionEnum.DESCENDING);
 
                 // Create the rest OrderBy methods as ThenBy() if any.
                 foreach (var sortInfo in dataTable.MultiSortMeta.Skip(1))
                 {
                     if (dataTableSort.Order > 0)
-                        thenOrderByQuery.Add(x => x.ThenByColumn(sortInfo.Field));
+                        query.ThenBy(sortInfo.Field, OrderDirectionEnum.ASCENDING);
                     else if (dataTableSort.Order < 0)
-                        thenOrderByQuery.Add(x => x.ThenByColumnDescending(sortInfo.Field));
+                        query.ThenBy(sortInfo.Field, OrderDirectionEnum.DESCENDING);
                 }
             }
 
@@ -77,20 +80,18 @@ namespace API.Controllers
             includesQuery.Add(x => x.Include(y => y.ContactInformations));
 
 
+            // Handle pagination.
+            query.AddPagging(dataTable.PageCount ?? 10, dataTable.Page ?? 1);
+
+
             // Retrieve Data.
-            List<Customer> result = await _dataService.Customers.GetPaggingWithFilterAndSort(
-                filterQuery,
-                orderByQuery,
-                thenOrderByQuery,
-                includesQuery,
-                dataTable.PageCount.Value,
-                dataTable.Page.Value
-            );
+            List<ContactInformation> result = await query.ToListAsync();
             List<CustomerDto> customerDto = _mapper.Map<List<CustomerDto>>(result);
 
             customerDto.SelectMany(x => x.ContactInformations).ToList().ForEach(x => x.Customer = null);
 
-            int rows = await _dataService.Customers.CountAsyncFiltered(filterQuery);
+            //TODDO add filter
+            int rows = await _dataService.Customers.CountAsync();
 
             dataTable.Data = customerDto;
             dataTable.PageCount = rows;
@@ -141,7 +142,6 @@ namespace API.Controllers
 
 
             _dataService.Customers.Add(customer);
-            await _dataService.SaveChangesAsync();
 
             customerDto = _mapper.Map<CustomerDto>(customer);
 
@@ -162,11 +162,10 @@ namespace API.Controllers
             if (id != customer.Id)
                 return BadRequest();
 
-            _dataService.Customers.Update(customer);
 
             try
             {
-                await _dataService.SaveChangesAsync();
+            _dataService.Update(customer);
             }
             catch (DbUpdateConcurrencyException)
             {

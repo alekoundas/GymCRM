@@ -20,8 +20,8 @@ namespace API.AutoMapper
             CreateMap<IdentityRole, IdentityRoleDto>();
             CreateMap<IdentityRoleDto, IdentityRole>();
 
-            CreateMap<ApplicationUser, UserDto>();
-            CreateMap<UserDto, ApplicationUser>();
+            CreateMap<User, UserDto>();
+            CreateMap<UserDto, User>();
 
         }
     }

@@ -9,6 +9,8 @@ using AutoMapper;
 using Core.Dtos.Identity;
 using Core.Dtos;
 using Business;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Core.Enums;
 
 namespace API.Controllers
 {
@@ -31,14 +33,14 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ContactInformation>>> GetContactInformations()
         {
-            return await _dataService.ContactInformations.GetPaggingWithFilterAndSort(null,null,null);
+            return await _dataService.ContactInformations.ToListAsync();
         }
 
         // GET: api/ContactInformations/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ContactInformation>> GetContactInformation(int id)
         {
-            var contactInformation = await _dataService.ContactInformations.FindByIdAsync(id);
+            var contactInformation = await _dataService.ContactInformations.FindAsync(id);
 
             if (contactInformation == null)
                 return NotFound();
@@ -54,11 +56,10 @@ namespace API.Controllers
             if (id != contactInformation.Id)
                 return BadRequest();
 
-            _dataService.ContactInformations.Update(contactInformation);
 
             try
             {
-                await _dataService.SaveChangesAsync();
+                _dataService.Update(contactInformation);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -77,7 +78,6 @@ namespace API.Controllers
         public async Task<ActionResult<ContactInformation>> PostContactInformation(ContactInformation contactInformation)
         {
             _dataService.ContactInformations.Add(contactInformation);
-            await _dataService.SaveChangesAsync();
 
             return CreatedAtAction("GetContactInformation", new { id = contactInformation.Id }, contactInformation);
         }
@@ -86,12 +86,11 @@ namespace API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteContactInformation(int id)
         {
-            var contactInformation = await _dataService.ContactInformations.FindByIdAsync(id);
+            var contactInformation = await _dataService.ContactInformations.FindAsync(id);
             if (contactInformation == null)
                 return NotFound();
 
             _dataService.ContactInformations.Remove(contactInformation);
-            await _dataService.SaveChangesAsync();
 
             return NoContent();
         }
@@ -102,10 +101,12 @@ namespace API.Controllers
         public async Task<ApiResponse<DataTableDto<ContactInformationDto>>> GetDataTable([FromBody] DataTableDto<ContactInformationDto> dataTable)
         {
             Func<IQueryable<ContactInformation>, IOrderedQueryable<ContactInformation>>? orderByQuery = null;
+
             List<Func<IOrderedQueryable<ContactInformation>, IOrderedQueryable<ContactInformation>>>? thenOrderByQuery = new List<Func<IOrderedQueryable<ContactInformation>, IOrderedQueryable<ContactInformation>>>();
             List<Expression<Func<ContactInformation, bool>>>? filterQuery = new List<Expression<Func<ContactInformation, bool>>>();
             List<Func<IQueryable<ContactInformation>, IIncludableQueryable<ContactInformation, object>>>? includesQuery = new List<Func<IQueryable<ContactInformation>, IIncludableQueryable<ContactInformation, object>>>();
 
+            var query = _dataService.ContactInformations;
 
             // Handle Sorting of DataTable.
             if (dataTable.MultiSortMeta?.Count() > 0)
@@ -113,44 +114,37 @@ namespace API.Controllers
                 // Create the first OrderBy().
                 DataTableSortDto? dataTableSort = dataTable.MultiSortMeta.First();
                 if (dataTableSort.Order > 0)
-                    orderByQuery = x => x.OrderByColumn(dataTableSort.Field);
+                    query.OrderBy(dataTableSort.Field, OrderDirectionEnum.ASCENDING);
                 else if (dataTableSort.Order < 0)
-                    orderByQuery = x => x.OrderByColumnDescending(dataTableSort.Field);
+                    query.OrderBy(dataTableSort.Field, OrderDirectionEnum.DESCENDING);
 
                 // Create the rest OrderBy methods as ThenBy() if any.
                 foreach (var sortInfo in dataTable.MultiSortMeta.Skip(1))
                 {
                     if (dataTableSort.Order > 0)
-                        thenOrderByQuery.Add(x => x.ThenByColumn(sortInfo.Field));
+                        query.ThenBy(sortInfo.Field, OrderDirectionEnum.ASCENDING);
                     else if (dataTableSort.Order < 0)
-                        thenOrderByQuery.Add(x => x.ThenByColumnDescending(sortInfo.Field));
+                        query.ThenBy(sortInfo.Field, OrderDirectionEnum.DESCENDING);
                 }
             }
 
-
             // Handle Filtering of DataTable.
-            if (dataTable.Filters?.Value?.Value != null && dataTable.Filters?.Value.Value.Length > 0)
-                filterQuery.Add(x => x.Value.Contains(dataTable.Filters.Value.Value));
+            //if (dataTable.Filters?.Value?.Value != null && dataTable.Filters?.Value.Value.Length > 0)
+            //    filterQuery.Add(x => x.Value.Contains(dataTable.Filters.Value.Value));
 
-            if (dataTable.Filters?.Description?.Value != null && dataTable.Filters?.Description.Value.Length > 0)
-                filterQuery.Add(x => x.Description.Contains(dataTable.Filters.Description.Value));
+            //if (dataTable.Filters?.Description?.Value != null && dataTable.Filters?.Description.Value.Length > 0)
+            //    filterQuery.Add(x => x.Description.Contains(dataTable.Filters.Description.Value));
 
-            if (dataTable.Filters?.CustomerId?.Value != null && dataTable.Filters?.CustomerId.Value.Length > 0)
-                filterQuery.Add(x => x.CustomerId.ToString() == dataTable.Filters.CustomerId.Value);
+            //if (dataTable.Filters?.CustomerId?.Value != null && dataTable.Filters?.CustomerId.Value.Length > 0)
+            //    filterQuery.Add(x => x.CustomerId.ToString() == dataTable.Filters.CustomerId.Value);
 
-
+            query.AddPagging(dataTable.PageCount ?? 10, dataTable.Page ?? 1);
             // Retrieve Data.
-            List<ContactInformation> result = await _dataService.ContactInformations.GetPaggingWithFilterAndSort(
-                filterQuery,
-                orderByQuery,
-                thenOrderByQuery,
-                includesQuery,
-                dataTable.PageCount.Value,
-                dataTable.Page.Value
-            );
+            List<ContactInformation> result = await query.ToListAsync();
             List<ContactInformationDto> customerDto = _mapper.Map<List<ContactInformationDto>>(result);
 
-            int rows = await _dataService.ContactInformations.CountAsyncFiltered(filterQuery);
+            //TODO add filter
+            int rows = await _dataService.ContactInformations.CountAsync();
 
             dataTable.Data = customerDto;
             dataTable.PageCount = rows;
