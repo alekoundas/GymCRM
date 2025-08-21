@@ -100,7 +100,6 @@ namespace API.Controllers
         [HttpPost("GetDataTable")]
         public async Task<ApiResponse<DataTableDto<ContactInformationDto>>> GetDataTable([FromBody] DataTableDto<ContactInformationDto> dataTable)
         {
-            Func<IQueryable<ContactInformation>, IOrderedQueryable<ContactInformation>>? orderByQuery = null;
 
             List<Func<IOrderedQueryable<ContactInformation>, IOrderedQueryable<ContactInformation>>>? thenOrderByQuery = new List<Func<IOrderedQueryable<ContactInformation>, IOrderedQueryable<ContactInformation>>>();
             List<Expression<Func<ContactInformation, bool>>>? filterQuery = new List<Expression<Func<ContactInformation, bool>>>();
@@ -128,17 +127,11 @@ namespace API.Controllers
                 }
             }
 
-            // Handle Filtering of DataTable.
-            //if (dataTable.Filters?.Value?.Value != null && dataTable.Filters?.Value.Value.Length > 0)
-            //    filterQuery.Add(x => x.Value.Contains(dataTable.Filters.Value.Value));
+           
+            int skip = (dataTable.Page - 1) * dataTable.Rows;
+            int take = dataTable.Rows;
 
-            //if (dataTable.Filters?.Description?.Value != null && dataTable.Filters?.Description.Value.Length > 0)
-            //    filterQuery.Add(x => x.Description.Contains(dataTable.Filters.Description.Value));
-
-            //if (dataTable.Filters?.CustomerId?.Value != null && dataTable.Filters?.CustomerId.Value.Length > 0)
-            //    filterQuery.Add(x => x.CustomerId.ToString() == dataTable.Filters.CustomerId.Value);
-
-            query.AddPagging(dataTable.PageCount ?? 10, dataTable.Page ?? 1);
+            query.AddPagging(skip, take);
             // Retrieve Data.
             List<ContactInformation> result = await query.ToListAsync();
             List<ContactInformationDto> customerDto = _mapper.Map<List<ContactInformationDto>>(result);

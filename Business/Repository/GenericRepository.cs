@@ -10,15 +10,16 @@ namespace Business.Repository
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
         private readonly IDbContextFactory<ApiDbContext> _contextFactory;
-        protected ApiDbContext _context;
+        //protected ApiDbContext _context;
         protected IQueryable<TEntity>? _query;
 
         public GenericRepository(IDbContextFactory<ApiDbContext> contextFactory)
         {
-            _context = contextFactory.CreateDbContext();
+            //_context = contextFactory.CreateDbContext();
+            _contextFactory = contextFactory;
         }
 
-        public IQueryable<TEntity> Query => _context.Set<TEntity>();
+        //public IQueryable<TEntity> Query => _context.Set<TEntity>();
 
 
 
@@ -26,7 +27,7 @@ namespace Business.Repository
         public GenericRepository<TEntity> Include<TProperty>(Expression<Func<TEntity, TProperty>> navigationProperty)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             _query = _query.Include(navigationProperty);
             return this;
@@ -36,36 +37,36 @@ namespace Business.Repository
         public GenericRepository<User> Select<TResult>(Expression<Func<TEntity, User>> selector)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             var newQuery = _query.Select(selector);
             return new GenericRepository<User>(_contextFactory)
             {
-                _context = _context,
+                //_context = _context,
                 _query = newQuery
             };
         }
         public GenericRepository<ContactInformation> Select<TResult>(Expression<Func<TEntity, ContactInformation>> selector)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             var newQuery = _query.Select(selector);
             return new GenericRepository<ContactInformation>(_contextFactory)
             {
-                _context = _context,
+                //_context = _context,
                 _query = newQuery
             };
         }
         public GenericRepository<Customer> Select<TResult>(Expression<Func<TEntity, Customer>> selector)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             var newQuery = _query.Select(selector);
             return new GenericRepository<Customer>(_contextFactory)
             {
-                _context = _context,
+                //_context = _context,
                 _query = newQuery
             };
         }
@@ -75,36 +76,36 @@ namespace Business.Repository
         public GenericRepository<User> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<User>>> selector)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             var newQuery = _query.SelectMany(selector);
             return new GenericRepository<User>(_contextFactory)
             {
-                _context = _context,
+                //_context = _context,
                 _query = newQuery
             };
         }
         public GenericRepository<ContactInformation> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<ContactInformation>>> selector)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             var newQuery = _query.SelectMany(selector);
             return new GenericRepository<ContactInformation>(_contextFactory)
             {
-                _context = _context,
+                //_context = _context,
                 _query = newQuery
             };
         }
         public GenericRepository<Customer> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<Customer>>> selector)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             var newQuery = _query.SelectMany(selector);
             return new GenericRepository<Customer>(_contextFactory)
             {
-                _context = _context,
+                //_context = _context,
                 _query = newQuery
             };
         }
@@ -118,7 +119,7 @@ namespace Business.Repository
         public GenericRepository<TEntity> OrderBy<TKey>(Expression<Func<TEntity, TKey>> keySelector)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             _query = _query.OrderBy(keySelector);
 
@@ -128,7 +129,7 @@ namespace Business.Repository
         public GenericRepository<TEntity> OrderBy(string propertyName, OrderDirectionEnum orderDirection)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             if (orderDirection == OrderDirectionEnum.ASCENDING)
                 _query = _query.OrderByColumn(propertyName);
@@ -141,7 +142,7 @@ namespace Business.Repository
         public GenericRepository<TEntity> ThenBy(string propertyName, OrderDirectionEnum orderDirection)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             if (orderDirection == OrderDirectionEnum.ASCENDING)
                 _query = (_query as IOrderedQueryable<TEntity>).ThenByColumn(propertyName);
@@ -154,7 +155,7 @@ namespace Business.Repository
         public GenericRepository<TEntity> Contains(string propertyName, string value)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             if (string.IsNullOrEmpty(propertyName) || value == null)
                 return this;
@@ -168,7 +169,7 @@ namespace Business.Repository
         public GenericRepository<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             _query = _query.Where(predicate);
             return this;
@@ -177,7 +178,7 @@ namespace Business.Repository
         public GenericRepository<TEntity> AddPagging(int skip = 10, int take = 1)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             if (skip >= 0 && take >= 0)
                 _query = _query.Skip(skip).Take(take);
@@ -191,7 +192,7 @@ namespace Business.Repository
         public bool Any(Expression<Func<TEntity, bool>> predicate)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             var result = _query.Any(predicate);
             Dispose();
@@ -201,7 +202,7 @@ namespace Business.Repository
         public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             var result = await _query.AnyAsync(predicate);
             Dispose();
@@ -216,7 +217,7 @@ namespace Business.Repository
         public int Count()
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             var result = _query.Count();
             Dispose();
@@ -225,7 +226,7 @@ namespace Business.Repository
         public async Task<int> CountAsync()
         {
             if (_query == null)
-                _query = _context.Set<TEntity>();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             var result = await _query.CountAsync();
             Dispose();
@@ -238,69 +239,85 @@ namespace Business.Repository
 
         public void Add(TEntity entity)
         {
-            _context.Set<TEntity>().Add(entity);
-            _context.SaveChanges();
+            ApiDbContext context = _contextFactory.CreateDbContext();
+            context.Set<TEntity>().Add(entity);
+            context.SaveChanges();
+            context.Dispose();
             Dispose();
         }
 
         public async Task AddAsync(TEntity entity)
         {
-            await _context.AddAsync(entity);
-            await _context.SaveChangesAsync();
+            ApiDbContext context = _contextFactory.CreateDbContext();
+            await context.AddAsync(entity);
+            await context.SaveChangesAsync();
+            context.Dispose();
             Dispose();
         }
 
 
         public void AddRange(IEnumerable<TEntity> entities)
         {
-            _context.Set<TEntity>().AddRange(entities);
-            _context.SaveChanges();
+            ApiDbContext context = _contextFactory.CreateDbContext();
+            context.Set<TEntity>().AddRange(entities);
+            context.SaveChanges();
+            context.Dispose();
             Dispose();
         }
         public async Task AddRangeAsync(IEnumerable<TEntity> entities)
         {
-            await _context.Set<TEntity>().AddRangeAsync(entities);
-            await _context.SaveChangesAsync();
+            ApiDbContext context = _contextFactory.CreateDbContext();
+            await context.Set<TEntity>().AddRangeAsync(entities);
+            await context.SaveChangesAsync();
+            context.Dispose();
             Dispose();
         }
 
         public void Remove(TEntity entity)
         {
-            _context.Set<TEntity>().Remove(entity);
-            _context.SaveChanges();
+            ApiDbContext context = _contextFactory.CreateDbContext();
+            context.Set<TEntity>().Remove(entity);
+            context.SaveChanges();
+            context.Dispose();
             Dispose();
         }
         public async Task RemoveAsync(TEntity entity)
         {
-            _context.Set<TEntity>().Remove(entity);
-            await _context.SaveChangesAsync();
+            ApiDbContext context = _contextFactory.CreateDbContext();
+            context.Set<TEntity>().Remove(entity);
+            await context.SaveChangesAsync();
+            context.Dispose();
             Dispose();
         }
 
         public void RemoveRange(IEnumerable<TEntity> entities)
         {
-            _context.Set<TEntity>().RemoveRange(entities);
-            _context.SaveChangesAsync();
+            ApiDbContext context = _contextFactory.CreateDbContext();
+            context.Set<TEntity>().RemoveRange(entities);
+            context.SaveChangesAsync();
+            context.Dispose();
             Dispose();
         }
         public async Task RemoveRangeAsync(IEnumerable<TEntity> entities)
         {
-            _context.Set<TEntity>().RemoveRange(entities);
-            await _context.SaveChangesAsync();
+            ApiDbContext context = _contextFactory.CreateDbContext();
+            context.Set<TEntity>().RemoveRange(entities);
+            await context.SaveChangesAsync();
+            context.Dispose();
             Dispose();
         }
 
 
         public TEntity? Find(int id)
         {
-            TEntity? result = _context.Set<TEntity>().Find(id);
+            TEntity? result = _contextFactory.CreateDbContext().Set<TEntity>().Find(id);
 
             Dispose();
             return result;
         }
         public async Task<TEntity?> FindAsync(int id)
         {
-            TEntity? result = await _context.Set<TEntity>().FindAsync(id);
+            TEntity? result = await _contextFactory.CreateDbContext().Set<TEntity>().FindAsync(id);
 
             Dispose();
             return result;
@@ -313,7 +330,7 @@ namespace Business.Repository
             TEntity? result = null;
 
             if (_query == null)
-                result = await _context.Set<TEntity>().AsNoTracking().FirstAsync(filter);
+                result = await _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().FirstAsync(filter);
             else
                 result = await _query.AsNoTracking().FirstAsync(filter);
 
@@ -328,14 +345,14 @@ namespace Business.Repository
             if (filter != null)
             {
                 if (_query == null)
-                    result = _context.Set<TEntity>().AsNoTracking().FirstOrDefault(filter);
+                    result = _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().FirstOrDefault(filter);
                 else
                     result = _query.AsNoTracking().FirstOrDefault(filter);
             }
             else
             {
                 if (_query == null)
-                    result = _context.Set<TEntity>().AsNoTracking().FirstOrDefault();
+                    result = _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().FirstOrDefault();
                 else
                     result = _query.AsNoTracking().FirstOrDefault();
             }
@@ -350,14 +367,14 @@ namespace Business.Repository
             if (filter != null)
             {
                 if (_query == null)
-                    result = await _context.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(filter);
+                    result = await _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(filter);
                 else
                     result = await _query.AsNoTracking().FirstOrDefaultAsync(filter);
             }
             else
             {
                 if (_query == null)
-                    result = await _context.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync();
+                    result = await  _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().FirstOrDefaultAsync();
                 else
                     result = await _query.AsNoTracking().FirstOrDefaultAsync();
             }
@@ -384,7 +401,7 @@ namespace Business.Repository
             List<TEntity>? result = null;
 
             if (_query == null)
-                result = _context.Set<TEntity>().AsNoTracking().ToList();
+                result = _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().ToList();
             else
                 result = _query.AsNoTracking().ToList();
 
@@ -398,7 +415,7 @@ namespace Business.Repository
             List<TEntity>? result = null;
 
             if (_query == null)
-                result = await _context.Set<TEntity>().AsNoTracking().ToListAsync();
+                result = await _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().ToListAsync();
             else
                 result = await _query.AsNoTracking().ToListAsync();
 
@@ -410,7 +427,7 @@ namespace Business.Repository
 
         public void Dispose()
         {
-            _context = null;
+            //_context = null;
             _query = null;
         }
     }

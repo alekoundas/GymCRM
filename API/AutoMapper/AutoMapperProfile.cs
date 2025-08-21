@@ -17,8 +17,8 @@ namespace API.AutoMapper
             CreateMap<ContactInformationDto, ContactInformation>();
 
 
-            CreateMap<IdentityRole, IdentityRoleDto>();
-            CreateMap<IdentityRoleDto, IdentityRole>();
+            CreateMap<IdentityRole<Guid>, IdentityRoleDto>();
+            CreateMap<IdentityRoleDto, IdentityRole<Guid>>();
 
             CreateMap<User, UserDto>();
             CreateMap<UserDto, User>();

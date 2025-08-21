@@ -1,16 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using System.Linq.Expressions;
-using Core.Dtos.Identity;
-using Core.Dtos.DataTable;
+﻿using AutoMapper;
 using Business.Services;
-using Core.Models;
-using Core.System;
-using Core.Dtos.Lookup;
 using Core.Dtos;
+using Core.Dtos.DataTable;
+using Core.Dtos.Identity;
+using Core.Dtos.Lookup;
+using Core.Enums;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -21,13 +19,13 @@ namespace API.Controllers
         private readonly IDataService _dataService;
         private readonly ILogger<RolesController> _logger;
         private readonly IMapper _mapper;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
         public RolesController(
             IDataService dataService,
             ILogger<RolesController> logger,
             IMapper mapper,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole<Guid>> roleManager)
         {
             _dataService = dataService;
             _logger = logger;
@@ -37,9 +35,9 @@ namespace API.Controllers
 
         // GET: api/Roles
         [HttpGet]
-        public async Task<IEnumerable<IdentityRole>> GetAll()
+        public async Task<IEnumerable<IdentityRole<Guid>>> GetAll()
         {
-            List<IdentityRole> result = await _roleManager.Roles.ToListAsync();
+            List<IdentityRole<Guid> > result = await _roleManager.Roles.ToListAsync();
             return result;
         }
 
@@ -50,7 +48,7 @@ namespace API.Controllers
             if (id == null)
                 return new ApiResponse<IdentityRoleDto>().SetErrorResponse("errors", "Role ID not set!");
 
-            IdentityRole? role = await _roleManager.FindByIdAsync(id);
+            IdentityRole<Guid>? role = await _roleManager.FindByIdAsync(id);
             if (role == null)
                 return new ApiResponse<IdentityRoleDto>().SetErrorResponse("errors", "Role not found!");
 
@@ -78,22 +76,22 @@ namespace API.Controllers
             if (lookupDto.Filter?.Id != null && lookupDto.Filter?.Id.Length>0)
             {
                 lookupOptions = await _roleManager.Roles
-                    .Where(x=>lookupDto.Filter.Id.Contains(x.Id))
-                    .Select(x => new LookupOptionDto() { Id = x.Id, Value = x.Name ?? "" })
+                    .Where(x=>lookupDto.Filter.Id.Contains(x.Id.ToString()))
+                    .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.Name ?? "" })
                     .ToListAsync();
             }
             else if (lookupDto.Filter?.Value != null && lookupDto.Filter?.Value.Length > 0)
             {
                 lookupOptions = await _roleManager.Roles
                     .Where(x => x.Name.Contains(lookupDto.Filter.Value))
-                    .Select(x => new LookupOptionDto() { Id = x.Id, Value = x.Name ?? "" })
+                    .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.Name ?? "" })
                     .ToListAsync();
             }
             else
             {
 
                 lookupOptions = await _roleManager.Roles
-                    .Select(x => new LookupOptionDto() { Id = x.Id, Value = x.Name ?? "" })
+                    .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.Name ?? "" })
                     .ToListAsync();
             }
 
@@ -106,63 +104,45 @@ namespace API.Controllers
         [HttpPost("GetDataTable")]
         public async Task<ApiResponse<DataTableDto<IdentityRoleDto>>> GetDataTable([FromBody] DataTableDto<IdentityRoleDto> dataTable)
         {
-            //Func<IQueryable<IdentityRole>, IOrderedQueryable<IdentityRole>>? orderByQuery = null;
-            //List<Func<IOrderedQueryable<IdentityRole>, IOrderedQueryable<IdentityRole>>>? thenOrderByQuery = new List<Func<IOrderedQueryable<IdentityRole>, IOrderedQueryable<IdentityRole>>>();
-            //Expression<Func<IdentityRole, bool>>? filterQuery = new Expression<Func<IdentityRole, bool>>();
+            var query = _dataService.Roles;
+
+            // Handle Sorting of DataTable.
+            if (dataTable.MultiSortMeta?.Count() > 0)
+            {
+                // Create the first OrderBy().
+                DataTableSortDto? dataTableSort = dataTable.MultiSortMeta.First();
+                if (dataTableSort.Order > 0)
+                    query.OrderBy(dataTableSort.Field, OrderDirectionEnum.ASCENDING);
+                else if (dataTableSort.Order < 0)
+                    query.OrderBy(dataTableSort.Field, OrderDirectionEnum.DESCENDING);
+
+                // Create the rest OrderBy methods as ThenBy() if any.
+                foreach (var sortInfo in dataTable.MultiSortMeta.Skip(1))
+                {
+                    if (dataTableSort.Order > 0)
+                        query.ThenBy(sortInfo.Field, OrderDirectionEnum.ASCENDING);
+                    else if (dataTableSort.Order < 0)
+                        query.ThenBy(sortInfo.Field, OrderDirectionEnum.DESCENDING);
+                }
+            }
 
 
-            //// Handle Sorting of DataTable.
-            //if (dataTable.MultiSortMeta?.Count() > 0)
-            //{
-            //    // Create the first OrderBy().
-            //    DataTableSortDto? dataTableSort = dataTable.MultiSortMeta.First();
-            //    if (dataTableSort.Order > 0)
-            //        orderByQuery = x => x.OrderByColumn(dataTableSort.Field);
-            //    else if (dataTableSort.Order < 0)
-            //        orderByQuery = x => x.OrderByColumnDescending(dataTableSort.Field);
+            // Handle pagination.
+            int skip = (dataTable.Page - 1) * dataTable.Rows;
+            int take = dataTable.Rows;
 
-            //    // Create the rest OrderBy methods as ThenBy() if any.
-            //    foreach (var sortInfo in dataTable.MultiSortMeta.Skip(1))
-            //    {
-            //        if (dataTableSort.Order > 0)
-            //            thenOrderByQuery.Add(x => x.ThenByColumn(sortInfo.Field));
-            //        else if (dataTableSort.Order < 0)
-            //            thenOrderByQuery.Add(x => x.ThenByColumnDescending(sortInfo.Field));
-            //    }
-            //}
-
-
-            // Handle Filtering of DataTable.
-            //if (dataTable.Filters?.FirstName?.Value != null && dataTable.Filters?.FirstName.Value.Length > 0)
-            //    filterQuery.Add(x => x.FirstName.Contains(dataTable.Filters.FirstName.Value));
-
-            //if (dataTable.Filters?.LastName?.Value != null && dataTable.Filters?.LastName.Value.Length > 0)
-            //    filterQuery.Add(x => x.LastName.Contains(dataTable.Filters.LastName.Value));
-
+            query.AddPagging(skip, take);
 
 
             // Retrieve Data.
-            List<IdentityRole<Guid>> result = await _dataService.Roles.ToListAsync();
+            List<IdentityRole<Guid>> result = await query.ToListAsync();
+            List<IdentityRoleDto> customerDto = _mapper.Map<List<IdentityRoleDto>>(result);
 
+            //TODDO add filter
+            int rows = await _dataService.Users.CountAsync();
 
-
-            //    (
-            //    filterQuery,
-            //    orderByQuery,
-            //    thenOrderByQuery,
-            //    null,
-            //    dataTable.PageCount.Value,
-            //    dataTable.Page.Value
-            //);
-            List<IdentityRoleDto> IdentityRoleDto = _mapper.Map<List<IdentityRoleDto>>(result);
-
-            //IdentityRoleDto.SelectMany(x => x.ContactInformations).ToList().ForEach(x => x.IdentityRole = null);
-            //IdentityRoleDto.SelectMany(x => x.Tickets).ToList().ForEach(x => x.IdentityRole = null);
-
-            //int rows = await _dataService.IdentityRoles.co(filterQuery);
-
-            dataTable.Data = IdentityRoleDto;
-            dataTable.PageCount = 0;
+            dataTable.Data = customerDto;
+            dataTable.PageCount = rows;
 
             return new ApiResponse<DataTableDto<IdentityRoleDto>>().SetSuccessResponse(dataTable);
 
@@ -182,7 +162,7 @@ namespace API.Controllers
             if (roleExists)
                 return new ApiResponse<IdentityRoleDto>().SetErrorResponse("errors", "Role already exists");
 
-            IdentityRole identityRole = new IdentityRole(identityRoleDto.Name);
+            IdentityRole<Guid> identityRole = new IdentityRole<Guid>(identityRoleDto.Name);
             var result = await _roleManager.CreateAsync(identityRole);
             if (result.Succeeded)
             {
@@ -215,7 +195,7 @@ namespace API.Controllers
             if (id == null || id.Count() == 0)
                 return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role name not not set!");
 
-            IdentityRole? identityRole = await _roleManager.FindByIdAsync(id);
+            IdentityRole<Guid>? identityRole = await _roleManager.FindByIdAsync(id);
             if (identityRole == null)
                 return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role name not found!");
 

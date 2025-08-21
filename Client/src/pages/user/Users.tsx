@@ -40,7 +40,6 @@ export default function Users() {
     filters: {
       userName: { value: "", matchMode: "contains" },
       email: { value: "", matchMode: "contains" },
-      roleId: { value: "", matchMode: "contains" },
     },
   };
 
@@ -56,7 +55,7 @@ export default function Users() {
     },
     {
       field: "email",
-      header: "Emal",
+      header: "Email",
       sortable: formMode !== FormMode.ADD,
       filter: formMode !== FormMode.ADD,
       filterPlaceholder: "Search",

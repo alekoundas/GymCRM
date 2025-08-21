@@ -3,6 +3,7 @@ using Core.Models;
 using DataAccess;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Business.Services
 {
@@ -20,16 +21,21 @@ namespace Business.Services
 
 
         public DataService(
-            IDbContextFactory<ApiDbContext> apiDbContextFactory,
+            IDbContextFactory<ApiDbContext> dbContextFactory,
             IGenericRepository<Customer> customerRepository,
             IGenericRepository<User> userRepository,
             IGenericRepository<ContactInformation> contactInformationRepository,
-            IGenericRepository<IdentityRole> roleRepository,
+            IGenericRepository<IdentityRole<Guid>> roleRepository,
+            IGenericRepository<IdentityRoleClaim<Guid>> roleClaimRepository,
             IGenericRepository<IdentityUserRole<Guid>> userRoleRepository)
         {
+            _dbContextFactory = dbContextFactory;
             Customers = customerRepository;
             Users = userRepository;
             ContactInformations = contactInformationRepository;
+            Roles = roleRepository;
+            RoleClaims = roleClaimRepository;
+            UserRoles = userRoleRepository;
         }
 
         public IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : class

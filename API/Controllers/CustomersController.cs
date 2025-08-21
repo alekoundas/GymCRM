@@ -40,10 +40,7 @@ namespace API.Controllers
         [HttpPost("GetDataTable")]
         public async Task<ApiResponse<DataTableDto<CustomerDto>>> GetDataTable([FromBody] DataTableDto<CustomerDto> dataTable)
         {
-            Func<IQueryable<Customer>, IOrderedQueryable<Customer>>? orderByQuery = null;
-            List<Func<IOrderedQueryable<Customer>, IOrderedQueryable<Customer>>>? thenOrderByQuery = new List<Func<IOrderedQueryable<Customer>, IOrderedQueryable<Customer>>>();
             List<Expression<Func<Customer, bool>>>? filterQuery = new List<Expression<Func<Customer, bool>>>();
-            List<Func<IQueryable<Customer>, IIncludableQueryable<Customer, object>>>? includesQuery = new List<Func<IQueryable<Customer>, IIncludableQueryable<Customer, object>>>();
 
             var query = _dataService.ContactInformations;
 
@@ -77,11 +74,14 @@ namespace API.Controllers
 
 
             // Handle Includes.
-            includesQuery.Add(x => x.Include(y => y.ContactInformations));
+            //query.inclure.Add(x => x.Include(y => y.ContactInformations));
 
 
             // Handle pagination.
-            query.AddPagging(dataTable.PageCount ?? 10, dataTable.Page ?? 1);
+            int skip = (dataTable.Page - 1) * dataTable.Rows;
+            int take = dataTable.Rows;
+
+            query.AddPagging(skip, take);
 
 
             // Retrieve Data.
