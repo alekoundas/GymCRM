@@ -2,23 +2,31 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import ApiService from "../../services/ApiService";
-import { UserLoginRequestDto } from "../../model/UserLoginRequestDto";
 import { useAuth } from "../../contexts/AuthContext";
+import { UserRegisterRequestDto } from "../../model/UserRegisterRequestDto";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const [userLoginDto, setUserLoginDto] = useState(new UserLoginRequestDto());
+  const [userRegisterDto, setUserLoginDto] = useState(
+    new UserRegisterRequestDto()
+  );
   const handleChange = (event: React.ChangeEvent<any>) => {
     const name = event.target.name;
     const value = event.target.value;
 
-    userLoginDto[name] = value;
-    setUserLoginDto({ ...userLoginDto });
+    userRegisterDto[name] = value;
+    setUserLoginDto({ ...userRegisterDto });
   };
 
   const onRegister = () => {
-    ApiService.register(userLoginDto, login);
+    ApiService.register(userRegisterDto, login).then((isSuccessful) => {
+      if (isSuccessful) {
+        navigate("/");
+      }
+    });
   };
   return (
     <>
@@ -45,11 +53,48 @@ export default function Register() {
               id="userName"
               name="userName"
               type="text"
-              placeholder="userName"
+              placeholder="User Name"
               className="w-full mb-3"
-              value={userLoginDto.userName}
+              value={userRegisterDto.userName}
               onChange={handleChange}
             />
+
+            <div className="grid ">
+              <div className=" col-12  lg:col-6 xl:col-6">
+                <label
+                  htmlFor="firstName"
+                  className="block text-900 font-medium mb-2"
+                >
+                  First Name
+                </label>
+                <InputText
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  placeholder="First Name"
+                  className="w-full mb-3"
+                  value={userRegisterDto.firstName}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="col-12  lg:col-6 xl:col-6">
+                <label
+                  htmlFor="lastName"
+                  className="block text-900 font-medium mb-2"
+                >
+                  Last Name
+                </label>
+                <InputText
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  placeholder="Last Name"
+                  className="w-full mb-3"
+                  value={userRegisterDto.lastName}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
 
             <label
               htmlFor="email"
@@ -63,7 +108,7 @@ export default function Register() {
               type="text"
               placeholder="Email address"
               className="w-full mb-3"
-              value={userLoginDto.email}
+              value={userRegisterDto.email}
               onChange={handleChange}
             />
 
@@ -79,7 +124,7 @@ export default function Register() {
               type="password"
               placeholder="Password"
               className="w-full mb-3"
-              value={userLoginDto.password}
+              value={userRegisterDto.password}
               onChange={handleChange}
             />
 

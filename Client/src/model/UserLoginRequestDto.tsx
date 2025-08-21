@@ -1,12 +1,10 @@
 export interface UserLoginRequestDto {
-  userName: string;
-  email: string;
+  userNameOrEmail: string;
   password: string;
 }
 
 export class UserLoginRequestDto {
   [key: string]: any;
-  userName: string = "";
-  email: string = "";
+  userNameOrEmail: string = "";
   password: string = "";
 }

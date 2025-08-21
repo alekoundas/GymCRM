@@ -11,13 +11,13 @@ namespace DataAccess
     public class ApiDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>, IDataProtectionKeyContext
     {
         private readonly IConfiguration _configuration;
-        private readonly ApiDbContextInitialiser _apiDbContextInitialiser;
+        //private readonly ApiDbContextInitialiser _apiDbContextInitialiser;
 
-        public ApiDbContext(DbContextOptions<ApiDbContext> options, IConfiguration configuration, ApiDbContextInitialiser apiDbContextInitialiser)
+        public ApiDbContext(DbContextOptions<ApiDbContext> options, IConfiguration configuration)//, ApiDbContextInitialiser apiDbContextInitialiser)
         : base(options)
         {
             _configuration = configuration;
-            _apiDbContextInitialiser = apiDbContextInitialiser;
+            //_apiDbContextInitialiser = apiDbContextInitialiser;
         }
 
         public DbSet<Customer> Customers { get; set; }
@@ -50,9 +50,9 @@ namespace DataAccess
             this.Database.Migrate();
         }
 
-        public async Task TrySeedInitialData()
-        {
-            await _apiDbContextInitialiser.SeedAsync();
-        }
+        //public async Task TrySeedInitialData()
+        //{
+        //    await _apiDbContextInitialiser.SeedAsync();
+        //}
     }
 }

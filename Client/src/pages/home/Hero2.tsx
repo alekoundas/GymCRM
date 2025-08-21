@@ -36,7 +36,7 @@ const HomePage: React.FC = () => {
           start: "center 60%",
           // end: "bottom top",
           end: "+=400%", // Extend scrub duration for smooth pacing (adjust based on video length)
-          scrub: 1,
+          scrub: 1.5,
           pin: true,
           markers: true,
         },

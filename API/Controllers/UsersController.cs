@@ -1,18 +1,12 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.Identity;
 using Core.Models;
-using Core.System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace API.Controllers
 {
@@ -31,14 +25,13 @@ namespace API.Controllers
             IDataService dataService,
             IMapper mapper,
             ILogger<UsersController> logger,
-            IUserService _userService,
-
+            IUserService userService,
             UserManager<User> userManager,
             RoleManager<IdentityRole<Guid>> roleManager)
         {
             _dataService = dataService;
             _logger = logger;
-            _userService = _userService;
+            _userService = userService;
             _userManager = userManager;
             _roleManager = roleManager;
             _mapper = mapper;
@@ -84,7 +77,7 @@ namespace API.Controllers
             user.UserName = request.UserName;
 
             await _userService.AssignSingleRoleAsync(user, role.Name);
-            _dataService.Update(user);
+            await _userManager.UpdateAsync(user);
 
             return new ApiResponse<bool>().SetSuccessResponse(true, "success", "User updated successfully");
         }
@@ -138,7 +131,11 @@ namespace API.Controllers
         [HttpPost("Login")]
         public async Task<ApiResponse<UserLoginResponseDto>> Login(UserLoginRequestDto request)
         {
-            User? user = await _dataService.Users.FirstOrDefaultAsync(x => x.Email == request.UserNameOrEmail || x.UserName == request.UserNameOrEmail);
+
+            User? user = await _userManager.FindByEmailAsync(request.UserNameOrEmail);
+            if(user == null)
+                user = await _userManager.FindByNameAsync(request.UserNameOrEmail);
+
             if (user == null)
                 return new ApiResponse<UserLoginResponseDto>().SetErrorResponse("email", "User Name/Email not found");
 
@@ -159,7 +156,7 @@ namespace API.Controllers
         {
             return await _userService.RefreshToken(request);
         }
-
+         
 
         // POST: api/Users/Logout
         [HttpPost("Logout")]
@@ -169,7 +166,7 @@ namespace API.Controllers
                 return new ApiResponse<bool>().SetErrorResponse("error", "User is not loged in!");
 
             string username = User.Claims.First(x => x.Type == "UserName").Value;
-            User? user = await _dataService.Users.FirstOrDefaultAsync(x => x.UserName == username);
+            User? user = await _userManager.FindByNameAsync(username);
 
             if (user == null)
                 return new ApiResponse<bool>().SetErrorResponse("error", "User doesnt exist!");

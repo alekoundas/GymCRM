@@ -91,7 +91,7 @@ function Customers() {
           icon="pi pi-plus"
           label="Add"
           outlined
-          onClick={() => navigate("/customers/add")}
+          onClick={() => navigate("/administrator/customers/add")}
         />
       </div>
     );

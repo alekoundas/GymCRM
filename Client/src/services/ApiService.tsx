@@ -2,6 +2,7 @@ import { ApiResponse } from "../model/ApiResponse";
 import { DataTableDto } from "../model/DataTableDto";
 import { LookupDto } from "../model/lookup/LookupDto";
 import { UserLoginRequestDto } from "../model/UserLoginRequestDto";
+import { UserRegisterRequestDto } from "../model/UserRegisterRequestDto";
 import { LocalStorageService } from "./LocalStorageService";
 import { ToastService } from "./ToastService";
 import { TokenService } from "./TokenService";
@@ -60,10 +61,13 @@ export default class ApiService {
     return await this.apiRequest(url, "PUT", data);
   }
 
-  public static async login(data: UserLoginRequestDto, authLogin: () => void) {
+  public static async login(
+    data: UserLoginRequestDto,
+    authLogin: () => void
+  ): Promise<boolean> {
     const url = this.serverUrl + "users/login";
 
-    await this.apiRequest(url, "POST", data).then((result) => {
+    return await this.apiRequest(url, "POST", data).then((result) => {
       if (result) {
         const expireDate = new Date(new Date().getTime() + 604800 * 1000);
 
@@ -73,31 +77,39 @@ export default class ApiService {
         authLogin();
 
         ToastService.showSuccess("Login was successfull!");
+        return true;
       } else {
         ToastService.showError("Login Failed!");
+        return false;
       }
     });
   }
 
   public static async register(
-    data: UserLoginRequestDto,
+    data: UserRegisterRequestDto,
     authLogin: () => void
-  ) {
+  ): Promise<boolean> {
     const url = this.serverUrl + "users/register";
-    await this.apiRequest(url, "POST", data).then((result) => {
+    return await this.apiRequest(url, "POST", data).then((result) => {
       if (result) {
-        ToastService.showInfo("ssss");
-        this.login(data, authLogin);
+        var loginDto = new UserLoginRequestDto();
+        loginDto.userNameOrEmail = data.email;
+        loginDto.password = data.password;
+        ToastService.showSuccess("Register was successfull!");
+        this.login(loginDto, authLogin);
+
+        return true;
       }
+      return false;
     });
   }
 
   public static async logout(authLogout: () => void) {
     const url = this.serverUrl + "users/logout";
     await this.apiRequest<ApiResponse<boolean>>(url, "POST").then((result) => {
+      TokenService.logout();
+      authLogout();
       if (result) {
-        TokenService.logout();
-        authLogout();
         ToastService.showSuccess("Logout was successfull!");
       } else {
         ToastService.showError("Logout Failed!");

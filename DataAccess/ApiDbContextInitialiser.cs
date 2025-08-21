@@ -1,5 +1,7 @@
 ﻿using Core.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
@@ -8,31 +10,43 @@ namespace DataAccess
     public class ApiDbContextInitialiser
     {
         private readonly ILogger<ApiDbContextInitialiser> _logger;
-        private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly ClaimsIdentity _claimsIdentity;
-
-
+        private readonly IDbContextFactory<ApiDbContext> _dbContextFactory;
+        private readonly IServiceProvider _serviceProvider;
 
         public ApiDbContextInitialiser(
             ILogger<ApiDbContextInitialiser> logger,
-            UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManager,
-            ClaimsIdentity claimsIdentity)
+            IDbContextFactory<ApiDbContext> dbContextFactory,
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
-            _userManager = userManager;
-            _roleManager = roleManager;
-            _claimsIdentity = claimsIdentity;
+            _dbContextFactory = dbContextFactory;
+            _serviceProvider = serviceProvider;
         }
 
+        public async Task RunMigrationsAsync()
+        {
+            try
+            {
+                using var dbContext = _dbContextFactory.CreateDbContext();
+                await dbContext.Database.MigrateAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while running migrations.");
+                throw;
+            }
+        }
 
         public async Task SeedAsync()
         {
             try
             {
-                TrySeedClaimsAsync();
-                await TrySeedAdminUserAsync();
+                using var scope = _serviceProvider.CreateScope();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+
+                await TrySeedRolesAndClaimsAsync(roleManager);
+                await TrySeedAdminUserAsync(userManager, roleManager);
             }
             catch (Exception ex)
             {
@@ -40,73 +54,85 @@ namespace DataAccess
                 throw;
             }
         }
-       
 
-        private void TrySeedClaimsAsync()
+        private async Task TrySeedRolesAndClaimsAsync(RoleManager<IdentityRole<Guid>> roleManager)
         {
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Customers_View"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Customers_Add"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Customers_Edit"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Customers_Delete"));
+            var administratorRole = new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Administrator", NormalizedName = "ADMINISTRATOR" };
 
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Tickets_View"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Tickets_Add"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Tickets_Edit"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Tickets_Delete"));
+            if (!await roleManager.RoleExistsAsync(administratorRole.Name))
+            {
+                var roleResult = await roleManager.CreateAsync(administratorRole);
+                if (!roleResult.Succeeded)
+                    throw new InvalidOperationException($"Failed to create role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
 
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "ContactInformations_View"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "ContactInformations_Add"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "ContactInformations_Edit"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "ContactInformations_Delete"));
+                var claims = new List<Claim>
+                {
+                    new Claim("Permission", "Customers_View"),
+                    new Claim("Permission", "Customers_Add"),
+                    new Claim("Permission", "Customers_Edit"),
+                    new Claim("Permission", "Customers_Delete"),
+                    new Claim("Permission", "Tickets_View"),
+                    new Claim("Permission", "Tickets_Add"),
+                    new Claim("Permission", "Tickets_Edit"),
+                    new Claim("Permission", "Tickets_Delete"),
+                    new Claim("Permission", "ContactInformations_View"),
+                    new Claim("Permission", "ContactInformations_Add"),
+                    new Claim("Permission", "ContactInformations_Edit"),
+                    new Claim("Permission", "ContactInformations_Delete"),
+                    new Claim("Permission", "Roles_View"),
+                    new Claim("Permission", "Roles_Add"),
+                    new Claim("Permission", "Roles_Edit"),
+                    new Claim("Permission", "Roles_Delete"),
+                    new Claim("Permission", "Users_View"),
+                    new Claim("Permission", "Users_Add"),
+                    new Claim("Permission", "Users_Edit"),
+                    new Claim("Permission", "Users_Delete"),
+                    new Claim("Permission", "Makers_View"),
+                    new Claim("Permission", "Makers_Add"),
+                    new Claim("Permission", "Makers_Edit"),
+                    new Claim("Permission", "Makers_Delete"),
+                    new Claim("Permission", "MakerModels_View"),
+                    new Claim("Permission", "MakerModels_Add"),
+                    new Claim("Permission", "MakerModels_Edit"),
+                    new Claim("Permission", "MakerModels_Delete")
+                };
 
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Roles_View"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Roles_Add"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Roles_Edit"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Roles_Delete"));
-
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Users_View"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Users_Add"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Users_Edit"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Users_Delete"));
-
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Makers_View"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Makers_Add"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Makers_Edit"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "Makers_Delete"));
-
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "MakerModels_View"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "MakerModels_Add"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "MakerModels_Edit"));
-            _claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "MakerModels_Delete"));
-
+                foreach (var claim in claims)
+                {
+                    var claimResult = await roleManager.AddClaimAsync(administratorRole, claim);
+                    if (!claimResult.Succeeded)
+                        throw new InvalidOperationException($"Failed to add claim {claim.Value}: {string.Join(", ", claimResult.Errors.Select(e => e.Description))}");
+                }
+            }
         }
 
-        private async Task TrySeedAdminUserAsync()
+        private async Task TrySeedAdminUserAsync(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
         {
-            // Default roles
-            var administratorRole = new IdentityRole("Administrator");
-
-            if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
+            var administrator = new User
             {
-                var role = await _roleManager.CreateAsync(administratorRole);
-                if (role != null)
-                    _claimsIdentity.Claims
-                        .Select(x => x.Value)
-                        .ToList()
-                        .ForEach(async x =>
-                            await _roleManager.AddClaimAsync(administratorRole, _claimsIdentity.Claims.First(y => y.Value == x))
-                         );
-            }
+                Id = Guid.NewGuid(),
+                UserName = "Admin",
+                Email = "Admin@Admin.Admin",
+                FirstName = "Admin",
+                LastName = "User"
+            };
 
-            // Default users
-            var administrator = new User { UserName = "Admin", Email = "Admin@Admin.Admin" };
-
-            if (_userManager.Users.All(u => u.UserName != administrator.UserName))
+            if (await userManager.FindByNameAsync(administrator.UserName) == null)
             {
-                await _userManager.CreateAsync(administrator, "P@ssw0rd");
-                if (!string.IsNullOrWhiteSpace(administratorRole.Name))
+                var userResult = await userManager.CreateAsync(administrator, "P@ssw0rd");
+                if (!userResult.Succeeded)
+                    throw new InvalidOperationException($"Failed to create user: {string.Join(", ", userResult.Errors.Select(e => e.Description))}");
+
+                if (await roleManager.RoleExistsAsync("Administrator"))
                 {
-                    await _userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
+                    // Enforce single role
+                    var currentRoles = await userManager.GetRolesAsync(administrator);
+                    if (currentRoles.Any())
+                        await userManager.RemoveFromRolesAsync(administrator, currentRoles);
+
+                    var roleResult = await userManager.AddToRoleAsync(administrator, "Administrator");
+                    if (!roleResult.Succeeded)
+                        throw new InvalidOperationException($"Failed to assign role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
                 }
             }
         }
