@@ -18,6 +18,8 @@ namespace DataAccess.Configurations
             builder.Property(x => x.MaxParticipants)
                 .IsRequired();
 
+            builder.Property(x => x.StartOn)
+                .IsRequired();
 
             builder.Property(x => x.Name)
                .IsRequired(false)

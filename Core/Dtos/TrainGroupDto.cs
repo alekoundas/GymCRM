@@ -18,8 +18,12 @@ namespace Core.Dtos
         public bool IsRepeating { get; set; }
 
         [Required(ErrorMessage = "Duration is required")]
-        //[Range(typeof(TimeSpan), "00:15:00", "04:00:00", ErrorMessage = "Duration must be between 15 minutes and 4 hours")]
+        [Range(typeof(TimeSpan), "00:15:00", "04:00:00", ErrorMessage = "Duration must be between 5 minutes and 8 hours")]
         public TimeSpan Duration { get; set; }
+
+        [Required(ErrorMessage = "StartOn is required")]
+        [Range(typeof(TimeSpan), "00:00:00", "23:59:59", ErrorMessage = "StartOn must be a valid time of day")]
+        public TimeSpan StartOn { get; set; }
 
         [Required(ErrorMessage = "MaxParticipants is required")]
         //[Range(1, 50, ErrorMessage = "MaxParticipants must be between 1 and 50")]

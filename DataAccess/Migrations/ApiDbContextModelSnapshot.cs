@@ -96,6 +96,9 @@ namespace DataAccess.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<TimeSpan>("StartOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("TrainerId")
                         .HasColumnType("TEXT");
 
@@ -174,9 +177,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("RepeatingTrainGroupType")
-                        .HasColumnType("TEXT");
-
-                    b.Property<TimeSpan>("StartOn")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TrainGroupId")

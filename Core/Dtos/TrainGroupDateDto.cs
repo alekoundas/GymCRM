@@ -11,10 +11,6 @@ namespace Core.Dtos
 
         public RepeatingTrainGroupTypeEnum? RepeatingTrainGroupType { get; set; }
 
-        [Required(ErrorMessage = "StartOn is required")]
-        [Range(typeof(TimeSpan), "00:00:00", "23:59:59", ErrorMessage = "StartOn must be a valid time of day")]
-        public TimeSpan StartOn { get; set; }
-
         public DateOnly? FixedDay { get; set; }
 
 

@@ -6,10 +6,7 @@ namespace Core.Models
 {
     public class TrainGroupDate : BaseModel
     {
-
         public RepeatingTrainGroupTypeEnum? RepeatingTrainGroupType { get; set; }
-        public TimeSpan StartOn { get; set; }
-
         public DateOnly? FixedDay { get; set; }
 
         [Range(0, 6)] // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
