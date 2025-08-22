@@ -12,9 +12,17 @@ namespace DataAccess.Configurations
             builder.HasIndex(x => x.Id).IsUnique();
             builder.HasKey(x => x.Id);
 
-            builder.HasOne(x => x.Customer)
+
+            // Properties.
+            // Store enum as string
+            builder.Property(x => x.Type)
+                .IsRequired()
+                .HasConversion<string>();
+
+
+            builder.HasOne(x => x.User)
                 .WithMany(x => x.ContactInformations)
-                .HasForeignKey(x => x.CustomerId)
+                .HasForeignKey(x => x.UserId)
                 .IsRequired(true)
                 .OnDelete(DeleteBehavior.Cascade);
         }

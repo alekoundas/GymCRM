@@ -7,6 +7,6 @@ namespace Core.Models
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
 
-        public virtual ICollection<ContactInformation> ContactInformations { get; set; } = new Collection<ContactInformation>();
+        //public virtual ICollection<ContactInformation> ContactInformations { get; set; } = new Collection<ContactInformation>();
     }
 }
