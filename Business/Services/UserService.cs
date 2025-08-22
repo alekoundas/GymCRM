@@ -85,17 +85,31 @@ namespace Business.Services
 
         public async Task<UserLoginResponseDto> GenerateUserToken(User user)
         {
-            // Get role claims directly from UserManager
+            // Get user claims 
             List<Claim> claims = (await _userManager.GetClaimsAsync(user)).ToList();
 
-            // Get roles and create role claims
-            List<string> roles = (await _userManager.GetRolesAsync(user)).ToList();
-            List<Claim> roleClaims = roles
-                .Where(x => !string.IsNullOrEmpty(x))
-                .Select(x => new Claim(ClaimTypes.Role, x))
-                .ToList();
+            // Get user roles
+            var userRoles = await _userManager.GetRolesAsync(user);
 
-            claims.AddRange(roleClaims);
+            // Add role-based claims
+            foreach (var roleName in userRoles)
+            {
+                var role = await _roleManager.FindByNameAsync(roleName);
+                if (role != null)
+                {
+                    var roleClaims = await _roleManager.GetClaimsAsync(role);
+                    claims.AddRange(roleClaims);
+                }
+            }
+
+            // Get roles and create role claims
+            //List<string> roles = (await _userManager.GetRolesAsync(user)).ToList();
+            //List<Claim> roleClaims = roles
+            //    .Where(x => !string.IsNullOrEmpty(x))
+            //    .Select(x => new Claim(ClaimTypes.Role, x))
+            //    .ToList();
+
+            //claims.AddRange(roleClaims);
 
             string token = GetToken(_tokenSettings, user, claims);
             await _userManager.RemoveAuthenticationTokenAsync(user, "REFRESHTOKENPROVIDER", "RefreshToken");

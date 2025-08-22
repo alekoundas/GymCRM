@@ -1,5 +1,3 @@
-import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
 import { ScrollPanel } from "primereact/scrollpanel";
 import { Route, Routes } from "react-router-dom";
 import NavLeft from "../../components/navbar-left/NavLeft";
@@ -8,9 +6,8 @@ import Customers from "../customer/Customers";
 import MakerModels from "../maker-model/MakerModels";
 import Makers from "../maker/Makers";
 import Roles from "../role/Roles";
-import Login from "../user/Login";
-import Register from "../user/Register";
 import Users from "../user/Users";
+import TrainGroups from "../train-group/TrainGroups";
 
 export default function Administrator() {
   return (
@@ -25,6 +22,23 @@ export default function Administrator() {
             className="custombar2"
           >
             <Routes>
+              <Route
+                path="train-groups"
+                element={<TrainGroups />}
+              />
+              <Route
+                path="train-groups/add"
+                element={<CustomerForm />}
+              />
+              <Route
+                path="train-groups/:id/edit"
+                element={<CustomerForm />}
+              />
+              <Route
+                path="train-groups/:id/view"
+                element={<CustomerForm />}
+              />
+
               <Route
                 path="customers"
                 element={<Customers />}

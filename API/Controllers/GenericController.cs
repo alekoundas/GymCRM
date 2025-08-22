@@ -1,21 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+﻿using AutoMapper;
 using Business.Services;
 using Core.Dtos;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class GenericController<TEntity, TEntityController> : ControllerBase where TEntity : class
+    public class GenericController<TEntity, TEntityDto> : ControllerBase where TEntity : class
     {
         private readonly IDataService _dataService;
-        private readonly ILogger<TEntityController> _logger;
-
-        public GenericController(IDataService dataService, ILogger<TEntityController> logger)
+        //private readonly ILogger<TEntityController> _logger;
+        private readonly IMapper _mapper;
+        public GenericController(IDataService dataService, IMapper mapper)//, ILogger<TEntityController> logger)
         {
-            _logger = logger;
+            //_logger = logger;
             _dataService = dataService;
+            _mapper= mapper;
         }
 
 
@@ -39,13 +41,16 @@ namespace API.Controllers
 
         // POST: api/controller
         [HttpPost]
-        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Post([FromBody] TEntity entity)
+        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Post([FromBody] TEntityDto entityDto)
         {
             if (!IsUserAuthorized("Add"))
                 return new ApiResponse<TEntity>().SetErrorResponse("Authorization", "User is not authorized to perform this action.");
 
             if (!ModelState.IsValid)
                 return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("Validation", "Invalid data provided."));
+
+
+            TEntity entity = _mapper.Map<TEntity>(entityDto);
 
             try
             {
@@ -57,20 +62,23 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating {EntityName}", typeof(TEntity).Name);
+                //_logger.LogError(ex, "Error creating {EntityName}", typeof(TEntity).Name);
                 return StatusCode(500, new ApiResponse<TEntity>().SetErrorResponse("Server", "An error occurred while creating the entity."));
             }
         }
 
         // PUT: api/controller/5
         [HttpPut("{id}")]
-        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Put(int id, [FromBody] TEntity entity)
+        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Put(int id, [FromBody] TEntityDto entityDto)
         {
             if (!IsUserAuthorized("Edit"))
                 return new ApiResponse<TEntity>().SetErrorResponse("Authorization", "User is not authorized to perform this action.");
 
             if (!ModelState.IsValid)
                 return new ApiResponse<TEntity>().SetErrorResponse("Validation", "Invalid data provided.");
+
+            TEntity entity = _mapper.Map<TEntity>(entityDto);
+
 
             TEntity? existingEntity = await _dataService.GetGenericRepository<TEntity>().FindAsync(id);
             if (existingEntity == null)
@@ -86,7 +94,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating {EntityName}", typeof(TEntity).Name);
+                //_logger.LogError(ex, "Error updating {EntityName}", typeof(TEntity).Name);
                 return StatusCode(500, new ApiResponse<TEntity>().SetErrorResponse("Server", "An error occurred while updating the entity."));
             }
         }

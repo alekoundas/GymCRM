@@ -10,22 +10,8 @@ export default function NavLeft() {
 
   const items: MenuItem[] = [
     {
-      label: "",
+      label: "Admin",
       items: [
-        {
-          label: "Customers",
-          icon: "pi pi-user",
-          command: () => {
-            navigate("/administrator/customers");
-          },
-        },
-        // {
-        //   label: "Tickets",
-        //   icon: "pi pi-ticket",
-        //   command: () => {
-        //     navigate("/administrator/tickets");
-        //   },
-        // },
         {
           label: "Users",
           icon: "pi pi-users",
@@ -43,24 +29,36 @@ export default function NavLeft() {
       ],
     },
     {
-      label: "Lookups",
+      label: "Trainer",
       items: [
-        // {
-        //   label: "Makers",
-        //   icon: "pi pi-database",
-        //   command: () => {
-        //     navigate("/administrator/makers");
-        //   },
-        // },
-        // {
-        //   label: "Maker Models",
-        //   icon: "pi pi-database",
-        //   command: () => {
-        //     navigate("/administrator/makermodels");
-        //   },
-        // },
+        {
+          label: "Train Groups",
+          icon: "pi pi-users",
+          command: () => {
+            navigate("/administrator/train-groups");
+          },
+        },
       ],
     },
+    // {
+    //   label: "Lookups",
+    //   items: [
+    //     // {
+    //     //   label: "Makers",
+    //     //   icon: "pi pi-database",
+    //     //   command: () => {
+    //     //     navigate("/administrator/makers");
+    //     //   },
+    //     // },
+    //     // {
+    //     //   label: "Maker Models",
+    //     //   icon: "pi pi-database",
+    //     //   command: () => {
+    //     //     navigate("/administrator/makermodels");
+    //     //   },
+    //     // },
+    //   ],
+    // },
   ];
 
   return (

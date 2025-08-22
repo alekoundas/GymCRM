@@ -17,6 +17,7 @@ import MakerModels from "./pages/maker-model/MakerModels.tsx";
 import Register from "./pages/user/Register.tsx";
 import Administrator from "./pages/administrator/administrator.tsx";
 import Appointment from "./pages/appointment/Appointment.tsx";
+import TrainGroups from "./pages/train-group/TrainGroups.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -71,20 +72,20 @@ export default function App() {
                 element={<Administrator />}
               >
                 <Route
-                  path="customers"
-                  element={<Customers />}
+                  path="train-groups"
+                  element={<TrainGroups />}
                 />
                 <Route
-                  path="customers/add"
-                  element={<CustomerForm />}
+                  path="train-groups/add"
+                  element={<TrainGroups />}
                 />
                 <Route
-                  path="customers/:id/edit"
-                  element={<CustomerForm />}
+                  path="train-groups/:id/edit"
+                  element={<TrainGroups />}
                 />
                 <Route
-                  path="customers/:id/view"
-                  element={<CustomerForm />}
+                  path="train-groups/:id/view"
+                  element={<TrainGroups />}
                 />
 
                 {/* Users */}
