@@ -1,6 +1,7 @@
 ﻿using Business.Repository;
 using Core.Models;
 using DataAccess;
+using DataAccess.Configurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -13,27 +14,45 @@ namespace Business.Services
         private IDbContextFactory<ApiDbContext> _dbContextFactory;
 
 
-        public IGenericRepository<Customer> Customers { get; }
+        // Repositories.
         public IGenericRepository<User> Users { get; }
+        public IGenericRepository<TrainGroup> TrainGroups { get; }
+        public IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
         public IGenericRepository<ContactInformation> ContactInformations { get; }
+        public IGenericRepository<TrainGroupParticipant> TrainGroupParticipants { get; }
+        public IGenericRepository<TrainGroupCancellationSubscriber> TrainGroupCancellationSubscribers { get; }
+
+        // Identity.
         public IGenericRepository<IdentityRole<Guid>> Roles { get; }
         public IGenericRepository<IdentityUserRole<Guid>> UserRoles { get; }
         public IGenericRepository<IdentityRoleClaim<Guid>> RoleClaims { get; }
 
 
+
         public DataService(
             IDbContextFactory<ApiDbContext> dbContextFactory,
-            IGenericRepository<Customer> customerRepository,
             IGenericRepository<User> userRepository,
+            IGenericRepository<TrainGroup> trainGroupRepository,
+            IGenericRepository<TrainGroupDate> trainGroupDateRepository,
             IGenericRepository<ContactInformation> contactInformationRepository,
+            IGenericRepository<TrainGroupParticipant> trainGroupParticipantRepository,
+            IGenericRepository<TrainGroupCancellationSubscriber> trainGroupCancellationSubscriberRepository,
             IGenericRepository<IdentityRole<Guid>> roleRepository,
             IGenericRepository<IdentityRoleClaim<Guid>> roleClaimRepository,
             IGenericRepository<IdentityUserRole<Guid>> userRoleRepository)
         {
             _dbContextFactory = dbContextFactory;
-            Customers = customerRepository;
+
+            // Repositories.
             Users = userRepository;
+            TrainGroups = trainGroupRepository;
+            TrainGroupDates = trainGroupDateRepository;
+            TrainGroupParticipants = trainGroupParticipantRepository;
+            TrainGroupCancellationSubscribers = trainGroupCancellationSubscriberRepository;
             ContactInformations = contactInformationRepository;
+
+
+            // Identity.
             Roles = roleRepository;
             RoleClaims = roleClaimRepository;
             UserRoles = userRoleRepository;
@@ -41,12 +60,18 @@ namespace Business.Services
 
         public IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : class
         {
-            if (typeof(TEntity) == typeof(Customer))
-                return (IGenericRepository<TEntity>)Customers;
             if (typeof(TEntity) == typeof(User))
                 return (IGenericRepository<TEntity>)Users;
+            if (typeof(TEntity) == typeof(TrainGroup))
+                return (IGenericRepository<TEntity>)TrainGroups;
+            if (typeof(TEntity) == typeof(TrainGroupDate))
+                return (IGenericRepository<TEntity>)TrainGroupDates;
             if (typeof(TEntity) == typeof(ContactInformation))
                 return (IGenericRepository<TEntity>)ContactInformations;
+            if (typeof(TEntity) == typeof(TrainGroupParticipant))
+                return (IGenericRepository<TEntity>)TrainGroupParticipants;
+            if (typeof(TEntity) == typeof(TrainGroupCancellationSubscriber))
+                return (IGenericRepository<TEntity>)TrainGroupCancellationSubscribers;
             if (typeof(TEntity) == typeof(IdentityRole<Guid>))
                 return (IGenericRepository<TEntity>)Roles;
             if (typeof(TEntity) == typeof(IdentityUserRole<Guid>))

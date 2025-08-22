@@ -41,12 +41,12 @@ namespace DataAccess
         {
             base.OnModelCreating(builder);
 
+            builder.ApplyConfiguration(new UserConfiguration());
             builder.ApplyConfiguration(new TrainGroupConfiguration());
             builder.ApplyConfiguration(new TrainGroupDateConfiguration());
+            builder.ApplyConfiguration(new ContactInformationConfiguration());
             builder.ApplyConfiguration(new TrainGroupParticipantConfiguration());
             builder.ApplyConfiguration(new TrainGroupCancellationSubscriberConfiguration());
-            builder.ApplyConfiguration(new ContactInformationConfiguration());
-            builder.ApplyConfiguration(new UserConfiguration());
         }
 
         public void RunMigrations()
