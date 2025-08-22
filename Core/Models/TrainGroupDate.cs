@@ -23,9 +23,8 @@ namespace Core.Models
         public int TrainGroupId { get; set; }
         public TrainGroup TrainGroup { get; set; } = null!;
 
+
         public virtual ICollection<TrainGroupParticipant> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipant>();
         public virtual ICollection<TrainGroupCancellationSubscriber> TrainGroupCancellationSubscribers { get; set; } = new Collection<TrainGroupCancellationSubscriber>();
-
-
     }
 }

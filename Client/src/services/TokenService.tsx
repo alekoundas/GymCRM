@@ -7,6 +7,7 @@ interface TokenData {
   id?: string;
   userName?: string;
   roleClaim?: string[];
+  Permission?: string[];
 }
 
 export class TokenService {
@@ -46,12 +47,57 @@ export class TokenService {
     }
   };
 
+  public static getTokenClaims = (): TokenData | null => {
+    const token = LocalStorageService.getAccessToken();
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const decodedToken = jwtDecode<TokenData>(token);
+      return decodedToken;
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return null;
+    }
+  };
+
+  // Get specific claim by key
+  public static getClaim = (claimKey: keyof TokenData): any => {
+    const claims = TokenService.getTokenClaims();
+    return claims ? claims[claimKey] : null;
+  };
+
+  // Get role claims
+  public static getRoleClaims = (): string[] | null => {
+    return TokenService.getClaim("roleClaim") || null;
+  };
+
+  // Get user ID
+  public static getUserId = (): string | null => {
+    return TokenService.getClaim("id") || null;
+  };
+
+  // Get username
+  public static getUserName = (): string | null => {
+    return TokenService.getClaim("userName") || null;
+  };
+
+  // Is user allowed
+  public static isUserAllowed = (claim: string): boolean => {
+    const permissions: string[] = TokenService.getClaim("Permission");
+    const isAllowed = permissions.includes(claim);
+    return isAllowed;
+  };
+
+  // Logout
   public static logout = () => {
     LocalStorageService.setRefreshToken();
     LocalStorageService.setAccessToken();
     LocalStorageService.setRefreshTokenExpireDate();
   };
 
+  // Login
   public static setAccessToken = (value: string) =>
     LocalStorageService.setAccessToken(value);
 
@@ -61,6 +107,7 @@ export class TokenService {
   public static setRefreshTokenExpireDate = (value: string) =>
     LocalStorageService.setRefreshTokenExpireDate(value);
 
+  // Refresh tokens
   public static getUserRefreshTokenDto = (): UserRefreshTokenDto => ({
     accessToken: LocalStorageService.getAccessToken() ?? "",
     refreshToken: LocalStorageService.getRefreshToken() ?? "",

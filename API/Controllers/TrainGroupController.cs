@@ -1,4 +1,5 @@
-﻿using Business.Services;
+﻿using AutoMapper;
+using Business.Services;
 using Core.Dtos;
 using Core.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -6,15 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [Route("api/[controller]")]
-    public class TrainGroupController : GenericController<TrainGroup, TrainGroupController>
+    public class TrainGroupController : GenericController<TrainGroup, TrainGroupDto>
     {
         private readonly IDataService _dataService;
         private readonly ILogger<TrainGroupController> _logger;
 
-        public TrainGroupController(IDataService dataService, ILogger<TrainGroupController> logger) : base(dataService, logger)
+        public TrainGroupController(IDataService dataService, IMapper mapper) : base(dataService, mapper)
         {
             _dataService = dataService;
-            _logger = logger;
         }
 
         //// Override Get to add custom logic
