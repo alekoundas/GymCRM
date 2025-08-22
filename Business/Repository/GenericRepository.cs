@@ -237,74 +237,92 @@ namespace Business.Repository
 
 
 
-        public void Add(TEntity entity)
+        public int Add(TEntity entity)
         {
             ApiDbContext context = _contextFactory.CreateDbContext();
             context.Set<TEntity>().Add(entity);
-            context.SaveChanges();
+            int result = context.SaveChanges();
             context.Dispose();
             Dispose();
+
+            return result;
         }
 
-        public async Task AddAsync(TEntity entity)
+        public async Task<int> AddAsync(TEntity entity)
         {
             ApiDbContext context = _contextFactory.CreateDbContext();
             await context.AddAsync(entity);
-            await context.SaveChangesAsync();
+            int result = await context.SaveChangesAsync();
             context.Dispose();
             Dispose();
+
+            return result;
         }
 
 
-        public void AddRange(IEnumerable<TEntity> entities)
+        public int AddRange(IEnumerable<TEntity> entities)
         {
             ApiDbContext context = _contextFactory.CreateDbContext();
             context.Set<TEntity>().AddRange(entities);
-            context.SaveChanges();
+            int result = context.SaveChanges();
             context.Dispose();
             Dispose();
+
+            return result;
         }
-        public async Task AddRangeAsync(IEnumerable<TEntity> entities)
+
+        public async Task<int> AddRangeAsync(IEnumerable<TEntity> entities)
         {
             ApiDbContext context = _contextFactory.CreateDbContext();
             await context.Set<TEntity>().AddRangeAsync(entities);
-            await context.SaveChangesAsync();
+            int result = await context.SaveChangesAsync();
             context.Dispose();
             Dispose();
+
+            return result;
         }
 
-        public void Remove(TEntity entity)
+        public int Remove(TEntity entity)
         {
             ApiDbContext context = _contextFactory.CreateDbContext();
             context.Set<TEntity>().Remove(entity);
-            context.SaveChanges();
+            int result = context.SaveChanges();
             context.Dispose();
             Dispose();
+
+            return result;
         }
-        public async Task RemoveAsync(TEntity entity)
+        public async Task<int> RemoveAsync(TEntity entity)
         {
             ApiDbContext context = _contextFactory.CreateDbContext();
             context.Set<TEntity>().Remove(entity);
-            await context.SaveChangesAsync();
+            int result = await context.SaveChangesAsync();
             context.Dispose();
             Dispose();
+
+            return result;
         }
 
-        public void RemoveRange(IEnumerable<TEntity> entities)
+        public int RemoveRange(IEnumerable<TEntity> entities)
         {
             ApiDbContext context = _contextFactory.CreateDbContext();
             context.Set<TEntity>().RemoveRange(entities);
-            context.SaveChangesAsync();
+            int result = context.SaveChanges();
             context.Dispose();
             Dispose();
+
+            return result;
         }
-        public async Task RemoveRangeAsync(IEnumerable<TEntity> entities)
+
+        public async Task<int> RemoveRangeAsync(IEnumerable<TEntity> entities)
         {
             ApiDbContext context = _contextFactory.CreateDbContext();
             context.Set<TEntity>().RemoveRange(entities);
-            await context.SaveChangesAsync();
+            int result = await context.SaveChangesAsync();
             context.Dispose();
             Dispose();
+
+            return result;
         }
 
 
@@ -374,7 +392,7 @@ namespace Business.Repository
             else
             {
                 if (_query == null)
-                    result = await  _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().FirstOrDefaultAsync();
+                    result = await _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().FirstOrDefaultAsync();
                 else
                     result = await _query.AsNoTracking().FirstOrDefaultAsync();
             }

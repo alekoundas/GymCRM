@@ -38,17 +38,17 @@ namespace Business.Repository
 
 
 
-        void Add(TEntity entity);
-        Task AddAsync(TEntity entity);
-        void AddRange(IEnumerable<TEntity> entities);
-        Task AddRangeAsync(IEnumerable<TEntity> entities);
+        int Add(TEntity entity);
+        Task<int> AddAsync(TEntity entity);
+        int AddRange(IEnumerable<TEntity> entities);
+        Task<int> AddRangeAsync(IEnumerable<TEntity> entities);
 
 
-        void Remove(TEntity entity);
-        Task RemoveAsync(TEntity entity);
+        int Remove(TEntity entity);
+        Task<int> RemoveAsync(TEntity entity);
 
-        void RemoveRange(IEnumerable<TEntity> entities);
-        Task RemoveRangeAsync(IEnumerable<TEntity> entities);
+        int RemoveRange(IEnumerable<TEntity> entities);
+        Task<int> RemoveRangeAsync(IEnumerable<TEntity> entities);
 
 
         TEntity? Find(int id);
