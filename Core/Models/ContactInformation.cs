@@ -10,7 +10,7 @@ namespace Core.Models
         public bool IsFavorite { get; set; }
 
 
-        public int CustomerId { get; set; }
-        public Customer Customer { get; set; } = new Customer();
+        public Guid UserId { get; set; }
+        public User User { get; set; } = null!;
     }
 }

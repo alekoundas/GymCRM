@@ -34,9 +34,6 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -44,8 +41,12 @@ namespace DataAccess.Migrations
                     b.Property<bool>("IsFavorite")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -53,15 +54,15 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
                     b.HasIndex("Id")
                         .IsUnique();
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("ContactInformations");
                 });
 
-            modelBuilder.Entity("Core.Models.Customer", b =>
+            modelBuilder.Entity("Core.Models.TrainGroup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -78,12 +79,24 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
+                    b.Property<TimeSpan>("Duration")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsRepeating")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MaxParticipants")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("TrainerId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -91,7 +104,130 @@ namespace DataAccess.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.ToTable("Customers");
+                    b.HasIndex("TrainerId");
+
+                    b.ToTable("TrainGroups");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupCancellationSubscriber", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("CancellationSubscriberId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SelectedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TrainGroupDateId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CancellationSubscriberId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("TrainGroupDateId");
+
+                    b.ToTable("TrainGroupCancellationSubscribers");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupDate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateOnly?>("FixedDay")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("RecurrenceDayOfMonth")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("RecurrenceDayOfWeek")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RepeatingTrainGroupType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan>("StartOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TrainGroupId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("TrainGroupId");
+
+                    b.ToTable("TrainGroupDates");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ParticipantId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SelectedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TrainGroupDateId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("ParticipantId");
+
+                    b.HasIndex("TrainGroupDateId");
+
+                    b.ToTable("TrainGroupParticipants");
                 });
 
             modelBuilder.Entity("Core.Models.User", b =>
@@ -116,10 +252,12 @@ namespace DataAccess.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LastName")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("LockoutEnabled")
@@ -156,6 +294,9 @@ namespace DataAccess.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.HasIndex("Id")
                         .IsUnique();
@@ -313,15 +454,90 @@ namespace DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("TrainGroupUser", b =>
+                {
+                    b.Property<Guid>("RepeatingParticipantsId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RepeatingTrainGroupsId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("RepeatingParticipantsId", "RepeatingTrainGroupsId");
+
+                    b.HasIndex("RepeatingTrainGroupsId");
+
+                    b.ToTable("TrainGroupRepeatingParticipants", (string)null);
+                });
+
             modelBuilder.Entity("Core.Models.ContactInformation", b =>
                 {
-                    b.HasOne("Core.Models.Customer", "Customer")
+                    b.HasOne("Core.Models.User", "User")
                         .WithMany("ContactInformations")
-                        .HasForeignKey("CustomerId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Customer");
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroup", b =>
+                {
+                    b.HasOne("Core.Models.User", "Trainer")
+                        .WithMany("Trainers")
+                        .HasForeignKey("TrainerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Trainer");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupCancellationSubscriber", b =>
+                {
+                    b.HasOne("Core.Models.User", "CancellationSubscriber")
+                        .WithMany("TrainGroupCancellationSubscribers")
+                        .HasForeignKey("CancellationSubscriberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Models.TrainGroupDate", "TrainGroupDate")
+                        .WithMany("TrainGroupCancellationSubscribers")
+                        .HasForeignKey("TrainGroupDateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CancellationSubscriber");
+
+                    b.Navigation("TrainGroupDate");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupDate", b =>
+                {
+                    b.HasOne("Core.Models.TrainGroup", "TrainGroup")
+                        .WithMany("TrainGroupDates")
+                        .HasForeignKey("TrainGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TrainGroup");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
+                {
+                    b.HasOne("Core.Models.User", "Participant")
+                        .WithMany("TrainGroupParticipants")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Core.Models.TrainGroupDate", "TrainGroupDate")
+                        .WithMany("TrainGroupParticipants")
+                        .HasForeignKey("TrainGroupDateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Participant");
+
+                    b.Navigation("TrainGroupDate");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -375,9 +591,42 @@ namespace DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Core.Models.Customer", b =>
+            modelBuilder.Entity("TrainGroupUser", b =>
+                {
+                    b.HasOne("Core.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("RepeatingParticipantsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Models.TrainGroup", null)
+                        .WithMany()
+                        .HasForeignKey("RepeatingTrainGroupsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroup", b =>
+                {
+                    b.Navigation("TrainGroupDates");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupDate", b =>
+                {
+                    b.Navigation("TrainGroupCancellationSubscribers");
+
+                    b.Navigation("TrainGroupParticipants");
+                });
+
+            modelBuilder.Entity("Core.Models.User", b =>
                 {
                     b.Navigation("ContactInformations");
+
+                    b.Navigation("TrainGroupCancellationSubscribers");
+
+                    b.Navigation("TrainGroupParticipants");
+
+                    b.Navigation("Trainers");
                 });
 #pragma warning restore 612, 618
         }
