@@ -3,6 +3,7 @@ using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.Identity;
+using Core.Dtos.Lookup;
 using Core.Enums;
 using Core.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -83,6 +84,26 @@ namespace API.Controllers
             await _userManager.UpdateAsync(user);
 
             return new ApiResponse<bool>().SetSuccessResponse(true, "success", "User updated successfully");
+        }
+
+        // POST: api/Users/lookup
+        [HttpPost("Lookup")]
+        public async Task<ApiResponse<LookupDto>> Lookup([FromBody] LookupDto lookupDto)
+        {
+            List<User> users;
+            if (lookupDto.Filter?.Id != null && lookupDto.Filter?.Id.Length > 0)
+                users = await _dataService.Users
+                    .Where(x => lookupDto.Filter.Id.ToLower().Contains(x.Id.ToString().ToLower()))
+                    .ToListAsync();
+            else
+                users = await _dataService.Users.ToListAsync();
+
+
+            lookupDto.Data = users
+                .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.UserName?? "" })
+                .ToList();
+
+            return new ApiResponse<LookupDto>().SetSuccessResponse(lookupDto);
         }
 
         // POST: api/Users/GetDataTable

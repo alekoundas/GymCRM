@@ -1,180 +1,274 @@
-import { Button } from "primereact/button";
-import { Calendar } from "primereact/calendar";
-import { Card } from "primereact/card";
-import { Dialog } from "primereact/dialog";
-import { Dropdown } from "primereact/dropdown";
+import React, { SyntheticEvent, useState } from "react";
 import { InputText } from "primereact/inputtext";
+import { InputNumber } from "primereact/inputnumber";
+import { InputSwitch } from "primereact/inputswitch";
+import { Button } from "primereact/button";
+import { Fieldset } from "primereact/fieldset";
+import { Calendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
+import { TrainGroupDto } from "../../model/TrainGroupDto";
+import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
 import { InputTextarea } from "primereact/inputtextarea";
-import { classNames } from "primereact/utils";
-import { useEffect, useState } from "react";
+import { FormEvent } from "primereact/ts-helpers";
+import LookupComponent from "../../components/dropdown/LookupComponent";
+import { FormMode } from "../../enum/FormMode";
 
-interface TimeSlot {
-  id: number;
-  time: string;
-  available: boolean;
+interface IField {
+  formMode: FormMode;
+  // onAfterSave: () => void;
 }
 
-function TrainGroupForm() {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | null>(null);
+export default function TrainGroupForm({ formMode }: IField) {
+  const [trainGroupDto, setTrainGroupDto] = useState<TrainGroupDto>({
+    id: -1,
+    name: "",
+    description: "",
+    isRepeating: false,
+    duration: new Date(),
+    maxParticipants: 1,
+    trainerId: "",
+    repeatingParticipants: [],
+    trainGroupDates: [],
+  });
 
-  // Mock function to generate time slots based on selected date
-  useEffect(() => {
-    if (selectedDate) {
-      // Simulate fetching time slots for the selected date
-      const mockTimeSlots: TimeSlot[] = [
-        { id: 1, time: "09:00 AM", available: true },
-        { id: 2, time: "10:00 AM", available: true },
-        { id: 3, time: "11:00 AM", available: false },
-        { id: 4, time: "01:00 PM", available: true },
-        { id: 5, time: "02:00 PM", available: true },
-        { id: 6, time: "03:00 PM", available: false },
-      ];
-      setTimeSlots(mockTimeSlots);
-      setSelectedTimeSlot(null); // Reset selected time slot when date changes
+  // const [newParticipantDto, setNewParticipantDto] =
+  //   useState<TrainGroupParticipantDto>({
+  //     id: -1,
+  //     selectedDate: new Date(),
+  //     trainGroupDateId: 0,
+  //     participantId: "",
+  //   });
+
+  const [trainGroupDateDto, setTrainGroupDateDto] = useState<TrainGroupDateDto>(
+    {
+      id: -1,
+      startOn: "",
+      trainGroupId: 0,
+      trainGroupParticipants: [],
+      trainGroupCancellationSubscribers: [],
+      trainGroup: trainGroupDto,
     }
-  }, [selectedDate]);
+  );
 
-  const handleTimeSlotClick = (slotId: number) => {
-    setSelectedTimeSlot(slotId);
+  const handleChangeTrainGroupDto = (
+    event:
+      | React.ChangeEvent<any>
+      | FormEvent<Date, SyntheticEvent<Element, Event>>
+      | { target: { value: any; name?: string } }
+  ) => {
+    const name = event.target.name;
+    const value = event.target.value;
+
+    trainGroupDto[name] = value;
+    setTrainGroupDto({ ...trainGroupDto });
   };
 
-  const handleBooking = () => {
-    if (selectedDate && selectedTimeSlot) {
-      const selectedSlot = timeSlots.find(
-        (slot) => slot.id === selectedTimeSlot
-      );
-      alert(
-        `Booking confirmed for ${selectedDate.toDateString()} at ${
-          selectedSlot?.time
-        }`
-      );
-      // Call your API here to book the slot (e.g., POST to api/TrainGroupParticipant)
+  const handleChangeTrainGroupDateDto = (event: React.ChangeEvent<any>) => {
+    const name = event.target.name;
+    const value = event.target.value;
+
+    trainGroupDateDto[name] = value;
+    setTrainGroupDateDto({ ...trainGroupDateDto });
+  };
+
+  const repeatingTypeOptions = [
+    { label: "None", value: null },
+    { label: "Daily", value: "Daily" },
+    { label: "Weekly", value: "Weekly" },
+    { label: "Monthly", value: "Monthly" },
+  ];
+
+  const dayOfWeekOptions = [
+    { label: "Sunday", value: 0 },
+    { label: "Monday", value: 1 },
+    { label: "Tuesday", value: 2 },
+    { label: "Wednesday", value: 3 },
+    { label: "Thursday", value: 4 },
+    { label: "Friday", value: 5 },
+    { label: "Saturday", value: 6 },
+  ];
+
+  // const addParticipant = () => {
+  //   if (!newParticipant.selectedDate || !newParticipant.participantId) {
+  //     alert("Participant: Selected Date and Participant ID are required");
+  //     return;
+  //   }
+  //   setTrainGroup({
+  //     ...trainGroup,
+  //     repeatingParticipants: [
+  //       ...trainGroup.repeatingParticipants,
+  //       { ...newParticipant, id: crypto.randomUUID() },
+  //     ],
+  //   });
+  //   setNewParticipant({
+  //     id: "",
+  //     selectedDate: "",
+  //     trainGroupDateId: 0,
+  //     participantId: "",
+  //   });
+  // };
+
+  // const addDate = () => {
+  //   if (!trainGroupDate.startOn || !trainGroupDate.trainGroupId) {
+  //     alert("Train Group Date: Start Time and Train Group ID are required");
+  //     return;
+  //   }
+  //   setTrainGroup({
+  //     ...trainGroup,
+  //     trainGroupDates: [
+  //       ...trainGroup.trainGroupDates,
+  //       { ...trainGroupDate, id: crypto.randomUUID() },
+  //     ],
+  //   });
+  //   setTrainGroupDate({
+  //     id: "",
+  //     startOn: "",
+  //     trainGroupId: 0,
+  //     trainGroupParticipants: [],
+  //     trainGroupCancellationSubscribers: [],
+  //   });
+  // };
+
+  const handleSubmit = async () => {
+    try {
+      // const response = await axios.post<ApiResponse<TrainGroupDto>>(
+      //   "/api/traingroups",
+      //   trainGroup,
+      //   {
+      //     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      //   }
+      // );
+      // if (response.data.success) {
+      //   alert("Train group created successfully");
+      //   setTrainGroup({
+      //     id: 0,
+      //     name: "",
+      //     description: "",
+      //     isRepeating: false,
+      //     duration: "PT1H",
+      //     maxParticipants: 1,
+      //     trainerId: "",
+      //     repeatingParticipants: [],
+      //     trainGroupDates: [],
+      //    });
+      // } else {
+      //   alert(`Error: ${response.data.error?.message}`);
+      // }
+    } catch (error) {
+      console.error("Error submitting train group:", error);
+      alert("Failed to create train group");
     }
   };
 
   return (
-    <>
-      {/* <div className="w-full  flex items-center justify-center p-1 gap-1"> */}
-      <div className="grid w-full ">
-        <div className="col-12 lg:col-6 xl:col-6">
-          <Card title="Train Groups">
-            <Calendar
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.value as Date)}
-              inline
-              showIcon={false}
-              minDate={new Date()} // Prevent selecting past dates
-              className="w-full"
-            />
-          </Card>
-        </div>
+    <div className="pr-5 pl-5">
+      <h2>Create Training Group</h2>
 
-        {/* Time Slots Section */}
-        <div className=" col-12  lg:col-6 xl:col-6 ">
-          <Card title="Available Time Slots">
-            {timeSlots.length === 0 ? (
-              <p className="text-gray-500">
-                No time slots available for this date.
-              </p>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {timeSlots.map((slot) => (
-                  <Button
-                    key={slot.id}
-                    label={slot.time}
-                    // className={classNames("p-button-text", {
-                    //   "bg-blue-500 text-white":
-                    //     selectedTimeSlot === slot.id && slot.available,
-                    //   "bg-gray-200 text-gray-500 cursor-not-allowed":
-                    //     !slot.available,
-                    //   "bg-white border border-gray-300 hover:bg-blue-100":
-                    //     slot.available && selectedTimeSlot !== slot.id,
-                    // })}
-
-                    disabled={!slot.available}
-                    onClick={() =>
-                      slot.available && handleTimeSlotClick(slot.id)
-                    }
-                  />
-                ))}
-              </div>
-            )}
-            {/* <div className="mt-6">
-              <Button
-                label="Book Now"
-                icon="pi pi-check"
-                className="p-button-raised p-button-success w-full"
-                disabled={!selectedTimeSlot}
-                onClick={handleBooking}
-              />
-            </div> */}
-          </Card>
-        </div>
+      <div className="field">
+        <label
+          htmlFor="name"
+          className="block text-900 font-medium mb-2"
+        >
+          Name
+        </label>
+        <InputText
+          id="name"
+          name="name"
+          type="text"
+          placeholder="Name"
+          className="w-full mb-3"
+          value={trainGroupDto.name}
+          onChange={handleChangeTrainGroupDto}
+        />
       </div>
 
-      {/* <div className="field">
-                <label htmlFor="type">Type</label>
-                <Dropdown
-                  id="type"
-                  name="type"
-                  value={contactInformation.type}
-                  onChange={handleContactInformationChange}
-                  options={Object.keys(ContactInformationTypesEnum)}
-                  optionLabel="type"
-                  placeholder="Select Type"
-                  className="w-full md:w-14rem"
-                  checkmark={true}
-                  highlightOnSelect={true}
-                />
-              </div>
-      
-              <div className="field">
-                <label htmlFor="value">Value</label>
-                {elementsVisibility.contactInformationPhoneVisible && (
-                  <InputMask
-                    id="value"
-                    name="value"
-                    value={contactInformation.value}
-                    onChange={handleContactInformationChange}
-                    mask="999 9999 999"
-                    placeholder="999 9999 999"
-                    required
-                    autoFocus
-                    // className={classNames({ "p-invalid": submitted && !product.name })}
-                  />
-                )}
-                {elementsVisibility.contactInformationEmailVisible && (
-                  <InputText
-                    id="value"
-                    name="value"
-                    value={contactInformation.value}
-                    onChange={(e) => handleChange(e, FormType.ContactInformation)}
-                    // placeholder={inputMaskSettings.placeholder}
-                    required
-                    autoFocus
-                    // className={classNames({ "p-invalid": submitted && !product.name })}
-                  />
-                )}
-                {/* {submitted && !product.name && (
-                  <small className="p-error">Name is required.</small>
-                )} */}
-      {/* </div>
-              <div className="field">
-                <label htmlFor="description">Description</label>
-                <InputTextarea
-                  id="description"
-                  name="description"
-                  value={contactInformation.description}
-                  onChange={(e) => handleChange(e, FormType.ContactInformation)}
-                  required
-                  rows={3}
-                  cols={20}
-                />
-              </div> */}
-    </>
+      <div className="field">
+        <label
+          htmlFor="description"
+          className="block text-900 font-medium mb-2"
+        >
+          Description
+        </label>
+        <InputTextarea
+          id="description"
+          name="description"
+          placeholder="Description"
+          className="w-full mb-3"
+          value={trainGroupDto.description}
+          onChange={handleChangeTrainGroupDto}
+        />
+      </div>
+
+      <div className="field">
+        <label
+          htmlFor="duration"
+          className="block text-900 font-medium mb-2"
+        >
+          Duration
+        </label>
+        <Calendar
+          id="duration"
+          name="duration"
+          value={trainGroupDto.duration}
+          onChange={handleChangeTrainGroupDto}
+          showIcon
+          timeOnly
+          icon={() => <i className="pi pi-clock" />}
+        />
+      </div>
+
+      <div className="field">
+        <label
+          htmlFor="maxParticipants"
+          className="block text-900 font-medium mb-2"
+        >
+          Max Participants
+        </label>
+        <InputNumber
+          id="maxParticipants"
+          name="maxParticipants"
+          value={trainGroupDto.maxParticipants}
+          onValueChange={(x) =>
+            handleChangeTrainGroupDto({
+              target: {
+                name: "maxParticipants",
+                value: x.value,
+              },
+            })
+          }
+          className="w-full"
+          inputClassName="border border-gray-300 rounded p-2"
+          showButtons
+          min={1}
+          max={100}
+        />
+      </div>
+
+      <div className="field">
+        <label
+          htmlFor="trainer"
+          className="block text-900 font-medium mb-2"
+        >
+          Trainer
+        </label>
+        <LookupComponent
+          controller="users"
+          idValue={trainGroupDto.trainerId}
+          isEditable={true}
+          isEnabled={formMode === FormMode.EDIT || formMode === FormMode.ADD}
+          allowCustom={true}
+          // onCustomChange={isCustomChange}
+          // onCustomSave={handleCustomSave}
+          onChange={(x) =>
+            handleChangeTrainGroupDto({
+              target: {
+                name: "trainerId",
+                value: x,
+              },
+            })
+          }
+        />
+      </div>
+    </div>
   );
 }
-
-export default TrainGroupForm;
