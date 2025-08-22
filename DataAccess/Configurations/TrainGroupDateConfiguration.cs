@@ -16,9 +16,6 @@ namespace DataAccess.Configurations
             builder.Property(x => x.RepeatingTrainGroupType)
                 .HasConversion<string>(); 
 
-            builder.Property(x => x.StartOn)
-                .IsRequired();
-
             builder.Property(x => x.FixedDay)
                 .IsRequired(false); // Nullable
 

@@ -7,6 +7,7 @@ export interface TrainGroupDto {
   description: string;
   isRepeating: boolean;
   duration: Date;
+  startOn: Date;
   maxParticipants: number;
   trainerId: string;
   repeatingParticipants: TrainGroupParticipantDto[];
@@ -19,6 +20,7 @@ export class TrainGroupDto {
   description: string;
   isRepeating: boolean;
   duration: Date;
+  startOn: Date;
   maxParticipants: number;
   trainerId: string;
   repeatingParticipants: TrainGroupParticipantDto[];

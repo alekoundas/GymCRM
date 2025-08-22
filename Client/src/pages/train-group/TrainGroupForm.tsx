@@ -25,6 +25,7 @@ export default function TrainGroupForm({ formMode }: IField) {
     description: "",
     isRepeating: false,
     duration: new Date(),
+    startOn: new Date(),
     maxParticipants: 1,
     trainerId: "",
     repeatingParticipants: [],
@@ -42,7 +43,6 @@ export default function TrainGroupForm({ formMode }: IField) {
   const [trainGroupDateDto, setTrainGroupDateDto] = useState<TrainGroupDateDto>(
     {
       id: -1,
-      startOn: "",
       trainGroupId: 0,
       trainGroupParticipants: [],
       trainGroupCancellationSubscribers: [],
@@ -71,94 +71,7 @@ export default function TrainGroupForm({ formMode }: IField) {
     setTrainGroupDateDto({ ...trainGroupDateDto });
   };
 
-  const repeatingTypeOptions = [
-    { label: "None", value: null },
-    { label: "Daily", value: "Daily" },
-    { label: "Weekly", value: "Weekly" },
-    { label: "Monthly", value: "Monthly" },
-  ];
-
-  const dayOfWeekOptions = [
-    { label: "Sunday", value: 0 },
-    { label: "Monday", value: 1 },
-    { label: "Tuesday", value: 2 },
-    { label: "Wednesday", value: 3 },
-    { label: "Thursday", value: 4 },
-    { label: "Friday", value: 5 },
-    { label: "Saturday", value: 6 },
-  ];
-
-  // const addParticipant = () => {
-  //   if (!newParticipant.selectedDate || !newParticipant.participantId) {
-  //     alert("Participant: Selected Date and Participant ID are required");
-  //     return;
-  //   }
-  //   setTrainGroup({
-  //     ...trainGroup,
-  //     repeatingParticipants: [
-  //       ...trainGroup.repeatingParticipants,
-  //       { ...newParticipant, id: crypto.randomUUID() },
-  //     ],
-  //   });
-  //   setNewParticipant({
-  //     id: "",
-  //     selectedDate: "",
-  //     trainGroupDateId: 0,
-  //     participantId: "",
-  //   });
-  // };
-
-  // const addDate = () => {
-  //   if (!trainGroupDate.startOn || !trainGroupDate.trainGroupId) {
-  //     alert("Train Group Date: Start Time and Train Group ID are required");
-  //     return;
-  //   }
-  //   setTrainGroup({
-  //     ...trainGroup,
-  //     trainGroupDates: [
-  //       ...trainGroup.trainGroupDates,
-  //       { ...trainGroupDate, id: crypto.randomUUID() },
-  //     ],
-  //   });
-  //   setTrainGroupDate({
-  //     id: "",
-  //     startOn: "",
-  //     trainGroupId: 0,
-  //     trainGroupParticipants: [],
-  //     trainGroupCancellationSubscribers: [],
-  //   });
-  // };
-
-  const handleSubmit = async () => {
-    try {
-      // const response = await axios.post<ApiResponse<TrainGroupDto>>(
-      //   "/api/traingroups",
-      //   trainGroup,
-      //   {
-      //     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      //   }
-      // );
-      // if (response.data.success) {
-      //   alert("Train group created successfully");
-      //   setTrainGroup({
-      //     id: 0,
-      //     name: "",
-      //     description: "",
-      //     isRepeating: false,
-      //     duration: "PT1H",
-      //     maxParticipants: 1,
-      //     trainerId: "",
-      //     repeatingParticipants: [],
-      //     trainGroupDates: [],
-      //    });
-      // } else {
-      //   alert(`Error: ${response.data.error?.message}`);
-      // }
-    } catch (error) {
-      console.error("Error submitting train group:", error);
-      alert("Failed to create train group");
-    }
-  };
+  const handleSubmit = async () => {};
 
   return (
     <div className="pr-5 pl-5">
@@ -196,6 +109,24 @@ export default function TrainGroupForm({ formMode }: IField) {
           className="w-full mb-3"
           value={trainGroupDto.description}
           onChange={handleChangeTrainGroupDto}
+        />
+      </div>
+
+      <div className="field">
+        <label
+          htmlFor="startOn"
+          className="block text-900 font-medium mb-2"
+        >
+          Starts On
+        </label>
+        <Calendar
+          id="startOn"
+          name="startOn"
+          value={trainGroupDto.startOn}
+          onChange={handleChangeTrainGroupDto}
+          showIcon
+          timeOnly
+          icon={() => <i className="pi pi-clock" />}
         />
       </div>
 

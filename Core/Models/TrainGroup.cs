@@ -8,6 +8,7 @@ namespace Core.Models
         public string Description { get; set; } = "";    
         public bool IsRepeating { get; set; }
         public TimeSpan Duration { get; set; }
+        public TimeSpan StartOn { get; set; }
         public int MaxParticipants { get; set; }
 
 
