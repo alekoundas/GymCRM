@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TokenService } from "../../services/TokenService";
 import TrainGroupForm from "./TrainGroupForm";
+import { FormMode } from "../../enum/FormMode";
 
 interface TimeSlot {
   id: number;
@@ -170,7 +171,7 @@ function TrainGroups() {
         }
         onHide={() => setModalVisibility(false)}
       >
-        <TrainGroupForm />
+        <TrainGroupForm formMode={FormMode.ADD} />
       </Dialog>
     </>
   );
