@@ -122,13 +122,13 @@ namespace Business.Services
         public async Task<ApiResponse<UserRefreshResponseDto>> RefreshToken(UserRefreshRequestDto request)
         {
             var principal = GetPrincipalFromExpiredToken(_tokenSettings, request.AccessToken);
-            if (principal == null || principal.FindFirst("userName")?.Value == null)
+            if (principal == null || principal.FindFirst(ClaimTypes.Name)?.Value == null)
             {
                 return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("error", "User not found");
             }
             else
             {
-                var user = await _userManager.FindByNameAsync(principal.FindFirst("userName")?.Value ?? "");
+                var user = await _userManager.FindByNameAsync(principal.FindFirst(ClaimTypes.Name)?.Value ?? "");
                 if (user == null)
                 {
                     return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("error", "User not found");
