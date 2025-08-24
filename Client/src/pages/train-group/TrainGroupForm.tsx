@@ -2,35 +2,17 @@ import React, { SyntheticEvent, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 import { Calendar } from "primereact/calendar";
-import { TrainGroupDto } from "../../model/TrainGroupDto";
-import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
 import { InputTextarea } from "primereact/inputtextarea";
-import { FormEvent } from "primereact/ts-helpers";
 import LookupComponent from "../../components/dropdown/LookupComponent";
 import { FormMode } from "../../enum/FormMode";
 import { useTrainGroupStore } from "./TrainGroupStore";
 
 interface IField {
   formMode: FormMode;
-  // onAfterSave: () => void;
 }
 
 export default function TrainGroupForm({ formMode }: IField) {
-  // const [trainGroupDto, setTrainGroupDto] = useState<TrainGroupDto>(data);
   const { trainGroupDto, updateTrainGroupDto } = useTrainGroupStore();
-
-  // const handleChangeTrainGroupDto = (
-  //   event:
-  //     | React.ChangeEvent<any>
-  //     | FormEvent<Date, SyntheticEvent<Element, Event>>
-  //     | { target: { value: any; name?: string } }
-  // ) => {
-  //   const name = event.target.name;
-  //   const value = event.target.value;
-
-  //   trainGroupDto[name] = value;
-  //   setTrainGroupDto({ ...trainGroupDto });
-  // };
 
   const handleChange = (
     e: React.ChangeEvent<any> | { target: { name: string; value: any } }

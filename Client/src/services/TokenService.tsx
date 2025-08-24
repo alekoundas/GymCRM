@@ -86,8 +86,12 @@ export class TokenService {
   // Is user allowed
   public static isUserAllowed = (claim: string): boolean => {
     const permissions: string[] = TokenService.getClaim("Permission");
-    const isAllowed = permissions.includes(claim);
-    return isAllowed;
+    if (permissions) {
+      const isAllowed = permissions.includes(claim);
+      return isAllowed;
+    }
+
+    return false;
   };
 
   // Logout
