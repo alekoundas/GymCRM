@@ -3,12 +3,13 @@ using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace API.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class GenericController<TEntity, TEntityDto, TEntityAddDto> : ControllerBase
         where TEntity : class
@@ -174,8 +175,9 @@ namespace API.Controllers
         {
             string controllerName = ControllerContext.ActionDescriptor.ControllerName;
             string claimName = controllerName + "_" + action;
-
-            return User.HasClaim(ClaimTypes.Role, claimName);
+            bool hasClaim = User.HasClaim("Permission", claimName);
+            var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+            return hasClaim; 
         }
     }
 }
