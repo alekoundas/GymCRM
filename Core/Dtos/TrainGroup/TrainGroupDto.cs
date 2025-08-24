@@ -1,7 +1,8 @@
 ﻿using Core.Dtos.Identity;
+using Core.Dtos.TrainGroupDate;
 using System.ComponentModel.DataAnnotations;
 
-namespace Core.Dtos
+namespace Core.Dtos.TrainGroup
 {
     public class TrainGroupDto
     {
@@ -12,7 +13,6 @@ namespace Core.Dtos
         [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
         public string Name { get; set; } = "";
 
-        [Required(ErrorMessage = "Description is required")]
         [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
         public string Description { get; set; } = "";
 

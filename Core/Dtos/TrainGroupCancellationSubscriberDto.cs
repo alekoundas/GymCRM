@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Dtos.TrainGroupDate;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Dtos
 {
