@@ -1,5 +1,4 @@
 ﻿using Core.Enums;
-using Core.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Core.Dtos.TrainGroupDate
@@ -9,7 +8,7 @@ namespace Core.Dtos.TrainGroupDate
         [Required(ErrorMessage = "RecurringTrainGroupType is required")]
         public RecurringTrainGroupTypeEnum RecurringTrainGroupType { get; set; }
 
-        public DateOnly? FixedDay { get; set; }
+        public DateTime? FixedDay { get; set; }
 
 
         public DayOfWeekEnum? RecurrenceDayOfWeek { get; set; }

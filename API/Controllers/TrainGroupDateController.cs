@@ -38,6 +38,7 @@ namespace API.Controllers
             DayOfWeekEnum dayOfWeekEnum = (DayOfWeekEnum)selectedDate.DayOfWeek;
 
             List<TrainGroupDate>? timeslots = await _dataService.TrainGroupDates
+                .Include(x => x.TrainGroup)
                 .Where(x =>
                     x.FixedDay == selectedDate
                     || x.RecurrenceDayOfMonth == selectedDate.Day
