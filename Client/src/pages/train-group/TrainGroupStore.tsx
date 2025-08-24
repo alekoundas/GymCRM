@@ -41,7 +41,6 @@ export const useTrainGroupStore = create<TrainGroupState>((set) => ({
         id: -1,
         name: "",
         description: "",
-        isRepeating: false,
         duration: new Date(),
         startOn: new Date(),
         maxParticipants: 1,

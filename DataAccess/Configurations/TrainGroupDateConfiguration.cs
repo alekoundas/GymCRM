@@ -13,14 +13,18 @@ namespace DataAccess.Configurations
 
             // Properties
             // Store enum as string
-            builder.Property(x => x.RepeatingTrainGroupType)
-                .HasConversion<string>(); 
+            builder.Property(x => x.RecurringTrainGroupType)
+                .HasConversion<string>();
+
+            // Store enum as string
+            builder.Property(x => x.RecurrenceDayOfWeek)
+                .HasConversion<string>();
 
             builder.Property(x => x.FixedDay)
                 .IsRequired(false); // Nullable
 
             builder.Property(x => x.RecurrenceDayOfWeek)
-                .IsRequired(false); // Nullable, range 0-6 validated by data annotation
+                .IsRequired(false); 
 
             builder.Property(x => x.RecurrenceDayOfMonth)
                 .IsRequired(false); // Nullable, range 1-31 validated by data annotation

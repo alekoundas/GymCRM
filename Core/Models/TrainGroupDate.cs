@@ -6,11 +6,10 @@ namespace Core.Models
 {
     public class TrainGroupDate : BaseModel
     {
-        public RepeatingTrainGroupTypeEnum? RepeatingTrainGroupType { get; set; }
+        public RecurringTrainGroupTypeEnum? RecurringTrainGroupType { get; set; }
         public DateOnly? FixedDay { get; set; }
 
-        [Range(0, 6)] // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-        public int? RecurrenceDayOfWeek { get; set; }
+        public DayOfWeekEnum? RecurrenceDayOfWeek { get; set; }
 
         [Range(1, 31)]
         public int? RecurrenceDayOfMonth { get; set; }

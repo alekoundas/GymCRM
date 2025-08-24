@@ -15,7 +15,6 @@ namespace Core.Dtos
         [Required(ErrorMessage = "Description is required")]
         [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
         public string Description { get; set; } = "";
-        public bool IsRepeating { get; set; }
 
         [Required(ErrorMessage = "Duration is required")]
         [Range(typeof(TimeSpan), "00:15:00", "04:00:00", ErrorMessage = "Duration must be between 5 minutes and 8 hours")]
