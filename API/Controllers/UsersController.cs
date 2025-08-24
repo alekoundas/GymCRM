@@ -47,11 +47,11 @@ namespace API.Controllers
         public async Task<ApiResponse<User>> Get(string? id)
         {
             if (id == null)
-                return new ApiResponse<User>().SetErrorResponse("errors", "Role ID not set!");
+                return new ApiResponse<User>().SetErrorResponse("error", "Role ID not set!");
 
             User? user = await _dataService.Users.FirstOrDefaultAsync(x => x.Id.ToString() == id);
             if (user == null)
-                return new ApiResponse<User>().SetErrorResponse("errors", "Role not found!");
+                return new ApiResponse<User>().SetErrorResponse("error", "Role not found!");
 
             return new ApiResponse<User>().SetSuccessResponse(user);
         }
@@ -61,17 +61,17 @@ namespace API.Controllers
         public async Task<ApiResponse<bool>> Update(Guid id, UserUpdateRequestDto request)
         {
             if (id != request.Id)
-                return new ApiResponse<bool>().SetErrorResponse("errors", "ID mismatch");
+                return new ApiResponse<bool>().SetErrorResponse("error", "ID mismatch");
 
 
             User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == request.Id);
             if (user == null)
-                return new ApiResponse<bool>().SetErrorResponse("errors", "User not found");
+                return new ApiResponse<bool>().SetErrorResponse("error", "User not found");
 
 
             IdentityRole<Guid>? role = await _dataService.Roles.FirstOrDefaultAsync(x => x.Id.ToString() == request.RoleId);
             if (role?.Name == null)
-                return new ApiResponse<bool>().SetErrorResponse("errors", "Role not found");
+                return new ApiResponse<bool>().SetErrorResponse("error", "Role not found");
 
 
             // Update user properties
@@ -206,7 +206,7 @@ namespace API.Controllers
                 user = await _userManager.FindByNameAsync(request.UserNameOrEmail);
 
             if (user == null)
-                return new ApiResponse<UserLoginResponseDto>().SetErrorResponse("email", "User Name/Email not found");
+                return new ApiResponse<UserLoginResponseDto>().SetErrorResponse("error", "User Name/Email not found");
 
 
             string? result = await _userService.SignInUser(user, request.Password);

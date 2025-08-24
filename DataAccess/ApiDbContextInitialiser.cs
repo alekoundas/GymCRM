@@ -83,6 +83,10 @@ namespace DataAccess
                     new Claim("Permission", "TrainGroup_Add"),
                     new Claim("Permission", "TrainGroup_Edit"),
                     new Claim("Permission", "TrainGroup_Delete"),
+                    new Claim("Permission", "TrainGroupDate_View"),
+                    new Claim("Permission", "TrainGroupDate_Add"),
+                    new Claim("Permission", "TrainGroupDate_Edit"),
+                    new Claim("Permission", "TrainGroupDate_Delete"),
                 };
 
                 foreach (var claim in claims)

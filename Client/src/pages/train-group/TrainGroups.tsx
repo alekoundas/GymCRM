@@ -2,32 +2,23 @@ import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { Card } from "primereact/card";
 import { Dialog } from "primereact/dialog";
-import { Dropdown } from "primereact/dropdown";
-import { InputText } from "primereact/inputtext";
-import { InputTextarea } from "primereact/inputtextarea";
-import { classNames } from "primereact/utils";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TokenService } from "../../services/TokenService";
 import TrainGroupForm from "./TrainGroupForm";
 import { FormMode } from "../../enum/FormMode";
 import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
-import { TrainGroupDto } from "../../model/TrainGroupDto";
 import { useTrainGroupStore } from "./TrainGroupStore";
 import ApiService from "../../services/ApiService";
-
-interface TimeSlot {
-  id: number;
-  time: string;
-  available: boolean;
-}
+import { TimeSlotRequestDto } from "../../model/TimeSlotRequestDto";
+import { TimeSlotResponseDto } from "../../model/TimeSlotResponseDto";
 
 function TrainGroups() {
   const navigate = useNavigate();
 
   const [isModalVisible, setModalVisibility] = useState(false); // Dialog visibility
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | null>(null);
   const { resetTrainGroupDto, trainGroupDto } = useTrainGroupStore();
 
@@ -48,21 +39,35 @@ function TrainGroups() {
   // );
 
   // Mock function to generate time slots based on selected date
-  useEffect(() => {
-    if (selectedDate) {
-      // Simulate fetching time slots for the selected date
-      const mockTimeSlots: TimeSlot[] = [
-        { id: 1, time: "09:00 AM", available: true },
-        { id: 2, time: "10:00 AM", available: true },
-        { id: 3, time: "11:00 AM", available: false },
-        { id: 4, time: "01:00 PM", available: true },
-        { id: 5, time: "02:00 PM", available: true },
-        { id: 6, time: "03:00 PM", available: false },
-      ];
-      setTimeSlots(mockTimeSlots);
-      setSelectedTimeSlot(null); // Reset selected time slot when date changes
-    }
-  }, [selectedDate]);
+  // useEffect(() => {
+  //   if (selectedDate) {
+  //     // Simulate fetching time slots for the selected date
+  //     const mockTimeSlots: TimeSlot[] = [
+  //       { id: 1, time: "09:00 AM", available: true },
+  //       { id: 2, time: "10:00 AM", available: true },
+  //       { id: 3, time: "11:00 AM", available: false },
+  //       { id: 4, time: "01:00 PM", available: true },
+  //       { id: 5, time: "02:00 PM", available: true },
+  //       { id: 6, time: "03:00 PM", available: false },
+  //     ];
+  //     setTimeSlots(mockTimeSlots);
+  //     setSelectedTimeSlot(null); // Reset selected time slot when date changes
+  //   }
+  // }, [selectedDate]);
+
+  const handleChangeDate = (value: Date) => {
+    setSelectedDate(value);
+
+    const timeSlotDto = new TimeSlotRequestDto();
+    timeSlotDto.selectedDate = value;
+    ApiService.timeslots("TrainGroupDate/TimeSlots", timeSlotDto).then(
+      (response) => {
+        if (response) {
+          setTimeSlots(response);
+        }
+      }
+    );
+  };
 
   const handleTimeSlotClick = (slotId: number) => {
     setSelectedTimeSlot(slotId);
@@ -71,11 +76,11 @@ function TrainGroups() {
   const handleBooking = () => {
     if (selectedDate && selectedTimeSlot) {
       const selectedSlot = timeSlots.find(
-        (slot) => slot.id === selectedTimeSlot
+        (slot) => slot.trainGroupDateId === selectedTimeSlot
       );
       alert(
         `Booking confirmed for ${selectedDate.toDateString()} at ${
-          selectedSlot?.time
+          selectedSlot?.startOn
         }`
       );
       // Call your API here to book the slot (e.g., POST to api/TrainGroupParticipant)
@@ -101,7 +106,7 @@ function TrainGroups() {
           >
             <Calendar
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.value as Date)}
+              onChange={(e) => handleChangeDate(e.value as Date)}
               inline
               showIcon={false}
               minDate={new Date()} // Prevent selecting past dates
@@ -135,9 +140,6 @@ function TrainGroups() {
                     onClick={() => {
                       setModalVisibility(true);
                       resetTrainGroupDto();
-                      // setTrainGroupDto(createNewData());
-                      // if (triggerRefreshGrid.current)
-                      //   triggerRefreshGrid.current();
                     }}
                   />
                 )}
@@ -153,11 +155,12 @@ function TrainGroups() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {timeSlots.map((slot) => (
                   <Button
-                    key={slot.id}
-                    label={slot.time}
+                    key={slot.trainGroupDateId}
+                    label={slot.displayDate}
                     disabled={!slot.available}
                     onClick={() =>
-                      slot.available && handleTimeSlotClick(slot.id)
+                      slot.available &&
+                      handleTimeSlotClick(slot.trainGroupDateId)
                     }
                   />
                 ))}

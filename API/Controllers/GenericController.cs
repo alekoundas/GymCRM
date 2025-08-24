@@ -5,6 +5,7 @@ using Core.Dtos.DataTable;
 using Core.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace API.Controllers
 {
@@ -39,7 +40,7 @@ namespace API.Controllers
             if (entity == null)
             {
                 string className = typeof(TEntity).Name;
-                return new ApiResponse<TEntity>().SetErrorResponse(className, $"Requested {className} not found!");
+                return new ApiResponse<TEntity>().SetErrorResponse("error", $"Requested {className} not found!");
             }
 
             return new ApiResponse<TEntity>().SetSuccessResponse(entity);
@@ -50,10 +51,10 @@ namespace API.Controllers
         public virtual async Task<ActionResult<ApiResponse<TEntity>>> Post([FromBody] TEntityAddDto entityDto)
         {
             if (!IsUserAuthorized("Add"))
-                return new ApiResponse<TEntity>().SetErrorResponse("Authorization", "User is not authorized to perform this action.");
+                return new ApiResponse<TEntity>().SetErrorResponse("error", "User is not authorized to perform this action.");
 
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("Validation", "Invalid data provided."));
+                return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", "Invalid data provided."));
 
 
             TEntity entity = _mapper.Map<TEntity>(entityDto);
@@ -70,10 +71,10 @@ namespace API.Controllers
         public virtual async Task<ActionResult<ApiResponse<TEntity>>> Put(int id, [FromBody] TEntityDto entityDto)
         {
             if (!IsUserAuthorized("Edit"))
-                return new ApiResponse<TEntity>().SetErrorResponse("Authorization", "User is not authorized to perform this action.");
+                return new ApiResponse<TEntity>().SetErrorResponse("error", "User is not authorized to perform this action.");
 
             if (!ModelState.IsValid)
-                return new ApiResponse<TEntity>().SetErrorResponse("Validation", "Invalid data provided.");
+                return new ApiResponse<TEntity>().SetErrorResponse("error", "Invalid data provided.");
 
             TEntity entity = _mapper.Map<TEntity>(entityDto);
 
@@ -82,7 +83,7 @@ namespace API.Controllers
             if (existingEntity == null)
             {
                 string className = typeof(TEntity).Name;
-                return new ApiResponse<TEntity>().SetErrorResponse(className, $"Requested {className} not found!");
+                return new ApiResponse<TEntity>().SetErrorResponse("error", $"Requested {className} not found!");
             }
 
             _dataService.Update(entity);
@@ -101,7 +102,7 @@ namespace API.Controllers
             if (entity == null)
             {
                 string className = typeof(TEntity).Name;
-                return new ApiResponse<TEntity>().SetErrorResponse(className, $"Requested {className} not found!");
+                return new ApiResponse<TEntity>().SetErrorResponse("error", $"Requested {className} not found!");
             }
 
             int result = await _dataService.GetGenericRepository<TEntity>().RemoveAsync(entity);
@@ -171,7 +172,7 @@ namespace API.Controllers
 
 
 
-        private bool IsUserAuthorized(string action)
+        protected bool IsUserAuthorized(string action)
         {
             string controllerName = ControllerContext.ActionDescriptor.ControllerName;
             string claimName = controllerName + "_" + action;

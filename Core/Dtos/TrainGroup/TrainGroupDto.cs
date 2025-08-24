@@ -1,5 +1,6 @@
 ﻿using Core.Dtos.Identity;
 using Core.Dtos.TrainGroupDate;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Core.Dtos.TrainGroup
@@ -17,12 +18,12 @@ namespace Core.Dtos.TrainGroup
         public string Description { get; set; } = "";
 
         [Required(ErrorMessage = "Duration is required")]
-        [Range(typeof(TimeSpan), "00:15:00", "04:00:00", ErrorMessage = "Duration must be between 5 minutes and 8 hours")]
-        public TimeSpan Duration { get; set; }
+        //[Range(typeof(TimeSpan), "00:15:00", "04:00:00", ErrorMessage = "Duration must be between 5 minutes and 8 hours")]
+        public DateTime Duration { get; set; }
 
         [Required(ErrorMessage = "StartOn is required")]
-        [Range(typeof(TimeSpan), "00:00:00", "23:59:59", ErrorMessage = "StartOn must be a valid time of day")]
-        public TimeSpan StartOn { get; set; }
+        //[Range(typeof(TimeSpan), "00:00:00", "23:59:59", ErrorMessage = "StartOn must be a valid time of day")]
+        public DateTime StartOn { get; set; }
 
         [Required(ErrorMessage = "MaxParticipants is required")]
         //[Range(1, 50, ErrorMessage = "MaxParticipants must be between 1 and 50")]
@@ -31,7 +32,6 @@ namespace Core.Dtos.TrainGroup
         [Required(ErrorMessage = "TrainerId is required")]
         public Guid TrainerId { get; set; }
 
-        public List<UserDto> RepeatingParticipants { get; set; } = new List<UserDto>();
-        public List<TrainGroupDateDto> TrainGroupDates { get; set; } = new List<TrainGroupDateDto>();
+        public ICollection<TrainGroupDateDto> TrainGroupDates { get; set; } = new Collection<TrainGroupDateDto>();
     }
 }

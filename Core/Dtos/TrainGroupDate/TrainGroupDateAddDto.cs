@@ -1,5 +1,4 @@
-﻿using Core.Dtos.TrainGroup;
-using Core.Enums;
+﻿using Core.Enums;
 using Core.Models;
 using System.ComponentModel.DataAnnotations;
 
@@ -18,10 +17,5 @@ namespace Core.Dtos.TrainGroupDate
 
         [Range(1, 31, ErrorMessage = "RecurrenceDayOfMonth must be between 1 and 31")]
         public int? RecurrenceDayOfMonth { get; set; }
-
-
-        public List<TrainGroupParticipantDto> TrainGroupParticipants { get; set; } = new List<TrainGroupParticipantDto>();
-
-        public List<TrainGroupCancellationSubscriber> TrainGroupCancellationSubscribers { get; set; } = new List<TrainGroupCancellationSubscriber>();
     }
 }

@@ -122,21 +122,21 @@ namespace Business.Services
         public async Task<ApiResponse<UserRefreshResponseDto>> RefreshToken(UserRefreshRequestDto request)
         {
             var principal = GetPrincipalFromExpiredToken(_tokenSettings, request.AccessToken);
-            if (principal == null || principal.FindFirst("UserName")?.Value == null)
+            if (principal == null || principal.FindFirst("userName")?.Value == null)
             {
-                return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("email", "User not found");
+                return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("error", "User not found");
             }
             else
             {
-                var user = await _userManager.FindByNameAsync(principal.FindFirst("UserName")?.Value ?? "");
+                var user = await _userManager.FindByNameAsync(principal.FindFirst("userName")?.Value ?? "");
                 if (user == null)
                 {
-                    return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("email", "User not found");
+                    return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("error", "User not found");
                 }
                 else
                 {
                     if (!await _userManager.VerifyUserTokenAsync(user, "REFRESHTOKENPROVIDER", "RefreshToken", request.RefreshToken))
-                        return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("token", "Refresh token expired");
+                        return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("error", "Refresh token expired. Please Login again.");
 
                     var token = await GenerateUserToken(user);
                     return new ApiResponse<UserRefreshResponseDto>()
@@ -173,8 +173,8 @@ namespace Business.Services
 
             List<Claim> userClaims = new List<Claim>();
             userClaims.Add(new("Id", user.Id.ToString()));
-            userClaims.Add(new("UserName", user.UserName ?? ""));
-            userClaims.Add(new("RoleName", userRoles.FirstOrDefault()?? ""));
+            userClaims.Add(new("userName", user.UserName ?? ""));
+            userClaims.Add(new("RoleName", userRoles.FirstOrDefault() ?? ""));
             userClaims.AddRange(roleClaims);
             userClaims.AddRange(appSettings.Audiences.Select(x => new Claim(JwtRegisteredClaimNames.Aud, x)));
 
