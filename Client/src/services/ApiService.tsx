@@ -174,28 +174,63 @@ export default class ApiService {
     return response.data ?? null; // Return data or null if data is undefined
   }
 
+  // private static async refreshUserToken(): Promise<boolean> {
+  //   const url = this.serverUrl + "users/refreshToken";
+  //   var aasdasdf = TokenService.getUserName();
+  //   const refreshTokenDto = TokenService.getUserRefreshTokenDto();
+  //   return await this.apiFetch<UserRefreshTokenDto, UserRefreshTokenDto>(
+  //     url,
+  //     "POST",
+  //     null,
+  //     refreshTokenDto
+  //   ).then((response) => {
+  //     if (!response || !response.data) {
+  //       response?.messages["error"].forEach((x) => ToastService.showError(x));
+  //       //TODO: ennable this to switch to loged out mode
+  //       // TokenService.logout();
+  //       // authLogout();
+  //       return false;
+  //     }
+
+  //     // authLogin();
+  //     TokenService.setAccessToken(response.data.accessToken);
+  //     TokenService.setRefreshToken(response.data.refreshToken);
+  //     TokenService.setRefreshTokenExpireDate(response.toString());
+  //     return true;
+  //   });
+  // }
+
   private static async refreshUserToken(): Promise<boolean> {
     const url = this.serverUrl + "users/refreshToken";
-    var aasdasdf = TokenService.getUserName();
     const refreshTokenDto = TokenService.getUserRefreshTokenDto();
+
+    // Use the accessToken from refreshTokenDto for the Authorization header
+    const token = refreshTokenDto.accessToken;
+
+    if (!token) {
+      console.error("No access token available for refresh.");
+      ToastService.showError("No access token available. Please log in again.");
+      TokenService.logout();
+      return false;
+    }
+
     return await this.apiFetch<UserRefreshTokenDto, UserRefreshTokenDto>(
       url,
       "POST",
-      null,
+      token, // Pass the access token instead of null
       refreshTokenDto
     ).then((response) => {
       if (!response || !response.data) {
-        response?.messages["error"].forEach((x) => ToastService.showError(x));
-        //TODO: ennable this to switch to loged out mode
-        // TokenService.logout();
-        // authLogout();
+        response?.messages["error"]?.forEach((x) => ToastService.showError(x));
         return false;
       }
 
-      // authLogin();
       TokenService.setAccessToken(response.data.accessToken);
       TokenService.setRefreshToken(response.data.refreshToken);
-      TokenService.setRefreshTokenExpireDate(response.toString());
+      // Set refresh token expiration (7 days from now, matching server)
+      const expireDate = new Date(new Date().getTime() + 604800 * 1000);
+      TokenService.setRefreshTokenExpireDate(expireDate.toString());
+      ToastService.showSuccess("Token refreshed successfully!");
       return true;
     });
   }

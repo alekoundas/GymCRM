@@ -174,8 +174,13 @@ namespace Business.Services
             List<Claim> userClaims = new List<Claim>();
             userClaims.Add(new("Id", user.Id.ToString()));
             userClaims.Add(new("userName", user.UserName ?? ""));
+
+
+            
+            userClaims.Add(new Claim(ClaimTypes.Name, user.UserName ?? ""));
+            userClaims.Add(new("UserName", user.UserName ?? ""));
             userClaims.Add(new("RoleName", userRoles.FirstOrDefault() ?? ""));
-            userClaims.AddRange(roleClaims);
+            userClaims.AddRange(roleClaims); new Claim(ClaimTypes.Name, user.UserName ?? "");
             userClaims.AddRange(appSettings.Audiences.Select(x => new Claim(JwtRegisteredClaimNames.Aud, x)));
 
             JwtSecurityToken tokeOptions =
