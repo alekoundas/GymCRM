@@ -24,14 +24,22 @@ namespace API.AutoMapper
 
 
             CreateMap<TrainGroupDate, TrainGroupDateDto>();
-            CreateMap<TrainGroupDateDto, TrainGroupDate>()
-                .ForMember(dest => dest.FixedDay, opt => opt.MapFrom<FixedDayResolver>());
+            CreateMap<TrainGroupDateDto, TrainGroupDate>();
 
 
 
 
             CreateMap<TrainGroupDate, TrainGroupDateAddDto>();
-            CreateMap<TrainGroupDateAddDto, TrainGroupDate>();
+            CreateMap<TrainGroupDateAddDto, TrainGroupDate>()
+                .ForMember(dest => dest.FixedDay, opt => opt.MapFrom<FixedDayResolver>());
+                            //.ForMember(dest => dest.FixedDay, opt => opt.MapFrom(source =>
+                            // {
+                            //     if (source.FixedDay.HasValue)
+                            //         return DateOnly.FromDateTime(source.FixedDay.Value);
+
+                            //     return null;
+                            // }));
+
 
             CreateMap<ContactInformation, ContactInformationDto>();
             CreateMap<ContactInformationDto, ContactInformation>();

@@ -4,14 +4,17 @@ using Core.Models;
 
 namespace API.AutoMapper
 {
-    public class FixedDayResolver : IValueResolver< TrainGroupDateDto, TrainGroupDate, DateOnly?>
+    public class FixedDayResolver : IValueResolver<TrainGroupDateAddDto, TrainGroupDate, DateOnly?>
     {
-        public DateOnly? Resolve( TrainGroupDateDto source, TrainGroupDate destination, DateOnly? destMember, ResolutionContext context)
+        public DateOnly? Resolve(TrainGroupDateAddDto source, TrainGroupDate destination, DateOnly? destMember, ResolutionContext context)
         {
-            return source.FixedDay.HasValue ? DateOnly.FromDateTime(source.FixedDay.Value) : null;
+            if (source.FixedDay.HasValue)
+                return DateOnly.FromDateTime(source.FixedDay.Value);
+
+            return null;
         }
 
-        public DateOnly? Resolve(TrainGroupDate source, TrainGroupDateDto destination, DateOnly? destMember, ResolutionContext context)
+        public DateOnly? Resolve(TrainGroupDate source, TrainGroupDateAddDto destination, DateOnly? destMember, ResolutionContext context)
         {
             throw new NotImplementedException();
         }

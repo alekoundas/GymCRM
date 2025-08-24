@@ -113,16 +113,37 @@ builder.Services.AddScoped<ApiDbContextInitialiser>();
 
 // AutoMapper.
 //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+//builder.Services.AddAutoMapper(config =>
+//{
+
+//    config.AddProfile<AutoMapperProfile>();
+//    // Scan for profiles in the current assembly or specific assemblies
+//    //config.AddMaps(builder.Environment.ContentRootPath); // Scans all assemblies in the project
+//    // Or specify specific assemblies:
+//    // config.AddMaps(typeof(Program).Assembly);
+//    // config.AddMaps(AppDomain.CurrentDomain.GetAssemblies()); // If you need to scan all assemblies
+//});
+
 builder.Services.AddAutoMapper(config =>
 {
-
+    //config.ConstructServicesUsing(type => builder.Services.BuildServiceProvider().GetService(type));
     config.AddProfile<AutoMapperProfile>();
-    // Scan for profiles in the current assembly or specific assemblies
-    //config.AddMaps(builder.Environment.ContentRootPath); // Scans all assemblies in the project
-    // Or specify specific assemblies:
-    // config.AddMaps(typeof(Program).Assembly);
-    // config.AddMaps(AppDomain.CurrentDomain.GetAssemblies()); // If you need to scan all assemblies
+    //config.AddMaps(typeof(ValidateModelFilter).Assembly);
 });
+
+
+
+
+
+
+
+
+
+
+//builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(AutoMapperProfile).Assembly));
+builder.Services.AddScoped<ValidateModelFilter>();
+builder.Services.AddTransient<FixedDayResolver>();
+
 
 
 builder.Services.AddSingleton<ClaimsIdentity>();
@@ -135,7 +156,6 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddSingleton(appSettings); // appsettings.json
 builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Services.AddScoped<ValidateModelFilter>();
 
 
 builder.Services.AddDataProtection().PersistKeysToDbContext<ApiDbContext>();

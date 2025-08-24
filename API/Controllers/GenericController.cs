@@ -60,7 +60,7 @@ namespace API.Controllers
             TEntity entity = _mapper.Map<TEntity>(entityDto);
 
             int result = await _dataService.GetGenericRepository<TEntity>().AddAsync(entity);
-            if (result != 1)
+            if (result <= 0)
                 return new ApiResponse<TEntity>().SetErrorResponse("error", "An error occurred while creating the entity.");
 
             return new ApiResponse<TEntity>().SetSuccessResponse(entity);
