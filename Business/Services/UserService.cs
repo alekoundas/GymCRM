@@ -111,7 +111,7 @@ namespace Business.Services
 
             //claims.AddRange(roleClaims);
 
-            string token = GetToken(_tokenSettings, user, claims);
+            string token = GetToken(_tokenSettings, user, claims, userRoles);
             await _userManager.RemoveAuthenticationTokenAsync(user, "REFRESHTOKENPROVIDER", "RefreshToken");
             string refreshToken = await _userManager.GenerateUserTokenAsync(user, "REFRESHTOKENPROVIDER", "RefreshToken");
             await _userManager.SetAuthenticationTokenAsync(user, "REFRESHTOKENPROVIDER", "RefreshToken", refreshToken);
@@ -165,14 +165,16 @@ namespace Business.Services
             return principal;
         }
 
-        private string GetToken(TokenSettings appSettings, User user, List<Claim> roleClaims)
+        private string GetToken(TokenSettings appSettings, User user, List<Claim> roleClaims, IList<string> userRoles)
         {
             SymmetricSecurityKey secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.SecretKey));
             SigningCredentials signInCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
+
             List<Claim> userClaims = new List<Claim>();
             userClaims.Add(new("Id", user.Id.ToString()));
             userClaims.Add(new("UserName", user.UserName ?? ""));
+            userClaims.Add(new("RoleName", userRoles.FirstOrDefault()?? ""));
             userClaims.AddRange(roleClaims);
             userClaims.AddRange(appSettings.Audiences.Select(x => new Claim(JwtRegisteredClaimNames.Aud, x)));
 

@@ -4,8 +4,9 @@ import { UserRefreshTokenDto } from "../model/UserRefreshTokenDto";
 
 interface TokenData {
   exp?: number;
-  id?: string;
+  Id?: string;
   userName?: string;
+  RoleName?: string;
   roleClaim?: string[];
   Permission?: string[];
 }
@@ -65,7 +66,8 @@ export class TokenService {
   // Get specific claim by key
   public static getClaim = (claimKey: keyof TokenData): any => {
     const claims = TokenService.getTokenClaims();
-    return claims ? claims[claimKey] : null;
+    const result = claims ? claims[claimKey] : null;
+    return result;
   };
 
   // Get role claims
@@ -75,12 +77,17 @@ export class TokenService {
 
   // Get user ID
   public static getUserId = (): string | null => {
-    return TokenService.getClaim("id") || null;
+    return TokenService.getClaim("Id") || null;
   };
 
   // Get username
   public static getUserName = (): string | null => {
     return TokenService.getClaim("userName") || null;
+  };
+
+  // Get RoleName
+  public static getRoleName = (): string | null => {
+    return TokenService.getClaim("RoleName") || null;
   };
 
   // Is user allowed

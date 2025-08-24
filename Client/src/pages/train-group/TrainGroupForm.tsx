@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 import { Calendar } from "primereact/calendar";
@@ -6,6 +6,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import LookupComponent from "../../components/dropdown/LookupComponent";
 import { FormMode } from "../../enum/FormMode";
 import { useTrainGroupStore } from "./TrainGroupStore";
+import { TokenService } from "../../services/TokenService";
 
 interface IField {
   formMode: FormMode;
@@ -13,6 +14,13 @@ interface IField {
 
 export default function TrainGroupForm({ formMode }: IField) {
   const { trainGroupDto, updateTrainGroupDto } = useTrainGroupStore();
+  useEffect(() => {
+    const userId = TokenService.getUserId();
+    if (userId && !trainGroupDto.trainerId) {
+      updateTrainGroupDto({ ...trainGroupDto, trainerId: userId });
+      console.log("Updated trainGroupDto.trainerId:", userId);
+    }
+  }, []); // Empty dependency array to run once on mount
 
   const handleChange = (
     e: React.ChangeEvent<any> | { target: { name: string; value: any } }
@@ -134,7 +142,10 @@ export default function TrainGroupForm({ formMode }: IField) {
           controller="users"
           idValue={trainGroupDto.trainerId}
           isEditable={true}
-          isEnabled={formMode === FormMode.EDIT || formMode === FormMode.ADD}
+          isEnabled={
+            (formMode === FormMode.EDIT || formMode === FormMode.ADD) &&
+            TokenService.getRoleName() === "Administrator"
+          }
           allowCustom={true}
           onChange={(x) =>
             handleChange({
