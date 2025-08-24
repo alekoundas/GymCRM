@@ -9,13 +9,12 @@ namespace Core.Dtos
         [Required(ErrorMessage = "Id is required")]
         public string Id { get; set; } = "";
 
-        public RepeatingTrainGroupTypeEnum? RepeatingTrainGroupType { get; set; }
+        public RecurringTrainGroupTypeEnum? RepeatingTrainGroupType { get; set; }
 
         public DateOnly? FixedDay { get; set; }
 
 
-        [Range(0, 6, ErrorMessage = "RecurrenceDayOfWeek must be between 0 (Sunday) and 6 (Saturday)")]
-        public int? RecurrenceDayOfWeek { get; set; }
+        public DayOfWeekEnum? RecurrenceDayOfWeek { get; set; }
 
 
         [Range(1, 31, ErrorMessage = "RecurrenceDayOfMonth must be between 1 and 31")]

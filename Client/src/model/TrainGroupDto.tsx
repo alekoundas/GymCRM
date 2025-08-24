@@ -5,7 +5,6 @@ export interface TrainGroupDto {
   id: number;
   name: string;
   description: string;
-  isRepeating: boolean;
   duration: Date;
   startOn: Date;
   maxParticipants: number;
@@ -18,7 +17,6 @@ export class TrainGroupDto {
   id: number;
   name: string;
   description: string;
-  isRepeating: boolean;
   duration: Date;
   startOn: Date;
   maxParticipants: number;

@@ -86,9 +86,6 @@ namespace DataAccess.Migrations
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsRepeating")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("MaxParticipants")
                         .HasColumnType("INTEGER");
 
@@ -173,10 +170,10 @@ namespace DataAccess.Migrations
                     b.Property<int?>("RecurrenceDayOfMonth")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("RecurrenceDayOfWeek")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("RecurrenceDayOfWeek")
+                        .HasColumnType("TEXT");
 
-                    b.Property<string>("RepeatingTrainGroupType")
+                    b.Property<string>("RecurringTrainGroupType")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TrainGroupId")
