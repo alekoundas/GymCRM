@@ -10,7 +10,7 @@ export interface TrainGroupDateDto {
   recurrenceDayOfWeek?: number;
   recurrenceDayOfMonth?: number;
   trainGroupId: number;
-  trainGroup: TrainGroupDto;
+  trainGroup?: TrainGroupDto;
   trainGroupParticipants: TrainGroupParticipantDto[];
   trainGroupCancellationSubscribers: TrainGroupCancellationSubscriberDto[];
 }
@@ -22,7 +22,7 @@ export class TrainGroupDateDto {
   recurrenceDayOfWeek?: number;
   recurrenceDayOfMonth?: number;
   trainGroupId: number = 0;
-  trainGroup: TrainGroupDto;
+  trainGroup?: TrainGroupDto;
   trainGroupParticipants: TrainGroupParticipantDto[] = [];
   trainGroupCancellationSubscribers: TrainGroupCancellationSubscriberDto[] = [];
 }

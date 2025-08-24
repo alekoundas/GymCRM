@@ -6,11 +6,14 @@ import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { classNames } from "primereact/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TokenService } from "../../services/TokenService";
 import TrainGroupForm from "./TrainGroupForm";
 import { FormMode } from "../../enum/FormMode";
+import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
+import { TrainGroupDto } from "../../model/TrainGroupDto";
+import { useTrainGroupStore } from "./TrainGroupStore";
 
 interface TimeSlot {
   id: number;
@@ -20,10 +23,28 @@ interface TimeSlot {
 
 function TrainGroups() {
   const navigate = useNavigate();
+
   const [isModalVisible, setModalVisibility] = useState(false); // Dialog visibility
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | null>(null);
+  const { resetTrainGroupDto, trainGroupDto } = useTrainGroupStore();
+
+  // const createNewData = (): TrainGroupDto => ({
+  //   id: -1,
+  //   name: "",
+  //   description: "",
+  //   isRepeating: false,
+  //   duration: new Date(),
+  //   startOn: new Date(),
+  //   maxParticipants: 1,
+  //   trainerId: "",
+  //   repeatingParticipants: [],
+  //   trainGroupDates: [],
+  // });
+  // const [trainGroupDto, setTrainGroupDto] = useState<TrainGroupDto>(
+  //   createNewData()
+  // );
 
   // Mock function to generate time slots based on selected date
   useEffect(() => {
@@ -60,7 +81,24 @@ function TrainGroups() {
     }
   };
 
-  const handleSaveTrainGroup = () => {};
+  const handleSaveTrainGroup = () => {
+    // try {
+    //   const response = await axios.post<ApiResponse<TrainGroupDto>>(
+    //     '/api/traingroups',
+    //     trainGroupDto,
+    //     { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    //   );
+    //   if (response.data.success) {
+    //     resetTrainGroupDto();
+    //     setModalVisibility(false);
+    //   } else {
+    //     alert(`Error: ${response.data.error?.message}`);
+    //   }
+    // } catch (error) {
+    //   console.error('Error saving train group:', error);
+    //   alert('Failed to save train group');
+    // }
+  };
 
   return (
     <>
@@ -103,7 +141,13 @@ function TrainGroups() {
                     icon="pi pi-plus"
                     label="Add"
                     outlined
-                    onClick={() => setModalVisibility(true)}
+                    onClick={() => {
+                      setModalVisibility(true);
+                      resetTrainGroupDto();
+                      // setTrainGroupDto(createNewData());
+                      // if (triggerRefreshGrid.current)
+                      //   triggerRefreshGrid.current();
+                    }}
                   />
                 )}
               </div>
@@ -172,6 +216,7 @@ function TrainGroups() {
         onHide={() => setModalVisibility(false)}
       >
         <TrainGroupForm formMode={FormMode.ADD} />
+        <TrainGroupDateGrid formMode={FormMode.ADD} />
       </Dialog>
     </>
   );

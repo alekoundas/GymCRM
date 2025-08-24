@@ -7,5 +7,6 @@ export class DataTableDto<TEntity> {
   page: number = 0;
   pageCount: number = 0;
   multiSortMeta: DataTableSortMeta[] = [];
+  // multiSort: DataTableSortDto[] = [];
   filters: DataTableFilterMeta = {};
 }
