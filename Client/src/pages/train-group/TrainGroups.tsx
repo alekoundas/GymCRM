@@ -14,6 +14,7 @@ import { FormMode } from "../../enum/FormMode";
 import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
 import { TrainGroupDto } from "../../model/TrainGroupDto";
 import { useTrainGroupStore } from "./TrainGroupStore";
+import ApiService from "../../services/ApiService";
 
 interface TimeSlot {
   id: number;
@@ -81,23 +82,13 @@ function TrainGroups() {
     }
   };
 
-  const handleSaveTrainGroup = () => {
-    // try {
-    //   const response = await axios.post<ApiResponse<TrainGroupDto>>(
-    //     '/api/traingroups',
-    //     trainGroupDto,
-    //     { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-    //   );
-    //   if (response.data.success) {
-    //     resetTrainGroupDto();
-    //     setModalVisibility(false);
-    //   } else {
-    //     alert(`Error: ${response.data.error?.message}`);
-    //   }
-    // } catch (error) {
-    //   console.error('Error saving train group:', error);
-    //   alert('Failed to save train group');
-    // }
+  const handleSaveTrainGroup = async () => {
+    const response = await ApiService.create("trainGroup", trainGroupDto);
+
+    if (response) {
+      resetTrainGroupDto();
+      setModalVisibility(false);
+    }
   };
 
   return (

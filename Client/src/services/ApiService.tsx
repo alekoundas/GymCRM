@@ -130,32 +130,31 @@ export default class ApiService {
     method: string,
     data?: TEntity
   ): Promise<TEntity | null> {
-    let token = LocalStorageService.getAccessToken();
-    const result = await this.apiFetch<TEntity>(url, method, token, data).then(
-      (response) => {
-        if (!response?.data || !response?.isSucceed) {
-          if (response?.messages) {
-            // Loop in dictionary to display errors.
-            Object.keys(response.messages).forEach((key) =>
-              response.messages[key].forEach((value) =>
-                ToastService.showError(value)
-              )
-            );
-          }
-          return response?.isSucceed;
-        }
+    const token = LocalStorageService.getAccessToken();
+    const response = await this.apiFetch<TEntity>(url, method, token, data);
 
-        // Loop in dictionary to display errors.
+    if (!response || !response.isSucceed) {
+      if (response?.messages) {
+        // Display error messages
         Object.keys(response.messages).forEach((key) =>
           response.messages[key].forEach((value) =>
-            ToastService.showSuccess(value)
+            ToastService.showError(value)
           )
         );
-        return response.data;
       }
-    );
+      return null; // Explicitly return null for failed requests
+    }
 
-    return result;
+    // Display success messages
+    if (response.messages) {
+      Object.keys(response.messages).forEach((key) =>
+        response.messages[key].forEach((value) =>
+          ToastService.showSuccess(value)
+        )
+      );
+    }
+
+    return response.data ?? null; // Return data or null if data is undefined
   }
 
   private static async refreshUserToken(): Promise<boolean> {

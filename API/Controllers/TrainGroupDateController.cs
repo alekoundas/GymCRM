@@ -1,17 +1,17 @@
 ﻿
 using AutoMapper;
 using Business.Services;
-using Core.Dtos;
+using Core.Dtos.TrainGroupDate;
 using Core.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
-    public class TrainGroupDateController : GenericController<TrainGroupDate, TrainGroupDateDto>
+    public class TrainGroupDateController : GenericController<TrainGroupDate, TrainGroupDateDto, TrainGroupDateAddDto>
     {
         private readonly IDataService _dataService;
-        private readonly ILogger<TrainGroupDateController> _logger;
+        //private readonly ILogger<TrainGroupDateController> _logger;
 
         public TrainGroupDateController(IDataService dataService, IMapper mapper) : base(dataService, mapper)
         {

@@ -3,17 +3,17 @@ using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Enums;
-using Core.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Expressions;
 using System.Security.Claims;
 
 namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class GenericController<TEntity, TEntityDto> : ControllerBase where TEntity : class
+    public class GenericController<TEntity, TEntityDto, TEntityAddDto> : ControllerBase
+        where TEntity : class
+        where TEntityDto : class
+        where TEntityAddDto : class
     {
         private readonly IDataService _dataService;
         //private readonly ILogger<TEntityController> _logger;
@@ -22,7 +22,7 @@ namespace API.Controllers
         {
             //_logger = logger;
             _dataService = dataService;
-            _mapper= mapper;
+            _mapper = mapper;
         }
 
 
@@ -46,7 +46,7 @@ namespace API.Controllers
 
         // POST: api/controller
         [HttpPost]
-        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Post([FromBody] TEntityDto entityDto)
+        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Post([FromBody] TEntityAddDto entityDto)
         {
             if (!IsUserAuthorized("Add"))
                 return new ApiResponse<TEntity>().SetErrorResponse("Authorization", "User is not authorized to perform this action.");
@@ -57,19 +57,11 @@ namespace API.Controllers
 
             TEntity entity = _mapper.Map<TEntity>(entityDto);
 
-            try
-            {
-                int result = await _dataService.GetGenericRepository<TEntity>().AddAsync(entity);
-                if (result != 1)
-                    return new ApiResponse<TEntity>().SetErrorResponse("error", "An error occurred while creating the entity.");
+            int result = await _dataService.GetGenericRepository<TEntity>().AddAsync(entity);
+            if (result != 1)
+                return new ApiResponse<TEntity>().SetErrorResponse("error", "An error occurred while creating the entity.");
 
-                return new ApiResponse<TEntity>().SetSuccessResponse(entity);
-            }
-            catch (Exception ex)
-            {
-                //_logger.LogError(ex, "Error creating {EntityName}", typeof(TEntity).Name);
-                return StatusCode(500, new ApiResponse<TEntity>().SetErrorResponse("Server", "An error occurred while creating the entity."));
-            }
+            return new ApiResponse<TEntity>().SetSuccessResponse(entity);
         }
 
         // PUT: api/controller/5
@@ -92,16 +84,8 @@ namespace API.Controllers
                 return new ApiResponse<TEntity>().SetErrorResponse(className, $"Requested {className} not found!");
             }
 
-            try
-            {
-                _dataService.Update(entity);
-                return new ApiResponse<TEntity>().SetSuccessResponse(entity);
-            }
-            catch (Exception ex)
-            {
-                //_logger.LogError(ex, "Error updating {EntityName}", typeof(TEntity).Name);
-                return StatusCode(500, new ApiResponse<TEntity>().SetErrorResponse("Server", "An error occurred while updating the entity."));
-            }
+            _dataService.Update(entity);
+            return new ApiResponse<TEntity>().SetSuccessResponse(entity);
         }
 
         // DELETE: api/controller/5
@@ -143,9 +127,9 @@ namespace API.Controllers
                 // Create the first OrderBy().
                 DataTableSortDto? dataTableSort = dataTable.MultiSortMeta.First();
                 if (dataTableSort.Order > 0)
-                    query.OrderBy(dataTableSort.Field.Substring(0,1).ToUpper() + dataTableSort.Field.Substring(1, dataTableSort.Field.Length), OrderDirectionEnum.ASCENDING);
+                    query.OrderBy(dataTableSort.Field.Substring(0, 1).ToUpper() + dataTableSort.Field.Substring(1, dataTableSort.Field.Length), OrderDirectionEnum.ASCENDING);
                 else if (dataTableSort.Order < 0)
-                    query.OrderBy(dataTableSort.Field.Substring(0,1).ToUpper() + dataTableSort.Field.Substring(1, dataTableSort.Field.Length), OrderDirectionEnum.DESCENDING);
+                    query.OrderBy(dataTableSort.Field.Substring(0, 1).ToUpper() + dataTableSort.Field.Substring(1, dataTableSort.Field.Length), OrderDirectionEnum.DESCENDING);
 
                 // Create the rest OrderBy methods as ThenBy() if any.
                 foreach (var sortInfo in dataTable.MultiSortMeta.Skip(1))

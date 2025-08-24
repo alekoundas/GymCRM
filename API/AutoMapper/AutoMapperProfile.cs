@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Core.Dtos;
 using Core.Dtos.Identity;
+using Core.Dtos.TrainGroup;
+using Core.Dtos.TrainGroupDate;
 using Core.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -13,8 +15,14 @@ namespace API.AutoMapper
             CreateMap<TrainGroup, TrainGroupDto>();
             CreateMap<TrainGroupDto, TrainGroup>();
 
+            CreateMap<TrainGroup, TrainGroupAddDto>();
+            CreateMap<TrainGroupAddDto, TrainGroup>();
+
             CreateMap<TrainGroupDate, TrainGroupDateDto>();
             CreateMap<TrainGroupDateDto, TrainGroupDate>();
+
+            CreateMap<TrainGroupDate, TrainGroupDateAddDto>();
+            CreateMap<TrainGroupDateAddDto, TrainGroupDate>();
 
             CreateMap<ContactInformation, ContactInformationDto>();
             CreateMap<ContactInformationDto, ContactInformation>();

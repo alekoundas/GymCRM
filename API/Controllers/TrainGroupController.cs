@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using Business.Services;
-using Core.Dtos;
+using Core.Dtos.TrainGroup;
 using Core.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
-    public class TrainGroupController : GenericController<TrainGroup, TrainGroupDto>
+    public class TrainGroupController : GenericController<TrainGroup, TrainGroupDto, TrainGroupAddDto>
     {
         private readonly IDataService _dataService;
-        private readonly ILogger<TrainGroupController> _logger;
+        //private readonly ILogger<TrainGroupController> _logger;
 
         public TrainGroupController(IDataService dataService, IMapper mapper) : base(dataService, mapper)
         {

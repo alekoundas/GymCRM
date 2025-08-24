@@ -1,15 +1,14 @@
-﻿using Core.Enums;
+﻿using Core.Dtos.TrainGroup;
+using Core.Enums;
 using Core.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace Core.Dtos
+namespace Core.Dtos.TrainGroupDate
 {
-    public class TrainGroupDateDto
+    public class TrainGroupDateAddDto
     {
-        [Required(ErrorMessage = "Id is required")]
-        public string Id { get; set; } = "";
-
-        public RecurringTrainGroupTypeEnum? RepeatingTrainGroupType { get; set; }
+        [Required(ErrorMessage = "RecurringTrainGroupType is required")]
+        public RecurringTrainGroupTypeEnum RecurringTrainGroupType { get; set; }
 
         public DateOnly? FixedDay { get; set; }
 
