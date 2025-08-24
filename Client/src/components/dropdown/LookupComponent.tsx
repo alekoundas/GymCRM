@@ -1,5 +1,5 @@
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ApiService from "../../services/ApiService";
 import { VirtualScrollerLazyEvent } from "primereact/virtualscroller";
 import { LookupDto } from "../../model/lookup/LookupDto";
@@ -33,82 +33,94 @@ export default function LookupComponent({
 
   const refreshData = async (dto: LookupDto) => {
     setLoading(true);
-
-    return await ApiService.getDataLookup(controller, dto).then((result) => {
-      lookupDto.data = result?.data;
+    try {
+      const result = await ApiService.getDataLookup(controller, dto);
+      console.log(`LookupComponent: API response for ${controller}:`, result); // Debug
       setLoading(false);
       return result;
-    });
+    } catch (error) {
+      console.error(`Failed to fetch data for ${controller}:`, error);
+      setLoading(false);
+      return null;
+    }
   };
 
-  const setSelectedOptionById = (id: string) => {
+  const setSelectedOptionById = async (id: string) => {
+    if (!id) return;
     const dto = new LookupDto();
     dto.filter.id = id;
-    refreshData(dto).then((x) => {
-      if (x?.data && x?.data[0]?.value) {
-        setSelectedOption(x.data[0].value);
-      }
-    });
+    const result = await refreshData(dto);
+    if (result?.data && result.data[0]?.id) {
+      setSelectedOption(result.data[0].id);
+      console.log("LookupComponent: Preselected id:", result.data[0].id); // Debug
+    } else {
+      console.warn(`LookupComponent: No option found for id ${id}`);
+    }
   };
 
-  // Load intitial data.
-  React.useEffect(() => {
+  // Load initial data and react to idValue changes
+  useEffect(() => {
     if (idValue) {
       setSelectedOptionById(idValue);
     }
-  }, []);
-
-  const onLazyLoad = async (_event: VirtualScrollerLazyEvent) => {
-    refreshData(lookupDto).then((resultLookupDto) => {
-      if (resultLookupDto) setLookupDto({ ...resultLookupDto });
-      else setLookupDto(new LookupDto());
+    // Load all options for the dropdown
+    refreshData(new LookupDto()).then((result) => {
+      if (result?.data) {
+        setLookupDto({ ...result });
+        // Check if idValue matches an option
+        if (idValue && result.data.some((opt: any) => opt.id === idValue)) {
+          setSelectedOption(idValue);
+          console.log("LookupComponent: Matched idValue in options:", idValue); // Debug
+        }
+      }
     });
+  }, [idValue, controller]);
+
+  const onLazyLoad = async (event: VirtualScrollerLazyEvent) => {
+    const result = await refreshData(lookupDto);
+    if (result) {
+      setLookupDto({ ...result });
+    } else {
+      setLookupDto(new LookupDto());
+    }
   };
 
   const onSaveCustom = () => {
-    if (onCustomSave && selectedOption)
+    if (onCustomSave && selectedOption) {
       onCustomSave(selectedOption).then((id) => {
         if (!id) return;
-
         setIsVisible(false);
         setSelectedOptionById(id.toString());
-        refreshData(lookupDto).then((resultLookupDto) => {
-          if (resultLookupDto) setLookupDto({ ...resultLookupDto });
+        refreshData(lookupDto).then((result) => {
+          if (result) setLookupDto({ ...result });
           else setLookupDto(new LookupDto());
         });
       });
+    }
   };
 
   const handleChange = (event: DropdownChangeEvent): void => {
-    // Stupid PrimeRact Dropdown doesnt retrieve object but just a string.
-    // This "if" statement means that user selected an option.
     if (event.originalEvent) {
       if (onCustomChange) onCustomChange(false);
-
       setIsVisible(false);
       setSelectedOption(event.value);
-    }
-
-    // This else statement means that user set a custom value.
-    else {
+    } else {
       if (onCustomChange) onCustomChange(true);
       if (allowCustom) setIsVisible(true);
-
       lookupDto.filter.value = event.value;
       setLookupDto({ ...lookupDto });
-      refreshData(lookupDto).then((resultLookupDto) => {
-        if (resultLookupDto) setLookupDto({ ...resultLookupDto });
+      refreshData(lookupDto).then((result) => {
+        if (result) setLookupDto({ ...result });
         else setLookupDto(new LookupDto());
       });
       setSelectedOption(event.value);
     }
-
     if (onChange) onChange(event.value);
   };
 
   return (
     <>
-      <div className="grid ">
+      <div className="grid">
         <div className="col-9 pr-0">
           <div className="flex justify-center">
             <Dropdown
@@ -118,7 +130,7 @@ export default function LookupComponent({
               onChange={handleChange}
               editable={isEditable}
               options={lookupDto.data}
-              placeholder="Select a Role"
+              placeholder="Select a value"
               className="w-full md:w-14rem"
               disabled={!isEnabled}
               virtualScrollerOptions={{
@@ -127,7 +139,6 @@ export default function LookupComponent({
                 itemSize: 38,
                 showLoader: true,
                 loading: loading,
-
                 delay: 250,
               }}
             />
