@@ -8,21 +8,27 @@ using Microsoft.AspNetCore.Identity;
 
 namespace API.AutoMapper
 {
-    public class AutoMapperProfile: Profile
+    public class AutoMapperProfile : Profile
     {
         public AutoMapperProfile()
         {
             CreateMap<TrainGroup, TrainGroupDto>();
-            CreateMap<TrainGroupDto, TrainGroup>();
+            CreateMap<TrainGroupDto, TrainGroup>()
+               .ForMember(destination => destination.Duration, act => act.MapFrom(source => source.Duration.TimeOfDay))
+               .ForMember(destination => destination.StartOn, act => act.MapFrom(source => source.StartOn.TimeOfDay));
 
             CreateMap<TrainGroup, TrainGroupAddDto>();
             CreateMap<TrainGroupAddDto, TrainGroup>()
                 .ForMember(destination => destination.Duration, act => act.MapFrom(source => source.Duration.TimeOfDay))
                 .ForMember(destination => destination.StartOn, act => act.MapFrom(source => source.StartOn.TimeOfDay));
-                
+
 
             CreateMap<TrainGroupDate, TrainGroupDateDto>();
-            CreateMap<TrainGroupDateDto, TrainGroupDate>();
+            CreateMap<TrainGroupDateDto, TrainGroupDate>()
+                .ForMember(dest => dest.FixedDay, opt => opt.MapFrom<FixedDayResolver>());
+
+
+
 
             CreateMap<TrainGroupDate, TrainGroupDateAddDto>();
             CreateMap<TrainGroupDateAddDto, TrainGroupDate>();
@@ -32,7 +38,7 @@ namespace API.AutoMapper
 
             CreateMap<TrainGroupParticipant, TrainGroupParticipantDto>();
             CreateMap<TrainGroupParticipantDto, TrainGroupParticipant>();
-            
+
             CreateMap<TrainGroupCancellationSubscriber, TrainGroupCancellationSubscriberDto>();
             CreateMap<TrainGroupCancellationSubscriberDto, TrainGroupCancellationSubscriber>();
 

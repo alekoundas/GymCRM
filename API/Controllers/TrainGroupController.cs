@@ -2,11 +2,13 @@
 using Business.Services;
 using Core.Dtos.TrainGroup;
 using Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     public class TrainGroupController : GenericController<TrainGroup, TrainGroupDto, TrainGroupAddDto>
     {
         private readonly IDataService _dataService;
@@ -16,6 +18,13 @@ namespace API.Controllers
         {
             _dataService = dataService;
         }
+
+
+
+      
+
+
+
 
         //// Override Get to add custom logic
         //public override async Task<ActionResult<ApiResponse<TrainGroup>>> Get(int id)

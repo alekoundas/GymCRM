@@ -1,16 +1,17 @@
 import { ApiResponse } from "../model/ApiResponse";
 import { DataTableDto } from "../model/DataTableDto";
 import { LookupDto } from "../model/lookup/LookupDto";
+import { TimeSlotRequestDto } from "../model/TimeSlotRequestDto";
+import { TimeSlotResponseDto } from "../model/TimeSlotResponseDto";
 import { UserLoginRequestDto } from "../model/UserLoginRequestDto";
+import { UserRefreshTokenDto } from "../model/UserRefreshTokenDto";
 import { UserRegisterRequestDto } from "../model/UserRegisterRequestDto";
 import { LocalStorageService } from "./LocalStorageService";
 import { ToastService } from "./ToastService";
 import { TokenService } from "./TokenService";
 
 export default class ApiService {
-  // static serverUrl = "https://alexps.gr/api/";
   static serverUrl = "/api/";
-  // static serverUrl = "http://localhost:8080/api/";
 
   public static async get<TEntity>(
     controller: string,
@@ -44,6 +45,18 @@ export default class ApiService {
     return await this.apiRequest(url, "POST", data);
   }
 
+  public static async timeslots(
+    endpoint: string,
+    data: TimeSlotRequestDto
+  ): Promise<TimeSlotResponseDto[] | null> {
+    const url = this.serverUrl + endpoint;
+    return await this.apiRequest<TimeSlotRequestDto, TimeSlotResponseDto[]>(
+      url,
+      "POST",
+      data
+    );
+  }
+
   public static async delete<TEntity>(
     controller: string,
     id: number | string
@@ -67,7 +80,11 @@ export default class ApiService {
   ): Promise<boolean> {
     const url = this.serverUrl + "users/login";
 
-    return await this.apiRequest(url, "POST", data).then((result) => {
+    return await this.apiRequest<UserLoginRequestDto, UserLoginRequestDto>(
+      url,
+      "POST",
+      data
+    ).then((result) => {
       if (result) {
         const expireDate = new Date(new Date().getTime() + 604800 * 1000);
 
@@ -75,7 +92,7 @@ export default class ApiService {
         TokenService.setRefreshToken(result.refreshToken);
         TokenService.setRefreshTokenExpireDate(expireDate.toString());
         authLogin();
-
+        var dsfsdf = TokenService.getUserName();
         ToastService.showSuccess("Login was successfull!");
         return true;
       } else {
@@ -106,7 +123,10 @@ export default class ApiService {
 
   public static async logout(authLogout: () => void) {
     const url = this.serverUrl + "users/logout";
-    await this.apiRequest<ApiResponse<boolean>>(url, "POST").then((result) => {
+    await this.apiRequest<ApiResponse<boolean>, ApiResponse<boolean>>(
+      url,
+      "POST"
+    ).then((result) => {
       TokenService.logout();
       authLogout();
       if (result) {
@@ -117,21 +137,18 @@ export default class ApiService {
     });
   }
 
-  public static async test<TEntity>() {
-    let url = this.serverUrl + "users/profile";
-    await this.apiRequest<TEntity>(url, "POST");
-
-    url = this.serverUrl + "tickets/5";
-    await this.apiRequest<TEntity>(url, "GET");
-  }
-
-  private static async apiRequest<TEntity>(
+  private static async apiRequest<TRequest, TResponse>(
     url: string,
     method: string,
-    data?: TEntity
-  ): Promise<TEntity | null> {
+    data?: TRequest
+  ): Promise<TResponse | null> {
     const token = LocalStorageService.getAccessToken();
-    const response = await this.apiFetch<TEntity>(url, method, token, data);
+    const response = await this.apiFetch<TRequest, TResponse>(
+      url,
+      method,
+      token,
+      data
+    );
 
     if (!response || !response.isSucceed) {
       if (response?.messages) {
@@ -159,28 +176,36 @@ export default class ApiService {
 
   private static async refreshUserToken(): Promise<boolean> {
     const url = this.serverUrl + "users/refreshToken";
+    var aasdasdf = TokenService.getUserName();
     const refreshTokenDto = TokenService.getUserRefreshTokenDto();
-    return await this.apiFetch(url, "POST", null, refreshTokenDto).then(
-      (response) => {
-        if (!response || !response.data) {
-          return false;
-        }
-
-        // authLogin();
-        TokenService.setAccessToken(response.data.accessToken);
-        TokenService.setRefreshToken(response.data.refreshToken);
-        TokenService.setRefreshTokenExpireDate(response.toString());
-        return true;
+    return await this.apiFetch<UserRefreshTokenDto, UserRefreshTokenDto>(
+      url,
+      "POST",
+      null,
+      refreshTokenDto
+    ).then((response) => {
+      if (!response || !response.data) {
+        response?.messages["error"].forEach((x) => ToastService.showError(x));
+        //TODO: ennable this to switch to loged out mode
+        // TokenService.logout();
+        // authLogout();
+        return false;
       }
-    );
+
+      // authLogin();
+      TokenService.setAccessToken(response.data.accessToken);
+      TokenService.setRefreshToken(response.data.refreshToken);
+      TokenService.setRefreshTokenExpireDate(response.toString());
+      return true;
+    });
   }
 
-  private static async handle401<TEntity>(
+  private static async handle401<TRequest, Tresponse>(
     url: string,
     method: string,
     token?: string | null,
-    data?: TEntity | null
-  ): Promise<ApiResponse<TEntity> | null> {
+    data?: TRequest | null
+  ): Promise<ApiResponse<Tresponse> | null> {
     // Refresh Token Expired!
     if (TokenService.isRefreshTokenExpired()) {
       ToastService.showWarn("Token expired. Login Required.");
@@ -213,12 +238,12 @@ export default class ApiService {
     return null;
   }
 
-  private static async apiFetch<TEntity>(
+  private static async apiFetch<TRequest, TResponse>(
     url: string,
     method: string,
     token?: string | null,
-    data?: TEntity | null
-  ): Promise<ApiResponse<TEntity> | null> {
+    data?: TRequest | null
+  ): Promise<ApiResponse<TResponse> | null> {
     try {
       const response: Response = await fetch(url, {
         method: method,
@@ -237,12 +262,14 @@ export default class ApiService {
       }
 
       if (response.status === 400) {
-        const result = (await response.json()) as ApiResponse<TEntity>;
+        const result = (await response.json()) as ApiResponse<TResponse>;
         return this.handle400(result);
       }
 
       if (response.ok) {
-        const result = (await response.json()) as Promise<ApiResponse<TEntity>>;
+        const result = (await response.json()) as Promise<
+          ApiResponse<TResponse>
+        >;
         return result;
       }
 

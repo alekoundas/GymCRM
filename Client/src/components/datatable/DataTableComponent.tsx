@@ -203,7 +203,7 @@ IField<TEntity>) {
         lazy
         stripedRows
         emptyMessage="No data found."
-        tableStyle={{ minWidth: "50rem" }}
+        // tableStyle={{ minWidth: "50rem" }}
         selectionMode="single"
         loading={loading}
         // Pagging.

@@ -46,11 +46,11 @@ namespace API.Controllers
         public async Task<ApiResponse<IdentityRoleDto>> Get(string? id)
         {
             if (id == null)
-                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("errors", "Role ID not set!");
+                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role ID not set!");
 
             IdentityRole<Guid>? role = await _roleManager.FindByIdAsync(id);
             if (role == null)
-                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("errors", "Role not found!");
+                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role not found!");
 
             IdentityRoleDto identityRoleDto = _mapper.Map<IdentityRoleDto>(role);
             return new ApiResponse<IdentityRoleDto>().SetSuccessResponse(identityRoleDto);
@@ -155,12 +155,12 @@ namespace API.Controllers
 
 
             if (string.IsNullOrWhiteSpace(identityRoleDto.Name))
-                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("errors", "Role name is required");
+                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role name is required");
 
 
             var roleExists = await _roleManager.RoleExistsAsync(identityRoleDto.Name);
             if (roleExists)
-                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("errors", "Role already exists");
+                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role already exists");
 
             IdentityRole<Guid> identityRole = new IdentityRole<Guid>(identityRoleDto.Name);
             var result = await _roleManager.CreateAsync(identityRole);

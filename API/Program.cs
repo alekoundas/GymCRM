@@ -1,3 +1,4 @@
+using API.AutoMapper;
 using API.Filters;
 using Business.Repository;
 using Business.Services;
@@ -99,7 +100,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
             }
         }
 
-        var response = new ApiResponse<object>().SetErrorResponse("",validationErrors);
+        var response = new ApiResponse<object>().SetErrorResponse("error", validationErrors);
         return new BadRequestObjectResult(response);
     };
 });
@@ -111,7 +112,17 @@ builder.Services.AddTransient<IDbContextFactory<ApiDbContext>, ApiDbContextFacto
 builder.Services.AddScoped<ApiDbContextInitialiser>();
 
 // AutoMapper.
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+//builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(config =>
+{
+
+    config.AddProfile<AutoMapperProfile>();
+    // Scan for profiles in the current assembly or specific assemblies
+    //config.AddMaps(builder.Environment.ContentRootPath); // Scans all assemblies in the project
+    // Or specify specific assemblies:
+    // config.AddMaps(typeof(Program).Assembly);
+    // config.AddMaps(AppDomain.CurrentDomain.GetAssemblies()); // If you need to scan all assemblies
+});
 
 
 builder.Services.AddSingleton<ClaimsIdentity>();
