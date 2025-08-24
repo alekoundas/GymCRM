@@ -1,17 +1,14 @@
 import React, { SyntheticEvent, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
-import { InputSwitch } from "primereact/inputswitch";
-import { Button } from "primereact/button";
-import { Fieldset } from "primereact/fieldset";
 import { Calendar } from "primereact/calendar";
-import { Dropdown } from "primereact/dropdown";
 import { TrainGroupDto } from "../../model/TrainGroupDto";
 import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
 import { InputTextarea } from "primereact/inputtextarea";
 import { FormEvent } from "primereact/ts-helpers";
 import LookupComponent from "../../components/dropdown/LookupComponent";
 import { FormMode } from "../../enum/FormMode";
+import { useTrainGroupStore } from "./TrainGroupStore";
 
 interface IField {
   formMode: FormMode;
@@ -19,59 +16,28 @@ interface IField {
 }
 
 export default function TrainGroupForm({ formMode }: IField) {
-  const [trainGroupDto, setTrainGroupDto] = useState<TrainGroupDto>({
-    id: -1,
-    name: "",
-    description: "",
-    isRepeating: false,
-    duration: new Date(),
-    startOn: new Date(),
-    maxParticipants: 1,
-    trainerId: "",
-    repeatingParticipants: [],
-    trainGroupDates: [],
-  });
+  // const [trainGroupDto, setTrainGroupDto] = useState<TrainGroupDto>(data);
+  const { trainGroupDto, updateTrainGroupDto } = useTrainGroupStore();
 
-  // const [newParticipantDto, setNewParticipantDto] =
-  //   useState<TrainGroupParticipantDto>({
-  //     id: -1,
-  //     selectedDate: new Date(),
-  //     trainGroupDateId: 0,
-  //     participantId: "",
-  //   });
+  // const handleChangeTrainGroupDto = (
+  //   event:
+  //     | React.ChangeEvent<any>
+  //     | FormEvent<Date, SyntheticEvent<Element, Event>>
+  //     | { target: { value: any; name?: string } }
+  // ) => {
+  //   const name = event.target.name;
+  //   const value = event.target.value;
 
-  const [trainGroupDateDto, setTrainGroupDateDto] = useState<TrainGroupDateDto>(
-    {
-      id: -1,
-      trainGroupId: 0,
-      trainGroupParticipants: [],
-      trainGroupCancellationSubscribers: [],
-      trainGroup: trainGroupDto,
-    }
-  );
+  //   trainGroupDto[name] = value;
+  //   setTrainGroupDto({ ...trainGroupDto });
+  // };
 
-  const handleChangeTrainGroupDto = (
-    event:
-      | React.ChangeEvent<any>
-      | FormEvent<Date, SyntheticEvent<Element, Event>>
-      | { target: { value: any; name?: string } }
+  const handleChange = (
+    e: React.ChangeEvent<any> | { target: { name: string; value: any } }
   ) => {
-    const name = event.target.name;
-    const value = event.target.value;
-
-    trainGroupDto[name] = value;
-    setTrainGroupDto({ ...trainGroupDto });
+    const { name, value } = e.target;
+    updateTrainGroupDto({ [name]: value });
   };
-
-  const handleChangeTrainGroupDateDto = (event: React.ChangeEvent<any>) => {
-    const name = event.target.name;
-    const value = event.target.value;
-
-    trainGroupDateDto[name] = value;
-    setTrainGroupDateDto({ ...trainGroupDateDto });
-  };
-
-  const handleSubmit = async () => {};
 
   return (
     <div className="pr-5 pl-5">
@@ -91,7 +57,7 @@ export default function TrainGroupForm({ formMode }: IField) {
           placeholder="Name"
           className="w-full mb-3"
           value={trainGroupDto.name}
-          onChange={handleChangeTrainGroupDto}
+          onChange={handleChange}
         />
       </div>
 
@@ -108,7 +74,7 @@ export default function TrainGroupForm({ formMode }: IField) {
           placeholder="Description"
           className="w-full mb-3"
           value={trainGroupDto.description}
-          onChange={handleChangeTrainGroupDto}
+          onChange={handleChange}
         />
       </div>
 
@@ -123,7 +89,7 @@ export default function TrainGroupForm({ formMode }: IField) {
           id="startOn"
           name="startOn"
           value={trainGroupDto.startOn}
-          onChange={handleChangeTrainGroupDto}
+          onChange={handleChange}
           showIcon
           timeOnly
           icon={() => <i className="pi pi-clock" />}
@@ -141,7 +107,7 @@ export default function TrainGroupForm({ formMode }: IField) {
           id="duration"
           name="duration"
           value={trainGroupDto.duration}
-          onChange={handleChangeTrainGroupDto}
+          onChange={handleChange}
           showIcon
           timeOnly
           icon={() => <i className="pi pi-clock" />}
@@ -160,10 +126,10 @@ export default function TrainGroupForm({ formMode }: IField) {
           name="maxParticipants"
           value={trainGroupDto.maxParticipants}
           onValueChange={(x) =>
-            handleChangeTrainGroupDto({
+            handleChange({
               target: {
                 name: "maxParticipants",
-                value: x.value,
+                value: x.value ?? 1,
               },
             })
           }
@@ -188,10 +154,8 @@ export default function TrainGroupForm({ formMode }: IField) {
           isEditable={true}
           isEnabled={formMode === FormMode.EDIT || formMode === FormMode.ADD}
           allowCustom={true}
-          // onCustomChange={isCustomChange}
-          // onCustomSave={handleCustomSave}
           onChange={(x) =>
-            handleChangeTrainGroupDto({
+            handleChange({
               target: {
                 name: "trainerId",
                 value: x,

@@ -1,85 +1,153 @@
 import { Column, ColumnBodyOptions } from "primereact/column";
-import { DataTable, DataTableValue } from "primereact/datatable";
+import {
+  DataTable,
+  DataTableRowEditCompleteEvent,
+  DataTableValue,
+} from "primereact/datatable";
 import { DataTableDto } from "../../model/DataTableDto";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DataTableService from "../../services/DataTableService";
 import { Button } from "primereact/button";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { DataTableEditModeEnum } from "../../enum/DataTableEditModeEnum";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
+import { FormMode } from "../../enum/FormMode";
 
 interface IField<TEntity> {
   controller: string;
   dataTable: DataTableDto<TEntity>;
   dataTableColumns: DataTableColumns[];
+  formMode: FormMode;
   enableGridRowActions?: boolean;
   enableAddAction?: boolean;
   editMode?: DataTableEditModeEnum;
   filterDisplay?: DataTableFilterDisplayEnum;
+  onRowEditInit?: (e: any) => void;
+  onRowEditComplete?: (e: DataTableRowEditCompleteEvent) => void;
+  onRowEditCancel?: (e: any) => void;
   onButtonClick: (buttonType: ButtonTypeEnum, rowData?: TEntity) => void;
-  onAfterDataLoaded?: (
-    data: DataTableDto<TEntity> | null
-  ) => DataTableDto<TEntity> | null;
-  triggerRefreshData?: React.MutableRefObject<(() => void) | undefined>;
-  triggerRequestData?: (data: () => TEntity[]) => void;
+  // onAfterDataLoaded?: (
+  //   data: DataTableDto<TEntity> | null
+  // ) => DataTableDto<TEntity> | null;
+  // triggerRefreshData?: React.MutableRefObject<(() => void) | undefined>;
+  // triggerRequestData?: (data: () => TEntity[]) => void;
 }
 
 export default function DataTableComponent<TEntity extends DataTableValue>({
   controller,
   dataTable,
   dataTableColumns,
+  formMode,
   enableGridRowActions = false,
   enableAddAction = false,
   editMode,
   filterDisplay,
+  onRowEditInit,
+  onRowEditComplete,
+  onRowEditCancel,
   onButtonClick,
-  onAfterDataLoaded,
-  triggerRefreshData,
-  triggerRequestData,
-}: IField<TEntity>) {
+}: // onAfterDataLoaded,
+// triggerRefreshData,
+// triggerRequestData,
+IField<TEntity>) {
   const [loading, setLoading] = useState(true);
   const [dataTableDto, setDataTableDto] =
     useState<DataTableDto<TEntity>>(dataTable);
 
+  // const dataTableService = new DataTableService(
+  //   controller,
+  //   dataTable,
+  //   setLoading,
+  //   null,
+  //   formMode,
+  //   onAfterDataLoaded
+  // );
+  const onAfterDataLoaded = (
+    data: DataTableDto<TEntity> | null
+  ): DataTableDto<TEntity> | null => {
+    if (data) {
+      setDataTableDto(data);
+    }
+    return data;
+  };
+
   const dataTableService = new DataTableService(
     controller,
-    dataTableDto,
-    setDataTableDto,
+    dataTable,
     setLoading,
     null,
+    formMode,
     onAfterDataLoaded
   );
-  // Return data to parent.
-  if (triggerRequestData) triggerRequestData(() => dataTableDto.data);
+
+  // React.useEffect(() => {
+  //   if (triggerRefreshData)
+  //     triggerRefreshData.current = dataTableService.refreshData;
+  // }, [triggerRefreshData]);
+
+  // Sync dataTableDto with dataTable prop when it changes
+  React.useEffect(() => {
+    setDataTableDto(dataTable);
+  }, [dataTable]);
 
   React.useEffect(() => {
-    if (triggerRefreshData)
-      triggerRefreshData.current = dataTableService.refreshData;
-  }, [triggerRefreshData]);
-
-  React.useEffect(() => {
-    dataTableService.loadData(null);
-    console.log("loaded");
+    if (formMode === FormMode.ADD) {
+      setLoading(false);
+    } else {
+      dataTableService.loadData(null);
+    }
   }, []);
 
+  // const getDataTableColumns = () => {
+  //   let canAddAction =
+  //     dataTableColumns.filter((x) => x.header === "Actions").length === 0;
+
+  //   canAddAction = canAddAction && enableGridRowActions;
+
+  //   if (canAddAction)
+  //     dataTableColumns.push({
+  //       field: "",
+  //       header: "Actions",
+  //       sortable: false,
+  //       filter: false,
+  //       filterPlaceholder: "",
+  //       style: { width: "20%" },
+  //       body: gridRowActions,
+  //     });
+  //   return dataTableColumns;
+  // };
+
   const getDataTableColumns = () => {
-    let canAddAction =
-      dataTableColumns.filter((x) => x.header === "Actions").length === 0;
+    const columns = [...dataTableColumns];
 
-    canAddAction = canAddAction && enableGridRowActions;
-
-    if (canAddAction)
-      dataTableColumns.push({
-        field: "",
-        header: "Actions",
-        sortable: false,
-        filter: false,
-        filterPlaceholder: "",
-        style: { width: "20%" },
-        body: gridRowActions,
-      });
-    return dataTableColumns;
+    // In case Actions column already exists dont add it
+    if (columns.every((x) => x.header !== "Actions")) {
+      // In case editMode is set, add Edit inline button
+      if (editMode)
+        columns.push({
+          field: "",
+          header: "Actions",
+          sortable: false,
+          filter: false,
+          filterPlaceholder: "",
+          style: { width: "10%" },
+          body: null,
+          rowEditor: true, // enables row edit
+        });
+      // In case editMode is NOT set, add View,Edit,Delete buttons
+      else if (enableGridRowActions)
+        columns.push({
+          field: "",
+          header: "Actions",
+          sortable: false,
+          filter: false,
+          filterPlaceholder: "",
+          style: { width: "20%" },
+          body: gridRowActions,
+        });
+    }
+    return columns;
   };
 
   const gridRowActions = (rowData: TEntity, _options: ColumnBodyOptions) => (
@@ -118,7 +186,10 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
           icon="pi pi-plus"
           label="Add"
           outlined
-          onClick={() => onButtonClick(ButtonTypeEnum.ADD)}
+          onClick={() => {
+            onButtonClick(ButtonTypeEnum.ADD);
+            dataTableService.refreshData();
+          }}
         />
       </div>
     );
@@ -137,27 +208,34 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         loading={loading}
         // Pagging.
         paginator
-        rows={dataTableDto.rows}
-        totalRecords={dataTableDto.pageCount}
+        rows={dataTable.rows}
+        totalRecords={dataTable.pageCount}
         onPage={dataTableService.onPage}
         rowsPerPageOptions={[10, 25, 50, 100]}
         // paginatorLeft={paginatorLeft}
-        currentPageReportTemplate={
-          "1 to " + dataTableDto.rows + " out of " + dataTableDto.pageCount
-        }
         paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+        currentPageReportTemplate={
+          "1 to " + dataTable.rows + " out of " + dataTable.pageCount
+        }
         // Filter.
         filterDisplay={filterDisplay}
-        filters={dataTableDto.filters}
+        filters={dataTable.filters}
         onFilter={dataTableService.onFilter}
         // Sort.
         removableSort
         sortMode="multiple"
         onSort={dataTableService.onSort}
-        multiSortMeta={dataTableDto.multiSortMeta}
+        multiSortMeta={dataTable.multiSortMeta}
         header={enableAddAction ? renderHeader() : null}
         // Edit row/column.
         editMode={editMode}
+        onRowEditInit={onRowEditInit}
+        onRowEditCancel={onRowEditCancel}
+        onRowEditComplete={
+          onRowEditComplete
+            ? onRowEditComplete
+            : dataTableService.onRowEditComplete
+        }
       >
         {getDataTableColumns().map((col, _i) => (
           <Column
@@ -170,14 +248,15 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
             style={col.style}
             body={col.body}
             showFilterMenu={false}
-            editor={col.editor}
+            editor={col.cellEditor}
             onCellEditComplete={
               col.onCellEditComplete
                 ? col.onCellEditComplete
                 : dataTableService.onCellEditComplete
             }
             onCellEditInit={col.onCellEditInit}
-          ></Column>
+            rowEditor={col.rowEditor}
+          />
         ))}
       </DataTable>
     </>

@@ -1,7 +1,12 @@
 ﻿using AutoMapper;
 using Business.Services;
 using Core.Dtos;
+using Core.Dtos.DataTable;
+using Core.Enums;
+using Core.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Expressions;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -121,6 +126,61 @@ namespace API.Controllers
             return new ApiResponse<TEntity>().SetSuccessResponse(entity);
         }
 
+
+
+
+
+
+        // POST: api/controller/GetDataTable
+        [HttpPost("GetDataTable")]
+        public async Task<ApiResponse<DataTableDto<TEntityDto>>> GetDataTable([FromBody] DataTableDto<TEntityDto> dataTable)
+        {
+            var query = _dataService.GetGenericRepository<TEntity>();
+
+            // Handle Sorting of DataTable.
+            if (dataTable.MultiSortMeta?.Count() > 0)
+            {
+                // Create the first OrderBy().
+                DataTableSortDto? dataTableSort = dataTable.MultiSortMeta.First();
+                if (dataTableSort.Order > 0)
+                    query.OrderBy(dataTableSort.Field.Substring(0,1).ToUpper() + dataTableSort.Field.Substring(1, dataTableSort.Field.Length), OrderDirectionEnum.ASCENDING);
+                else if (dataTableSort.Order < 0)
+                    query.OrderBy(dataTableSort.Field.Substring(0,1).ToUpper() + dataTableSort.Field.Substring(1, dataTableSort.Field.Length), OrderDirectionEnum.DESCENDING);
+
+                // Create the rest OrderBy methods as ThenBy() if any.
+                foreach (var sortInfo in dataTable.MultiSortMeta.Skip(1))
+                {
+                    if (dataTableSort.Order > 0)
+                        query.ThenBy(sortInfo.Field.Substring(0, 1).ToUpper() + sortInfo.Field.Substring(1, sortInfo.Field.Length), OrderDirectionEnum.ASCENDING);
+                    else if (dataTableSort.Order < 0)
+                        query.ThenBy(sortInfo.Field.Substring(0, 1).ToUpper() + sortInfo.Field.Substring(1, sortInfo.Field.Length), OrderDirectionEnum.DESCENDING);
+                }
+            }
+
+
+            // TODO add filters
+
+
+
+            int skip = (dataTable.Page - 1) * dataTable.Rows;
+            int take = dataTable.Rows;
+            query.AddPagging(skip, take);
+
+            // Retrieve Data.
+            List<TEntity> result = await query.ToListAsync();
+            List<TEntityDto> customerDto = _mapper.Map<List<TEntityDto>>(result);
+
+            //TODO add filter
+            int rows = await _dataService
+                .GetGenericRepository<TEntity>()
+                //.Where()
+                .CountAsync();
+
+            dataTable.Data = customerDto;
+            dataTable.PageCount = rows;
+
+            return new ApiResponse<DataTableDto<TEntityDto>>().SetSuccessResponse(dataTable);
+        }
 
 
 
