@@ -197,6 +197,7 @@ namespace API.Controllers
 
         // POST: api/Users/Login
         [HttpPost("Login")]
+        //[Authorize]
         public async Task<ApiResponse<UserLoginResponseDto>> Login(UserLoginRequestDto request)
         {
 

@@ -205,6 +205,14 @@ export default class ApiService {
     return null;
   }
 
+  private static async handle400<TEntity>(
+    response?: ApiResponse<TEntity> | null
+  ): Promise<ApiResponse<TEntity> | null> {
+    response?.messages["error"].forEach((x) => ToastService.showError(x));
+
+    return null;
+  }
+
   private static async apiFetch<TEntity>(
     url: string,
     method: string,
@@ -226,6 +234,11 @@ export default class ApiService {
       // Check Refresh and Access Tokens!
       if (response.status === 401) {
         return this.handle401(url, method, token, data);
+      }
+
+      if (response.status === 400) {
+        const result = (await response.json()) as ApiResponse<TEntity>;
+        return this.handle400(result);
       }
 
       if (response.ok) {

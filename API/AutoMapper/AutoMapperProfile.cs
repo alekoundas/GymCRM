@@ -16,7 +16,11 @@ namespace API.AutoMapper
             CreateMap<TrainGroupDto, TrainGroup>();
 
             CreateMap<TrainGroup, TrainGroupAddDto>();
-            CreateMap<TrainGroupAddDto, TrainGroup>();
+            CreateMap<TrainGroupAddDto, TrainGroup>().BeforeMap((source,destination) =>
+            {
+                destination.Duration = source.Duration.TimeOfDay;
+                destination.StartOn = source.StartOn.TimeOfDay;
+            });
 
             CreateMap<TrainGroupDate, TrainGroupDateDto>();
             CreateMap<TrainGroupDateDto, TrainGroupDate>();

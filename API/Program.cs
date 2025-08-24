@@ -1,5 +1,7 @@
+using API.Filters;
 using Business.Repository;
 using Business.Services;
+using Core.Dtos;
 using Core.Models;
 using Core.System;
 using DataAccess;
@@ -7,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -19,7 +22,15 @@ var appSettings = builder.Configuration.GetSection("TokenSettings").Get<TokenSet
 
 // Add services to the container.
 builder.Services
-    .AddControllers()
+    .AddControllers(options =>
+    {
+        // Suppress automatic 400 response for invalid ModelState (Dto validation)
+        //options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+        //options.ModelValidatorProviders.Clear(); // Optional: Clears default validation providers
+
+        // Add custom validation filter
+        options.Filters.Add<ValidateModelFilter>();
+    })
     .AddJsonOptions(x =>
     {
         // Serialize enums as strings in api responses (e.g. Role).
@@ -62,6 +73,38 @@ builder.Services.AddSwaggerGen(config =>
         });
 });
 
+
+
+
+// Configure ApiBehaviorOptions to customize invalid ModelState response
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true; // Disable default validation response
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        // Log ModelState for debugging
+        Console.WriteLine($"ModelState.IsValid: {context.ModelState.IsValid}");
+        foreach (var entry in context.ModelState)
+        {
+            Console.WriteLine($"Key: {entry.Key}, Errors: {string.Join(", ", entry.Value.Errors.Select(e => e.ErrorMessage))}");
+        }
+
+        string[] validationErrors = [];
+        foreach (var error in context.ModelState)
+        {
+            foreach (var errorDetail in error.Value.Errors)
+            {
+                var fieldName = error.Key.StartsWith("$.") ? error.Key.Substring(2) : error.Key;
+                validationErrors.Append(errorDetail.ErrorMessage);
+            }
+        }
+
+        var response = new ApiResponse<object>().SetErrorResponse("",validationErrors);
+        return new BadRequestObjectResult(response);
+    };
+});
+
+
 // DB context and factory.
 builder.Services.AddDbContext<ApiDbContext>();
 builder.Services.AddTransient<IDbContextFactory<ApiDbContext>, ApiDbContextFactory>();
@@ -81,7 +124,7 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddSingleton(appSettings); // appsettings.json
 builder.Services.AddScoped<IUserService, UserService>();
 
-
+builder.Services.AddScoped<ValidateModelFilter>();
 
 
 builder.Services.AddDataProtection().PersistKeysToDbContext<ApiDbContext>();
@@ -90,7 +133,20 @@ builder.Services.AddDataProtection().PersistKeysToDbContext<ApiDbContext>();
 // Add Identity.
 builder.Services.AddIdentityCore<User>(options =>
     {
+        // User
         options.User.RequireUniqueEmail = true;
+
+        // Password
+        options.Password.RequiredLength = 8;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireDigit = true;
+
+        // Lockout
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.AllowedForNewUsers = true;
     })
     .AddRoles<IdentityRole<Guid>>()
     .AddRoleManager<RoleManager<IdentityRole<Guid>>>()
@@ -99,19 +155,6 @@ builder.Services.AddIdentityCore<User>(options =>
     .AddTokenProvider<DataProtectorTokenProvider<User>>("REFRESHTOKENPROVIDER");
 
 
-
-// Identity with Guid key type
-//builder.Services.AddIdentityCore<User>(options =>
-//{
-//    options.User.RequireUniqueEmail = true;
-//})
-//.AddRoles<IdentityRole<Guid>>()
-//.AddRoleManager<RoleManager<IdentityRole<Guid>>>()
-//.AddSignInManager<SignInManager<User>>()
-//.AddUserStore<UserStore<User, IdentityRole<Guid>, ApiDbContext, Guid>>()
-//.AddRoleStore<RoleStore<IdentityRole<Guid>, ApiDbContext, Guid>>()
-//.AddEntityFrameworkStores<ApiDbContext>()
-//.AddTokenProvider<DataProtectorTokenProvider<User>>("REFRESHTOKENPROVIDER");
 
 // Configure JWT Bearer token and refresh token.
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
@@ -138,6 +181,65 @@ builder.Services.AddAuthentication(options =>
 
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.SecretKey)),
         ClockSkew = TimeSpan.FromSeconds(0)
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+
+        // Token Revocation
+        //OnTokenValidated = async context =>
+        //{
+        //    var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<User>>();
+        //    var userName = context.Principal?.FindFirst("UserName")?.Value;
+        //    if (userName != null)
+        //    {
+        //        var user = await userManager.FindByNameAsync(userName);
+        //        if (user == null || await userManager.IsLockedOutAsync(user))
+        //        {
+        //            context.Fail("User account is locked or does not exist.");
+        //        }
+        //        // Validate security stamp
+        //        var securityStamp = context.Principal.FindFirst("securityStamp")?.Value;
+        //        if (securityStamp != null && securityStamp != await userManager.GetSecurityStampAsync(user))
+        //        {
+        //            context.Fail("Security stamp is invalid.");
+        //        }
+        //    }
+        //},
+        //    OnAuthenticationFailed = context =>
+        //    {
+        //        if (context.Exception is SecurityTokenExpiredException)
+        //        {
+        //            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        //            context.Response.ContentType = "application/json";
+        //            return context.Response.WriteAsync(
+        //                System.Text.Json.JsonSerializer.Serialize(new
+        //                {
+        //                    error = "Unauthorized",
+        //                    message = "Token has expired."
+        //                }));
+        //        }
+        //        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        //        context.Response.ContentType = "application/json";
+        //        return context.Response.WriteAsync(
+        //            System.Text.Json.JsonSerializer.Serialize(new
+        //            {
+        //                error = "Unauthorized",
+        //                message = context.Exception.Message
+        //            }));
+        //    },
+        //    OnChallenge = context =>
+        //    {
+        //        // Ensure unauthorized requests return 401
+        //        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        //        context.Response.ContentType = "application/json";
+        //        return context.Response.WriteAsync(
+        //            System.Text.Json.JsonSerializer.Serialize(new
+        //            {
+        //                error = "Unauthorized",
+        //                message = "Authentication required."
+        //            }));
+        //    }
     };
 });
 

@@ -20,11 +20,6 @@ namespace Core.Dtos.TrainGroupDate
         public int? RecurrenceDayOfMonth { get; set; }
 
 
-        [Required(ErrorMessage = "TrainGroupId is required")]
-        public int TrainGroupId { get; set; }
-        public TrainGroupDto TrainGroup { get; set; } = null!;
-
-
         public List<TrainGroupParticipantDto> TrainGroupParticipants { get; set; } = new List<TrainGroupParticipantDto>();
 
         public List<TrainGroupCancellationSubscriber> TrainGroupCancellationSubscribers { get; set; } = new List<TrainGroupCancellationSubscriber>();

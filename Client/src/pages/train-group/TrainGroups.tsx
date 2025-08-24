@@ -125,7 +125,7 @@ function TrainGroups() {
                 }}
               >
                 <h2 style={{ margin: 0 }}>Available Timeslots</h2>
-                {TokenService.isUserAllowed("Customers_View") && (
+                {TokenService.isUserAllowed("TrainGroup_View") && (
                   <Button
                     className="m-2"
                     type="button"

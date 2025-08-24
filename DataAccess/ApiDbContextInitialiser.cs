@@ -67,14 +67,6 @@ namespace DataAccess
 
                 var claims = new List<Claim>
                 {
-                    new Claim("Permission", "Customers_View"),
-                    new Claim("Permission", "Customers_Add"),
-                    new Claim("Permission", "Customers_Edit"),
-                    new Claim("Permission", "Customers_Delete"),
-                    new Claim("Permission", "Tickets_View"),
-                    new Claim("Permission", "Tickets_Add"),
-                    new Claim("Permission", "Tickets_Edit"),
-                    new Claim("Permission", "Tickets_Delete"),
                     new Claim("Permission", "ContactInformations_View"),
                     new Claim("Permission", "ContactInformations_Add"),
                     new Claim("Permission", "ContactInformations_Edit"),
@@ -87,14 +79,10 @@ namespace DataAccess
                     new Claim("Permission", "Users_Add"),
                     new Claim("Permission", "Users_Edit"),
                     new Claim("Permission", "Users_Delete"),
-                    new Claim("Permission", "Makers_View"),
-                    new Claim("Permission", "Makers_Add"),
-                    new Claim("Permission", "Makers_Edit"),
-                    new Claim("Permission", "Makers_Delete"),
-                    new Claim("Permission", "MakerModels_View"),
-                    new Claim("Permission", "MakerModels_Add"),
-                    new Claim("Permission", "MakerModels_Edit"),
-                    new Claim("Permission", "MakerModels_Delete")
+                    new Claim("Permission", "TrainGroup_View"),
+                    new Claim("Permission", "TrainGroup_Add"),
+                    new Claim("Permission", "TrainGroup_Edit"),
+                    new Claim("Permission", "TrainGroup_Delete"),
                 };
 
                 foreach (var claim in claims)
