@@ -27,11 +27,11 @@ interface IField<TEntity> {
   onRowEditComplete?: (e: DataTableRowEditCompleteEvent) => void;
   onRowEditCancel?: (e: any) => void;
   onButtonClick: (buttonType: ButtonTypeEnum, rowData?: TEntity) => void;
-  // onAfterDataLoaded?: (
-  //   data: DataTableDto<TEntity> | null
-  // ) => DataTableDto<TEntity> | null;
-  // triggerRefreshData?: React.MutableRefObject<(() => void) | undefined>;
-  // triggerRequestData?: (data: () => TEntity[]) => void;
+  onAfterDataLoaded?: (
+    data: DataTableDto<TEntity> | null
+  ) => DataTableDto<TEntity> | null;
+  triggerRefreshData?: React.MutableRefObject<(() => void) | undefined>;
+  triggerRequestData?: (data: () => TEntity[]) => void;
 }
 
 export default function DataTableComponent<TEntity extends DataTableValue>({
@@ -47,10 +47,9 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   onRowEditComplete,
   onRowEditCancel,
   onButtonClick,
-}: // onAfterDataLoaded,
-// triggerRefreshData,
-// triggerRequestData,
-IField<TEntity>) {
+  triggerRefreshData,
+  triggerRequestData,
+}: IField<TEntity>) {
   const [loading, setLoading] = useState(true);
   const [dataTableDto, setDataTableDto] =
     useState<DataTableDto<TEntity>>(dataTable);
@@ -99,32 +98,13 @@ IField<TEntity>) {
     }
   }, []);
 
-  // const getDataTableColumns = () => {
-  //   let canAddAction =
-  //     dataTableColumns.filter((x) => x.header === "Actions").length === 0;
-
-  //   canAddAction = canAddAction && enableGridRowActions;
-
-  //   if (canAddAction)
-  //     dataTableColumns.push({
-  //       field: "",
-  //       header: "Actions",
-  //       sortable: false,
-  //       filter: false,
-  //       filterPlaceholder: "",
-  //       style: { width: "20%" },
-  //       body: gridRowActions,
-  //     });
-  //   return dataTableColumns;
-  // };
-
   const getDataTableColumns = () => {
     const columns = [...dataTableColumns];
 
     // In case Actions column already exists dont add it
     if (columns.every((x) => x.header !== "Actions")) {
       // In case editMode is set, add Edit inline button
-      if (editMode)
+      if (editMode === DataTableEditModeEnum.ROW)
         columns.push({
           field: "",
           header: "Actions",

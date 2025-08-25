@@ -66,10 +66,7 @@ export default function Roles() {
     },
   ];
 
-  const onDataTableClick = (
-    buttonType: ButtonTypeEnum,
-    rowData?: IdentityRoleDto
-  ) => {
+  const onDataTableClick = (buttonType: ButtonTypeEnum, rowData?: any) => {
     if (rowData) setIdentityRoleDto({ ...rowData });
     switch (buttonType) {
       case ButtonTypeEnum.VIEW:
@@ -115,9 +112,10 @@ export default function Roles() {
       <Card title="Roles">
         <div className="card">
           <DataTableComponent
+            formMode={formMode}
             onButtonClick={onDataTableClick}
             controller="roles"
-            enableGridRowActions={true}
+            enableGridRowActions={false}
             filterDisplay={DataTableFilterDisplayEnum.ROW}
             enableAddAction={true}
             dataTable={datatableDto}

@@ -1,68 +1,75 @@
-import React, { ReactElement, useState } from "react";
-import { Button } from "primereact/button";
+import React, { ReactNode } from "react";
 import { Dialog } from "primereact/dialog";
+import { Button } from "primereact/button";
+import "primereact/resources/themes/saga-blue/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
 
-interface IField {
-  title?: string;
-  body: ReactElement;
-  onSaveButtonClick: () => void;
-  triggerDialogVisibility: (callback: (value: boolean) => void) => void;
-  triggerSaveDisable?: (callback: (value: boolean) => void) => void;
-  triggerSaveEnable?: (callback: (value: boolean) => void) => void;
+// Interface for child component props
+interface DialogChildProps {
+  showDialog?: () => void;
+  hideDialog?: () => void;
 }
 
-export default function GenericDialogComponent({
-  title,
-  body,
-  onSaveButtonClick,
-  triggerDialogVisibility,
-  triggerSaveDisable,
-  triggerSaveEnable,
-}: IField) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isEnabled, setIsEnabled] = useState(true);
+export interface DialogControl {
+  showDialog: () => void;
+  hideDialog: () => void;
+}
 
-  React.useEffect(() => {
-    triggerDialogVisibility((value: boolean) => setIsVisible(value));
-  }, [triggerDialogVisibility]);
+interface DialogComponentProps {
+  header?: string;
+  visible: boolean;
+  control: DialogControl;
+  children: ReactNode;
+  onSave?: () => void;
+}
 
-  React.useEffect(() => {
-    if (triggerSaveDisable)
-      triggerSaveDisable((value: boolean) => setIsEnabled(value));
-  }, [triggerSaveDisable, triggerSaveEnable]);
-
-  const dialogFooter = () => (
-    <React.Fragment>
+const DialogComponent: React.FC<DialogComponentProps> = ({
+  header = "Dialog",
+  visible,
+  control,
+  children,
+  onSave,
+}) => {
+  const footer = (
+    <div>
       <Button
         label="Cancel"
         icon="pi pi-times"
-        outlined
-        onClick={() => setIsVisible(false)}
+        onClick={control.hideDialog}
+        className="p-button-text"
       />
-      <Button
-        label="Save"
-        icon="pi pi-check"
-        onClick={() => {
-          onSaveButtonClick();
-        }}
-        disabled={!isEnabled}
-      />
-    </React.Fragment>
+      {onSave && (
+        <Button
+          label="Save"
+          icon="pi pi-check"
+          onClick={onSave}
+          autoFocus
+        />
+      )}
+    </div>
   );
 
   return (
-    <>
-      <Dialog
-        visible={isVisible}
-        style={{ width: "45%" }}
-        header={"Add " + title}
-        modal
-        className="p-fluid"
-        footer={dialogFooter()}
-        onHide={() => setIsVisible(false)}
-      >
-        {body}
-      </Dialog>
-    </>
+    <Dialog
+      header={header}
+      visible={visible}
+      style={{ width: "50vw" }}
+      footer={footer}
+      onHide={control.hideDialog}
+      draggable={false}
+      resizable={false}
+    >
+      {React.Children.map(children, (child) =>
+        React.isValidElement<DialogChildProps>(child)
+          ? React.cloneElement(child, {
+              showDialog: control.showDialog,
+              hideDialog: control.hideDialog,
+            })
+          : child
+      )}
+    </Dialog>
   );
-}
+};
+
+export default DialogComponent;

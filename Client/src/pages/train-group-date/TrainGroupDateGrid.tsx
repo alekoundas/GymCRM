@@ -1,19 +1,19 @@
-import DataTableComponent from "../../components/datatable/DataTableComponent";
-import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
-import { FormMode } from "../../enum/FormMode";
-import { DataTableColumns } from "../../model/datatable/DataTableColumns";
-import { DataTableDto } from "../../model/DataTableDto";
-import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
-import { DataTableEditModeEnum } from "../../enum/DataTableEditModeEnum";
-import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
-import { useEffect, useState } from "react";
-import { useTrainGroupStore } from "../train-group/TrainGroupStore";
+import { Calendar } from "primereact/calendar";
 import { ColumnEditorOptions } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
-import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
-import { Calendar } from "primereact/calendar";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
+import { useState, useEffect } from "react";
+import DataTableComponent from "../../components/core/datatable/DataTableComponent";
+import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
+import { DataTableEditModeEnum } from "../../enum/DataTableEditModeEnum";
+import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
+import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
+import { FormMode } from "../../enum/FormMode";
 import { RecurringTrainGroupTypeEnum } from "../../enum/RecurringTrainGroupTypeEnum";
+import { DataTableColumns } from "../../model/datatable/DataTableColumns";
+import { DataTableDto } from "../../model/DataTableDto";
+import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
+import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 
 interface IField {
   formMode: FormMode;
@@ -22,9 +22,14 @@ interface IField {
 export default function TrainGroupDateGrid({ formMode }: IField) {
   const { trainGroupDto, addTrainGroupDate, setTrainGroupDto } =
     useTrainGroupStore();
-  const [editingRowType, setEditingRowType] =
-    useState<RecurringTrainGroupTypeEnum | null>(null);
-  const [editingRowIndex, setEditingRowIndex] = useState<number | null>(null);
+
+  const [editingRows, setEditingRows] = useState<
+    {
+      rowId: number;
+      type: RecurringTrainGroupTypeEnum;
+    }[]
+  >([]);
+
   const [datatableDto, setDatatableDto] = useState<
     DataTableDto<TrainGroupDateDto>
   >({
@@ -65,24 +70,32 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
               // onChange={handleContactInformationChange}
               onChange={(e: any) => {
                 options.editorCallback?.(e.target.value);
-                setEditingRowType(e.value);
+                const rowId = options.rowData["id"];
+                editingRows.filter((x) => x.rowId === rowId)[0].type =
+                  e.target.value;
+
+                const row = editingRows.filter((x) => x.rowId === rowId)[0];
+                const rowIndex = trainGroupDto.trainGroupDates.indexOf(
+                  trainGroupDto.trainGroupDates.filter((x) => x.id === rowId)[0]
+                );
+
                 // Update row data immediately
-                if (editingRowIndex !== null) {
+                if (rowIndex !== null) {
                   const updatedDates = [...trainGroupDto.trainGroupDates];
-                  updatedDates[editingRowIndex] = {
-                    ...updatedDates[editingRowIndex],
+                  updatedDates[rowIndex] = {
+                    ...updatedDates[rowIndex],
                     repeatingTrainGroupType: e.value,
                     fixedDay:
                       e.value === RecurringTrainGroupTypeEnum.FIXED_DAY
-                        ? updatedDates[editingRowIndex].fixedDay || new Date()
+                        ? updatedDates[rowIndex].fixedDay || new Date()
                         : undefined,
                     recurrenceDayOfWeek:
                       e.value === RecurringTrainGroupTypeEnum.DAY_OF_WEEK
-                        ? updatedDates[editingRowIndex].recurrenceDayOfWeek
+                        ? updatedDates[rowIndex].recurrenceDayOfWeek
                         : undefined,
                     recurrenceDayOfMonth:
                       e.value === RecurringTrainGroupTypeEnum.DAY_OF_MONTH
-                        ? updatedDates[editingRowIndex].recurrenceDayOfMonth
+                        ? updatedDates[rowIndex].recurrenceDayOfMonth
                         : undefined,
                   };
                   setTrainGroupDto({
@@ -113,9 +126,14 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
       body: (rowData: TrainGroupDateDto) =>
         rowData.fixedDay ? rowData.fixedDay.toLocaleDateString() : "", // Convert Date to string
       cellEditor: (options: ColumnEditorOptions) => {
+        const editingRow = editingRows.filter(
+          (x) => x.rowId === options.rowData.id
+        )[0];
+
         if (
+          editingRow &&
           options.field === "fixedDay" &&
-          editingRowType === RecurringTrainGroupTypeEnum.FIXED_DAY
+          editingRow.type === RecurringTrainGroupTypeEnum.FIXED_DAY
         ) {
           return (
             <Calendar
@@ -139,9 +157,14 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
       style: { width: "20%" },
       body: null,
       cellEditor: (options: ColumnEditorOptions) => {
+        const editingRow = editingRows.filter(
+          (x) => x.rowId === options.rowData.id
+        )[0];
+
         if (
+          editingRow &&
           options.field === "recurrenceDayOfWeek" &&
-          editingRowType === RecurringTrainGroupTypeEnum.DAY_OF_WEEK
+          editingRow.type === RecurringTrainGroupTypeEnum.DAY_OF_WEEK
         ) {
           return (
             <Dropdown
@@ -166,9 +189,14 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
       style: { width: "20%" },
       body: null,
       cellEditor: (options: ColumnEditorOptions) => {
+        const editingRow = editingRows.filter(
+          (x) => x.rowId === options.rowData.id
+        )[0];
+
         if (
+          editingRow &&
           options.field === "recurrenceDayOfMonth" &&
-          editingRowType === RecurringTrainGroupTypeEnum.DAY_OF_MONTH
+          editingRow.type === RecurringTrainGroupTypeEnum.DAY_OF_MONTH
         ) {
           return (
             <InputNumber
@@ -186,16 +214,23 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
   ];
 
   const onRowEditInit = (event: { data: TrainGroupDateDto; index: number }) => {
-    setEditingRowType(
-      event.data.repeatingTrainGroupType ||
-        RecurringTrainGroupTypeEnum.FIXED_DAY
-    );
-    setEditingRowIndex(event.index);
+    editingRows?.push({
+      rowId: event.data.id,
+      type:
+        event.data.repeatingTrainGroupType ??
+        RecurringTrainGroupTypeEnum.FIXED_DAY,
+    });
+
+    setEditingRows(editingRows);
   };
 
-  const onRowEditCancel = () => {
-    setEditingRowType(null);
-    setEditingRowIndex(null);
+  const onRowEditCancel = (event: {
+    data: TrainGroupDateDto;
+    index: number;
+  }) => {
+    const rowId = event.data.id;
+    const rows = editingRows.filter((x) => x.rowId !== rowId);
+    setEditingRows(rows);
   };
 
   const onRowEditComplete = (e: any) => {
@@ -207,7 +242,7 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
       fixedDay:
         newData.repeatingTrainGroupType ===
         RecurringTrainGroupTypeEnum.FIXED_DAY
-          ? newData.fixedDay || new Date()
+          ? newData.fixedDay
           : undefined,
       recurrenceDayOfWeek:
         newData.repeatingTrainGroupType ===
@@ -225,6 +260,10 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
       ...trainGroupDto,
       trainGroupDates: updatedDates,
     });
+
+    const rowId = newData.id;
+    const rows = editingRows.filter((x) => x.rowId !== rowId);
+    setEditingRows(rows);
   };
 
   const onDataTableClick = (
@@ -240,7 +279,7 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
         break;
       case ButtonTypeEnum.ADD:
         const newRow: TrainGroupDateDto = {
-          id: -1,
+          id: (trainGroupDto.trainGroupDates.length + 1) * -1,
           repeatingTrainGroupType: RecurringTrainGroupTypeEnum.FIXED_DAY,
           fixedDay: undefined,
           recurrenceDayOfWeek: undefined,

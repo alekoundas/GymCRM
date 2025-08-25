@@ -142,7 +142,7 @@ export default function RoleForm({
       filterPlaceholder: "Search",
       style: { width: "1%" },
       body: (rowData: ClaimDto) => cellBody(rowData.view),
-      editor: cellEditor,
+      cellEditor: cellEditor,
       onCellEditComplete: onCellEditComplete,
       onCellEditInit: onDisableSaveButton,
     },
@@ -154,7 +154,7 @@ export default function RoleForm({
       filterPlaceholder: "Search",
       style: { width: "1%" },
       body: (rowData: ClaimDto) => cellBody(rowData.add),
-      editor: cellEditor,
+      cellEditor: cellEditor,
       onCellEditComplete: onCellEditComplete,
       onCellEditInit: onDisableSaveButton,
     },
@@ -166,7 +166,7 @@ export default function RoleForm({
       filterPlaceholder: "Search",
       style: { width: "1%" },
       body: (rowData: ClaimDto) => cellBody(rowData.edit),
-      editor: cellEditor,
+      cellEditor: cellEditor,
       onCellEditComplete: onCellEditComplete,
       onCellEditInit: onDisableSaveButton,
     },
@@ -179,19 +179,11 @@ export default function RoleForm({
       filterPlaceholder: "Search",
       style: { width: "1%" },
       body: (rowData: ClaimDto) => cellBody(rowData.delete),
-      editor: cellEditor,
+      cellEditor: cellEditor,
       onCellEditComplete: onCellEditComplete,
       onCellEditInit: onDisableSaveButton,
     },
   ];
-
-  const handleChange = (event: React.ChangeEvent<any>) => {
-    const name = event.target.name;
-    const value = event.target.value;
-
-    identityRoleDto[name] = value;
-    setIdentityRoleDto({ ...identityRoleDto });
-  };
 
   // Load initial data.
   React.useEffect(() => {
@@ -217,7 +209,12 @@ export default function RoleForm({
                 id="name"
                 name="name"
                 value={identityRoleDto.name}
-                onChange={handleChange}
+                onChange={(x) =>
+                  setIdentityRoleDto({
+                    ...identityRoleDto,
+                    name: x.target.value,
+                  })
+                }
                 disabled={formMode !== FormMode.ADD}
               />
             </div>
@@ -226,6 +223,7 @@ export default function RoleForm({
       </Card>
 
       <DataTableComponent
+        formMode={formMode}
         controller="claims"
         dataTable={datatableDto}
         dataTableColumns={dataTableColumns}
