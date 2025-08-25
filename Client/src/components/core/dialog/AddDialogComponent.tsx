@@ -40,7 +40,9 @@ export default function AddDialogComponent({
       <Button
         label="Save"
         icon="pi pi-check"
-        onClick={() => onSaveButtonClick()}
+        onClick={() => {
+          onSaveButtonClick();
+        }}
         disabled={!isEnabled}
       />
     </React.Fragment>
@@ -51,7 +53,7 @@ export default function AddDialogComponent({
       <Dialog
         visible={isVisible}
         style={{ width: "45%" }}
-        header="Add"
+        header={"Add "}
         modal
         className="p-fluid"
         footer={dialogFooter()}

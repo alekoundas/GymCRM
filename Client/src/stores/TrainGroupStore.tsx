@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { TrainGroupDto } from "../../model/TrainGroupDto";
-import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
+import { TrainGroupDateDto } from "../model/TrainGroupDateDto";
+import { TrainGroupDto } from "../model/TrainGroupDto";
 
 interface TrainGroupState {
   trainGroupDto: TrainGroupDto;

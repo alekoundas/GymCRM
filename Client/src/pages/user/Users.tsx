@@ -1,17 +1,17 @@
 import { useRef, useState } from "react";
-import DataTableComponent from "../../components/datatable/DataTableComponent";
-import DeleteDialogComponent from "../../components/dialog/DeleteDialogComponent";
-import EditDialogComponent from "../../components/dialog/EditDialogComponent";
-import ViewDialogComponent from "../../components/dialog/ViewDialogComponent";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { FormMode } from "../../enum/FormMode";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
 import { DataTableDto } from "../../model/DataTableDto";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
-import AddDialogComponent from "../../components/dialog/AddDialogComponent";
 import UserForm from "./UserForm";
 import { UserDto } from "../../model/UserDto";
 import { Card } from "primereact/card";
+import DataTableComponent from "../../components/core/datatable/DataTableComponent";
+import AddDialogComponent from "../../components/core/dialog/AddDialogComponent";
+import DeleteDialogComponent from "../../components/core/dialog/DeleteDialogComponent";
+import EditDialogComponent from "../../components/core/dialog/EditDialogComponent";
+import ViewDialogComponent from "../../components/core/dialog/ViewDialogComponent";
 
 export default function Users() {
   const [userDto, setUserDto] = useState<UserDto>(new UserDto());

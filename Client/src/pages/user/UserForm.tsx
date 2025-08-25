@@ -5,7 +5,7 @@ import { InputText } from "primereact/inputtext";
 import ApiService from "../../services/ApiService";
 import { ToastService } from "../../services/ToastService";
 import { UserDto } from "../../model/UserDto";
-import LookupComponent from "../../components/dropdown/LookupComponent";
+import LookupComponent from "../../components/core/dropdown/LookupComponent";
 
 interface IField {
   parentUserDto: UserDto;

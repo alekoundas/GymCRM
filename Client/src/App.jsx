@@ -5,19 +5,15 @@ import { ThemeService } from "./services/ThemeService.tsx";
 import { useEffect, useRef } from "react";
 import { Toast } from "primereact/toast";
 
-import NavTop from "./components/navbar-top/NavTop.tsx";
+import NavTop from "./components/core/navbar-top/NavTop.tsx";
 import Home from "./pages/home/Home.tsx";
-import Customers from "./pages/customer/Customers.tsx";
-import CustomerForm from "./pages/customer/CustomerForm.tsx";
 import Login from "./pages/user/Login.tsx";
 import Roles from "./pages/role/Roles.tsx";
 import Users from "./pages/user/Users.tsx";
-import Makers from "./pages/maker/Makers.tsx";
-import MakerModels from "./pages/maker-model/MakerModels.tsx";
 import Register from "./pages/user/Register.tsx";
 import Administrator from "./pages/administrator/administrator.tsx";
 import Appointment from "./pages/appointment/Appointment.tsx";
-import TrainGroups from "./pages/train-group/TrainGroups.tsx";
+import TrainGroupAdminPage from "./pages/train-group/TrainGroupAdminPage.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -73,19 +69,19 @@ export default function App() {
               >
                 <Route
                   path="train-groups"
-                  element={<TrainGroups />}
+                  element={<TrainGroupAdminPage />}
                 />
                 <Route
                   path="train-groups/add"
-                  element={<TrainGroups />}
+                  element={<TrainGroupAdminPage />}
                 />
                 <Route
                   path="train-groups/:id/edit"
-                  element={<TrainGroups />}
+                  element={<TrainGroupAdminPage />}
                 />
                 <Route
                   path="train-groups/:id/view"
-                  element={<TrainGroups />}
+                  element={<TrainGroupAdminPage />}
                 />
 
                 {/* Users */}
@@ -107,14 +103,14 @@ export default function App() {
                 />
 
                 {/* Lookups */}
-                <Route
+                {/* <Route
                   path="makers"
                   element={<Makers />}
                 />
                 <Route
                   path="makermodels"
                   element={<MakerModels />}
-                />
+                /> */}
               </Route>
 
               {/* Users */}

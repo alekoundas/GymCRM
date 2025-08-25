@@ -5,8 +5,8 @@ import { InputText } from "primereact/inputtext";
 import ApiService from "../../services/ApiService";
 import { ToastService } from "../../services/ToastService";
 import { MakerModelDto } from "../../model/MakerModelDto";
-import LookupComponent from "../../components/dropdown/LookupComponent";
 import { MakerDto } from "../../model/MakerDto";
+import LookupComponent from "../../components/core/dropdown/LookupComponent";
 
 interface IField {
   data: MakerModelDto;
