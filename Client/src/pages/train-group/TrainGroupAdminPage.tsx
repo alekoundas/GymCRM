@@ -6,18 +6,21 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TokenService } from "../../services/TokenService";
 import { FormMode } from "../../enum/FormMode";
-import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
 import ApiService from "../../services/ApiService";
 import { TimeSlotRequestDto } from "../../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../../model/TimeSlotResponseDto";
-import TrainGroupForm from "../../components/entities/train-group/TrainGroupForm";
+import GenericDialogComponent, {
+  DialogControl,
+} from "../../components/core/dialog/GenericDialogComponent";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
-import TrainGroupContainer from "../../components/entities/TrainGroupContainer";
+import TrainGroupForm from "./TrainGroupForm";
+import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
 
 export default function TrainGroupAdminPage() {
   const navigate = useNavigate();
 
-  const [isModalVisible, setModalVisibility] = useState(false); // Dialog visibility
+  const [isEditModalVisible, setEditModalVisibility] = useState(false); // Dialog visibility
+  const [isAddModalVisible, setAddModalVisibility] = useState(false); // Dialog visibility
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | null>(null);
@@ -55,6 +58,36 @@ export default function TrainGroupAdminPage() {
     }
   };
 
+  const dialogControlAdd: DialogControl = {
+    showDialog: () => setAddModalVisibility(true),
+    hideDialog: () => setAddModalVisibility(false),
+  };
+
+  const dialogControlEdit: DialogControl = {
+    showDialog: () => setAddModalVisibility(true),
+    hideDialog: () => setAddModalVisibility(false),
+  };
+
+  const OnSaveAdd = async () => {
+    const response = await ApiService.create("trainGroup", trainGroupDto);
+
+    if (response) {
+      resetTrainGroupDto();
+    }
+  };
+
+  const OnSaveEdit = async () => {
+    const response = await ApiService.update(
+      "trainGroup",
+      trainGroupDto,
+      trainGroupDto.id
+    );
+
+    if (response) {
+      resetTrainGroupDto();
+    }
+  };
+
   return (
     <>
       <div className="grid w-full ">
@@ -89,7 +122,7 @@ export default function TrainGroupAdminPage() {
                 }}
               >
                 <h2 style={{ margin: 0 }}>Available Timeslots</h2>
-                {TokenService.isUserAllowed("TrainGroup_View") && (
+                {TokenService.isUserAllowed("TrainGroup_Add") && (
                   <Button
                     className="m-2"
                     type="button"
@@ -97,7 +130,7 @@ export default function TrainGroupAdminPage() {
                     label="Add"
                     outlined
                     onClick={() => {
-                      setModalVisibility(true);
+                      setAddModalVisibility(true);
                       resetTrainGroupDto();
                     }}
                   />
@@ -105,7 +138,6 @@ export default function TrainGroupAdminPage() {
               </div>
             }
           >
-            {}
             {timeSlots.length === 0 ? (
               <p className="text-gray-500">
                 No time slots available for this date.
@@ -116,45 +148,56 @@ export default function TrainGroupAdminPage() {
                   <Button
                     key={slot.trainGroupDateId}
                     label={slot.displayDate}
-                    disabled={!slot.available}
-                    onClick={() =>
-                      slot.available &&
-                      handleTimeSlotClick(slot.trainGroupDateId)
-                    }
+                    // disabled={!slot.available}
+                    onClick={() => handleTimeSlotClick(slot.trainGroupDateId)}
                   />
                 ))}
               </div>
             )}
-
-            {/* {TokenService.isUserAllowed("Customers_View") && (
-              <div className="mt-6">
-                <Button
-                  label="Book Now"
-                  icon="pi pi-check"
-                  className="p-button-raised p-button-success w-full"
-                  disabled={!selectedTimeSlot}
-                  //   onClick={handleBooking}
-                  onClick={() => navigate("/administrator/customers/add")}
-                />
-              </div>
-            )} */}
           </Card>
         </div>
       </div>
 
-      {/*                                   */}
-      {/* Modal of Contact Information Form */}
-      {/*                                   */}
+      {/*                                     */}
+      {/*           Add Train Group           */}
+      {/*                                     */}
+
+      <GenericDialogComponent
+        visible={isAddModalVisible}
+        control={dialogControlAdd}
+        onSave={OnSaveAdd}
+      >
+        <div className="w-full">
+          <TrainGroupForm formMode={FormMode.ADD} />
+          <TrainGroupDateGrid formMode={FormMode.ADD} />
+        </div>
+      </GenericDialogComponent>
+
+      {/* 
       <Dialog
-        visible={isModalVisible}
+        visible={isAddModalVisible}
         style={{ width: "35%" }}
         header="Add New Timeslot"
         modal
         className="p-fluid"
-        onHide={() => setModalVisibility(false)}
+        onHide={() => setAddModalVisibility(false)}
       >
         <TrainGroupContainer formMode={FormMode.ADD} />
-      </Dialog>
+      </Dialog> */}
+
+      {/*                                     */}
+      {/*          Edit Train Group           */}
+      {/*                                     */}
+      <GenericDialogComponent
+        visible={isEditModalVisible}
+        control={dialogControlEdit}
+        onSave={OnSaveEdit}
+      >
+        <div className="w-full">
+          <TrainGroupForm formMode={FormMode.EDIT} />
+          <TrainGroupDateGrid formMode={FormMode.EDIT} />
+        </div>
+      </GenericDialogComponent>
     </>
   );
 }

@@ -3,10 +3,10 @@ import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 import { Calendar } from "primereact/calendar";
 import { InputTextarea } from "primereact/inputtextarea";
-import { FormMode } from "../../../enum/FormMode";
-import { TokenService } from "../../../services/TokenService";
-import LookupComponent from "../../core/dropdown/LookupComponent";
-import { useTrainGroupStore } from "../../../stores/TrainGroupStore";
+import LookupComponent from "../../components/core/dropdown/LookupComponent";
+import { FormMode } from "../../enum/FormMode";
+import { TokenService } from "../../services/TokenService";
+import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 
 interface IField {
   formMode: FormMode;
@@ -14,13 +14,15 @@ interface IField {
 
 export default function TrainGroupForm({ formMode }: IField) {
   const { trainGroupDto, updateTrainGroupDto } = useTrainGroupStore();
+
+  // Preset TrainerId
   useEffect(() => {
     const userId = TokenService.getUserId();
     if (userId && !trainGroupDto.trainerId) {
       updateTrainGroupDto({ ...trainGroupDto, trainerId: userId });
       console.log("Updated trainGroupDto.trainerId:", userId);
     }
-  }, []); // Empty dependency array to run once on mount
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<any> | { target: { name: string; value: any } }
