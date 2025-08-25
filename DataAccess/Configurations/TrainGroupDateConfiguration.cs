@@ -13,7 +13,7 @@ namespace DataAccess.Configurations
 
             // Properties
             // Store enum as string
-            builder.Property(x => x.RecurringTrainGroupType)
+            builder.Property(x => x.TrainGroupDateType)
                 .HasConversion<string>();
 
             // Store enum as string

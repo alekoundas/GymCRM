@@ -1,11 +1,11 @@
-import { RecurringTrainGroupTypeEnum } from "../enum/RecurringTrainGroupTypeEnum";
+import { TrainGroupDateTypeEnum } from "../enum/TrainGroupDateTypeEnum";
 import { TrainGroupCancellationSubscriberDto } from "./TrainGroupCancellationSubscriberDto";
 import { TrainGroupDto } from "./TrainGroupDto";
 import { TrainGroupParticipantDto } from "./TrainGroupParticipantDto";
 
 export interface TrainGroupDateDto {
   id: number;
-  repeatingTrainGroupType?: RecurringTrainGroupTypeEnum;
+  trainGroupDateType?: TrainGroupDateTypeEnum;
   fixedDay?: Date;
   recurrenceDayOfWeek?: number;
   recurrenceDayOfMonth?: number;
@@ -17,7 +17,7 @@ export interface TrainGroupDateDto {
 
 export class TrainGroupDateDto {
   id: number;
-  repeatingTrainGroupType?: RecurringTrainGroupTypeEnum;
+  trainGroupDateType?: TrainGroupDateTypeEnum;
   fixedDay?: Date;
   recurrenceDayOfWeek?: number;
   recurrenceDayOfMonth?: number;

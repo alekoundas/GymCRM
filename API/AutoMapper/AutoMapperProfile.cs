@@ -12,33 +12,30 @@ namespace API.AutoMapper
     {
         public AutoMapperProfile()
         {
+            // TrainGroupDto
             CreateMap<TrainGroup, TrainGroupDto>();
             CreateMap<TrainGroupDto, TrainGroup>()
                .ForMember(destination => destination.Duration, act => act.MapFrom(source => source.Duration.TimeOfDay))
-               .ForMember(destination => destination.StartOn, act => act.MapFrom(source => source.StartOn.TimeOfDay));
+               .ForMember(destination => destination.StartOn, act => act.MapFrom(source => source.StartOn.TimeOfDay))
+               .ForMember(destination => destination.TrainerId, act => act.MapFrom(source => new Guid(source.TrainerId!)));
 
+            // TrainGroupAddDto
             CreateMap<TrainGroup, TrainGroupAddDto>();
             CreateMap<TrainGroupAddDto, TrainGroup>()
                 .ForMember(destination => destination.Duration, act => act.MapFrom(source => source.Duration.TimeOfDay))
-                .ForMember(destination => destination.StartOn, act => act.MapFrom(source => source.StartOn.TimeOfDay));
+                .ForMember(destination => destination.StartOn, act => act.MapFrom(source => source.StartOn.TimeOfDay))
+                .ForMember(destination => destination.TrainerId, act => act.MapFrom(source => new Guid(source.TrainerId!)));
 
 
+            // TrainGroupDateDto
             CreateMap<TrainGroupDate, TrainGroupDateDto>();
-            CreateMap<TrainGroupDateDto, TrainGroupDate>();
+            CreateMap<TrainGroupDateDto, TrainGroupDate>()
+                .ForMember(dest => dest.FixedDay, opt => opt.MapFrom<TrainGroupDateDtoDateOnlyResolver>());
 
-
-
-
+            // TrainGroupDateAddDto
             CreateMap<TrainGroupDate, TrainGroupDateAddDto>();
             CreateMap<TrainGroupDateAddDto, TrainGroupDate>()
-                .ForMember(dest => dest.FixedDay, opt => opt.MapFrom<FixedDayResolver>());
-                            //.ForMember(dest => dest.FixedDay, opt => opt.MapFrom(source =>
-                            // {
-                            //     if (source.FixedDay.HasValue)
-                            //         return DateOnly.FromDateTime(source.FixedDay.Value);
-
-                            //     return null;
-                            // }));
+                .ForMember(dest => dest.FixedDay, opt => opt.MapFrom<TrainGroupDateAddDtoDateOnlyResolver>());
 
 
             CreateMap<ContactInformation, ContactInformationDto>();

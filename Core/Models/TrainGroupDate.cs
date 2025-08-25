@@ -6,7 +6,7 @@ namespace Core.Models
 {
     public class TrainGroupDate : BaseModel
     {
-        public RecurringTrainGroupTypeEnum? RecurringTrainGroupType { get; set; }
+        public TrainGroupDateTypeEnum? TrainGroupDateType { get; set; }
         public DateOnly? FixedDay { get; set; }
 
         public DayOfWeekEnum? RecurrenceDayOfWeek { get; set; }
