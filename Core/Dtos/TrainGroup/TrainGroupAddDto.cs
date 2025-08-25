@@ -28,7 +28,7 @@ namespace Core.Dtos.TrainGroup
         public int MaxParticipants { get; set; }
 
         [Required(ErrorMessage = "TrainerId is required")]
-        public Guid TrainerId { get; set; }
+        public string? TrainerId { get; set; }
 
 
         public ICollection<TrainGroupDateAddDto> TrainGroupDates { get; set; } = new Collection<TrainGroupDateAddDto>();

@@ -4,7 +4,7 @@ using Core.Models;
 
 namespace API.AutoMapper
 {
-    public class FixedDayResolver : IValueResolver<TrainGroupDateAddDto, TrainGroupDate, DateOnly?>
+    public class TrainGroupDateAddDtoDateOnlyResolver : IValueResolver<TrainGroupDateAddDto, TrainGroupDate, DateOnly?>
     {
         public DateOnly? Resolve(TrainGroupDateAddDto source, TrainGroupDate destination, DateOnly? destMember, ResolutionContext context)
         {

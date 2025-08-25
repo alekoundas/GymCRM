@@ -173,7 +173,7 @@ namespace DataAccess.Migrations
                     b.Property<string>("RecurrenceDayOfWeek")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("RecurringTrainGroupType")
+                    b.Property<string>("TrainGroupDateType")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TrainGroupId")

@@ -1,6 +1,6 @@
 ﻿namespace Core.Enums
 {
-    public enum RecurringTrainGroupTypeEnum
+    public enum TrainGroupDateTypeEnum
     {
         DAY_OF_WEEK,
         DAY_OF_MONTH,
