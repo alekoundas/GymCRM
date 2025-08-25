@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import ApiService from "../../services/ApiService";
+import ApiService from "../../../services/ApiService";
 
 interface IField {
   id: string | number;

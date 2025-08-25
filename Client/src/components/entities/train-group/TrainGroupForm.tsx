@@ -3,10 +3,10 @@ import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 import { Calendar } from "primereact/calendar";
 import { InputTextarea } from "primereact/inputtextarea";
-import LookupComponent from "../../components/dropdown/LookupComponent";
-import { FormMode } from "../../enum/FormMode";
-import { useTrainGroupStore } from "./TrainGroupStore";
-import { TokenService } from "../../services/TokenService";
+import { FormMode } from "../../../enum/FormMode";
+import { TokenService } from "../../../services/TokenService";
+import LookupComponent from "../../core/dropdown/LookupComponent";
+import { useTrainGroupStore } from "../../../stores/TrainGroupStore";
 
 interface IField {
   formMode: FormMode;

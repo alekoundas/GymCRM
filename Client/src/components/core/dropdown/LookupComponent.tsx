@@ -1,9 +1,9 @@
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import React, { useEffect, useState } from "react";
-import ApiService from "../../services/ApiService";
 import { VirtualScrollerLazyEvent } from "primereact/virtualscroller";
-import { LookupDto } from "../../model/lookup/LookupDto";
 import { Button } from "primereact/button";
+import { LookupDto } from "../../../model/lookup/LookupDto";
+import ApiService from "../../../services/ApiService";
 
 interface IField {
   controller: string;

@@ -1,18 +1,18 @@
+import { Button } from "primereact/button";
 import { Column, ColumnBodyOptions } from "primereact/column";
 import {
   DataTable,
   DataTableRowEditCompleteEvent,
   DataTableValue,
 } from "primereact/datatable";
-import { DataTableDto } from "../../model/DataTableDto";
-import { DataTableColumns } from "../../model/datatable/DataTableColumns";
-import React, { useEffect, useState } from "react";
-import DataTableService from "../../services/DataTableService";
-import { Button } from "primereact/button";
-import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
-import { DataTableEditModeEnum } from "../../enum/DataTableEditModeEnum";
-import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
-import { FormMode } from "../../enum/FormMode";
+import React, { useState } from "react";
+import { ButtonTypeEnum } from "../../../enum/ButtonTypeEnum";
+import { DataTableEditModeEnum } from "../../../enum/DataTableEditModeEnum";
+import { DataTableFilterDisplayEnum } from "../../../enum/DataTableFilterDisplayEnum";
+import { FormMode } from "../../../enum/FormMode";
+import { DataTableColumns } from "../../../model/datatable/DataTableColumns";
+import { DataTableDto } from "../../../model/DataTableDto";
+import DataTableService from "../../../services/DataTableService";
 
 interface IField<TEntity> {
   controller: string;
@@ -133,7 +133,7 @@ IField<TEntity>) {
           filterPlaceholder: "",
           style: { width: "10%" },
           body: null,
-          rowEditor: true, // enables row edit
+          editor: true, // enables row edit
         });
       // In case editMode is NOT set, add View,Edit,Delete buttons
       else if (enableGridRowActions)
@@ -255,7 +255,7 @@ IField<TEntity>) {
                 : dataTableService.onCellEditComplete
             }
             onCellEditInit={col.onCellEditInit}
-            rowEditor={col.rowEditor}
+            rowEditor={col.editor}
           />
         ))}
       </DataTable>

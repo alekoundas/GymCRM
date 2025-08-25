@@ -1,17 +1,17 @@
 import { useRef, useState } from "react";
-import DataTableComponent from "../../components/datatable/DataTableComponent";
-import DeleteDialogComponent from "../../components/dialog/DeleteDialogComponent";
-import EditDialogComponent from "../../components/dialog/EditDialogComponent";
-import ViewDialogComponent from "../../components/dialog/ViewDialogComponent";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { FormMode } from "../../enum/FormMode";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
 import { DataTableDto } from "../../model/DataTableDto";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
-import AddDialogComponent from "../../components/dialog/AddDialogComponent";
 import { Card } from "primereact/card";
 import { MakerDto } from "../../model/MakerDto";
 import MakerForm from "./MakerForm";
+import DataTableComponent from "../../components/core/datatable/DataTableComponent";
+import DeleteDialogComponent from "../../components/core/dialog/DeleteDialogComponent";
+import ViewDialogComponent from "../../components/core/dialog/ViewDialogComponent";
+import EditDialogComponent from "../../components/core/dialog/EditDialogComponent";
+import AddDialogComponent from "../../components/core/dialog/AddDialogComponent";
 
 export default function Makers() {
   const [makerDto, setMakerDto] = useState(new MakerDto());

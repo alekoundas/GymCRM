@@ -5,15 +5,16 @@ import { Dialog } from "primereact/dialog";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TokenService } from "../../services/TokenService";
-import TrainGroupForm from "./TrainGroupForm";
 import { FormMode } from "../../enum/FormMode";
 import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
-import { useTrainGroupStore } from "./TrainGroupStore";
 import ApiService from "../../services/ApiService";
 import { TimeSlotRequestDto } from "../../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../../model/TimeSlotResponseDto";
+import TrainGroupForm from "../../components/entities/train-group/TrainGroupForm";
+import { useTrainGroupStore } from "../../stores/TrainGroupStore";
+import TrainGroupContainer from "../../components/entities/TrainGroupContainer";
 
-function TrainGroups() {
+export default function TrainGroupAdminPage() {
   const navigate = useNavigate();
 
   const [isModalVisible, setModalVisibility] = useState(false); // Dialog visibility
@@ -21,39 +22,6 @@ function TrainGroups() {
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | null>(null);
   const { resetTrainGroupDto, trainGroupDto } = useTrainGroupStore();
-
-  // const createNewData = (): TrainGroupDto => ({
-  //   id: -1,
-  //   name: "",
-  //   description: "",
-  //   isRepeating: false,
-  //   duration: new Date(),
-  //   startOn: new Date(),
-  //   maxParticipants: 1,
-  //   trainerId: "",
-  //   repeatingParticipants: [],
-  //   trainGroupDates: [],
-  // });
-  // const [trainGroupDto, setTrainGroupDto] = useState<TrainGroupDto>(
-  //   createNewData()
-  // );
-
-  // Mock function to generate time slots based on selected date
-  // useEffect(() => {
-  //   if (selectedDate) {
-  //     // Simulate fetching time slots for the selected date
-  //     const mockTimeSlots: TimeSlot[] = [
-  //       { id: 1, time: "09:00 AM", available: true },
-  //       { id: 2, time: "10:00 AM", available: true },
-  //       { id: 3, time: "11:00 AM", available: false },
-  //       { id: 4, time: "01:00 PM", available: true },
-  //       { id: 5, time: "02:00 PM", available: true },
-  //       { id: 6, time: "03:00 PM", available: false },
-  //     ];
-  //     setTimeSlots(mockTimeSlots);
-  //     setSelectedTimeSlot(null); // Reset selected time slot when date changes
-  //   }
-  // }, [selectedDate]);
 
   const handleChangeDate = (value: Date) => {
     setSelectedDate(value);
@@ -84,15 +52,6 @@ function TrainGroups() {
         }`
       );
       // Call your API here to book the slot (e.g., POST to api/TrainGroupParticipant)
-    }
-  };
-
-  const handleSaveTrainGroup = async () => {
-    const response = await ApiService.create("trainGroup", trainGroupDto);
-
-    if (response) {
-      resetTrainGroupDto();
-      setModalVisibility(false);
     }
   };
 
@@ -192,28 +151,10 @@ function TrainGroups() {
         header="Add New Timeslot"
         modal
         className="p-fluid"
-        footer={
-          <div>
-            <Button
-              label="Cancel"
-              icon="pi pi-times"
-              className="p-button-text"
-              onClick={() => setModalVisibility(false)}
-            />
-            <Button
-              label="Save"
-              icon="pi pi-check"
-              onClick={handleSaveTrainGroup}
-            />
-          </div>
-        }
         onHide={() => setModalVisibility(false)}
       >
-        <TrainGroupForm formMode={FormMode.ADD} />
-        <TrainGroupDateGrid formMode={FormMode.ADD} />
+        <TrainGroupContainer formMode={FormMode.ADD} />
       </Dialog>
     </>
   );
 }
-
-export default TrainGroups;

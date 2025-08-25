@@ -9,7 +9,7 @@ export interface DataTableColumns {
   filterPlaceholder: string;
   style: React.CSSProperties;
   body: any | null;
-  rowEditor?: boolean; // enables row edit
+  editor?: boolean; // enables row edit
 
   cellEditor?: (options: ColumnEditorOptions) => React.ReactNode;
   onCellEditInit?: (event: ColumnEvent) => void;

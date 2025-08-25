@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import DataTableComponent from "../../components/datatable/DataTableComponent";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { FormMode } from "../../enum/FormMode";
 import { ClaimDto } from "../../model/ClaimDto";
@@ -13,6 +12,7 @@ import { InputText } from "primereact/inputtext";
 import { IdentityRoleDto } from "../../model/IdentityRoleDto";
 import ApiService from "../../services/ApiService";
 import { ToastService } from "../../services/ToastService";
+import DataTableComponent from "../../components/core/datatable/DataTableComponent";
 
 interface IField {
   data: IdentityRoleDto;
