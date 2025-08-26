@@ -1,5 +1,6 @@
 using API.AutoMapper;
 using API.Filters;
+using API.JsonConverter;
 using Business.Repository;
 using Business.Services;
 using Core.Dtos;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
@@ -42,6 +44,10 @@ builder.Services
 
         // Ignore circular references.
         x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+
+        // Configure DateTime handling to always use UTC with 'Z'
+        x.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter());
+        x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
 // Swagger/OpenAPI configuration

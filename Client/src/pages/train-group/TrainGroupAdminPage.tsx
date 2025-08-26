@@ -192,7 +192,11 @@ export default function TrainGroupAdminPage() {
                 {timeSlots.map((slot) => (
                   <Button
                     key={slot.trainGroupDateId}
-                    label={slot.startOn.toString()}
+                    label={
+                      new Date(slot.startOn).getHours() +
+                      ":" +
+                      new Date(slot.startOn).getMinutes()
+                    }
                     // disabled={!slot.available}
                     onClick={() => handleTimeSlotClick(slot.trainGroupDateId)}
                   />
@@ -217,18 +221,6 @@ export default function TrainGroupAdminPage() {
           <TrainGroupDateGrid formMode={FormMode.ADD} />
         </div>
       </GenericDialogComponent>
-
-      {/* 
-      <Dialog
-        visible={isAddModalVisible}
-        style={{ width: "35%" }}
-        header="Add New Timeslot"
-        modal
-        className="p-fluid"
-        onHide={() => setAddModalVisibility(false)}
-      >
-        <TrainGroupContainer formMode={FormMode.ADD} />
-      </Dialog> */}
 
       {/*                                     */}
       {/*          Edit Train Group           */}
