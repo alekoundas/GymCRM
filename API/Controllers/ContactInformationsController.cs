@@ -107,22 +107,22 @@ namespace API.Controllers
             var query = _dataService.ContactInformations;
 
             // Handle Sorting of DataTable.
-            if (dataTable.MultiSortMeta?.Count() > 0)
+            if (dataTable.Sorts.Count() > 0)
             {
                 // Create the first OrderBy().
-                DataTableSortDto? dataTableSort = dataTable.MultiSortMeta.First();
+                DataTableSortDto? dataTableSort = dataTable.Sorts.First();
                 if (dataTableSort.Order > 0)
-                    query.OrderBy(dataTableSort.Field, OrderDirectionEnum.ASCENDING);
+                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.ASCENDING);
                 else if (dataTableSort.Order < 0)
-                    query.OrderBy(dataTableSort.Field, OrderDirectionEnum.DESCENDING);
+                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.DESCENDING);
 
                 // Create the rest OrderBy methods as ThenBy() if any.
-                foreach (var sortInfo in dataTable.MultiSortMeta.Skip(1))
+                foreach (var sortInfo in dataTable.Sorts.Skip(1))
                 {
                     if (dataTableSort.Order > 0)
-                        query.ThenBy(sortInfo.Field, OrderDirectionEnum.ASCENDING);
+                        query.ThenBy(sortInfo.FieldName, OrderDirectionEnum.ASCENDING);
                     else if (dataTableSort.Order < 0)
-                        query.ThenBy(sortInfo.Field, OrderDirectionEnum.DESCENDING);
+                        query.ThenBy(sortInfo.FieldName, OrderDirectionEnum.DESCENDING);
                 }
             }
 

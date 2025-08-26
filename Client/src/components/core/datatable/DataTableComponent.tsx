@@ -11,8 +11,8 @@ import { DataTableEditModeEnum } from "../../../enum/DataTableEditModeEnum";
 import { DataTableFilterDisplayEnum } from "../../../enum/DataTableFilterDisplayEnum";
 import { FormMode } from "../../../enum/FormMode";
 import { DataTableColumns } from "../../../model/datatable/DataTableColumns";
-import { DataTableDto } from "../../../model/DataTableDto";
 import DataTableService from "../../../services/DataTableService";
+import { DataTableDto } from "../../../model/datatable/DataTableDto";
 
 interface IField<TEntity> {
   controller: string;
@@ -199,13 +199,13 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         }
         // Filter.
         filterDisplay={filterDisplay}
-        filters={dataTable.filters}
+        filters={dataTable.dataTableFilters}
         onFilter={dataTableService.onFilter}
         // Sort.
         removableSort
         sortMode="multiple"
         onSort={dataTableService.onSort}
-        multiSortMeta={dataTable.multiSortMeta}
+        multiSortMeta={dataTable.dataTableSorts}
         header={enableAddAction ? renderHeader() : null}
         // Edit row/column.
         editMode={editMode}

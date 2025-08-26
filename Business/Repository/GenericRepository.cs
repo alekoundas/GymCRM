@@ -4,7 +4,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Linq.Dynamic.Core;
-using System.Linq;
+
 namespace Business.Repository
 {
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
@@ -165,6 +165,15 @@ namespace Business.Repository
             return this;
         }
 
+
+        public GenericRepository<TEntity> FilterByColumn(string columnPath, object value)
+        {
+            if (_query == null)
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+
+            _query = _query.Where(columnPath, value);
+            return this;
+        }
 
         public GenericRepository<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
         {

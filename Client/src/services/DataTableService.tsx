@@ -3,11 +3,13 @@ import {
   DataTablePageEvent,
   DataTableRowEditCompleteEvent,
   DataTableSortEvent,
+  DataTableSortMeta,
 } from "primereact/datatable";
-import { DataTableDto } from "../model/DataTableDto";
 import ApiService from "./ApiService";
 import { ColumnEvent } from "primereact/column";
 import { FormMode } from "../enum/FormMode";
+import { DataTableDto } from "../model/datatable/DataTableDto";
+import { DataTableSortDto } from "../model/datatable/DataTableSortDto";
 
 export default class DataTableService<TEntity> {
   private controller: string;
@@ -66,14 +68,32 @@ export default class DataTableService<TEntity> {
   // };
 
   public onSort = (event: DataTableSortEvent) => {
-    if (event.multiSortMeta)
-      this.dataTableDto.multiSortMeta = event.multiSortMeta;
-
+    this.dataTableDto.sorts = [];
+    if (event.multiSortMeta) {
+      this.dataTableDto.dataTableSorts = event.multiSortMeta;
+      event.multiSortMeta.forEach((value: DataTableSortMeta, index: number) =>
+        this.dataTableDto.sorts?.push({
+          fieldName: value.field,
+          order: value.order,
+        })
+      );
+    }
     this.refreshData();
   };
 
   public onFilter = (event: DataTableFilterEvent) => {
-    this.dataTableDto.filters = event.filters;
+    this.dataTableDto.filters = [];
+    this.dataTableDto.dataTableFilters = event.filters;
+
+    // This doesnt work  [...event.filters]
+    Object.entries(event.filters).map(([value, index]) =>
+      this.dataTableDto.filters?.push({
+        fieldName: value,
+        filterType: event.filters[value]["matchMode"],
+        value: event.filters[value]["value"],
+      })
+    );
+
     this.refreshData();
   };
 
@@ -156,4 +176,11 @@ export default class DataTableService<TEntity> {
   //       );
   //   }
   // };
+}
+function value(
+  value: DataTableSortMeta,
+  index: number,
+  array: DataTableSortMeta[]
+): void {
+  throw new Error("Function not implemented.");
 }

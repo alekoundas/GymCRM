@@ -3,7 +3,6 @@ import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { FormMode } from "../../enum/FormMode";
 import { ClaimDto } from "../../model/ClaimDto";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
-import { DataTableDto } from "../../model/DataTableDto";
 import { DataTableEditModeEnum } from "../../enum/DataTableEditModeEnum";
 import { InputSwitch } from "primereact/inputswitch";
 import { ColumnEditorOptions, ColumnEvent } from "primereact/column";
@@ -13,6 +12,7 @@ import { IdentityRoleDto } from "../../model/IdentityRoleDto";
 import ApiService from "../../services/ApiService";
 import { ToastService } from "../../services/ToastService";
 import DataTableComponent from "../../components/core/datatable/DataTableComponent";
+import { DataTableDto } from "../../model/datatable/DataTableDto";
 
 interface IField {
   data: IdentityRoleDto;
@@ -88,8 +88,8 @@ export default function RoleForm({
     rows: 10,
     page: 1,
     pageCount: 0,
-    multiSortMeta: [],
-    filters: {
+    dataTableSorts: [],
+    dataTableFilters: {
       roleName: {
         value: identityRoleDto.name,
         matchMode: "contains",

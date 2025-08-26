@@ -10,10 +10,10 @@ import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnu
 import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
 import { FormMode } from "../../enum/FormMode";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
-import { DataTableDto } from "../../model/DataTableDto";
 import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
+import { DataTableDto } from "../../model/datatable/DataTableDto";
 
 interface IField {
   formMode: FormMode;
@@ -38,8 +38,8 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
     rows: 10,
     page: 1,
     pageCount: 0,
-    multiSortMeta: [],
-    filters: {
+    dataTableSorts: [],
+    dataTableFilters: {
       title: { value: "", matchMode: "contains" },
     },
   });

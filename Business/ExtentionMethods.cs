@@ -18,17 +18,18 @@
 
             private static IOrderedQueryable<T> OrderByColumnUsing<T>(this IQueryable<T> source, string columnPath, string method)
             {
-                var parameter = Expression.Parameter(typeof(T), "item");
-                var member = columnPath.Split('.')
+                ParameterExpression parameter = Expression.Parameter(typeof(T), "item");
+                Expression member = columnPath
+                    .Split('.')
                     .Aggregate((Expression)parameter, Expression.PropertyOrField);
-                var keySelector = Expression.Lambda(member, parameter);
-                var methodCall = Expression.Call(typeof(Queryable), method, new[]
+
+                System.Linq.Expressions.LambdaExpression keySelector = Expression.Lambda(member, parameter);
+
+                MethodCallExpression methodCall = Expression.Call(typeof(Queryable), method, new[]
                         { parameter.Type, member.Type },
                     source.Expression, Expression.Quote(keySelector));
 
                 return (IOrderedQueryable<T>)source.Provider.CreateQuery(methodCall);
             }
-
-
-        }
     }
+}
