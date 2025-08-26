@@ -5,9 +5,9 @@ import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { CustomerDto } from "../../model/CustomerDto";
-import { DataTableDto } from "../../model/DataTableDto";
 import { Calendar } from "primereact/calendar";
 import DataTableService from "../../services/DataTableService";
+import { DataTableDto } from "../../model/datatable/DataTableDto";
 
 function Customers() {
   const navigate = useNavigate();
@@ -24,12 +24,12 @@ function Customers() {
     rows: 10,
     page: 1,
     pageCount: 0,
-    multiSortMeta: [
+    dataTableSorts: [
       { field: "lastName", order: 1 },
       { field: "firstName", order: 1 },
       { field: "createdOn", order: -1 },
     ],
-    filters: {
+    dataTableFilters: {
       firstName: { value: "", matchMode: "contains" },
       lastName: { value: "", matchMode: "contains" },
       createdOn: { value: "", matchMode: "contains" },

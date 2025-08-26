@@ -18,9 +18,9 @@ import { InputNumber } from "primereact/inputnumber";
 import { Editor, EditorTextChangeEvent } from "primereact/editor";
 import { TicketTypesEnum } from "../../enum/TicketTypesEnum";
 import { TicketStatusEnum } from "../../enum/TicketStatusEnum";
-import { DataTableDto } from "../../model/DataTableDto";
 import DataTableService from "../../services/DataTableService";
 import { ToastService } from "../../services/ToastService";
+import { DataTableDto } from "../../model/datatable/DataTableDto";
 
 enum FormType {
   Customer,
@@ -70,8 +70,8 @@ export default function CustomerForm() {
     rows: 10,
     page: 1,
     pageCount: 0,
-    multiSortMeta: [{ field: "id", order: -1 }],
-    filters: {
+    dataTableSorts: [{ field: "id", order: -1 }],
+    dataTableFilters: {
       id: { value: "", matchMode: "contains" },
       description: { value: "", matchMode: "contains" },
       completedOn: { value: "", matchMode: "contains" },
@@ -86,8 +86,8 @@ export default function CustomerForm() {
       rows: 10,
       page: 1,
       pageCount: 0,
-      multiSortMeta: [],
-      filters: {
+      dataTableSorts: [],
+      dataTableFilters: {
         value: { value: "", matchMode: "contains" },
         description: { value: "", matchMode: "contains" },
         customerId: { value: "", matchMode: "contains" },

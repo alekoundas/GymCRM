@@ -2,13 +2,13 @@ import { useRef, useState } from "react";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { FormMode } from "../../enum/FormMode";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
-import { DataTableDto } from "../../model/DataTableDto";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
 import { Card } from "primereact/card";
 import { MakerModelDto } from "../../model/MakerModelDto";
 import MakerModelForm from "./MakerModelForm";
 import DataTableComponent from "../../components/core/datatable/DataTableComponent";
 import AddDialogComponent from "../../components/core/dialog/AddDialogComponent";
+import { DataTableDto } from "../../model/datatable/DataTableDto";
 
 export default function MakerModels() {
   const [makerModelDto, setMakerModelDto] = useState(new MakerModelDto());
@@ -34,8 +34,8 @@ export default function MakerModels() {
     rows: 10,
     page: 1,
     pageCount: 0,
-    multiSortMeta: [],
-    filters: {
+    dataTableSorts: [],
+    dataTableFilters: {
       title: { value: "", matchMode: "contains" },
       makerId: { value: "", matchMode: "contains" },
     },

@@ -59,7 +59,7 @@ namespace API.Controllers
                 .ToList();
 
 
-            string? roleName = dataTable.Filters?.RoleName?.Value;
+            string? roleName = dataTable.Filters.First(x=>x.FieldName== "RoleName").Value;
             if (roleName != null && roleName.Count() > 0)
             {
                 IdentityRole<Guid>? identityRole = await _roleManager.FindByNameAsync(roleName);

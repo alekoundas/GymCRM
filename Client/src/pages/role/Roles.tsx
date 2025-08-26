@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { FormMode } from "../../enum/FormMode";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
-import { DataTableDto } from "../../model/DataTableDto";
 import { IdentityRoleDto } from "../../model/IdentityRoleDto";
 import RoleForm from "./RoleForm";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
@@ -12,6 +11,7 @@ import AddDialogComponent from "../../components/core/dialog/AddDialogComponent"
 import DeleteDialogComponent from "../../components/core/dialog/DeleteDialogComponent";
 import EditDialogComponent from "../../components/core/dialog/EditDialogComponent";
 import ViewDialogComponent from "../../components/core/dialog/ViewDialogComponent";
+import { DataTableDto } from "../../model/datatable/DataTableDto";
 
 export default function Roles() {
   const [identityRoleDto, setIdentityRoleDto] = useState(new IdentityRoleDto());
@@ -37,8 +37,8 @@ export default function Roles() {
     rows: 10,
     page: 1,
     pageCount: 0,
-    multiSortMeta: [],
-    filters: {
+    dataTableSorts: [],
+    dataTableFilters: {
       value: { value: "", matchMode: "contains" },
       description: { value: "", matchMode: "contains" },
       customerId: { value: "", matchMode: "contains" },

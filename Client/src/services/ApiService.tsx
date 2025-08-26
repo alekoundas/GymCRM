@@ -1,5 +1,5 @@
 import { ApiResponse } from "../model/ApiResponse";
-import { DataTableDto } from "../model/DataTableDto";
+import { DataTableDto } from "../model/datatable/DataTableDto";
 import { LookupDto } from "../model/lookup/LookupDto";
 import { TimeSlotRequestDto } from "../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../model/TimeSlotResponseDto";

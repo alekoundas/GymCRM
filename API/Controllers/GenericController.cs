@@ -127,28 +127,30 @@ namespace API.Controllers
             var query = _dataService.GetGenericRepository<TEntity>();
 
             // Handle Sorting of DataTable.
-            if (dataTable.MultiSortMeta?.Count() > 0)
+            if (dataTable.Sorts.Count() > 0)
             {
                 // Create the first OrderBy().
-                DataTableSortDto? dataTableSort = dataTable.MultiSortMeta.First();
+                DataTableSortDto? dataTableSort = dataTable.Sorts.First();
                 if (dataTableSort.Order > 0)
-                    query.OrderBy(dataTableSort.Field.Substring(0, 1).ToUpper() + dataTableSort.Field.Substring(1, dataTableSort.Field.Length), OrderDirectionEnum.ASCENDING);
+                    query.OrderBy(dataTableSort.FieldName.Substring(0, 1).ToUpper() + dataTableSort.FieldName.Substring(1, dataTableSort.FieldName.Length), OrderDirectionEnum.ASCENDING);
                 else if (dataTableSort.Order < 0)
-                    query.OrderBy(dataTableSort.Field.Substring(0, 1).ToUpper() + dataTableSort.Field.Substring(1, dataTableSort.Field.Length), OrderDirectionEnum.DESCENDING);
+                    query.OrderBy(dataTableSort.FieldName.Substring(0, 1).ToUpper() + dataTableSort.FieldName.Substring(1, dataTableSort.FieldName.Length), OrderDirectionEnum.DESCENDING);
 
                 // Create the rest OrderBy methods as ThenBy() if any.
-                foreach (var sortInfo in dataTable.MultiSortMeta.Skip(1))
+                foreach (var sortInfo in dataTable.Sorts.Skip(1))
                 {
                     if (dataTableSort.Order > 0)
-                        query.ThenBy(sortInfo.Field.Substring(0, 1).ToUpper() + sortInfo.Field.Substring(1, sortInfo.Field.Length), OrderDirectionEnum.ASCENDING);
+                        query.ThenBy(sortInfo.FieldName.Substring(0, 1).ToUpper() + sortInfo.FieldName.Substring(1, sortInfo.FieldName.Length), OrderDirectionEnum.ASCENDING);
                     else if (dataTableSort.Order < 0)
-                        query.ThenBy(sortInfo.Field.Substring(0, 1).ToUpper() + sortInfo.Field.Substring(1, sortInfo.Field.Length), OrderDirectionEnum.DESCENDING);
+                        query.ThenBy(sortInfo.FieldName.Substring(0, 1).ToUpper() + sortInfo.FieldName.Substring(1, sortInfo.FieldName.Length), OrderDirectionEnum.DESCENDING);
                 }
             }
 
 
-            // TODO add filters
-
+            foreach (var filter in dataTable.Filters)
+            {
+                query.FilterByColumn(filter.FieldName, filter.Value);
+            }
 
 
             int skip = (dataTable.Page - 1) * dataTable.Rows;

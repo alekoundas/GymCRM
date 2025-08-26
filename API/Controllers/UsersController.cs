@@ -115,32 +115,35 @@ namespace API.Controllers
             var query = _dataService.Users;
 
             // Handle Sorting of DataTable.
-            if (dataTable.MultiSortMeta?.Count() > 0)
+            if (dataTable.Sorts.Count() > 0)
             {
                 // Create the first OrderBy().
-                DataTableSortDto? dataTableSort = dataTable.MultiSortMeta.First();
+                DataTableSortDto? dataTableSort = dataTable.Sorts.First();
                 if (dataTableSort.Order > 0)
-                    query.OrderBy(dataTableSort.Field, OrderDirectionEnum.ASCENDING);
+                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.ASCENDING);
                 else if (dataTableSort.Order < 0)
-                    query.OrderBy(dataTableSort.Field, OrderDirectionEnum.DESCENDING);
+                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.DESCENDING);
 
                 // Create the rest OrderBy methods as ThenBy() if any.
-                foreach (var sortInfo in dataTable.MultiSortMeta.Skip(1))
+                foreach (var sortInfo in dataTable.Sorts.Skip(1))
                 {
                     if (dataTableSort.Order > 0)
-                        query.ThenBy(sortInfo.Field, OrderDirectionEnum.ASCENDING);
+                        query.ThenBy(sortInfo.FieldName, OrderDirectionEnum.ASCENDING);
                     else if (dataTableSort.Order < 0)
-                        query.ThenBy(sortInfo.Field, OrderDirectionEnum.DESCENDING);
+                        query.ThenBy(sortInfo.FieldName, OrderDirectionEnum.DESCENDING);
                 }
             }
 
 
             // Handle Filtering of DataTable.
-            if (dataTable.Filters?.FirstName?.Value != null && dataTable.Filters?.FirstName.Value.Length > 0)
-                filterQuery.Add(x => x.FirstName.Contains(dataTable.Filters.FirstName.Value));
+            foreach (var filter in dataTable.Filters)
+            {
+                if (filter.FieldName == "FirstName" && filter.Value.Length > 0)
+                    filterQuery.Add(x => x.FirstName.Contains(filter.Value));
 
-            if (dataTable.Filters?.LastName?.Value != null && dataTable.Filters?.LastName.Value.Length > 0)
-                filterQuery.Add(x => x.LastName.Contains(dataTable.Filters.LastName.Value));
+                if (filter.FieldName == "LastName" && filter.Value.Length > 0)
+                    filterQuery.Add(x => x.LastName.Contains(filter.Value));
+            }
 
 
 

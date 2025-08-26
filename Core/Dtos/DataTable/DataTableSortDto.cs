@@ -2,7 +2,7 @@
 {
     public class DataTableSortDto
     {
-        public string Field { get; set; }
+        public string FieldName { get; set; } = "";
         public int Order { get; set; }
 
     }
