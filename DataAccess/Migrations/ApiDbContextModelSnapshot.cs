@@ -89,11 +89,11 @@ namespace DataAccess.Migrations
                     b.Property<int>("MaxParticipants")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Name")
-                        .HasMaxLength(500)
+                    b.Property<TimeSpan>("StartOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<TimeSpan>("StartOn")
+                    b.Property<string>("Title")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("TrainerId")

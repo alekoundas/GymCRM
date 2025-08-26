@@ -21,7 +21,7 @@ namespace DataAccess.Configurations
             builder.Property(x => x.StartOn)
                 .IsRequired();
 
-            builder.Property(x => x.Name)
+            builder.Property(x => x.Title)
                .IsRequired(false)
                .HasMaxLength(500);
 

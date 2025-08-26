@@ -168,7 +168,6 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
           outlined
           onClick={() => {
             onButtonClick(ButtonTypeEnum.ADD);
-            // dataTableService.refreshData();
           }}
         />
       </div>

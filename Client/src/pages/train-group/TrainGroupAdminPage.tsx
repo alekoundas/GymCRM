@@ -18,47 +18,23 @@ import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
 import { TrainGroupDto } from "../../model/TrainGroupDto";
 import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
 import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
+import DataTableComponent from "../../components/core/datatable/DataTableComponent";
+import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
+import { DataTableDto } from "../../model/datatable/DataTableDto";
+import { DataTableColumns } from "../../model/datatable/DataTableColumns";
+import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 
 export default function TrainGroupAdminPage() {
-  const navigate = useNavigate();
-
-  const [isEditModalVisible, setEditModalVisibility] = useState(false); // Dialog visibility
+  const [isViewModalVisible, setViewModalVisibility] = useState(false); // Dialog visibility
   const [isAddModalVisible, setAddModalVisibility] = useState(false); // Dialog visibility
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | null>(null);
-  const { resetTrainGroupDto, trainGroupDto } = useTrainGroupStore();
+  const [isEditModalVisible, setEditModalVisibility] = useState(false); // Dialog visibility
 
-  const handleChangeDate = (value: Date) => {
-    setSelectedDate(value);
+  const { trainGroupDto, resetTrainGroupDto, setTrainGroupDto } =
+    useTrainGroupStore();
 
-    const timeSlotDto = new TimeSlotRequestDto();
-    timeSlotDto.selectedDate = value;
-    ApiService.timeslots("TrainGroupDate/TimeSlots", timeSlotDto).then(
-      (response) => {
-        if (response) {
-          setTimeSlots(response);
-        }
-      }
-    );
-  };
-
-  const handleTimeSlotClick = (slotId: number) => {
-    setSelectedTimeSlot(slotId);
-  };
-
-  const handleBooking = () => {
-    if (selectedDate && selectedTimeSlot) {
-      const selectedSlot = timeSlots.find(
-        (slot) => slot.trainGroupDateId === selectedTimeSlot
-      );
-      alert(
-        `Booking confirmed for ${selectedDate.toDateString()} at ${
-          selectedSlot?.startOn
-        }`
-      );
-      // Call your API here to book the slot (e.g., POST to api/TrainGroupParticipant)
-    }
+  const dialogControlView: DialogControl = {
+    showdialog: () => setViewModalVisibility(true),
+    hidedialog: () => setViewModalVisibility(false),
   };
 
   const dialogControlAdd: DialogControl = {
@@ -70,6 +46,64 @@ export default function TrainGroupAdminPage() {
     showdialog: () => setEditModalVisibility(true),
     hidedialog: () => setEditModalVisibility(false),
   };
+
+  const datatableDto: DataTableDto<TrainGroupDto> = {
+    data: [],
+    first: 0,
+    rows: 10,
+    page: 1,
+    pageCount: 0,
+    dataTableSorts: [],
+    dataTableFilters: {},
+  };
+
+  const dataTableColumns: DataTableColumns[] = [
+    {
+      field: "title",
+      header: "Title",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "30%" },
+      body: null,
+    },
+    {
+      field: "startOn",
+      header: "Start On",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "10%" },
+      body: null,
+    },
+    {
+      field: "duration",
+      header: "Duration",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "10%" },
+      body: null,
+    },
+    {
+      field: "maxParticipants",
+      header: "Max Participants",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "10%" },
+      body: null,
+    },
+    {
+      field: "trainerId",
+      header: "Trainer",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "20%" },
+      body: null,
+    },
+  ];
 
   const OnSaveAdd = async () => {
     const dayOfWeekMap: { [key: number]: DayOfWeekEnum } = {
@@ -131,84 +165,67 @@ export default function TrainGroupAdminPage() {
     }
   };
 
+  const onDataTableClick = (
+    buttonType: ButtonTypeEnum,
+    rowData?: TrainGroupDto
+  ) => {
+    if (rowData) setTrainGroupDto({ ...rowData });
+    switch (buttonType) {
+      case ButtonTypeEnum.VIEW:
+        dialogControlView.showdialog();
+        break;
+      case ButtonTypeEnum.ADD:
+        dialogControlAdd.showdialog();
+        break;
+      case ButtonTypeEnum.EDIT:
+        dialogControlEdit.showdialog();
+        break;
+      case ButtonTypeEnum.DELETE:
+        // setDeleteDialogVisibility(true);
+        break;
+      case ButtonTypeEnum.SAVE:
+        // triggerFormSave();
+        dialogControlAdd.hidedialog();
+        dialogControlEdit.hidedialog();
+        // if (onRefreshDataTable.current) onRefreshDataTable.current();
+        break;
+
+      default:
+        break;
+    }
+  };
+
   return (
     <>
-      <div className="grid w-full ">
-        <div className="col-12 lg:col-6 xl:col-6">
-          <Card
-            title="Train Groups"
-            subTitle="Handle your train groups"
-          >
-            <Calendar
-              value={selectedDate}
-              onChange={(e) => handleChangeDate(e.value as Date)}
-              inline
-              showIcon={false}
-              minDate={new Date()} // Prevent selecting past dates
-              className="w-full"
-            />
-          </Card>
+      <Card title="Makers">
+        <div className="card">
+          <DataTableComponent
+            dataTable={datatableDto}
+            formMode={FormMode.EDIT}
+            onButtonClick={onDataTableClick}
+            controller="TrainGroup"
+            enableGridRowActions={true}
+            filterDisplay={DataTableFilterDisplayEnum.ROW}
+            enableAddAction={true}
+            dataTableColumns={dataTableColumns}
+            // triggerRefreshData={onRefreshDataTable}
+          />
         </div>
+      </Card>
 
-        {/*                     */}
-        {/* Time Slots Section  */}
-        {/*                     */}
-        <div className=" col-12  lg:col-6 xl:col-6 ">
-          <Card
-            header={
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "1rem",
-                }}
-              >
-                <h2 style={{ margin: 0 }}>Available Timeslots</h2>
-                {TokenService.isUserAllowed("TrainGroup_Add") && (
-                  <Button
-                    className="m-2"
-                    type="button"
-                    icon="pi pi-plus"
-                    label="Add"
-                    outlined
-                    onClick={() => {
-                      setAddModalVisibility(true);
-                      resetTrainGroupDto();
-                    }}
-                  />
-                )}
-              </div>
-            }
-          >
-            {timeSlots.length === 0 ? (
-              <p className="text-gray-500">
-                No time slots available for this date.
-              </p>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {timeSlots.map((slot) => (
-                  <Button
-                    key={slot.trainGroupDateId}
-                    label={
-                      new Date(slot.startOn).getHours() +
-                      ":" +
-                      new Date(slot.startOn).getMinutes()
-                    }
-                    // disabled={!slot.available}
-                    onClick={() => {
-                      resetTrainGroupDto(slot.trainGroupDateId).then((x) => {
-                        setEditModalVisibility(true);
-                        handleTimeSlotClick(slot.trainGroupDateId);
-                      });
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-          </Card>
+      {/*                                     */}
+      {/*           View Train Group           */}
+      {/*                                     */}
+
+      <GenericDialogComponent
+        visible={isViewModalVisible}
+        control={dialogControlView}
+      >
+        <div className="w-full">
+          <TrainGroupForm formMode={FormMode.VIEW} />
+          <TrainGroupDateGrid formMode={FormMode.VIEW} />
         </div>
-      </div>
+      </GenericDialogComponent>
 
       {/*                                     */}
       {/*           Add Train Group           */}
