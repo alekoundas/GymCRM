@@ -83,14 +83,12 @@ export default function TrainGroupAdminPage() {
     };
 
     // Create a copy of trainGroupDto
+    // Update recurrenceDayOfWeek value to UTC
     const updatedTrainGroupDto: TrainGroupDto = {
       ...trainGroupDto,
       trainGroupDates: trainGroupDto.trainGroupDates.map(
         (dateDto: TrainGroupDateDto) => {
-          if (
-            dateDto.recurrenceDayOfWeek !== undefined &&
-            dateDto.fixedDay === null
-          ) {
+          if (!dateDto.recurrenceDayOfWeek) {
             // Use startOn as reference date, or fall back to current date
             const referenceDate = trainGroupDto.startOn ?? new Date();
             if (
@@ -198,7 +196,11 @@ export default function TrainGroupAdminPage() {
                       new Date(slot.startOn).getMinutes()
                     }
                     // disabled={!slot.available}
-                    onClick={() => handleTimeSlotClick(slot.trainGroupDateId)}
+                    onClick={() => {
+                      handleTimeSlotClick(slot.trainGroupDateId);
+                      setEditModalVisibility(true);
+                      resetTrainGroupDto(slot.trainGroupDateId);
+                    }}
                   />
                 ))}
               </div>

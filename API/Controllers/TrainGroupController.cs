@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Services;
+using Core.Dtos;
 using Core.Dtos.TrainGroup;
 using Core.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -12,14 +13,36 @@ namespace API.Controllers
     public class TrainGroupController : GenericController<TrainGroup, TrainGroupDto, TrainGroupAddDto>
     {
         private readonly IDataService _dataService;
+        private readonly IMapper _mapper;
         //private readonly ILogger<TrainGroupController> _logger;
 
         public TrainGroupController(IDataService dataService, IMapper mapper) : base(dataService, mapper)
         {
             _dataService = dataService;
+            _mapper = mapper;
         }
 
+        // GET: api/controller/5
+        //[HttpGet("{id}")]
+        //public override async Task<ActionResult<ApiResponse<TrainGroupDto>>> Get(int id)
+        //{
+        //    if (!IsUserAuthorized("View"))
+        //        return new ApiResponse<TrainGroupDto>().SetErrorResponse("error", "User is not authorized to perform this action.");
 
+        //    TrainGroup? entity = await _dataService.TrainGroups
+        //        .Include(x => x.TrainGroupDates)
+        //        .FirstOrDefaultAsync(x => x.Id == id);
+
+        //    TrainGroupDto entityDto = _mapper.Map<TrainGroupDto>(entity);
+
+        //    if (entityDto == null)
+        //    {
+        //        string className = typeof(TrainGroupDto).Name;
+        //        return new ApiResponse<TrainGroupDto>().SetErrorResponse("error", $"Requested {className} not found!");
+        //    }
+
+        //    return new ApiResponse<TrainGroupDto>().SetSuccessResponse(entityDto);
+        //}
 
 
         protected override bool CustomValidatePOST(TrainGroupAddDto entityAddDto, out string[] errors)

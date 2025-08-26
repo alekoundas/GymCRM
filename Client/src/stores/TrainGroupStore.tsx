@@ -1,13 +1,14 @@
 import { create } from "zustand";
 import { TrainGroupDateDto } from "../model/TrainGroupDateDto";
 import { TrainGroupDto } from "../model/TrainGroupDto";
+import ApiService from "../services/ApiService";
 
 interface TrainGroupState {
   trainGroupDto: TrainGroupDto;
   setTrainGroupDto: (data: TrainGroupDto) => void;
   updateTrainGroupDto: (updates: Partial<TrainGroupDto>) => void;
   addTrainGroupDate: (newRow: TrainGroupDateDto) => void;
-  resetTrainGroupDto: () => void;
+  resetTrainGroupDto: (id?: number) => void;
 }
 
 export const useTrainGroupStore = create<TrainGroupState>((set) => ({
@@ -35,18 +36,24 @@ export const useTrainGroupStore = create<TrainGroupState>((set) => ({
         trainGroupDates: [...state.trainGroupDto.trainGroupDates, newRow],
       },
     })),
-  resetTrainGroupDto: () =>
-    set({
-      trainGroupDto: {
-        id: -1,
-        name: "",
-        description: "",
-        duration: new Date(2000, 0, 1, 0, 0, 0),
-        startOn: new Date(2000, 0, 1, 0, 0, 0),
-        maxParticipants: 1,
-        trainerId: "",
-        repeatingParticipants: [],
-        trainGroupDates: [],
-      },
-    }),
+  resetTrainGroupDto: async (id?: number) => {
+    if (id)
+      await ApiService.get<TrainGroupDto>("TrainGroup", id).then((value) =>
+        value ? set({ trainGroupDto: value }) : null
+      );
+    else
+      set({
+        trainGroupDto: {
+          id: -1,
+          name: "",
+          description: "",
+          duration: new Date(2000, 0, 1, 0, 0, 0),
+          startOn: new Date(2000, 0, 1, 0, 0, 0),
+          maxParticipants: 1,
+          trainerId: "",
+          repeatingParticipants: [],
+          trainGroupDates: [],
+        },
+      });
+  },
 }));

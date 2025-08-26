@@ -148,8 +148,10 @@ builder.Services.AddAutoMapper(config =>
 
 //builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(AutoMapperProfile).Assembly));
 builder.Services.AddScoped<ValidateModelFilter>();
-builder.Services.AddTransient<TrainGroupDateDtoDateOnlyResolver>();
-builder.Services.AddTransient<TrainGroupDateAddDtoDateOnlyResolver>();
+builder.Services.AddTransient<TrainGroupDateDtoDateTimeToDateOnlyResolver>();
+builder.Services.AddTransient<TrainGroupDateDtoDateOnlyToDateTimeResolver>();
+builder.Services.AddTransient<TrainGroupDateAddDtoDateTimeToDateOnlyResolver>();
+builder.Services.AddTransient<TrainGroupDateAddDtoDateOnlyToDateTimeResolver>();
 
 
 

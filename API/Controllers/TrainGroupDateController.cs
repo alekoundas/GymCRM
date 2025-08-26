@@ -51,15 +51,13 @@ namespace API.Controllers
                 {
                     Duration = new DateTime(2000, 1, 1, x.TrainGroup.Duration.Hours, x.TrainGroup.Duration.Minutes, 0),
                     StartOn = new DateTime(2000, 1, 1, x.TrainGroup.StartOn.Hours, x.TrainGroup.StartOn.Minutes, 0),
-                    DisplayDate = x.TrainGroup.StartOn.ToString(@"hh\:mm"),
+                    TrainGroupId = x.Id,
                     TrainGroupDateId = x.TrainGroupId
                 })
                 .ToList();
 
             if (timeSlotRequestDtos == null)
-            {
                 return new ApiResponse<List<TimeSlotResponseDto>>().SetErrorResponse("error", $"Requested data not found!");
-            }
 
             return new ApiResponse<List<TimeSlotResponseDto>>().SetSuccessResponse(timeSlotRequestDtos);
         }

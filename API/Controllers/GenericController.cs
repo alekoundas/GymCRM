@@ -2,10 +2,10 @@
 using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
+using Core.Dtos.TrainGroup;
 using Core.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace API.Controllers
 {
@@ -30,20 +30,21 @@ namespace API.Controllers
 
         // GET: api/controller/5
         [HttpGet("{id}")]
-        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Get(int id)
+        public virtual async Task<ActionResult<ApiResponse<TEntityDto>>> Get(int id)
         {
             if (!IsUserAuthorized("View"))
-                return new ApiResponse<TEntity>().SetErrorResponse("error", "User is not authorized to perform this action.");
+                return new ApiResponse<TEntityDto>().SetErrorResponse("error", "User is not authorized to perform this action.");
 
 
             TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FindAsync(id);
-            if (entity == null)
+            TEntityDto entityDto = _mapper.Map<TEntityDto>(entity);
+            if (entityDto == null)
             {
                 string className = typeof(TEntity).Name;
-                return new ApiResponse<TEntity>().SetErrorResponse("error", $"Requested {className} not found!");
+                return new ApiResponse<TEntityDto>().SetErrorResponse("error", $"Requested {className} not found!");
             }
 
-            return new ApiResponse<TEntity>().SetSuccessResponse(entity);
+            return new ApiResponse<TEntityDto>().SetSuccessResponse(entityDto);
         }
 
         // POST: api/controller

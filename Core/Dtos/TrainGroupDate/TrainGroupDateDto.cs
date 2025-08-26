@@ -25,7 +25,7 @@ namespace Core.Dtos.TrainGroupDate
 
         [Required(ErrorMessage = "TrainGroupId is required")]
         public int TrainGroupId { get; set; }
-        public TrainGroupDto TrainGroup { get; set; } = null!;
+        //public TrainGroupDto TrainGroup { get; set; } = null!;
 
 
         public List<TrainGroupParticipantDto> TrainGroupParticipants { get; set; } = new List<TrainGroupParticipantDto>();

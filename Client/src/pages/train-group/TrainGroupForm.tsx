@@ -17,9 +17,11 @@ export default function TrainGroupForm({ formMode }: IField) {
 
   // Preset TrainerId
   useEffect(() => {
-    const userId = TokenService.getUserId();
-    if (userId && !trainGroupDto.trainerId)
-      updateTrainGroupDto({ ...trainGroupDto, trainerId: userId });
+    if (formMode === FormMode.ADD) {
+      const userId = TokenService.getUserId();
+      if (userId && !trainGroupDto.trainerId)
+        updateTrainGroupDto({ ...trainGroupDto, trainerId: userId });
+    }
   }, []);
 
   const handleChange = (
@@ -31,8 +33,6 @@ export default function TrainGroupForm({ formMode }: IField) {
 
   return (
     <div className="pr-5 pl-5">
-      <h2>Create Training Group</h2>
-
       <div className="field">
         <label
           htmlFor="name"
@@ -78,7 +78,7 @@ export default function TrainGroupForm({ formMode }: IField) {
         <Calendar
           id="startOn"
           name="startOn"
-          value={trainGroupDto.startOn}
+          value={new Date(trainGroupDto.startOn)}
           onChange={(e) => {
             const date = new Date(
               2000,
@@ -106,7 +106,7 @@ export default function TrainGroupForm({ formMode }: IField) {
         <Calendar
           id="duration"
           name="duration"
-          value={trainGroupDto.duration}
+          value={new Date(trainGroupDto.duration)}
           onChange={(e) => {
             const date = new Date(
               2000,
