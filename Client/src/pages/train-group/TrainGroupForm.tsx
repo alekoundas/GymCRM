@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import React, { FormEvent, SyntheticEvent, useEffect, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 import { Calendar } from "primereact/calendar";
@@ -18,10 +18,8 @@ export default function TrainGroupForm({ formMode }: IField) {
   // Preset TrainerId
   useEffect(() => {
     const userId = TokenService.getUserId();
-    if (userId && !trainGroupDto.trainerId) {
+    if (userId && !trainGroupDto.trainerId)
       updateTrainGroupDto({ ...trainGroupDto, trainerId: userId });
-      console.log("Updated trainGroupDto.trainerId:", userId);
-    }
   }, []);
 
   const handleChange = (
@@ -81,7 +79,17 @@ export default function TrainGroupForm({ formMode }: IField) {
           id="startOn"
           name="startOn"
           value={trainGroupDto.startOn}
-          onChange={handleChange}
+          onChange={(e) => {
+            const date = new Date(
+              2000,
+              0,
+              1,
+              e.value?.getHours(),
+              e.value?.getMinutes(),
+              0
+            );
+            handleChange({ target: { name: "startOn", value: date } });
+          }}
           showIcon
           timeOnly
           icon={() => <i className="pi pi-clock" />}
@@ -99,8 +107,20 @@ export default function TrainGroupForm({ formMode }: IField) {
           id="duration"
           name="duration"
           value={trainGroupDto.duration}
-          onChange={handleChange}
+          onChange={(e) => {
+            const date = new Date(
+              2000,
+              0,
+              1,
+              e.value?.getHours(),
+              e.value?.getMinutes(),
+              0
+            );
+            handleChange({ target: { name: "duration", value: date } });
+          }}
           showIcon
+          hourFormat="24"
+          placeholder="HH:mm"
           timeOnly
           icon={() => <i className="pi pi-clock" />}
         />
