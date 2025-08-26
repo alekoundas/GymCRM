@@ -39,8 +39,15 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
     page: 1,
     pageCount: 0,
     dataTableSorts: [],
+    filters: [
+      {
+        fieldName: "TrainGroupId",
+        value: trainGroupDto.id.toString(),
+        filterType: "equals",
+      },
+    ],
     dataTableFilters: {
-      title: { value: "", matchMode: "contains" },
+      TrainGroupId: { value: trainGroupDto.id, matchMode: "equals" },
     },
   });
 

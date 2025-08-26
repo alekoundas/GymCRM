@@ -146,16 +146,22 @@ namespace API.Controllers
                 }
             }
 
-
-            foreach (var filter in dataTable.Filters)
+            // Handle Filtering of DataTable.
+            foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.equals))
             {
-                query.FilterByColumn(filter.FieldName, filter.Value);
+                query.FilterEqualsByColumn(filter.FieldName, filter.Value);
+            }
+            foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.contains))
+            {
+                query.FilterByColumnContains(filter.FieldName, filter.Value);
             }
 
-
+            // Handle Pagging of DataTable.
             int skip = (dataTable.Page - 1) * dataTable.Rows;
             int take = dataTable.Rows;
             query.AddPagging(skip, take);
+
+
 
             // Retrieve Data.
             List<TEntity> result = await query.ToListAsync();
