@@ -13,6 +13,7 @@ import Users from "./pages/user/Users.tsx";
 import Register from "./pages/user/Register.tsx";
 import Administrator from "./pages/administrator/administrator.tsx";
 import Appointment from "./pages/appointment/Appointment.tsx";
+import TrainGroupAdminCalendarPage from "./pages/train-group/TrainGroupAdminCalendarPage.tsx";
 import TrainGroupAdminPage from "./pages/train-group/TrainGroupAdminPage.tsx";
 
 export default function App() {
@@ -68,19 +69,11 @@ export default function App() {
                 element={<Administrator />}
               >
                 <Route
+                  path="train-group-calendar"
+                  element={<TrainGroupAdminCalendarPage />}
+                />
+                <Route
                   path="train-groups"
-                  element={<TrainGroupAdminPage />}
-                />
-                <Route
-                  path="train-groups/add"
-                  element={<TrainGroupAdminPage />}
-                />
-                <Route
-                  path="train-groups/:id/edit"
-                  element={<TrainGroupAdminPage />}
-                />
-                <Route
-                  path="train-groups/:id/view"
                   element={<TrainGroupAdminPage />}
                 />
 
