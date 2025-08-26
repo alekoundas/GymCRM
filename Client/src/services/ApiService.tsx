@@ -18,7 +18,7 @@ export default class ApiService {
     id: number | string
   ): Promise<TEntity | null> {
     const url = this.serverUrl + controller + "/" + id;
-    return await this.apiRequest(url, "GET");
+    return await this.apiRequest<TEntity, TEntity>(url, "GET");
   }
 
   public static async getDataLookup(

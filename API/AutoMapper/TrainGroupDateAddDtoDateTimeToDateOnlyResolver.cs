@@ -1,10 +1,11 @@
-﻿using AutoMapper;
+﻿
+using AutoMapper;
 using Core.Dtos.TrainGroupDate;
 using Core.Models;
 
 namespace API.AutoMapper
 {
-    public class TrainGroupDateAddDtoDateOnlyResolver : IValueResolver<TrainGroupDateAddDto, TrainGroupDate, DateOnly?>
+    public class TrainGroupDateAddDtoDateTimeToDateOnlyResolver : IValueResolver<TrainGroupDateAddDto, TrainGroupDate, DateOnly?>
     {
         public DateOnly? Resolve(TrainGroupDateAddDto source, TrainGroupDate destination, DateOnly? destMember, ResolutionContext context)
         {
@@ -14,9 +15,5 @@ namespace API.AutoMapper
             return null;
         }
 
-        public DateOnly? Resolve(TrainGroupDate source, TrainGroupDateAddDto destination, DateOnly? destMember, ResolutionContext context)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

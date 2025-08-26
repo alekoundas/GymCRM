@@ -124,7 +124,7 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
       style: { width: "20%" },
 
       body: (rowData: TrainGroupDateDto) =>
-        rowData.fixedDay ? rowData.fixedDay.toLocaleDateString() : "", // Convert Date to string
+        rowData.fixedDay ? new Date(rowData.fixedDay).toLocaleDateString() : "", // Convert Date to string
       cellEditor: (options: ColumnEditorOptions) => {
         const editingRow = editingRows.filter(
           (x) => x.rowId === options.rowData.id
