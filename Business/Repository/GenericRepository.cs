@@ -166,12 +166,20 @@ namespace Business.Repository
         }
 
 
-        public GenericRepository<TEntity> FilterByColumn(string columnPath, object value)
+        public GenericRepository<TEntity> FilterByColumnContains(string columnPath, string value)
         {
             if (_query == null)
                 _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
-            _query = _query.Where(columnPath, value);
+            _query = _query.FilterByColumnContains(columnPath, value);
+            return this;
+        }
+        public GenericRepository<TEntity> FilterEqualsByColumn(string columnPath, object value)
+        {
+            if (_query == null)
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+
+            _query = _query.FilterEqualsByColumn(columnPath, value);
             return this;
         }
 
