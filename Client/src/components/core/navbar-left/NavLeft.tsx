@@ -32,6 +32,13 @@ export default function NavLeft() {
       label: "Trainer",
       items: [
         {
+          label: "Calendar",
+          icon: "pi pi-calendar",
+          command: () => {
+            navigate("/administrator/train-group-calendar");
+          },
+        },
+        {
           label: "Train Groups",
           icon: "pi pi-users",
           command: () => {

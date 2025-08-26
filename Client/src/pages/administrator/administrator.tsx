@@ -8,6 +8,7 @@ import Makers from "../maker/Makers";
 import Roles from "../role/Roles";
 import Users from "../user/Users";
 import TrainGroupAdminPage from "../train-group/TrainGroupAdminPage";
+import TrainGroupAdminCalendarPage from "../train-group/TrainGroupAdminCalendarPage";
 
 export default function Administrator() {
   return (
@@ -23,20 +24,12 @@ export default function Administrator() {
           >
             <Routes>
               <Route
+                path="train-group-calendar"
+                element={<TrainGroupAdminCalendarPage />}
+              />
+              <Route
                 path="train-groups"
                 element={<TrainGroupAdminPage />}
-              />
-              <Route
-                path="train-groups/add"
-                element={<CustomerForm />}
-              />
-              <Route
-                path="train-groups/:id/edit"
-                element={<CustomerForm />}
-              />
-              <Route
-                path="train-groups/:id/view"
-                element={<CustomerForm />}
               />
 
               <Route
