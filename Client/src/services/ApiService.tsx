@@ -311,7 +311,6 @@ export default class ApiService {
       ToastService.showError(
         "Something unexpected happend! API call was not successfull..."
       );
-      console.log(1);
       return null;
     } catch (error) {
       ToastService.showError(

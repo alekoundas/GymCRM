@@ -1,11 +1,14 @@
 ﻿using Business.Repository;
 using Core.Models;
+using DataAccess;
 using Microsoft.AspNetCore.Identity;
 
 namespace Business.Services
 {
     public interface IDataService
     {
+        // Create a new database context.
+        ApiDbContext GetDbContext();
 
         // Repositories.
         IGenericRepository<User> Users { get; }
