@@ -15,6 +15,9 @@ import GenericDialogComponent, {
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import TrainGroupForm from "./TrainGroupForm";
 import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
+import { TrainGroupDto } from "../../model/TrainGroupDto";
+import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
+import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
 
 export default function TrainGroupAdminPage() {
   const navigate = useNavigate();
@@ -59,19 +62,60 @@ export default function TrainGroupAdminPage() {
   };
 
   const dialogControlAdd: DialogControl = {
-    showDialog: () => setAddModalVisibility(true),
-    hideDialog: () => setAddModalVisibility(false),
+    showdialog: () => setAddModalVisibility(true),
+    hidedialog: () => setAddModalVisibility(false),
   };
 
   const dialogControlEdit: DialogControl = {
-    showDialog: () => setAddModalVisibility(true),
-    hideDialog: () => setAddModalVisibility(false),
+    showdialog: () => setEditModalVisibility(true),
+    hidedialog: () => setEditModalVisibility(false),
   };
 
   const OnSaveAdd = async () => {
-    const response = await ApiService.create("trainGroup", trainGroupDto);
+    const dayOfWeekMap: { [key: number]: DayOfWeekEnum } = {
+      0: DayOfWeekEnum.SUNDAY,
+      1: DayOfWeekEnum.MONDAY,
+      2: DayOfWeekEnum.TUESDAY,
+      3: DayOfWeekEnum.WEDNESDAY,
+      4: DayOfWeekEnum.THURSDAY,
+      5: DayOfWeekEnum.FRIDAY,
+      6: DayOfWeekEnum.SATURDAY,
+    };
+
+    // Create a copy of trainGroupDto
+    const updatedTrainGroupDto: TrainGroupDto = {
+      ...trainGroupDto,
+      trainGroupDates: trainGroupDto.trainGroupDates.map(
+        (dateDto: TrainGroupDateDto) => {
+          if (
+            dateDto.recurrenceDayOfWeek !== undefined &&
+            dateDto.fixedDay === null
+          ) {
+            // Use startOn as reference date, or fall back to current date
+            const referenceDate = trainGroupDto.startOn ?? new Date();
+            if (
+              referenceDate instanceof Date &&
+              !isNaN(referenceDate.getTime())
+            ) {
+              const utcDayOfWeek = referenceDate.getUTCDay();
+              return {
+                ...dateDto,
+                recurrenceDayOfWeek: dayOfWeekMap[utcDayOfWeek],
+              };
+            }
+          }
+          return dateDto;
+        }
+      ),
+    };
+
+    const response = await ApiService.create(
+      "trainGroup",
+      updatedTrainGroupDto
+    );
 
     if (response) {
+      dialogControlAdd.hidedialog();
       resetTrainGroupDto();
     }
   };
@@ -84,6 +128,7 @@ export default function TrainGroupAdminPage() {
     );
 
     if (response) {
+      dialogControlEdit.hidedialog();
       resetTrainGroupDto();
     }
   };
@@ -147,7 +192,7 @@ export default function TrainGroupAdminPage() {
                 {timeSlots.map((slot) => (
                   <Button
                     key={slot.trainGroupDateId}
-                    label={slot.displayDate}
+                    label={slot.startOn.toString()}
                     // disabled={!slot.available}
                     onClick={() => handleTimeSlotClick(slot.trainGroupDateId)}
                   />

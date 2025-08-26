@@ -56,6 +56,8 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", "Invalid data provided."));
 
+            if(CustomValidatePOST(entityDto, out string[] errors))
+                return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", errors));
 
             TEntity entity = _mapper.Map<TEntity>(entityDto);
 
@@ -170,7 +172,16 @@ namespace API.Controllers
 
 
 
-
+        protected virtual bool CustomValidatePOST(TEntityAddDto entity, out string[] errors)
+        {
+            errors = Array.Empty<string>();
+            return true;
+        }
+        protected virtual bool CustomValidatePUT(TEntityDto entity, out string[] errors)
+        {
+            errors = Array.Empty<string>();
+            return true;
+        }
 
         protected bool IsUserAuthorized(string action)
         {

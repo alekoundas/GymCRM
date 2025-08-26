@@ -140,7 +140,7 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
               value={options.value}
               onChange={(e: any) => options.editorCallback?.(e.target.value)}
               showIcon={true}
-              minDate={new Date()} // Prevent selecting past dates
+              minDate={new Date(new Date().setHours(0, 0, 0, 0))} // Prevent selecting past dates
               className="w-full"
               dateFormat="dd/mm/yy"
             />
