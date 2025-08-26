@@ -3,7 +3,7 @@ import { TrainGroupParticipantDto } from "./TrainGroupParticipantDto";
 
 export interface TrainGroupDto {
   id: number;
-  name: string;
+  title: string;
   description: string;
   duration: Date;
   startOn: Date;
@@ -15,7 +15,7 @@ export interface TrainGroupDto {
 
 export class TrainGroupDto {
   id: number;
-  name: string;
+  title: string;
   description: string;
   duration: Date;
   startOn: Date;

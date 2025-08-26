@@ -38,7 +38,7 @@ export default function TrainGroupForm({ formMode }: IField) {
           htmlFor="name"
           className="block text-900 font-medium mb-2"
         >
-          Name
+          Title
         </label>
         <InputText
           id="name"
@@ -46,8 +46,9 @@ export default function TrainGroupForm({ formMode }: IField) {
           type="text"
           placeholder="Name"
           className="w-full mb-3"
-          value={trainGroupDto.name}
+          value={trainGroupDto.title}
           onChange={handleChange}
+          disabled={formMode === FormMode.VIEW}
         />
       </div>
 
@@ -65,6 +66,7 @@ export default function TrainGroupForm({ formMode }: IField) {
           className="w-full mb-3"
           value={trainGroupDto.description}
           onChange={handleChange}
+          disabled={formMode === FormMode.VIEW}
         />
       </div>
 
@@ -93,6 +95,7 @@ export default function TrainGroupForm({ formMode }: IField) {
           showIcon
           timeOnly
           icon={() => <i className="pi pi-clock" />}
+          disabled={formMode === FormMode.VIEW}
         />
       </div>
 
@@ -123,6 +126,7 @@ export default function TrainGroupForm({ formMode }: IField) {
           placeholder="HH:mm"
           timeOnly
           icon={() => <i className="pi pi-clock" />}
+          disabled={formMode === FormMode.VIEW}
         />
       </div>
 
@@ -150,6 +154,7 @@ export default function TrainGroupForm({ formMode }: IField) {
           showButtons
           min={1}
           max={100}
+          disabled={formMode === FormMode.VIEW}
         />
       </div>
 
@@ -165,7 +170,7 @@ export default function TrainGroupForm({ formMode }: IField) {
           idValue={trainGroupDto.trainerId}
           isEditable={true}
           isEnabled={
-            (formMode === FormMode.EDIT || formMode === FormMode.ADD) &&
+            formMode !== FormMode.VIEW &&
             TokenService.getRoleName() === "Administrator"
           }
           allowCustom={true}

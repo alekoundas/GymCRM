@@ -4,7 +4,7 @@ namespace Core.Models
 {
     public class TrainGroup : BaseModel
     {
-        public string Name { get; set; } = "";    
+        public string Title { get; set; } = "";    
         public string Description { get; set; } = "";    
         public TimeSpan Duration { get; set; }
         public TimeSpan StartOn { get; set; }
