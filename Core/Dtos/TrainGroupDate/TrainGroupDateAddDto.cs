@@ -6,7 +6,7 @@ namespace Core.Dtos.TrainGroupDate
     public class TrainGroupDateAddDto
     {
         [Required(ErrorMessage = "TrainGroupDateType is required")]
-        public TrainGroupDateTypeEnum TrainGroupDateTypeType { get; set; }
+        public TrainGroupDateTypeEnum TrainGroupDateType { get; set; }
 
         public DateTime? FixedDay { get; set; }
 

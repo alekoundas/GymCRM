@@ -55,9 +55,6 @@ export class TokenService {
     }
 
     try {
-      const decodedTokens = jwtDecode(token); // Use raw decode without typing
-      console.log("Decoded JWT:", decodedTokens);
-
       const decodedToken = jwtDecode<TokenData>(token);
       return decodedToken;
     } catch (error) {

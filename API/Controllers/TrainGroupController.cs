@@ -21,50 +21,40 @@ namespace API.Controllers
 
 
 
-      
 
+        protected override bool CustomValidatePOST(TrainGroupAddDto entityAddDto, out string[] errors)
+        {
+            List<string> errorList = new List<string>();
 
+            foreach (var groupDate in entityAddDto.TrainGroupDates)
+            {
+                if (groupDate.TrainGroupDateType == Core.Enums.TrainGroupDateTypeEnum.FIXED_DAY && groupDate.FixedDay == null)
+                    errorList.Add("Each TrainGroupDate must have at least one of FixedDay, RecurrenceDayOfMonth, or RecurrenceDayOfWeek set.");
+                if (groupDate.TrainGroupDateType == Core.Enums.TrainGroupDateTypeEnum.DAY_OF_MONTH && groupDate.RecurrenceDayOfMonth == null)
+                    errorList.Add("Each TrainGroupDate must have at least one of FixedDay, RecurrenceDayOfMonth, or RecurrenceDayOfWeek set.");
+                if (groupDate.TrainGroupDateType == Core.Enums.TrainGroupDateTypeEnum.DAY_OF_WEEK && groupDate.RecurrenceDayOfWeek == null)
+                    errorList.Add("Each TrainGroupDate must have at least one of FixedDay, RecurrenceDayOfMonth, or RecurrenceDayOfWeek set.");
+            }
+            errors = errorList.ToArray();
+            return errors.Length > 0;
+        }
 
+        protected override bool CustomValidatePUT(TrainGroupDto entityAddDto, out string[] errors)
+        {
+            List<string> errorList = new List<string>();
 
-        //// Override Get to add custom logic
-        //public override async Task<ActionResult<ApiResponse<TrainGroup>>> Get(int id)
-        //{
-        //    // Custom logic (e.g., include related data)
-        //    var repository = _dataService.GetGenericRepository<TrainGroup>();
-        //    var entity = await repository.FindAsync(id, include: source => source
-        //        .Include(t => t.Trainer)
-        //        .Include(t => t.RepeatingParticipants)
-        //        .Include(t => t.TrainGroupDates));
+            foreach (var groupDate in entityAddDto.TrainGroupDates)
+            {
+                if (groupDate.TrainGroupDateType == Core.Enums.TrainGroupDateTypeEnum.FIXED_DAY && groupDate.FixedDay == null)
+                    errorList.Add("Each TrainGroupDate must have at least one of FixedDay, RecurrenceDayOfMonth, or RecurrenceDayOfWeek set.");
+                if (groupDate.TrainGroupDateType == Core.Enums.TrainGroupDateTypeEnum.DAY_OF_MONTH && groupDate.RecurrenceDayOfMonth == null)
+                    errorList.Add("Each TrainGroupDate must have at least one of FixedDay, RecurrenceDayOfMonth, or RecurrenceDayOfWeek set.");
+                if (groupDate.TrainGroupDateType == Core.Enums.TrainGroupDateTypeEnum.DAY_OF_WEEK && groupDate.RecurrenceDayOfWeek == null)
+                    errorList.Add("Each TrainGroupDate must have at least one of FixedDay, RecurrenceDayOfMonth, or RecurrenceDayOfWeek set.");
+            }
+            errors = errorList.ToArray();
+            return errors.Length > 0;
+        }
 
-        //    if (entity == null)
-        //    {
-        //        return NotFound(new ApiResponse<TrainGroup>().SetErrorResponse("TrainGroup", "Requested TrainGroup not found!"));
-        //    }
-
-        //    return Ok(new ApiResponse<TrainGroup>().SetSuccessResponse(entity));
-        //}
-
-        //// Add a custom endpoint
-        //[HttpPost("{id}/add-participant")]
-        //public async Task<ActionResult<ApiResponse<TrainGroup>>> AddParticipant(int id, [FromBody] Guid participantId)
-        //{
-        //    if (!IsUserAuthorized("AddParticipant"))
-        //        return Unauthorized(new ApiResponse<TrainGroup>().SetErrorResponse("Authorization", "User is not authorized to perform this action."));
-
-        //    // Custom logic to add a participant
-        //    // Example: Add participant to RepeatingParticipants
-        //    var trainGroup = await _dataService.GetGenericRepository<TrainGroup>().FindAsync(id);
-        //    if (trainGroup == null)
-        //        return NotFound(new ApiResponse<TrainGroup>().SetErrorResponse("TrainGroup", "Requested TrainGroup not found!"));
-
-        //    var user = await _dataService.GetGenericRepository<User>().FindAsync(participantId);
-        //    if (user == null)
-        //        return NotFound(new ApiResponse<TrainGroup>().SetErrorResponse("User", "Requested User not found!"));
-
-        //    trainGroup.RepeatingParticipants.Add(user);
-        //    await _dataService.SaveChangesAsync();
-
-        //    return Ok(new ApiResponse<TrainGroup>().SetSuccessResponse(trainGroup));
-        //}
     }
 }

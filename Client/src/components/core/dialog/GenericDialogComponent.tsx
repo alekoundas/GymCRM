@@ -7,13 +7,13 @@ import "primeicons/primeicons.css";
 
 // Interface for child component props
 interface DialogChildProps {
-  showDialog?: () => void;
-  hideDialog?: () => void;
+  showdialog?: () => void;
+  hidedialog?: () => void;
 }
 
 export interface DialogControl {
-  showDialog: () => void;
-  hideDialog: () => void;
+  showdialog: () => void;
+  hidedialog: () => void;
 }
 
 interface DialogComponentProps {
@@ -36,7 +36,7 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
       <Button
         label="Cancel"
         icon="pi pi-times"
-        onClick={control.hideDialog}
+        onClick={control.hidedialog}
         className="p-button-text"
       />
       {onSave && (
@@ -56,15 +56,15 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
       visible={visible}
       style={{ width: "50vw" }}
       footer={footer}
-      onHide={control.hideDialog}
+      onHide={control.hidedialog}
       draggable={false}
       resizable={false}
     >
       {React.Children.map(children, (child) =>
         React.isValidElement<DialogChildProps>(child)
           ? React.cloneElement(child, {
-              showDialog: control.showDialog,
-              hideDialog: control.hideDialog,
+              showdialog: control.showdialog,
+              hidedialog: control.hidedialog,
             })
           : child
       )}
