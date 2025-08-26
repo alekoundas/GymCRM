@@ -54,19 +54,6 @@ export default class DataTableService<TEntity> {
     return this.refreshData();
   };
 
-  // public loadData = (urlQuery: string | null) => {
-  //   if (urlQuery)
-  //     try {
-  //       // Decode datatable filters and ordering from base 64
-  //       const dtaTableQuery: DataTableDto<TEntity> = JSON.parse(atob(urlQuery));
-  //       this.dataTableDto = dtaTableQuery;
-  //       this.setDataTableDto({ ...dtaTableQuery });
-  //     } catch (e: any) {
-  //       console.log(e.message);
-  //     }
-  //   this.refreshData();
-  // };
-
   public onSort = (event: DataTableSortEvent) => {
     this.dataTableDto.sorts = [];
     if (event.multiSortMeta) {
@@ -106,7 +93,6 @@ export default class DataTableService<TEntity> {
   };
 
   public onCellEditComplete = (e: ColumnEvent) => {
-    // let { rowData, newValue, field } = e;
     let { rowData, newValue, field, originalEvent: event } = e;
     rowData[field] = newValue;
     event.preventDefault();
@@ -116,7 +102,6 @@ export default class DataTableService<TEntity> {
     let { newData, field, index } = e;
 
     this.dataTableDto.data[index] = newData as TEntity;
-
     this.refreshData();
   };
 
@@ -160,27 +145,4 @@ export default class DataTableService<TEntity> {
       }
     }
   };
-
-  // private setUrlSearchQuery = (response: DataTableDto<TEntity> | null) => {
-  //   if (response) {
-  //     response.data = [];
-
-  //     // Encode datatable filters and ordering to base 64
-  //     var searchQuery = btoa(JSON.stringify(response));
-
-  //     if (searchQuery !== this.defaultUrlSearchQuery)
-  //       window.history.replaceState(
-  //         null,
-  //         "New Page Title",
-  //         `/${this.controller}?search=${searchQuery}`
-  //       );
-  //   }
-  // };
-}
-function value(
-  value: DataTableSortMeta,
-  index: number,
-  array: DataTableSortMeta[]
-): void {
-  throw new Error("Function not implemented.");
 }

@@ -1,8 +1,6 @@
 ﻿using Core.Enums;
 using Core.Models;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Business.Repository
 {

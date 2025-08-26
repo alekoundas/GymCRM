@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using Business;
 using Business.Services;
 using Core.Dtos;
 using Core.Dtos.TrainGroup;
 using Core.Models;
+using DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -22,27 +25,76 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/controller/5
-        //[HttpGet("{id}")]
-        //public override async Task<ActionResult<ApiResponse<TrainGroupDto>>> Get(int id)
-        //{
-        //    if (!IsUserAuthorized("View"))
-        //        return new ApiResponse<TrainGroupDto>().SetErrorResponse("error", "User is not authorized to perform this action.");
+        // PUT: api/controller/5
+        [HttpPut("{id}")]
+        public override async Task<ActionResult<ApiResponse<TrainGroup>>> Put(int id, [FromBody] TrainGroupDto entityDto)
+        {
+            if (!IsUserAuthorized("Edit"))
+                return new ApiResponse<TrainGroup>().SetErrorResponse("error", "User is not authorized to perform this action.");
 
-        //    TrainGroup? entity = await _dataService.TrainGroups
-        //        .Include(x => x.TrainGroupDates)
-        //        .FirstOrDefaultAsync(x => x.Id == id);
+            if (!ModelState.IsValid)
+                return new ApiResponse<TrainGroup>().SetErrorResponse("error", "Invalid data provided.");
 
-        //    TrainGroupDto entityDto = _mapper.Map<TrainGroupDto>(entity);
+            TrainGroup entity = _mapper.Map<TrainGroup>(entityDto);
 
-        //    if (entityDto == null)
-        //    {
-        //        string className = typeof(TrainGroupDto).Name;
-        //        return new ApiResponse<TrainGroupDto>().SetErrorResponse("error", $"Requested {className} not found!");
-        //    }
 
-        //    return new ApiResponse<TrainGroupDto>().SetSuccessResponse(entityDto);
-        //}
+            ApiDbContext dbContext = _dataService.GetDbContext();
+
+            // Load existing entity with related data
+            TrainGroup? existingEntity = await dbContext.Set<TrainGroup>()
+                .Include(x => x.TrainGroupDates)
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (existingEntity == null)
+            {
+                string className = typeof(TrainGroup).Name;
+                return new ApiResponse<TrainGroup>().SetErrorResponse("error", $"Requested {className} not found!");
+            }
+
+
+            // Update scalar properties
+            dbContext.Entry(existingEntity).CurrentValues.SetValues(entity);
+
+            // Map incoming TrainGroupDates to existing ones
+            var incomingDates = entity.TrainGroupDates.ToList();
+            var existingDates = existingEntity.TrainGroupDates.ToList();
+
+            // Remove deleted TrainGroupDates
+            foreach (var existingDate in existingDates)
+            {
+                if (!incomingDates.Any(d => d.Id == existingDate.Id && d.Id > 0))
+                {
+                    dbContext.Remove(existingDate);
+                }
+            }
+
+            // Update or add TrainGroupDates
+            foreach (var incomingDate in incomingDates)
+            {
+                var existingDate = existingDates.FirstOrDefault(d => d.Id == incomingDate.Id && incomingDate.Id > 0);
+                if (existingDate != null)
+                {
+                    // Update existing TrainGroupDate
+                    dbContext.Entry(existingDate).CurrentValues.SetValues(incomingDate);
+                }
+                else
+                {
+                    // Add new TrainGroupDate
+                    incomingDate.Id = 0;
+                    incomingDate.TrainGroupId = entity.Id;
+                    dbContext.Add(incomingDate);
+                    existingEntity.TrainGroupDates.Add(incomingDate);
+                }
+
+
+
+
+            }
+                await dbContext.SaveChangesAsync();
+                dbContext.Dispose();
+                return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity);
+        }
 
 
         protected override bool CustomValidatePOST(TrainGroupAddDto entityAddDto, out string[] errors)

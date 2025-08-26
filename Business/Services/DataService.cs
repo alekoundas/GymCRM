@@ -1,11 +1,8 @@
 ﻿using Business.Repository;
 using Core.Models;
 using DataAccess;
-using DataAccess.Configurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using System.Security.Claims;
 
 namespace Business.Services
 {
@@ -86,7 +83,10 @@ namespace Business.Services
         //{
         //    return new GenericRepository<TEntity>(_dbContextFactory);
         //}
-
+        public ApiDbContext GetDbContext()
+        {
+            return _dbContextFactory.CreateDbContext();
+        }
 
         public void Update<TEntity>(TEntity model)
         {

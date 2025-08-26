@@ -9,6 +9,7 @@ namespace DataAccess.Configurations
         public void Configure(EntityTypeBuilder<TrainGroupDate> builder)
         {
             builder.HasIndex(x => x.Id).IsUnique();
+            builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.HasKey(x => x.Id);
 
             // Properties

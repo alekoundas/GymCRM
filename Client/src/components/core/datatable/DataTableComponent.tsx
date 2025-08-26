@@ -47,6 +47,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   onRowEditComplete,
   onRowEditCancel,
   onButtonClick,
+  onAfterDataLoaded,
   triggerRefreshData,
   triggerRequestData,
 }: IField<TEntity>) {
@@ -54,17 +55,15 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   const [dataTableDto, setDataTableDto] =
     useState<DataTableDto<TEntity>>(dataTable);
 
-  // const dataTableService = new DataTableService(
-  //   controller,
-  //   dataTable,
-  //   setLoading,
-  //   null,
-  //   formMode,
-  //   onAfterDataLoaded
-  // );
-  const onAfterDataLoaded = (
+  const afterDataLoaded = (
     data: DataTableDto<TEntity> | null
   ): DataTableDto<TEntity> | null => {
+    // if parent has set the onAfterDataLoaded, call parent
+    if (onAfterDataLoaded) {
+      return onAfterDataLoaded(data);
+    }
+
+    // Else do default action
     if (data) {
       setDataTableDto(data);
     }
@@ -77,8 +76,17 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     setLoading,
     null,
     formMode,
-    onAfterDataLoaded
+    afterDataLoaded
   );
+
+  // Initialize
+  React.useEffect(() => {
+    if (formMode === FormMode.ADD) {
+      setLoading(false);
+    } else {
+      dataTableService.loadData(null);
+    }
+  }, []);
 
   // React.useEffect(() => {
   //   if (triggerRefreshData)
@@ -89,14 +97,6 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   React.useEffect(() => {
     setDataTableDto(dataTable);
   }, [dataTable]);
-
-  React.useEffect(() => {
-    if (formMode === FormMode.ADD) {
-      setLoading(false);
-    } else {
-      dataTableService.loadData(null);
-    }
-  }, []);
 
   const getDataTableColumns = () => {
     const columns = [...dataTableColumns];
@@ -168,7 +168,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
           outlined
           onClick={() => {
             onButtonClick(ButtonTypeEnum.ADD);
-            dataTableService.refreshData();
+            // dataTableService.refreshData();
           }}
         />
       </div>
@@ -180,6 +180,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
       <DataTable
         className="w-full"
         value={dataTableDto.data}
+        // key={"id"}
         lazy
         stripedRows
         emptyMessage="No data found."

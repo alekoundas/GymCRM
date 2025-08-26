@@ -197,9 +197,10 @@ export default function TrainGroupAdminPage() {
                     }
                     // disabled={!slot.available}
                     onClick={() => {
-                      handleTimeSlotClick(slot.trainGroupDateId);
-                      setEditModalVisibility(true);
-                      resetTrainGroupDto(slot.trainGroupDateId);
+                      resetTrainGroupDto(slot.trainGroupDateId).then((x) => {
+                        setEditModalVisibility(true);
+                        handleTimeSlotClick(slot.trainGroupDateId);
+                      });
                     }}
                   />
                 ))}

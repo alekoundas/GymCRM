@@ -2,8 +2,10 @@
 using Core.Models;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Business.Repository
 {
@@ -357,6 +359,24 @@ namespace Business.Repository
             Dispose();
             return result;
         }
+
+        //public async Task<TEntity> FindAndUpdateAsync<TProperty>(int id, TEntity updateEntity, Expression<Func<TEntity, TProperty>> navigationProperty)
+        //{
+
+        //    ApiDbContext dbContext = _contextFactory.CreateDbContext();
+        //    TEntity existingEntity = await dbContext.Set<TEntity>()
+        //        .Include(navigationProperty)
+        //        .FilterEqualsByColumn("Id",id)
+        //        .FirstAsync();
+
+
+        //    dbContext.Entry(existingEntity).CurrentValues.SetValues(updateEntity);
+        //    await dbContext.SaveChangesAsync();
+
+        //    dbContext.Dispose();
+        //    Dispose();
+        //    return existingEntity;
+        //}
 
 
 

@@ -8,7 +8,7 @@ interface TrainGroupState {
   setTrainGroupDto: (data: TrainGroupDto) => void;
   updateTrainGroupDto: (updates: Partial<TrainGroupDto>) => void;
   addTrainGroupDate: (newRow: TrainGroupDateDto) => void;
-  resetTrainGroupDto: (id?: number) => void;
+  resetTrainGroupDto: (id?: number) => Promise<any>;
 }
 
 export const useTrainGroupStore = create<TrainGroupState>((set) => ({
@@ -38,8 +38,8 @@ export const useTrainGroupStore = create<TrainGroupState>((set) => ({
     })),
   resetTrainGroupDto: async (id?: number) => {
     if (id)
-      await ApiService.get<TrainGroupDto>("TrainGroup", id).then((value) =>
-        value ? set({ trainGroupDto: value }) : null
+      return await ApiService.get<TrainGroupDto>("TrainGroup", id).then(
+        (value) => (value ? set({ trainGroupDto: value }) : null)
       );
     else
       set({

@@ -30,6 +30,7 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
     }[]
   >([]);
 
+  useEffect(() => {}, []);
   const [datatableDto, setDatatableDto] = useState<
     DataTableDto<TrainGroupDateDto>
   >({
@@ -238,6 +239,16 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
     setEditingRows(rows);
   };
 
+  const onAfterDataLoaded = (data: DataTableDto<TrainGroupDateDto> | null) => {
+    if (data) {
+      trainGroupDto.trainGroupDates = data.data;
+      setTrainGroupDto(trainGroupDto);
+      data.data = [];
+    }
+    return data;
+    // consditingRows(rows);
+  };
+
   const onRowEditComplete = (e: any) => {
     const { newData, index } = e;
     const updatedDates = [...trainGroupDto.trainGroupDates];
@@ -272,21 +283,19 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
     buttonType: ButtonTypeEnum,
     rowData?: TrainGroupDateDto
   ) => {
-    if (rowData) {
-      // data.indexOf()
-      // setTrainGroupDateDto({ ...rowData });
-    }
     switch (buttonType) {
       case ButtonTypeEnum.VIEW:
         break;
       case ButtonTypeEnum.ADD:
         const newRow: TrainGroupDateDto = {
-          id: (trainGroupDto.trainGroupDates.length + 1) * -1,
+          id:
+            (trainGroupDto.trainGroupDates.filter((x) => x.id < 0).length + 1) *
+            -1,
           trainGroupDateType: TrainGroupDateTypeEnum.FIXED_DAY,
           fixedDay: undefined,
           recurrenceDayOfWeek: undefined,
           recurrenceDayOfMonth: undefined,
-          trainGroupId: trainGroupDto.id > 0 ? trainGroupDto.id : 0,
+          trainGroupId: trainGroupDto.id > 0 ? trainGroupDto.id : -1,
           trainGroupParticipants: [],
           trainGroupCancellationSubscribers: [],
         };
@@ -307,17 +316,18 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
   return (
     <>
       <DataTableComponent
-        onButtonClick={onDataTableClick}
         controller="TrainGroupDate"
-        filterDisplay={DataTableFilterDisplayEnum.ROW}
-        enableAddAction={true}
+        formMode={formMode}
         dataTable={datatableDto}
         dataTableColumns={dataTableColumns}
+        filterDisplay={DataTableFilterDisplayEnum.ROW}
+        enableAddAction={true}
         editMode={DataTableEditModeEnum.ROW}
+        onButtonClick={onDataTableClick}
         onRowEditComplete={onRowEditComplete}
         onRowEditInit={onRowEditInit}
         onRowEditCancel={onRowEditCancel}
-        formMode={formMode}
+        onAfterDataLoaded={onAfterDataLoaded}
       />
     </>
   );
