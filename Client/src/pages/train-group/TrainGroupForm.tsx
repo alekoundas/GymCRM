@@ -45,26 +45,8 @@ export default function TrainGroupForm({ formMode }: IField) {
           name="title"
           type="text"
           placeholder="Ttitle"
-          className="w-full mb-3"
+          className=" mb-4"
           value={trainGroupDto.title}
-          onChange={handleChange}
-          disabled={formMode === FormMode.VIEW}
-        />
-      </div>
-
-      <div className="field">
-        <label
-          htmlFor="description"
-          className="block text-900 font-medium mb-2"
-        >
-          Description
-        </label>
-        <InputTextarea
-          id="description"
-          name="description"
-          placeholder="Description"
-          className="w-full mb-3"
-          value={trainGroupDto.description}
           onChange={handleChange}
           disabled={formMode === FormMode.VIEW}
         />
@@ -149,7 +131,7 @@ export default function TrainGroupForm({ formMode }: IField) {
               },
             })
           }
-          className="w-full"
+          className=""
           inputClassName="border border-gray-300 rounded p-2"
           showButtons
           min={1}
@@ -182,6 +164,24 @@ export default function TrainGroupForm({ formMode }: IField) {
               },
             })
           }
+        />
+      </div>
+
+      <div className="field">
+        <label
+          htmlFor="description"
+          className="block text-900 font-medium mb-2"
+        >
+          Description
+        </label>
+        <InputTextarea
+          id="description"
+          name="description"
+          placeholder="Description"
+          className="w-full mb-3"
+          value={trainGroupDto.description}
+          onChange={handleChange}
+          disabled={formMode === FormMode.VIEW}
         />
       </div>
     </div>

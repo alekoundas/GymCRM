@@ -15,6 +15,7 @@ import Administrator from "./pages/administrator/administrator.tsx";
 import Appointment from "./pages/appointment/Appointment.tsx";
 import TrainGroupAdminCalendarPage from "./pages/train-group/TrainGroupAdminCalendarPage.tsx";
 import TrainGroupAdminPage from "./pages/train-group/TrainGroupAdminPage.tsx";
+import TrainGroupsBookingCalendarPage from "./pages/train-group/TrainGroupsBookingCalendarPage.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -60,7 +61,7 @@ export default function App() {
 
               <Route
                 path="/appointment"
-                element={<Appointment />}
+                element={<TrainGroupsBookingCalendarPage />}
               />
 
               {/* Administrator */}
