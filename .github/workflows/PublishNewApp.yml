@@ -79,12 +79,29 @@ jobs:
             # Clone DB file
             echo "[INFO]: Setting up rclone config"
             echo "${{ secrets.RCLONE_CONFIG }}" | base64 -d > ~/.config/rclone/rclone.conf
-            echo "[INFO]: Download db from gdrive"
-            rclone copy gdrive:/DB_Backups/Damianakos/sqlite.db /root/app/
-            if [ ! -f sqlite.db ]; then
-              echo "[INFO]: Error: sqlite.db not found!"
-              exit 1
+
+            # Check if local sqlite.db exists before renaming and uploading
+            if [ -f sqlite.db ]; then
+              echo "[INFO]: Local sqlite.db found, proceeding with rename and upload"
+              
+              # Rename sqlite.db on Google Drive to include date
+              echo "[INFO]: Renaming sqlite.db on Google Drive"
+              DATE=$(date +%Y%m%d_%H%M%S)
+              rclone moveto gdrive:/DB_Backups/Damianakos/sqlite.db gdrive:/DB_Backups/Damianakos/sqlite_${DATE}.db
+              
+              # Copy local sqlite.db to Google Drive
+              echo "[INFO]: Uploading local sqlite.db to Google Drive"
+              rclone copy sqlite.db gdrive:/DB_Backups/Damianakos/
+              
+            else
+              echo "[INFO]: Download db from gdrive"
+              rclone copy gdrive:/DB_Backups/Damianakos/sqlite.db /root/app/
+              if [ ! -f sqlite.db ]; then
+                echo "[INFO]: Error: sqlite.db not found!"
+                exit 1
+              fi
             fi
+
 
 
 
