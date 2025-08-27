@@ -49,10 +49,15 @@ namespace API.Controllers
             List<TimeSlotResponseDto>? timeSlotRequestDtos = timeslots
                 .Select(x => new TimeSlotResponseDto()
                 {
-                    Duration = x.TrainGroup.Duration, 
+                    Title = x.TrainGroup.Title,
+                    Description = x.TrainGroup.Description,
+                    Duration = x.TrainGroup.Duration,
                     StartOn = x.TrainGroup.StartOn,
+                    TrainerId=x.TrainGroup.TrainerId,
                     TrainGroupId = x.Id,
-                    TrainGroupDateId = x.TrainGroupId
+                    TrainGroupDateId = x.TrainGroupId,
+                    IsAvailable = (x.TrainGroup.MaxParticipants - (x.TrainGroup.RepeatingParticipants.Count + x.TrainGroupParticipants.Count))>0,
+                    SpotsLeft = x.TrainGroup.MaxParticipants - (x.TrainGroup.RepeatingParticipants.Count + x.TrainGroupParticipants.Count),
                 })
                 .ToList();
 

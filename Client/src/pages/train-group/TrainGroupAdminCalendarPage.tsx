@@ -1,9 +1,7 @@
 import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { Card } from "primereact/card";
-import { Dialog } from "primereact/dialog";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { TokenService } from "../../services/TokenService";
 import { FormMode } from "../../enum/FormMode";
 import ApiService from "../../services/ApiService";
@@ -15,19 +13,12 @@ import GenericDialogComponent, {
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import TrainGroupForm from "./TrainGroupForm";
 import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
-import { TrainGroupDto } from "../../model/TrainGroupDto";
-import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
-import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
-import { DateService } from "../../services/DateService";
 
 export default function TrainGroupAdminCalendarPage() {
-  const navigate = useNavigate();
-
   const [isEditModalVisible, setEditModalVisibility] = useState(false); // Dialog visibility
   const [isAddModalVisible, setAddModalVisibility] = useState(false); // Dialog visibility
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<number | null>(null);
   const { resetTrainGroupDto, trainGroupDto } = useTrainGroupStore();
 
   const handleChangeDate = (value: Date) => {
@@ -44,24 +35,6 @@ export default function TrainGroupAdminCalendarPage() {
     );
   };
 
-  const handleTimeSlotClick = (slotId: number) => {
-    setSelectedTimeSlot(slotId);
-  };
-
-  const handleBooking = () => {
-    if (selectedDate && selectedTimeSlot) {
-      const selectedSlot = timeSlots.find(
-        (slot) => slot.trainGroupDateId === selectedTimeSlot
-      );
-      alert(
-        `Booking confirmed for ${selectedDate.toDateString()} at ${
-          selectedSlot?.startOn
-        }`
-      );
-      // Call your API here to book the slot (e.g., POST to api/TrainGroupParticipant)
-    }
-  };
-
   const dialogControlAdd: DialogControl = {
     showdialog: () => setAddModalVisibility(true),
     hidedialog: () => setAddModalVisibility(false),
@@ -72,34 +45,7 @@ export default function TrainGroupAdminCalendarPage() {
     hidedialog: () => setEditModalVisibility(false),
   };
 
-  const OnSaveAdd = async () => {
-    // Update recurrenceDayOfWeek value to UTC
-    // Update recurrenceDayOfMonth value to UTC
-    // const updatedTrainGroupDto: TrainGroupDto = {
-    //   ...trainGroupDto,
-    //   trainGroupDates: trainGroupDto.trainGroupDates.map(
-    //     (dateDto: TrainGroupDateDto) => {
-    //       if (dateDto.recurrenceDayOfWeek) {
-    //         const utcDayOfWeek = DateService.getUTCDayOfWeek(
-    //           dateDto.recurrenceDayOfWeek
-    //         );
-    //         dateDto.recurrenceDayOfWeek = utcDayOfWeek;
-    //         return dateDto;
-    //       }
-
-    //       if (dateDto.recurrenceDayOfMonth) {
-    //         const utcDayOfMonth = DateService.getUTCDayOfMonth(
-    //           dateDto.recurrenceDayOfMonth
-    //         );
-    //         dateDto.recurrenceDayOfMonth = utcDayOfMonth;
-    //         return dateDto;
-    //       }
-
-    //       return dateDto;
-    //     }
-    //   ),
-    // };
-
+  const onSaveAdd = async () => {
     const response = await ApiService.create("trainGroup", trainGroupDto);
 
     if (response) {
@@ -108,34 +54,7 @@ export default function TrainGroupAdminCalendarPage() {
     }
   };
 
-  const OnSaveEdit = async () => {
-    // Update recurrenceDayOfWeek value to UTC
-    // Update recurrenceDayOfMonth value to UTC
-    // const updatedTrainGroupDto: TrainGroupDto = {
-    //   ...trainGroupDto,
-    //   trainGroupDates: trainGroupDto.trainGroupDates.map(
-    //     (dateDto: TrainGroupDateDto) => {
-    //       if (dateDto.recurrenceDayOfWeek) {
-    //         const utcDayOfWeek = DateService.getUTCDayOfWeek(
-    //           dateDto.recurrenceDayOfWeek
-    //         );
-    //         dateDto.recurrenceDayOfWeek = utcDayOfWeek;
-    //         return dateDto;
-    //       }
-
-    //       if (dateDto.recurrenceDayOfMonth) {
-    //         const utcDayOfMonth = DateService.getUTCDayOfMonth(
-    //           dateDto.recurrenceDayOfMonth
-    //         );
-    //         dateDto.recurrenceDayOfMonth = utcDayOfMonth;
-    //         return dateDto;
-    //       }
-
-    //       return dateDto;
-    //     }
-    //   ),
-    // };
-
+  const onSaveEdit = async () => {
     const response = await ApiService.update(
       "trainGroup",
       trainGroupDto,
@@ -150,7 +69,7 @@ export default function TrainGroupAdminCalendarPage() {
 
   return (
     <>
-      <div className="grid w-full ">
+      <div className="grid w-full">
         <div className="col-12 lg:col-6 xl:col-6">
           <Card
             title="Train Groups"
@@ -170,7 +89,7 @@ export default function TrainGroupAdminCalendarPage() {
         {/*                     */}
         {/* Time Slots Section  */}
         {/*                     */}
-        <div className=" col-12  lg:col-6 xl:col-6 ">
+        <div className=" col-12  lg:col-6 xl:col-6">
           <Card
             header={
               <div
@@ -203,24 +122,35 @@ export default function TrainGroupAdminCalendarPage() {
                 No time slots available for this date.
               </p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {timeSlots.map((slot) => (
-                  <Button
-                    key={slot.trainGroupDateId}
-                    label={
-                      new Date(slot.startOn).getHours() +
-                      ":" +
-                      new Date(slot.startOn).getMinutes()
-                    }
-                    // disabled={!slot.available}
-                    onClick={() => {
-                      resetTrainGroupDto(slot.trainGroupDateId).then((x) => {
-                        setEditModalVisibility(true);
-                        handleTimeSlotClick(slot.trainGroupDateId);
-                      });
-                    }}
-                  />
-                ))}
+              <div>
+                <div>
+                  {timeSlots
+                    .map((x) => x.trainGroupId)
+                    .filter(
+                      (value, index, array) => array.indexOf(value) === index // Distinct
+                    )
+                    .map((x) => (
+                      <div></div> // display a list of trainers
+                    ))}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {timeSlots.map((slot) => (
+                    <Button
+                      key={slot.trainGroupDateId}
+                      label={
+                        new Date(slot.startOn).getHours() +
+                        ":" +
+                        new Date(slot.startOn).getMinutes()
+                      }
+                      onClick={() => {
+                        resetTrainGroupDto(slot.trainGroupDateId).then((x) => {
+                          setEditModalVisibility(true);
+                        });
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
             )}
           </Card>
@@ -234,7 +164,7 @@ export default function TrainGroupAdminCalendarPage() {
       <GenericDialogComponent
         visible={isAddModalVisible}
         control={dialogControlAdd}
-        onSave={OnSaveAdd}
+        onSave={onSaveAdd}
       >
         <div className="w-full">
           <TrainGroupForm formMode={FormMode.ADD} />
@@ -248,7 +178,7 @@ export default function TrainGroupAdminCalendarPage() {
       <GenericDialogComponent
         visible={isEditModalVisible}
         control={dialogControlEdit}
-        onSave={OnSaveEdit}
+        onSave={onSaveEdit}
       >
         <div className="w-full">
           <TrainGroupForm formMode={FormMode.EDIT} />
