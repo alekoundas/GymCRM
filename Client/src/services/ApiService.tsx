@@ -138,16 +138,17 @@ export default class ApiService {
       return null;
     }
 
-    if (TokenService.isTokenExpired()) {
-      ToastService.showInfo("Token expired. Attempting to renew.");
-      const isSuccess = await this.refreshUserToken();
-      if (isSuccess) {
-        ToastService.showInfo("Token renewed. Retrying request.");
-        return this.apiFetch(url, method, data);
-      }
-      console.warn("Token refresh failed.");
-      return null;
+    // TODO find out what is wrong with this in published
+    // if (TokenService.isTokenExpired()) {
+    ToastService.showInfo("Token expired. Attempting to renew.");
+    const isSuccess = await this.refreshUserToken();
+    if (isSuccess) {
+      ToastService.showInfo("Token renewed. Retrying request.");
+      return this.apiFetch(url, method, data);
     }
+    console.warn("Token refresh failed.");
+    return null;
+    // }
     console.warn(
       "Received 401 but tokens are not expired. Possible server-side issue."
     );
