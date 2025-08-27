@@ -8,13 +8,13 @@ namespace Core.Dtos.TrainGroupDate
         [Required(ErrorMessage = "TrainGroupDateType is required")]
         public TrainGroupDateTypeEnum TrainGroupDateType { get; set; }
 
+
         public DateTime? FixedDay { get; set; }
+        public DateTime? RecurrenceDayOfMonth { get; set; }
+        public DateTime? RecurrenceDayOfWeek { get; set; }
 
 
-        public DayOfWeekEnum? RecurrenceDayOfWeek { get; set; }
 
 
-        [Range(1, 31, ErrorMessage = "RecurrenceDayOfMonth must be between 1 and 31")]
-        public int? RecurrenceDayOfMonth { get; set; }
     }
 }

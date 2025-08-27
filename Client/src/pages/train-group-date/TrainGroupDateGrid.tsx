@@ -14,6 +14,8 @@ import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
+import { TrainGroupDto } from "../../model/TrainGroupDto";
+import { DateService } from "../../services/DateService";
 
 interface IField {
   formMode: FormMode;
@@ -95,7 +97,7 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
                     trainGroupDateType: e.value,
                     fixedDay:
                       e.value === TrainGroupDateTypeEnum.FIXED_DAY
-                        ? updatedDates[rowIndex].fixedDay || new Date()
+                        ? updatedDates[rowIndex].fixedDay
                         : undefined,
                     recurrenceDayOfWeek:
                       e.value === TrainGroupDateTypeEnum.DAY_OF_WEEK
@@ -131,8 +133,19 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
       filterPlaceholder: "Search",
       style: { width: "20%" },
 
-      body: (rowData: TrainGroupDateDto) =>
-        rowData.fixedDay ? new Date(rowData.fixedDay).toLocaleDateString() : "", // Convert Date to string
+      body: (rowData: TrainGroupDateDto) => {
+        // return rowData.fixedDay; // Convert Date to string
+        if (rowData.fixedDay) {
+          const date = new Date(rowData.fixedDay);
+          return (
+            date.getDate() +
+            "/" +
+            (date.getMonth() + 1) +
+            "/" +
+            date.getFullYear()
+          );
+        }
+      },
       cellEditor: (options: ColumnEditorOptions) => {
         const editingRow = editingRows.filter(
           (x) => x.rowId === options.rowData.id
@@ -145,8 +158,10 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
         ) {
           return (
             <Calendar
-              value={options.value}
-              onChange={(e: any) => options.editorCallback?.(e.target.value)}
+              value={new Date(options.value)}
+              onChange={(e: any) => {
+                options.editorCallback?.(e.target.value);
+              }}
               showIcon={true}
               minDate={new Date(new Date().setHours(0, 0, 0, 0))} // Prevent selecting past dates
               className="w-full"
@@ -163,7 +178,9 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
       filter: formMode !== FormMode.ADD,
       filterPlaceholder: "Search",
       style: { width: "20%" },
-      body: null,
+      body: (rowData: TrainGroupDateDto) => {
+        return DateService.getDayOfWeekFromDate(rowData.recurrenceDayOfWeek);
+      },
       cellEditor: (options: ColumnEditorOptions) => {
         const editingRow = editingRows.filter(
           (x) => x.rowId === options.rowData.id
@@ -176,9 +193,18 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
         ) {
           return (
             <Dropdown
-              value={options.value}
+              value={DateService.getDayOfWeekFromDate(options.value)}
               options={Object.keys(DayOfWeekEnum)}
-              onChange={(e: any) => options.editorCallback?.(e.target.value)}
+              onChange={(e: any) => {
+                if (e.target.value) {
+                  const updatedDate: Date | undefined =
+                    DateService.getDateFromDayOfWeek(e.target.value);
+
+                  if (updatedDate) {
+                    options.editorCallback?.(updatedDate);
+                  }
+                }
+              }}
               placeholder="Select Type"
               className="w-full"
               checkmark={true}
@@ -195,7 +221,10 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
       filter: formMode !== FormMode.ADD,
       filterPlaceholder: "Search",
       style: { width: "20%" },
-      body: null,
+      body: (data: TrainGroupDateDto) => {
+        if (data.recurrenceDayOfMonth)
+          return new Date(data.recurrenceDayOfMonth).getDate();
+      },
       cellEditor: (options: ColumnEditorOptions) => {
         const editingRow = editingRows.filter(
           (x) => x.rowId === options.rowData.id
@@ -208,10 +237,13 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
         ) {
           return (
             <InputNumber
-              value={options.value}
-              onChange={(e: InputNumberChangeEvent) =>
-                options.editorCallback?.(e.value)
-              }
+              value={new Date(options.value).getDate()}
+              onChange={(e: InputNumberChangeEvent) => {
+                if (e.value)
+                  options.editorCallback?.(
+                    new Date(2000, 0, e.value, 0, 0, 0, 0)
+                  );
+              }}
               min={0}
               max={31}
             />
@@ -242,11 +274,34 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
   const onAfterDataLoaded = (data: DataTableDto<TrainGroupDateDto> | null) => {
     if (data) {
       trainGroupDto.trainGroupDates = data.data;
+
+      // Update recurrenceDayOfWeek value to Local
+      // Update recurrenceDayOfMonth value to Local
+      // (trainGroupDto.trainGroupDates = trainGroupDto.trainGroupDates.map(
+      //   (dateDto: TrainGroupDateDto) => {
+      //     if (dateDto.recurrenceDayOfWeek) {
+      //       const utcDayOfWeek = DateService.getLocalDayOfWeek(
+      //         dateDto.recurrenceDayOfWeek
+      //       );
+      //       dateDto.recurrenceDayOfWeek = utcDayOfWeek;
+      //       return dateDto;
+      //     }
+
+      //     if (dateDto.recurrenceDayOfMonth) {
+      //       const utcDayOfMonth = DateService.getLocalDayOfMonth(
+      //         dateDto.recurrenceDayOfMonth
+      //       );
+      //       dateDto.recurrenceDayOfMonth = utcDayOfMonth;
+      //       return dateDto;
+      //     }
+
+      //     return dateDto;
+      //   }
+      // )),
       setTrainGroupDto(trainGroupDto);
       data.data = [];
     }
     return data;
-    // consditingRows(rows);
   };
 
   const onRowEditComplete = (e: any) => {

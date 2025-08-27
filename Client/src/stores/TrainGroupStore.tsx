@@ -14,7 +14,7 @@ interface TrainGroupState {
 export const useTrainGroupStore = create<TrainGroupState>((set) => ({
   trainGroupDto: {
     id: -1,
-    name: "",
+    title: "",
     description: "",
     isRepeating: false,
     duration: new Date(2000, 0, 1, 0, 0, 0),
@@ -45,7 +45,7 @@ export const useTrainGroupStore = create<TrainGroupState>((set) => ({
       set({
         trainGroupDto: {
           id: -1,
-          name: "",
+          title: "",
           description: "",
           duration: new Date(2000, 0, 1, 0, 0, 0),
           startOn: new Date(2000, 0, 1, 0, 0, 0),
