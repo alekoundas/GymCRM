@@ -83,13 +83,13 @@ namespace DataAccess.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
-                    b.Property<TimeSpan>("Duration")
+                    b.Property<DateTime>("Duration")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("MaxParticipants")
                         .HasColumnType("INTEGER");
 
-                    b.Property<TimeSpan>("StartOn")
+                    b.Property<DateTime>("StartOn")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
@@ -164,11 +164,11 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateOnly?>("FixedDay")
+                    b.Property<DateTime?>("FixedDay")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("RecurrenceDayOfMonth")
-                        .HasColumnType("INTEGER");
+                    b.Property<DateTime?>("RecurrenceDayOfMonth")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RecurrenceDayOfWeek")
                         .HasColumnType("TEXT");

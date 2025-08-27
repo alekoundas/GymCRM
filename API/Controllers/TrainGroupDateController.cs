@@ -40,17 +40,17 @@ namespace API.Controllers
             List<TrainGroupDate>? timeslots = await _dataService.TrainGroupDates
                 .Include(x => x.TrainGroup)
                 .Where(x =>
-                    x.FixedDay == selectedDate
-                    || x.RecurrenceDayOfMonth == selectedDate.Day
-                    || (x.RecurrenceDayOfWeek != null && x.RecurrenceDayOfWeek == dayOfWeekEnum))
+                    x.FixedDay == timeSlotRequestDto.SelectedDate
+                    || x.RecurrenceDayOfMonth.Value.Day == timeSlotRequestDto.SelectedDate.Day
+                    || x.RecurrenceDayOfWeek.Value.DayOfWeek == timeSlotRequestDto.SelectedDate.DayOfWeek)
                 .ToListAsync();
 
 
             List<TimeSlotResponseDto>? timeSlotRequestDtos = timeslots
                 .Select(x => new TimeSlotResponseDto()
                 {
-                    Duration = new DateTime(2000, 1, 1, x.TrainGroup.Duration.Hours, x.TrainGroup.Duration.Minutes, 0),
-                    StartOn = new DateTime(2000, 1, 1, x.TrainGroup.StartOn.Hours, x.TrainGroup.StartOn.Minutes, 0),
+                    Duration = x.TrainGroup.Duration, 
+                    StartOn = x.TrainGroup.StartOn,
                     TrainGroupId = x.Id,
                     TrainGroupDateId = x.TrainGroupId
                 })

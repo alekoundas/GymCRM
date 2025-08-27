@@ -1,19 +1,15 @@
 ﻿using Core.Enums;
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace Core.Models
 {
     public class TrainGroupDate : BaseModel
     {
         public TrainGroupDateTypeEnum? TrainGroupDateType { get; set; }
-        public DateOnly? FixedDay { get; set; }
-
-        public DayOfWeekEnum? RecurrenceDayOfWeek { get; set; }
-
-        [Range(1, 31)]
-        public int? RecurrenceDayOfMonth { get; set; }
-
+        
+        public DateTime? FixedDay { get; set; }
+        public DateTime? RecurrenceDayOfWeek { get; set; }
+        public DateTime? RecurrenceDayOfMonth { get; set; }
 
 
         public int TrainGroupId { get; set; }

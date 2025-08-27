@@ -8,8 +8,8 @@ export interface TrainGroupDateDto {
   id: number;
   trainGroupDateType?: TrainGroupDateTypeEnum;
   fixedDay?: Date;
-  recurrenceDayOfWeek?: DayOfWeekEnum;
-  recurrenceDayOfMonth?: number;
+  recurrenceDayOfWeek?: Date;
+  recurrenceDayOfMonth?: Date;
   trainGroupId?: number;
   trainGroup?: TrainGroupDto;
   trainGroupParticipants: TrainGroupParticipantDto[];
@@ -20,8 +20,8 @@ export class TrainGroupDateDto {
   id: number;
   trainGroupDateType?: TrainGroupDateTypeEnum;
   fixedDay?: Date;
-  recurrenceDayOfWeek?: DayOfWeekEnum;
-  recurrenceDayOfMonth?: number;
+  recurrenceDayOfWeek?: Date;
+  recurrenceDayOfMonth?: Date;
   trainGroupId?: number;
   trainGroup?: TrainGroupDto;
   trainGroupParticipants: TrainGroupParticipantDto[] = [];

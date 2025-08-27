@@ -18,6 +18,7 @@ import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
 import { TrainGroupDto } from "../../model/TrainGroupDto";
 import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
 import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
+import { DateService } from "../../services/DateService";
 
 export default function TrainGroupAdminCalendarPage() {
   const navigate = useNavigate();
@@ -72,45 +73,34 @@ export default function TrainGroupAdminCalendarPage() {
   };
 
   const OnSaveAdd = async () => {
-    const dayOfWeekMap: { [key: number]: DayOfWeekEnum } = {
-      0: DayOfWeekEnum.SUNDAY,
-      1: DayOfWeekEnum.MONDAY,
-      2: DayOfWeekEnum.TUESDAY,
-      3: DayOfWeekEnum.WEDNESDAY,
-      4: DayOfWeekEnum.THURSDAY,
-      5: DayOfWeekEnum.FRIDAY,
-      6: DayOfWeekEnum.SATURDAY,
-    };
-
-    // Create a copy of trainGroupDto
     // Update recurrenceDayOfWeek value to UTC
-    const updatedTrainGroupDto: TrainGroupDto = {
-      ...trainGroupDto,
-      trainGroupDates: trainGroupDto.trainGroupDates.map(
-        (dateDto: TrainGroupDateDto) => {
-          if (!dateDto.recurrenceDayOfWeek) {
-            // Use startOn as reference date, or fall back to current date
-            const referenceDate = trainGroupDto.startOn ?? new Date();
-            if (
-              referenceDate instanceof Date &&
-              !isNaN(referenceDate.getTime())
-            ) {
-              const utcDayOfWeek = referenceDate.getUTCDay();
-              return {
-                ...dateDto,
-                recurrenceDayOfWeek: dayOfWeekMap[utcDayOfWeek],
-              };
-            }
-          }
-          return dateDto;
-        }
-      ),
-    };
+    // Update recurrenceDayOfMonth value to UTC
+    // const updatedTrainGroupDto: TrainGroupDto = {
+    //   ...trainGroupDto,
+    //   trainGroupDates: trainGroupDto.trainGroupDates.map(
+    //     (dateDto: TrainGroupDateDto) => {
+    //       if (dateDto.recurrenceDayOfWeek) {
+    //         const utcDayOfWeek = DateService.getUTCDayOfWeek(
+    //           dateDto.recurrenceDayOfWeek
+    //         );
+    //         dateDto.recurrenceDayOfWeek = utcDayOfWeek;
+    //         return dateDto;
+    //       }
 
-    const response = await ApiService.create(
-      "trainGroup",
-      updatedTrainGroupDto
-    );
+    //       if (dateDto.recurrenceDayOfMonth) {
+    //         const utcDayOfMonth = DateService.getUTCDayOfMonth(
+    //           dateDto.recurrenceDayOfMonth
+    //         );
+    //         dateDto.recurrenceDayOfMonth = utcDayOfMonth;
+    //         return dateDto;
+    //       }
+
+    //       return dateDto;
+    //     }
+    //   ),
+    // };
+
+    const response = await ApiService.create("trainGroup", trainGroupDto);
 
     if (response) {
       dialogControlAdd.hidedialog();
@@ -119,6 +109,33 @@ export default function TrainGroupAdminCalendarPage() {
   };
 
   const OnSaveEdit = async () => {
+    // Update recurrenceDayOfWeek value to UTC
+    // Update recurrenceDayOfMonth value to UTC
+    // const updatedTrainGroupDto: TrainGroupDto = {
+    //   ...trainGroupDto,
+    //   trainGroupDates: trainGroupDto.trainGroupDates.map(
+    //     (dateDto: TrainGroupDateDto) => {
+    //       if (dateDto.recurrenceDayOfWeek) {
+    //         const utcDayOfWeek = DateService.getUTCDayOfWeek(
+    //           dateDto.recurrenceDayOfWeek
+    //         );
+    //         dateDto.recurrenceDayOfWeek = utcDayOfWeek;
+    //         return dateDto;
+    //       }
+
+    //       if (dateDto.recurrenceDayOfMonth) {
+    //         const utcDayOfMonth = DateService.getUTCDayOfMonth(
+    //           dateDto.recurrenceDayOfMonth
+    //         );
+    //         dateDto.recurrenceDayOfMonth = utcDayOfMonth;
+    //         return dateDto;
+    //       }
+
+    //       return dateDto;
+    //     }
+    //   ),
+    // };
+
     const response = await ApiService.update(
       "trainGroup",
       trainGroupDto,

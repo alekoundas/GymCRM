@@ -35,16 +35,16 @@ export default function TrainGroupForm({ formMode }: IField) {
     <div className="pr-5 pl-5">
       <div className="field">
         <label
-          htmlFor="name"
+          htmlFor="title"
           className="block text-900 font-medium mb-2"
         >
           Title
         </label>
         <InputText
-          id="name"
-          name="name"
+          id="title"
+          name="title"
           type="text"
-          placeholder="Name"
+          placeholder="Ttitle"
           className="w-full mb-3"
           value={trainGroupDto.title}
           onChange={handleChange}
