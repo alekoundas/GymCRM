@@ -1,9 +1,11 @@
 ﻿
-
+//								//
+//		Entity Framework		//
+//								//
 
 dotnet ef migrations script --project DataAccess
 
- dotnet ef migrations add InitialMigration --project DataAccess --startup-project API
+dotnet ef migrations add InitialMigration --project DataAccess --startup-project API
 
 dotnet ef database update --project DataAccess --startup-project API
 
@@ -12,26 +14,28 @@ dotnet ef database update --project DataAccess --startup-project API
 
 
 
-
-
-
-
-
-
+//					//
+//		React		//
+//					//
 
 // Create vite react app
-	npm create vite@latest my-react-app -- --template react
+npm create vite@latest my-react-app -- --template react
+
+// Run localy
+cd my-react-app
+npm install
+npm run dev
 
 
- cd my-react-app
-  npm install
-  npm run dev
+// Run release
+npm run build
+npm run preview
 
 
 
 
 
-  Test connection string in powershell
+Test connection string in powershell
 PS C:\Users\psych> $conn = New-Object System.Data.SqlClient.SqlConnection
 PS C:\Users\psych> $conn.ConnectionString = "Server=localhost, 1433;Initial Catalog=TVServiceDB;Persist Security Info=False;User ID=sa;Password=P@ssw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 PS C:\Users\psych> $conn.Open()
@@ -40,6 +44,9 @@ PS C:\Users\psych> $conn.Close()
 
 
 
+//									//
+//		Secrets  Explenation		//
+//									//
 
 Github secrets
 
@@ -53,11 +60,14 @@ RCLONE_CONFIG: rclone configuration in base64 format.
 
 
 
+//					//
+//		Rclone		//
+//					//
 
 
 Rclone configure for Google Drive
 
-run command:
+run command: (download rclone)
 rclone config
 
 Choose n for new remote.
@@ -75,5 +85,7 @@ Locate config file:
 C:\Users\psych\AppData\Roaming\rclone
 
 
-Encode rclone.conf as base64: (powershell)
+Run the bellow to encode rclone.conf as base64: (powershell)
 [Convert]::ToBase64String([System.IO.File]::ReadAllBytes("C:\Users\<YourUsername>\AppData\Roaming\rclone\rclone.conf"))
+
+Use result in github secret

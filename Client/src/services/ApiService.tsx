@@ -145,13 +145,18 @@ export default class ApiService {
         ToastService.showInfo("Token renewed. Retrying request.");
         return this.apiFetch(url, method, data);
       }
+      console.warn("Token refresh failed.");
       return null;
     }
+    console.warn(
+      "Received 401 but tokens are not expired. Possible server-side issue."
+    );
     return null;
   }
 
   private static async refreshUserToken(): Promise<boolean> {
     if (this.refreshPromise) {
+      console.debug("Reusing existing token refresh promise.");
       return this.refreshPromise;
     }
 
@@ -170,6 +175,10 @@ export default class ApiService {
           return false;
         }
 
+        console.debug("Sending refresh token request:", {
+          url,
+          refreshTokenDto,
+        });
         const response = await this.apiFetch<
           UserRefreshTokenDto,
           UserRefreshTokenDto
@@ -182,9 +191,18 @@ export default class ApiService {
         const expireDate = new Date(Date.now() + this.TOKEN_EXPIRATION_MS);
         TokenService.setAccessToken(response.data.accessToken);
         TokenService.setRefreshToken(response.data.refreshToken);
-        TokenService.setRefreshTokenExpireDate(expireDate.toString());
+        TokenService.setRefreshTokenExpireDate(expireDate.toISOString()); // Use ISO format for UTC
+        // TokenService.setRefreshTokenExpireDate(expireDate.toString());
+        console.debug(
+          "Token refresh successful, new expiration:",
+          expireDate.toISOString()
+        );
         ToastService.showSuccess("Token refreshed successfully!");
         return true;
+      } catch (error) {
+        console.error("Unexpected error during token refresh:", error);
+        ToastService.showError("Failed to refresh token. Please log in again.");
+        return false;
       } finally {
         this.refreshPromise = null;
       }
@@ -275,7 +293,12 @@ export default class ApiService {
     const expireDate = new Date(Date.now() + this.TOKEN_EXPIRATION_MS);
     TokenService.setAccessToken(result.accessToken);
     TokenService.setRefreshToken(result.refreshToken);
-    TokenService.setRefreshTokenExpireDate(expireDate.toString());
+    // TokenService.setRefreshTokenExpireDate(expireDate.toString());
+    TokenService.setRefreshTokenExpireDate(expireDate.toISOString()); // Use ISO format for UTC
+    console.debug(
+      "Login successful, tokens set, expiration:",
+      expireDate.toISOString()
+    );
     authLogin();
     ToastService.showSuccess("Login successful!");
     return true;
@@ -303,11 +326,12 @@ export default class ApiService {
       ApiResponse<boolean>
     >(url, "POST");
     if (result) {
-      TokenService.logout();
-      authLogout();
       ToastService.showSuccess("Logout successful!");
-    } else {
-      ToastService.showError("Logout failed!");
     }
+    // else {
+    //   ToastService.showError("Logout failed!");
+    // }
+    TokenService.logout();
+    authLogout();
   }
 }
