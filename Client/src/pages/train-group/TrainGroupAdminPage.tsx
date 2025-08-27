@@ -1,14 +1,7 @@
-import { Button } from "primereact/button";
-import { Calendar } from "primereact/calendar";
 import { Card } from "primereact/card";
-import { Dialog } from "primereact/dialog";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { TokenService } from "../../services/TokenService";
 import { FormMode } from "../../enum/FormMode";
 import ApiService from "../../services/ApiService";
-import { TimeSlotRequestDto } from "../../model/TimeSlotRequestDto";
-import { TimeSlotResponseDto } from "../../model/TimeSlotResponseDto";
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
@@ -16,14 +9,11 @@ import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import TrainGroupForm from "./TrainGroupForm";
 import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
 import { TrainGroupDto } from "../../model/TrainGroupDto";
-import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
-import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
 import DataTableComponent from "../../components/core/datatable/DataTableComponent";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
-import { DateService } from "../../services/DateService";
 
 export default function TrainGroupAdminPage() {
   const [isViewModalVisible, setViewModalVisibility] = useState(false); // Dialog visibility
@@ -107,33 +97,6 @@ export default function TrainGroupAdminPage() {
   ];
 
   const OnSaveAdd = async () => {
-    // Update recurrenceDayOfWeek value to UTC
-    // Update recurrenceDayOfMonth value to UTC
-    // const updatedTrainGroupDto: TrainGroupDto = {
-    //   ...trainGroupDto,
-    //   trainGroupDates: trainGroupDto.trainGroupDates.map(
-    //     (dateDto: TrainGroupDateDto) => {
-    //       if (dateDto.recurrenceDayOfWeek) {
-    //         const utcDayOfWeek = DateService.getUTCDayOfWeek(
-    //           dateDto.recurrenceDayOfWeek
-    //         );
-    //         dateDto.recurrenceDayOfWeek = utcDayOfWeek;
-    //         return dateDto;
-    //       }
-
-    //       if (dateDto.recurrenceDayOfMonth) {
-    //         const utcDayOfMonth = DateService.getUTCDayOfMonth(
-    //           dateDto.recurrenceDayOfMonth
-    //         );
-    //         dateDto.recurrenceDayOfMonth = utcDayOfMonth;
-    //         return dateDto;
-    //       }
-
-    //       return dateDto;
-    //     }
-    //   ),
-    // };
-
     const response = await ApiService.create("trainGroup", trainGroupDto);
 
     if (response) {
@@ -143,33 +106,6 @@ export default function TrainGroupAdminPage() {
   };
 
   const OnSaveEdit = async () => {
-    // Update recurrenceDayOfWeek value to UTC
-    // Update recurrenceDayOfMonth value to UTC
-    // const updatedTrainGroupDto: TrainGroupDto = {
-    //   ...trainGroupDto,
-    //   trainGroupDates: trainGroupDto.trainGroupDates.map(
-    //     (dateDto: TrainGroupDateDto) => {
-    //       if (dateDto.recurrenceDayOfWeek) {
-    //         const utcDayOfWeek = DateService.getUTCDayOfWeek(
-    //           dateDto.recurrenceDayOfWeek
-    //         );
-    //         dateDto.recurrenceDayOfWeek = utcDayOfWeek;
-    //         return dateDto;
-    //       }
-
-    //       if (dateDto.recurrenceDayOfMonth) {
-    //         const utcDayOfMonth = DateService.getUTCDayOfMonth(
-    //           dateDto.recurrenceDayOfMonth
-    //         );
-    //         dateDto.recurrenceDayOfMonth = utcDayOfMonth;
-    //         return dateDto;
-    //       }
-
-    //       return dateDto;
-    //     }
-    //   ),
-    // };
-
     const response = await ApiService.update(
       "trainGroup",
       trainGroupDto,
@@ -198,13 +134,11 @@ export default function TrainGroupAdminPage() {
         dialogControlEdit.showdialog();
         break;
       case ButtonTypeEnum.DELETE:
-        // setDeleteDialogVisibility(true);
         break;
       case ButtonTypeEnum.SAVE:
         // triggerFormSave();
         dialogControlAdd.hidedialog();
         dialogControlEdit.hidedialog();
-        // if (onRefreshDataTable.current) onRefreshDataTable.current();
         break;
 
       default:

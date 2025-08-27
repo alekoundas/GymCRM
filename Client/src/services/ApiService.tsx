@@ -11,46 +11,230 @@ import { ToastService } from "./ToastService";
 import { TokenService } from "./TokenService";
 
 export default class ApiService {
-  static serverUrl = "/api/";
+  private static readonly BASE_URL = "/api/";
+  private static readonly TOKEN_EXPIRATION_MS = 604800 * 1000; // 7 days
+  private static refreshPromise: Promise<boolean> | null = null;
+
+  private static buildUrl(
+    controller: string,
+    endpoint: string = "",
+    id?: number | string
+  ): string {
+    let url = `${this.BASE_URL}${controller}`;
+    if (id) url += `/${id}`;
+    if (endpoint) url += `/${endpoint}`;
+    return url;
+  }
+
+  private static showMessages(
+    messages: Record<string, string[]> | undefined,
+    isSuccess: boolean
+  ) {
+    if (!messages) return;
+    const allMessages = Object.values(messages).flat();
+    if (allMessages.length > 1) {
+      const summary = isSuccess
+        ? "Operation completed with messages."
+        : "Multiple errors occurred.";
+      isSuccess
+        ? ToastService.showSuccess(summary)
+        : ToastService.showError(summary);
+      console.log("Messages:", allMessages); // Log details for debugging
+    } else {
+      allMessages.forEach((msg) =>
+        isSuccess ? ToastService.showSuccess(msg) : ToastService.showError(msg)
+      );
+    }
+  }
+
+  private static async apiFetch<TRequest, TResponse>(
+    url: string,
+    method: string,
+    data?: TRequest,
+    retries = 1
+  ): Promise<ApiResponse<TResponse> | null> {
+    const token = LocalStorageService.getAccessToken();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+        body: data ? JSON.stringify(data) : undefined,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.status === 401) {
+        return this.handle401(url, method, token, data);
+      }
+
+      if (response.status === 400) {
+        const result = (await response.json()) as ApiResponse<TResponse>;
+        this.showMessages(result.messages, false);
+        return null;
+      }
+
+      if (response.ok) {
+        return (await response.json()) as ApiResponse<TResponse>;
+      }
+
+      if (response.status >= 500 && retries > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1s before retry
+        return this.apiFetch(url, method, data, retries - 1);
+      }
+
+      ToastService.showError(`API call failed with status ${response.status}`);
+      return null;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof DOMException && error.name === "AbortError") {
+        ToastService.showError("Request timed out.");
+        return null;
+      }
+      if (error instanceof TypeError && retries > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        return this.apiFetch(url, method, data, retries - 1);
+      }
+      ToastService.showError("Network or unexpected error during API call.");
+      console.error(error);
+      return null;
+    }
+  }
+
+  private static async apiRequest<TRequest, TResponse>(
+    url: string,
+    method: string,
+    data?: TRequest
+  ): Promise<TResponse | null> {
+    const response = await this.apiFetch<TRequest, TResponse>(
+      url,
+      method,
+      data
+    );
+    if (!response || !response.isSucceed) {
+      this.showMessages(response?.messages, false);
+      return null;
+    }
+    this.showMessages(response.messages, true);
+    return response.data ?? null;
+  }
+
+  private static async handle401<TRequest, TResponse>(
+    url: string,
+    method: string,
+    token: string | null | undefined,
+    data?: TRequest
+  ): Promise<ApiResponse<TResponse> | null> {
+    if (TokenService.isRefreshTokenExpired()) {
+      ToastService.showWarn("Token expired. Login required.");
+      TokenService.logout();
+      return null;
+    }
+
+    if (TokenService.isTokenExpired()) {
+      ToastService.showInfo("Token expired. Attempting to renew.");
+      const isSuccess = await this.refreshUserToken();
+      if (isSuccess) {
+        ToastService.showInfo("Token renewed. Retrying request.");
+        return this.apiFetch(url, method, data);
+      }
+      return null;
+    }
+    return null;
+  }
+
+  private static async refreshUserToken(): Promise<boolean> {
+    if (this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.refreshPromise = (async () => {
+      try {
+        const url = this.buildUrl("users", "refreshToken");
+        const refreshTokenDto = TokenService.getUserRefreshTokenDto();
+        const token = refreshTokenDto.accessToken;
+        const refreshToken = refreshTokenDto.refreshToken;
+
+        if (!token || !refreshToken) {
+          ToastService.showError(
+            "Invalid or missing token. Please log in again."
+          );
+          TokenService.logout();
+          return false;
+        }
+
+        const response = await this.apiFetch<
+          UserRefreshTokenDto,
+          UserRefreshTokenDto
+        >(url, "POST", refreshTokenDto);
+        if (!response || !response.data) {
+          this.showMessages(response?.messages, false);
+          return false;
+        }
+
+        const expireDate = new Date(Date.now() + this.TOKEN_EXPIRATION_MS);
+        TokenService.setAccessToken(response.data.accessToken);
+        TokenService.setRefreshToken(response.data.refreshToken);
+        TokenService.setRefreshTokenExpireDate(expireDate.toString());
+        ToastService.showSuccess("Token refreshed successfully!");
+        return true;
+      } finally {
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
+  }
 
   public static async get<TEntity>(
     controller: string,
     id: number | string
   ): Promise<TEntity | null> {
-    const url = this.serverUrl + controller + "/" + id;
-    return await this.apiRequest<TEntity, TEntity>(url, "GET");
+    const url = this.buildUrl(controller, "", id);
+    return this.apiRequest<TEntity, TEntity>(url, "GET");
   }
 
   public static async getDataLookup(
     controller: string,
     data: LookupDto
   ): Promise<LookupDto | null> {
-    const url = this.serverUrl + controller + "/Lookup";
-    return await this.apiRequest(url, "POST", data);
+    const url = this.buildUrl(controller, "Lookup");
+    return this.apiRequest<LookupDto, LookupDto>(url, "POST", data);
   }
 
   public static async getDataGrid<TEntity>(
     controller: string,
     data: DataTableDto<TEntity>
   ): Promise<DataTableDto<TEntity> | null> {
-    const url = this.serverUrl + controller + "/GetDataTable";
-    return await this.apiRequest(url, "POST", data);
+    const url = this.buildUrl(controller, "GetDataTable");
+    return this.apiRequest<DataTableDto<TEntity>, DataTableDto<TEntity>>(
+      url,
+      "POST",
+      data
+    );
   }
 
   public static async create<TEntity>(
     controller: string,
     data: TEntity
   ): Promise<TEntity | null> {
-    const url = this.serverUrl + controller;
-    return await this.apiRequest(url, "POST", data);
+    const url = this.buildUrl(controller);
+    return this.apiRequest<TEntity, TEntity>(url, "POST", data);
   }
 
   public static async timeslots(
     endpoint: string,
     data: TimeSlotRequestDto
   ): Promise<TimeSlotResponseDto[] | null> {
-    const url = this.serverUrl + endpoint;
-    return await this.apiRequest<TimeSlotRequestDto, TimeSlotResponseDto[]>(
+    const url = this.buildUrl(endpoint);
+    return this.apiRequest<TimeSlotRequestDto, TimeSlotResponseDto[]>(
       url,
       "POST",
       data
@@ -61,8 +245,8 @@ export default class ApiService {
     controller: string,
     id: number | string
   ): Promise<TEntity | null> {
-    const url = this.serverUrl + controller + "/" + id;
-    return await this.apiRequest(url, "DELETE");
+    const url = this.buildUrl(controller, "", id);
+    return this.apiRequest<TEntity, TEntity>(url, "DELETE");
   }
 
   public static async update<TEntity>(
@@ -70,254 +254,60 @@ export default class ApiService {
     data: TEntity,
     id: number | string
   ): Promise<TEntity | null> {
-    const url = this.serverUrl + controller + "/" + id;
-    return await this.apiRequest(url, "PUT", data);
+    const url = this.buildUrl(controller, "", id);
+    return this.apiRequest<TEntity, TEntity>(url, "PUT", data);
   }
 
   public static async login(
     data: UserLoginRequestDto,
     authLogin: () => void
   ): Promise<boolean> {
-    const url = this.serverUrl + "users/login";
+    const url = this.buildUrl("users", "login");
+    const result = await this.apiRequest<
+      UserLoginRequestDto,
+      UserLoginRequestDto
+    >(url, "POST", data);
+    if (!result) {
+      ToastService.showError("Login failed!");
+      return false;
+    }
 
-    return await this.apiRequest<UserLoginRequestDto, UserLoginRequestDto>(
-      url,
-      "POST",
-      data
-    ).then((result) => {
-      if (result) {
-        const expireDate = new Date(new Date().getTime() + 604800 * 1000);
-
-        TokenService.setAccessToken(result.accessToken);
-        TokenService.setRefreshToken(result.refreshToken);
-        TokenService.setRefreshTokenExpireDate(expireDate.toString());
-        authLogin();
-        var dsfsdf = TokenService.getUserName();
-        ToastService.showSuccess("Login was successfull!");
-        return true;
-      } else {
-        ToastService.showError("Login Failed!");
-        return false;
-      }
-    });
+    const expireDate = new Date(Date.now() + this.TOKEN_EXPIRATION_MS);
+    TokenService.setAccessToken(result.accessToken);
+    TokenService.setRefreshToken(result.refreshToken);
+    TokenService.setRefreshTokenExpireDate(expireDate.toString());
+    authLogin();
+    ToastService.showSuccess("Login successful!");
+    return true;
   }
 
   public static async register(
     data: UserRegisterRequestDto,
     authLogin: () => void
   ): Promise<boolean> {
-    const url = this.serverUrl + "users/register";
-    return await this.apiRequest(url, "POST", data).then((result) => {
-      if (result) {
-        var loginDto = new UserLoginRequestDto();
-        loginDto.userNameOrEmail = data.email;
-        loginDto.password = data.password;
-        ToastService.showSuccess("Register was successfull!");
-        this.login(loginDto, authLogin);
+    const url = this.buildUrl("users", "register");
+    const result = await this.apiRequest(url, "POST", data);
+    if (!result) return false;
 
-        return true;
-      }
-      return false;
-    });
+    const loginDto = new UserLoginRequestDto();
+    loginDto.userNameOrEmail = data.email;
+    loginDto.password = data.password;
+    ToastService.showSuccess("Registration successful!");
+    return this.login(loginDto, authLogin);
   }
 
-  public static async logout(authLogout: () => void) {
-    const url = this.serverUrl + "users/logout";
-    await this.apiRequest<ApiResponse<boolean>, ApiResponse<boolean>>(
-      url,
-      "POST"
-    ).then((result) => {
+  public static async logout(authLogout: () => void): Promise<void> {
+    const url = this.buildUrl("users", "logout");
+    const result = await this.apiRequest<
+      ApiResponse<boolean>,
+      ApiResponse<boolean>
+    >(url, "POST");
+    if (result) {
       TokenService.logout();
       authLogout();
-      if (result) {
-        ToastService.showSuccess("Logout was successfull!");
-      } else {
-        ToastService.showError("Logout Failed!");
-      }
-    });
-  }
-
-  private static async apiRequest<TRequest, TResponse>(
-    url: string,
-    method: string,
-    data?: TRequest
-  ): Promise<TResponse | null> {
-    const token = LocalStorageService.getAccessToken();
-    const response = await this.apiFetch<TRequest, TResponse>(
-      url,
-      method,
-      token,
-      data
-    );
-
-    if (!response || !response.isSucceed) {
-      if (response?.messages) {
-        // Display error messages
-        Object.keys(response.messages).forEach((key) =>
-          response.messages[key].forEach((value) =>
-            ToastService.showError(value)
-          )
-        );
-      }
-      return null; // Explicitly return null for failed requests
-    }
-
-    // Display success messages
-    if (response.messages) {
-      Object.keys(response.messages).forEach((key) =>
-        response.messages[key].forEach((value) =>
-          ToastService.showSuccess(value)
-        )
-      );
-    }
-
-    return response.data ?? null; // Return data or null if data is undefined
-  }
-
-  // private static async refreshUserToken(): Promise<boolean> {
-  //   const url = this.serverUrl + "users/refreshToken";
-  //   var aasdasdf = TokenService.getUserName();
-  //   const refreshTokenDto = TokenService.getUserRefreshTokenDto();
-  //   return await this.apiFetch<UserRefreshTokenDto, UserRefreshTokenDto>(
-  //     url,
-  //     "POST",
-  //     null,
-  //     refreshTokenDto
-  //   ).then((response) => {
-  //     if (!response || !response.data) {
-  //       response?.messages["error"].forEach((x) => ToastService.showError(x));
-  //       //TODO: ennable this to switch to loged out mode
-  //       // TokenService.logout();
-  //       // authLogout();
-  //       return false;
-  //     }
-
-  //     // authLogin();
-  //     TokenService.setAccessToken(response.data.accessToken);
-  //     TokenService.setRefreshToken(response.data.refreshToken);
-  //     TokenService.setRefreshTokenExpireDate(response.toString());
-  //     return true;
-  //   });
-  // }
-
-  private static async refreshUserToken(): Promise<boolean> {
-    const url = this.serverUrl + "users/refreshToken";
-    const refreshTokenDto = TokenService.getUserRefreshTokenDto();
-
-    // Use the accessToken from refreshTokenDto for the Authorization header
-    const token = refreshTokenDto.accessToken;
-
-    if (!token) {
-      console.error("No access token available for refresh.");
-      ToastService.showError("No access token available. Please log in again.");
-      TokenService.logout();
-      return false;
-    }
-
-    return await this.apiFetch<UserRefreshTokenDto, UserRefreshTokenDto>(
-      url,
-      "POST",
-      token, // Pass the access token instead of null
-      refreshTokenDto
-    ).then((response) => {
-      if (!response || !response.data) {
-        response?.messages["error"]?.forEach((x) => ToastService.showError(x));
-        return false;
-      }
-
-      TokenService.setAccessToken(response.data.accessToken);
-      TokenService.setRefreshToken(response.data.refreshToken);
-      // Set refresh token expiration (7 days from now, matching server)
-      const expireDate = new Date(new Date().getTime() + 604800 * 1000);
-      TokenService.setRefreshTokenExpireDate(expireDate.toString());
-      ToastService.showSuccess("Token refreshed successfully!");
-      return true;
-    });
-  }
-
-  private static async handle401<TRequest, Tresponse>(
-    url: string,
-    method: string,
-    token?: string | null,
-    data?: TRequest | null
-  ): Promise<ApiResponse<Tresponse> | null> {
-    // Refresh Token Expired!
-    if (TokenService.isRefreshTokenExpired()) {
-      ToastService.showWarn("Token expired. Login Required.");
-      TokenService.logout();
-      return null;
-    }
-
-    // Access Token Expired!
-    // Try to renew token and re-execute earlier query.
-    if (TokenService.isTokenExpired()) {
-      ToastService.showInfo("Token expired. Trying to renew.");
-      return this.refreshUserToken().then((isSuccess) => {
-        if (isSuccess) {
-          ToastService.showInfo("Renewal success. Re-executing query.");
-
-          token = LocalStorageService.getAccessToken();
-          return this.apiFetch(url, method, token, data);
-        }
-        return null;
-      });
-    }
-    return null;
-  }
-
-  private static async handle400<TEntity>(
-    response?: ApiResponse<TEntity> | null
-  ): Promise<ApiResponse<TEntity> | null> {
-    response?.messages["error"].forEach((x) => ToastService.showError(x));
-
-    return null;
-  }
-
-  private static async apiFetch<TRequest, TResponse>(
-    url: string,
-    method: string,
-    token?: string | null,
-    data?: TRequest | null
-  ): Promise<ApiResponse<TResponse> | null> {
-    try {
-      const response: Response = await fetch(url, {
-        method: method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-        // body: JSON.stringify(data),
-        body: data ? JSON.stringify(data) : undefined, // Avoid sending body for GET requests
-      });
-
-      // Check Refresh and Access Tokens!
-      if (response.status === 401) {
-        return this.handle401(url, method, token, data);
-      }
-
-      if (response.status === 400) {
-        const result = (await response.json()) as ApiResponse<TResponse>;
-        return this.handle400(result);
-      }
-
-      if (response.ok) {
-        const result = (await response.json()) as Promise<
-          ApiResponse<TResponse>
-        >;
-        return result;
-      }
-
-      ToastService.showError(
-        "Something unexpected happend! API call was not successfull..."
-      );
-      return null;
-    } catch (error) {
-      ToastService.showError(
-        "Something unexpected happend! API call was not successfull..."
-      );
-      console.error(error);
-      return null;
+      ToastService.showSuccess("Logout successful!");
+    } else {
+      ToastService.showError("Logout failed!");
     }
   }
 }
