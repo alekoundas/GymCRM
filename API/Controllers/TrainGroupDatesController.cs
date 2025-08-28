@@ -31,18 +31,16 @@ namespace API.Controllers
             if (!IsUserAuthorized("View"))
                 return new ApiResponse<List<TimeSlotResponseDto>>().SetErrorResponse("error", "User is not authorized to perform this action.");
 
-            var aaa = await _dataService.TrainGroupDates.ToListAsync();
 
             DateOnly selectedDate = DateOnly.FromDateTime(timeSlotRequestDto.SelectedDate);
-            string dayOfWeekString = selectedDate.DayOfWeek.ToString();
             DayOfWeekEnum dayOfWeekEnum = (DayOfWeekEnum)selectedDate.DayOfWeek;
 
             List<TrainGroupDate>? timeslots = await _dataService.TrainGroupDates
                 .Include(x => x.TrainGroup)
                 .Where(x =>
                     x.FixedDay == timeSlotRequestDto.SelectedDate
-                    || x.RecurrenceDayOfMonth.Value.Day == timeSlotRequestDto.SelectedDate.Day
-                    || x.RecurrenceDayOfWeek.Value.DayOfWeek == timeSlotRequestDto.SelectedDate.DayOfWeek)
+                    || x.RecurrenceDayOfMonth!.Value.Day == timeSlotRequestDto.SelectedDate.Day
+                    || x.RecurrenceDayOfWeek!.Value.DayOfWeek == timeSlotRequestDto.SelectedDate.DayOfWeek)
                 .ToListAsync();
 
 
@@ -53,11 +51,23 @@ namespace API.Controllers
                     Description = x.TrainGroup.Description,
                     Duration = x.TrainGroup.Duration,
                     StartOn = x.TrainGroup.StartOn,
-                    TrainerId=x.TrainGroup.TrainerId,
+                    TrainerId = x.TrainGroup.TrainerId,
                     TrainGroupId = x.Id,
                     TrainGroupDateId = x.TrainGroupId,
-                    IsAvailable = (x.TrainGroup.MaxParticipants - (x.TrainGroup.RepeatingParticipants.Count + x.TrainGroupParticipants.Count))>0,
-                    SpotsLeft = x.TrainGroup.MaxParticipants - (x.TrainGroup.RepeatingParticipants.Count + x.TrainGroupParticipants.Count),
+                    SpotsLeft =
+                    (
+                        x.TrainGroup.MaxParticipants -
+                        x.TrainGroup.TrainGroupDates
+                        .Where(y =>
+                            y.FixedDay == timeSlotRequestDto.SelectedDate
+                            || (y.RecurrenceDayOfMonth.HasValue? y.RecurrenceDayOfMonth.Value.Day == timeSlotRequestDto.SelectedDate.Day:false)
+                            || (y.RecurrenceDayOfWeek.HasValue? y.RecurrenceDayOfWeek.Value.DayOfWeek == timeSlotRequestDto.SelectedDate.DayOfWeek:false)
+                         )
+                        .SelectMany(y => y.TrainGroupDateParticipants)
+                        .Where(y => y.SelectedDate == null || y.SelectedDate == timeSlotRequestDto.SelectedDate)
+                        .DistinctBy(y => y.UserId)
+                        .Count()
+                    ),
                 })
                 .ToList();
 
@@ -67,45 +77,5 @@ namespace API.Controllers
             return new ApiResponse<List<TimeSlotResponseDto>>().SetSuccessResponse(timeSlotRequestDtos);
         }
 
-        // Override Get to add custom logic
-        //public override async Task<ActionResult<ApiResponse<TrainGroup>>> Get(int id)
-        //{
-        //    // Custom logic (e.g., include related data)
-        //    var repository = _dataService.GetGenericRepository<TrainGroup>();
-        //    var entity = await repository.FindAsync(id, include: source => source
-        //        .Include(t => t.Trainer)
-        //        .Include(t => t.RepeatingParticipants)
-        //        .Include(t => t.TrainGroupDates));
-
-        //    if (entity == null)
-        //    {
-        //        return NotFound(new ApiResponse<TrainGroup>().SetErrorResponse("TrainGroup", "Requested TrainGroup not found!"));
-        //    }
-
-        //    return Ok(new ApiResponse<TrainGroup>().SetSuccessResponse(entity));
-        //}
-
-        //// Add a custom endpoint
-        //[HttpPost("{id}/add-participant")]
-        //public async Task<ActionResult<ApiResponse<TrainGroup>>> AddParticipant(int id, [FromBody] Guid participantId)
-        //{
-        //    if (!IsUserAuthorized("AddParticipant"))
-        //        return Unauthorized(new ApiResponse<TrainGroup>().SetErrorResponse("Authorization", "User is not authorized to perform this action."));
-
-        //    // Custom logic to add a participant
-        //    // Example: Add participant to RepeatingParticipants
-        //    var trainGroup = await _dataService.GetGenericRepository<TrainGroup>().FindAsync(id);
-        //    if (trainGroup == null)
-        //        return NotFound(new ApiResponse<TrainGroup>().SetErrorResponse("TrainGroup", "Requested TrainGroup not found!"));
-
-        //    var user = await _dataService.GetGenericRepository<User>().FindAsync(participantId);
-        //    if (user == null)
-        //        return NotFound(new ApiResponse<TrainGroup>().SetErrorResponse("User", "Requested User not found!"));
-
-        //    trainGroup.RepeatingParticipants.Add(user);
-        //    await _dataService.SaveChangesAsync();
-
-        //    return Ok(new ApiResponse<TrainGroup>().SetSuccessResponse(trainGroup));
-        //}
     }
 }

@@ -14,7 +14,6 @@ namespace Core.Models
         public Guid TrainerId { get; set; } 
         public User Trainer { get; set; } = null!; 
 
-        public virtual ICollection<User> RepeatingParticipants { get; set; } = new Collection<User>();
         public virtual ICollection<TrainGroupDate> TrainGroupDates { get; set; } = new Collection<TrainGroupDate>();
     }
 }

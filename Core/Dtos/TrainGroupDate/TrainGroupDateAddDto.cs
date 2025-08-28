@@ -12,9 +12,5 @@ namespace Core.Dtos.TrainGroupDate
         public DateTime? FixedDay { get; set; }
         public DateTime? RecurrenceDayOfMonth { get; set; }
         public DateTime? RecurrenceDayOfWeek { get; set; }
-
-
-
-
     }
 }

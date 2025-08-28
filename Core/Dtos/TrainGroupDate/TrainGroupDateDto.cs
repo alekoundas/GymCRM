@@ -1,5 +1,4 @@
-﻿using Core.Dtos.TrainGroup;
-using Core.Enums;
+﻿using Core.Enums;
 using Core.Models;
 using System.ComponentModel.DataAnnotations;
 
@@ -23,8 +22,8 @@ namespace Core.Dtos.TrainGroupDate
         //public TrainGroupDto TrainGroup { get; set; } = null!;
 
 
-        public List<TrainGroupParticipantDto> TrainGroupParticipants { get; set; } = new List<TrainGroupParticipantDto>();
+        public List<TrainGroupParticipantDto> TrainGroupDateParticipants { get; set; } = new List<TrainGroupParticipantDto>();
 
-        public List<TrainGroupCancellationSubscriber> TrainGroupCancellationSubscribers { get; set; } = new List<TrainGroupCancellationSubscriber>();
+        public List<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; set; } = new List<TrainGroupDateCancellationSubscriber>();
     }
 }

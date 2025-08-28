@@ -113,7 +113,7 @@ export default function TrainGroupsBookingCalendarPage() {
                         ? "p-button-raised p-button-primary"
                         : "p-button-outlined"
                     }
-                    disabled={!slot.isAvailable}
+                    // disabled={!slot.isAvailable}
                     onClick={() => setSelectedSlot(slot)}
                   />
                 ))}
@@ -151,14 +151,14 @@ export default function TrainGroupsBookingCalendarPage() {
               </p>
               <p>
                 <strong>Available:</strong>{" "}
-                {selectedSlot.isAvailable ? "Yes" : "No"}
+                {selectedSlot.spotsLeft > 0 ? "Yes" : "No"}
               </p>
               <Button
                 label="Book Now"
                 icon="pi pi-check"
                 className="mt-4"
                 onClick={handleBooking}
-                disabled={!selectedSlot.isAvailable}
+                disabled={!(selectedSlot.spotsLeft > 0)}
               />
             </Card>
           )}

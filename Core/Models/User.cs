@@ -12,9 +12,8 @@ namespace Core.Models
 
         // TrainGroup.
         public virtual ICollection<TrainGroup> Trainers { get; set; } = new Collection<TrainGroup>();
-        public virtual ICollection<TrainGroup> RepeatingTrainGroups { get; set; } = new Collection<TrainGroup>();
-        public virtual ICollection<TrainGroupParticipant> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipant>();
-        public virtual ICollection<TrainGroupCancellationSubscriber> TrainGroupCancellationSubscribers { get; set; } = new Collection<TrainGroupCancellationSubscriber>();
+        public virtual ICollection<TrainGroupDateParticipant> TrainGroupDatesParticipant { get; set; } = new Collection<TrainGroupDateParticipant>();
+        public virtual ICollection<TrainGroupDateCancellationSubscriber> TrainGroupDatesCancellationSubscriber { get; set; } = new Collection<TrainGroupDateCancellationSubscriber>();
 
     }
 }
