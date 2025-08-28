@@ -12,6 +12,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import ApiService from "../../../services/ApiService";
 import { LocalStorageService } from "../../../services/LocalStorageService";
 import { ThemeService } from "../../../services/ThemeService";
+import { TokenService } from "../../../services/TokenService";
 
 function NavTop() {
   const { isUserAuthenticated, logout } = useAuth();
@@ -36,7 +37,8 @@ function NavTop() {
       )}
     </a>
   );
-  const items = [
+
+  const items: MenuItem[] = [
     {
       label: "Home",
       icon: "pi pi-home",
@@ -54,6 +56,10 @@ function NavTop() {
     {
       label: "Admin",
       icon: "pi pi-building",
+      visible:
+        TokenService.isUserAllowed("Roles_View") ||
+        TokenService.isUserAllowed("Users_View") ||
+        TokenService.isUserAllowed("TrainGroups_View"),
       command: () => {
         navigate("/administrator");
       },
@@ -107,12 +113,12 @@ function NavTop() {
     //     },
     //   ],
     // },
-    {
-      label: "Contact",
-      icon: "pi pi-envelope",
-      badge: 3,
-      template: itemRenderer,
-    },
+    // {
+    //   label: "Contact",
+    //   icon: "pi pi-envelope",
+    //   badge: 3,
+    //   template: itemRenderer,
+    // },
   ];
 
   const start = (

@@ -45,8 +45,14 @@ namespace DataAccess
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
-                await TrySeedRolesAndClaimsAsync(roleManager);
+                await TrySeedAdminRolesAndClaimsAsync(roleManager);
+                await TrySeedTrainerRolesAndClaimsAsync(roleManager);
+                await TrySeedSimpleUserRolesAndClaimsAsync(roleManager);
+                
                 await TrySeedAdminUserAsync(userManager, roleManager);
+                await TrySeedTrainerUserAsync(userManager, roleManager);
+                await TrySeedSimpleUserUserAsync(userManager, roleManager);
+
             }
             catch (Exception ex)
             {
@@ -55,13 +61,13 @@ namespace DataAccess
             }
         }
 
-        private async Task TrySeedRolesAndClaimsAsync(RoleManager<IdentityRole<Guid>> roleManager)
+        private async Task TrySeedAdminRolesAndClaimsAsync(RoleManager<IdentityRole<Guid>> roleManager)
         {
-            var administratorRole = new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Administrator", NormalizedName = "ADMINISTRATOR" };
+            var role = new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Administrator", NormalizedName = "ADMINISTRATOR" };
 
-            if (!await roleManager.RoleExistsAsync(administratorRole.Name))
+            if (!await roleManager.RoleExistsAsync(role.Name))
             {
-                var roleResult = await roleManager.CreateAsync(administratorRole);
+                var roleResult = await roleManager.CreateAsync(role);
                 if (!roleResult.Succeeded)
                     throw new InvalidOperationException($"Failed to create role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
 
@@ -79,19 +85,77 @@ namespace DataAccess
                     new Claim("Permission", "Users_Add"),
                     new Claim("Permission", "Users_Edit"),
                     new Claim("Permission", "Users_Delete"),
-                    new Claim("Permission", "TrainGroup_View"),
-                    new Claim("Permission", "TrainGroup_Add"),
-                    new Claim("Permission", "TrainGroup_Edit"),
-                    new Claim("Permission", "TrainGroup_Delete"),
-                    new Claim("Permission", "TrainGroupDate_View"),
-                    new Claim("Permission", "TrainGroupDate_Add"),
-                    new Claim("Permission", "TrainGroupDate_Edit"),
-                    new Claim("Permission", "TrainGroupDate_Delete"),
+                    //new Claim("Permission", "Claims_View"),
+                    //new Claim("Permission", "Claims_Add"),
+                    //new Claim("Permission", "Claims_Edit"),
+                    //new Claim("Permission", "Claims_Delete"),
+                    new Claim("Permission", "TrainGroups_View"),
+                    new Claim("Permission", "TrainGroups_Add"),
+                    new Claim("Permission", "TrainGroups_Edit"),
+                    new Claim("Permission", "TrainGroups_Delete"),
+                    new Claim("Permission", "TrainGroupDates_View"),
+                    new Claim("Permission", "TrainGroupDates_Add"),
+                    new Claim("Permission", "TrainGroupDates_Edit"),
+                    new Claim("Permission", "TrainGroupDates_Delete"),
                 };
 
                 foreach (var claim in claims)
                 {
-                    var claimResult = await roleManager.AddClaimAsync(administratorRole, claim);
+                    var claimResult = await roleManager.AddClaimAsync(role, claim);
+                    if (!claimResult.Succeeded)
+                        throw new InvalidOperationException($"Failed to add claim {claim.Value}: {string.Join(", ", claimResult.Errors.Select(e => e.Description))}");
+                }
+            }
+        }
+
+        private async Task TrySeedTrainerRolesAndClaimsAsync(RoleManager<IdentityRole<Guid>> roleManager)
+        {
+            var role = new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Trainer", NormalizedName = "TRAINER" };
+
+            if (!await roleManager.RoleExistsAsync(role.Name))
+            {
+                var roleResult = await roleManager.CreateAsync(role);
+                if (!roleResult.Succeeded)
+                    throw new InvalidOperationException($"Failed to create role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
+
+                var claims = new List<Claim>
+                {
+                    new Claim("Permission", "TrainGroups_View"),
+                    new Claim("Permission", "TrainGroups_Add"),
+                    new Claim("Permission", "TrainGroups_Edit"),
+                    new Claim("Permission", "TrainGroups_Delete"),
+                    new Claim("Permission", "TrainGroupDates_View"),
+                    new Claim("Permission", "TrainGroupDates_Add"),
+                    new Claim("Permission", "TrainGroupDates_Edit"),
+                    new Claim("Permission", "TrainGroupDates_Delete"),
+                };
+
+                foreach (var claim in claims)
+                {
+                    var claimResult = await roleManager.AddClaimAsync(role, claim);
+                    if (!claimResult.Succeeded)
+                        throw new InvalidOperationException($"Failed to add claim {claim.Value}: {string.Join(", ", claimResult.Errors.Select(e => e.Description))}");
+                }
+            }
+        }
+
+        private async Task TrySeedSimpleUserRolesAndClaimsAsync(RoleManager<IdentityRole<Guid>> roleManager)
+        {
+            var role = new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "SimpleUser", NormalizedName = "SIMPLEUSER" };
+
+            if (!await roleManager.RoleExistsAsync(role.Name))
+            {
+                var roleResult = await roleManager.CreateAsync(role);
+                if (!roleResult.Succeeded)
+                    throw new InvalidOperationException($"Failed to create role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
+
+                var claims = new List<Claim>
+                {
+                };
+
+                foreach (var claim in claims)
+                {
+                    var claimResult = await roleManager.AddClaimAsync(role, claim);
                     if (!claimResult.Succeeded)
                         throw new InvalidOperationException($"Failed to add claim {claim.Value}: {string.Join(", ", claimResult.Errors.Select(e => e.Description))}");
                 }
@@ -100,7 +164,7 @@ namespace DataAccess
 
         private async Task TrySeedAdminUserAsync(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
         {
-            var administrator = new User
+            var user = new User
             {
                 Id = Guid.NewGuid(),
                 UserName = "Admin",
@@ -109,20 +173,82 @@ namespace DataAccess
                 LastName = "User"
             };
 
-            if (await userManager.FindByNameAsync(administrator.UserName) == null)
+            if (await userManager.FindByNameAsync(user.UserName) == null)
             {
-                var userResult = await userManager.CreateAsync(administrator, "P@ssw0rd");
+                var userResult = await userManager.CreateAsync(user, "P@ssw0rd");
                 if (!userResult.Succeeded)
                     throw new InvalidOperationException($"Failed to create user: {string.Join(", ", userResult.Errors.Select(e => e.Description))}");
 
                 if (await roleManager.RoleExistsAsync("Administrator"))
                 {
                     // Enforce single role
-                    var currentRoles = await userManager.GetRolesAsync(administrator);
+                    var currentRoles = await userManager.GetRolesAsync(user);
                     if (currentRoles.Any())
-                        await userManager.RemoveFromRolesAsync(administrator, currentRoles);
+                        await userManager.RemoveFromRolesAsync(user, currentRoles);
 
-                    var roleResult = await userManager.AddToRoleAsync(administrator, "Administrator");
+                    var roleResult = await userManager.AddToRoleAsync(user, "Administrator");
+                    if (!roleResult.Succeeded)
+                        throw new InvalidOperationException($"Failed to assign role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
+                }
+            }
+        }
+
+        private async Task TrySeedTrainerUserAsync(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+        {
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                UserName = "Trainer",
+                Email = "Trainer@Trainer.Trainer",
+                FirstName = "Trainer",
+                LastName = "User"
+            };
+
+            if (await userManager.FindByNameAsync(user.UserName) == null)
+            {
+                var userResult = await userManager.CreateAsync(user, "P@ssw0rd");
+                if (!userResult.Succeeded)
+                    throw new InvalidOperationException($"Failed to create user: {string.Join(", ", userResult.Errors.Select(e => e.Description))}");
+
+                if (await roleManager.RoleExistsAsync("Trainer"))
+                {
+                    // Enforce single role
+                    var currentRoles = await userManager.GetRolesAsync(user);
+                    if (currentRoles.Any())
+                        await userManager.RemoveFromRolesAsync(user, currentRoles);
+
+                    var roleResult = await userManager.AddToRoleAsync(user, "Trainer");
+                    if (!roleResult.Succeeded)
+                        throw new InvalidOperationException($"Failed to assign role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
+                }
+            }
+        }
+
+        private async Task TrySeedSimpleUserUserAsync(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+        {
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                UserName = "SimpleUser",
+                Email = "SimpleUser@SimpleUser.SimpleUser",
+                FirstName = "Simple",
+                LastName = "User"
+            };
+
+            if (await userManager.FindByNameAsync(user.UserName) == null)
+            {
+                var userResult = await userManager.CreateAsync(user, "P@ssw0rd");
+                if (!userResult.Succeeded)
+                    throw new InvalidOperationException($"Failed to create user: {string.Join(", ", userResult.Errors.Select(e => e.Description))}");
+
+                if (await roleManager.RoleExistsAsync("SimpleUser"))
+                {
+                    // Enforce single role
+                    var currentRoles = await userManager.GetRolesAsync(user);
+                    if (currentRoles.Any())
+                        await userManager.RemoveFromRolesAsync(user, currentRoles);
+
+                    var roleResult = await userManager.AddToRoleAsync(user, "SimpleUser");
                     if (!roleResult.Succeeded)
                         throw new InvalidOperationException($"Failed to assign role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
                 }

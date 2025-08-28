@@ -58,6 +58,7 @@ namespace API.Controllers
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
+
         public async Task<ApiResponse<bool>> Update(Guid id, UserUpdateRequestDto request)
         {
             if (id != request.Id)

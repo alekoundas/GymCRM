@@ -12,12 +12,12 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
-    public class TrainGroupDateController : GenericController<TrainGroupDate, TrainGroupDateDto, TrainGroupDateAddDto>
+    public class TrainGroupDatesController : GenericController<TrainGroupDate, TrainGroupDateDto, TrainGroupDateAddDto>
     {
         private readonly IDataService _dataService;
         //private readonly ILogger<TrainGroupDateController> _logger;
 
-        public TrainGroupDateController(IDataService dataService, IMapper mapper) : base(dataService, mapper)
+        public TrainGroupDatesController(IDataService dataService, IMapper mapper) : base(dataService, mapper)
         {
             _dataService = dataService;
         }
