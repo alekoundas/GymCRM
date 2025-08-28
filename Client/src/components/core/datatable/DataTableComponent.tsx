@@ -49,7 +49,6 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   onButtonClick,
   onAfterDataLoaded,
   triggerRefreshData,
-  triggerRequestData,
 }: IField<TEntity>) {
   const [loading, setLoading] = useState(true);
   const [dataTableDto, setDataTableDto] =
@@ -60,7 +59,10 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   ): DataTableDto<TEntity> | null => {
     // if parent has set the onAfterDataLoaded, call parent
     if (onAfterDataLoaded) {
-      return onAfterDataLoaded(data);
+      var dataResponse = onAfterDataLoaded(data);
+      if (dataResponse) {
+        setDataTableDto(dataResponse);
+      }
     }
 
     // Else do default action
@@ -88,45 +90,48 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     }
   }, []);
 
-  // React.useEffect(() => {
-  //   if (triggerRefreshData)
-  //     triggerRefreshData.current = dataTableService.refreshData;
-  // }, [triggerRefreshData]);
+  React.useEffect(() => {
+    if (triggerRefreshData)
+      triggerRefreshData.current = dataTableService.refreshData;
+  }, [triggerRefreshData]);
 
   // Sync dataTableDto with dataTable prop when it changes
   React.useEffect(() => {
-    setDataTableDto(dataTable);
+    if (dataTable.data.length > 0) setDataTableDto(dataTable);
   }, [dataTable]);
 
   const getDataTableColumns = () => {
     const columns = [...dataTableColumns];
 
     // In case Actions column already exists dont add it
-    if (columns.every((x) => x.header !== "Actions")) {
-      // In case editMode is set, add Edit inline button
-      if (editMode === DataTableEditModeEnum.ROW)
-        columns.push({
-          field: "",
-          header: "Actions",
-          sortable: false,
-          filter: false,
-          filterPlaceholder: "",
-          style: { width: "10%" },
-          body: null,
-          editor: true, // enables row edit
-        });
-      // In case editMode is NOT set, add View,Edit,Delete buttons
-      else if (enableGridRowActions)
-        columns.push({
-          field: "",
-          header: "Actions",
-          sortable: false,
-          filter: false,
-          filterPlaceholder: "",
-          style: { width: "20%" },
-          body: gridRowActions,
-        });
+    if (columns.filter((x) => x.header === "Actions")[0]) {
+      return columns;
     }
+
+    // In case editMode is set, add Edit inline button
+    if (editMode === DataTableEditModeEnum.ROW)
+      columns.push({
+        field: "",
+        header: "Actions",
+        sortable: false,
+        filter: false,
+        filterPlaceholder: "",
+        style: { width: "10%" },
+        body: null,
+        editor: true, // enables row edit
+      });
+
+    // In case editMode is NOT set, add View,Edit,Delete buttons
+    if (enableGridRowActions)
+      columns.push({
+        field: "",
+        header: "Actions",
+        sortable: false,
+        filter: false,
+        filterPlaceholder: "",
+        style: { width: "20%" },
+        body: gridRowActions,
+      });
     return columns;
   };
 

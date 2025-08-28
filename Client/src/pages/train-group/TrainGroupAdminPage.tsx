@@ -16,26 +16,25 @@ import { DataTableColumns } from "../../model/datatable/DataTableColumns";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 
 export default function TrainGroupAdminPage() {
-  const [isViewModalVisible, setViewModalVisibility] = useState(false); // Dialog visibility
-  const [isAddModalVisible, setAddModalVisibility] = useState(false); // Dialog visibility
-  const [isEditModalVisible, setEditModalVisibility] = useState(false); // Dialog visibility
-
   const { trainGroupDto, resetTrainGroupDto, setTrainGroupDto } =
     useTrainGroupStore();
+  const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
+  const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
+  const [isEditDialogVisible, setEditDialogVisibility] = useState(false); // Dialog visibility
 
   const dialogControlView: DialogControl = {
-    showdialog: () => setViewModalVisibility(true),
-    hidedialog: () => setViewModalVisibility(false),
+    showDialog: () => setViewDialogVisibility(true),
+    hideDialog: () => setViewDialogVisibility(false),
   };
 
   const dialogControlAdd: DialogControl = {
-    showdialog: () => setAddModalVisibility(true),
-    hidedialog: () => setAddModalVisibility(false),
+    showDialog: () => setAddDialogVisibility(true),
+    hideDialog: () => setAddDialogVisibility(false),
   };
 
   const dialogControlEdit: DialogControl = {
-    showdialog: () => setEditModalVisibility(true),
-    hidedialog: () => setEditModalVisibility(false),
+    showDialog: () => setEditDialogVisibility(true),
+    hideDialog: () => setEditDialogVisibility(false),
   };
 
   const datatableDto: DataTableDto<TrainGroupDto> = {
@@ -100,7 +99,7 @@ export default function TrainGroupAdminPage() {
     const response = await ApiService.create("trainGroup", trainGroupDto);
 
     if (response) {
-      dialogControlAdd.hidedialog();
+      dialogControlAdd.hideDialog();
       resetTrainGroupDto();
     }
   };
@@ -113,7 +112,7 @@ export default function TrainGroupAdminPage() {
     );
 
     if (response) {
-      dialogControlEdit.hidedialog();
+      dialogControlEdit.hideDialog();
       resetTrainGroupDto();
     }
   };
@@ -125,20 +124,21 @@ export default function TrainGroupAdminPage() {
     if (rowData) setTrainGroupDto({ ...rowData });
     switch (buttonType) {
       case ButtonTypeEnum.VIEW:
-        dialogControlView.showdialog();
+        dialogControlView.showDialog();
         break;
       case ButtonTypeEnum.ADD:
-        dialogControlAdd.showdialog();
+        resetTrainGroupDto();
+        dialogControlAdd.showDialog();
         break;
       case ButtonTypeEnum.EDIT:
-        dialogControlEdit.showdialog();
+        dialogControlEdit.showDialog();
         break;
       case ButtonTypeEnum.DELETE:
         break;
       case ButtonTypeEnum.SAVE:
         // triggerFormSave();
-        dialogControlAdd.hidedialog();
-        dialogControlEdit.hidedialog();
+        dialogControlAdd.hideDialog();
+        dialogControlEdit.hideDialog();
         break;
 
       default:
@@ -148,7 +148,7 @@ export default function TrainGroupAdminPage() {
 
   return (
     <>
-      <Card title="Makers">
+      <Card title="Train Groups">
         <div className="card">
           <DataTableComponent
             dataTable={datatableDto}
@@ -164,12 +164,12 @@ export default function TrainGroupAdminPage() {
         </div>
       </Card>
 
-      {/*                                     */}
+      {/*                                      */}
       {/*           View Train Group           */}
-      {/*                                     */}
+      {/*                                      */}
 
       <GenericDialogComponent
-        visible={isViewModalVisible}
+        visible={isViewDialogVisible}
         control={dialogControlView}
       >
         <div className="w-full">
@@ -183,7 +183,7 @@ export default function TrainGroupAdminPage() {
       {/*                                     */}
 
       <GenericDialogComponent
-        visible={isAddModalVisible}
+        visible={isAddDialogVisible}
         control={dialogControlAdd}
         onSave={OnSaveAdd}
       >
@@ -197,7 +197,7 @@ export default function TrainGroupAdminPage() {
       {/*          Edit Train Group           */}
       {/*                                     */}
       <GenericDialogComponent
-        visible={isEditModalVisible}
+        visible={isEditDialogVisible}
         control={dialogControlEdit}
         onSave={OnSaveEdit}
       >

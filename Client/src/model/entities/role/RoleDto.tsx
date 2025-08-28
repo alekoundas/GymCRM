@@ -1,6 +1,6 @@
-import { ClaimDto } from "./ClaimDto";
+import { ClaimDto } from "../../ClaimDto";
 
-export interface IdentityRoleDto {
+export interface RoleDto {
   [key: string]: any;
   id: string;
   name: string;
@@ -9,7 +9,7 @@ export interface IdentityRoleDto {
   claims: ClaimDto[];
 }
 
-export class IdentityRoleDto {
+export class RoleDto {
   id: string = "";
   name: string = "";
   normalizedName: string = "";

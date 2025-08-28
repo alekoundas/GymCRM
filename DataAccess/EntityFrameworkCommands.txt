@@ -33,7 +33,9 @@ npm run preview
 
 
 
-
+//									//
+//		Connection string test		//
+//									//
 
 Test connection string in powershell
 PS C:\Users\psych> $conn = New-Object System.Data.SqlClient.SqlConnection

@@ -5,10 +5,10 @@ import CustomerForm from "../customer/CustomerForm";
 import Customers from "../customer/Customers";
 import MakerModels from "../maker-model/MakerModels";
 import Makers from "../maker/Makers";
-import Roles from "../role/Roles";
 import Users from "../user/Users";
 import TrainGroupAdminPage from "../train-group/TrainGroupAdminPage";
 import TrainGroupAdminCalendarPage from "../train-group/TrainGroupAdminCalendarPage";
+import RolesPage from "../role/RolesPage";
 
 export default function Administrator() {
   return (
@@ -56,7 +56,7 @@ export default function Administrator() {
               />
               <Route
                 path="roles"
-                element={<Roles />}
+                element={<RolesPage />}
               />
 
               {/* Lookups */}
