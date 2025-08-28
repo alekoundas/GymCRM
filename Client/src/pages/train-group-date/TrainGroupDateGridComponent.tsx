@@ -20,7 +20,7 @@ interface IField {
   formMode: FormMode;
 }
 
-export default function TrainGroupDateGrid({ formMode }: IField) {
+export default function TrainGroupDateGridComponent({ formMode }: IField) {
   const { trainGroupDto, addTrainGroupDate, setTrainGroupDto } =
     useTrainGroupStore();
 

@@ -70,13 +70,27 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
       if (child.type === "div") {
         const childProps = child.props as { className?: string; children?: [] };
         if (childProps.children) {
-          return childProps.children.map((x) =>
-            React.cloneElement(x, {
+          // children = 2 and above
+          if (childProps.children.length > 1) {
+            return childProps.children.map((x) =>
+              React.cloneElement(x, {
+                showDialog: control.showDialog,
+                hideDialog: control.hideDialog,
+                toggleDialogSave: setIsSaveEnabled,
+              })
+            );
+          } else {
+            // children = 1
+            var schildProps = child.props as {
+              className?: string;
+              children?: any;
+            };
+            return React.cloneElement(schildProps.children, {
               showDialog: control.showDialog,
               hideDialog: control.hideDialog,
               toggleDialogSave: setIsSaveEnabled,
-            })
-          );
+            });
+          }
         }
       }
     }
