@@ -6,8 +6,8 @@ import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
-import TrainGroupForm from "./TrainGroupForm";
-import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
+import TrainGroupFormComponent from "./TrainGroupFormComponent";
+import TrainGroupDateGridComponent from "../train-group-date/TrainGroupDateGridComponent";
 import { TrainGroupDto } from "../../model/TrainGroupDto";
 import DataTableComponent from "../../components/core/datatable/DataTableComponent";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
@@ -172,8 +172,8 @@ export default function TrainGroupAdminPage() {
         control={dialogControlView}
       >
         <div className="w-full">
-          <TrainGroupForm formMode={FormMode.VIEW} />
-          <TrainGroupDateGrid formMode={FormMode.VIEW} />
+          <TrainGroupFormComponent formMode={FormMode.VIEW} />
+          <TrainGroupDateGridComponent formMode={FormMode.VIEW} />
         </div>
       </GenericDialogComponent>
 
@@ -187,8 +187,8 @@ export default function TrainGroupAdminPage() {
         onSave={OnSaveAdd}
       >
         <div className="w-full">
-          <TrainGroupForm formMode={FormMode.ADD} />
-          <TrainGroupDateGrid formMode={FormMode.ADD} />
+          <TrainGroupFormComponent formMode={FormMode.ADD} />
+          <TrainGroupDateGridComponent formMode={FormMode.ADD} />
         </div>
       </GenericDialogComponent>
 
@@ -201,8 +201,8 @@ export default function TrainGroupAdminPage() {
         onSave={OnSaveEdit}
       >
         <div className="w-full">
-          <TrainGroupForm formMode={FormMode.EDIT} />
-          <TrainGroupDateGrid formMode={FormMode.EDIT} />
+          <TrainGroupFormComponent formMode={FormMode.EDIT} />
+          <TrainGroupDateGridComponent formMode={FormMode.EDIT} />
         </div>
       </GenericDialogComponent>
     </>

@@ -7,14 +7,14 @@ import { Toast } from "primereact/toast";
 
 import NavTop from "./components/core/navbar-top/NavTop.tsx";
 import Home from "./pages/home/Home.tsx";
-import Login from "./pages/user/Login.tsx";
-import Users from "./pages/user/Users.tsx";
-import Register from "./pages/user/Register.tsx";
 import Administrator from "./pages/administrator/administrator.tsx";
 import TrainGroupAdminCalendarPage from "./pages/train-group/TrainGroupAdminCalendarPage.tsx";
 import TrainGroupAdminPage from "./pages/train-group/TrainGroupAdminPage.tsx";
 import TrainGroupsBookingCalendarPage from "./pages/train-group/TrainGroupsBookingCalendarPage.tsx";
 import RolesPage from "./pages/role/RolesPage.tsx";
+import UsersPage from "./pages/user/UsersPage.tsx";
+import LoginPage from "./pages/user/LoginPage.tsx";
+import RegisterPage from "./pages/user/RegisterPage.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -79,16 +79,8 @@ export default function App() {
 
                 {/* Users */}
                 <Route
-                  path="users/login"
-                  element={<Login />}
-                />
-                <Route
-                  path="users/register"
-                  element={<Register />}
-                />
-                <Route
                   path="users"
-                  element={<Users />}
+                  element={<UsersPage />}
                 />
                 <Route
                   path="roles"
@@ -109,11 +101,11 @@ export default function App() {
               {/* Users */}
               <Route
                 path="/users/login"
-                element={<Login />}
+                element={<LoginPage />}
               />
               <Route
                 path="/users/register"
-                element={<Register />}
+                element={<RegisterPage />}
               />
             </Routes>
           </ScrollPanel>

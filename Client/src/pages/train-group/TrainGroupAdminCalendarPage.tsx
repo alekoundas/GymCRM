@@ -11,8 +11,8 @@ import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
-import TrainGroupForm from "./TrainGroupForm";
-import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
+import TrainGroupFormComponent from "./TrainGroupFormComponent";
+import TrainGroupDateGridComponent from "../train-group-date/TrainGroupDateGridComponent";
 
 export default function TrainGroupAdminCalendarPage() {
   const { trainGroupDto, resetTrainGroupDto } = useTrainGroupStore();
@@ -168,8 +168,8 @@ export default function TrainGroupAdminCalendarPage() {
         onSave={onSaveAdd}
       >
         <div className="w-full">
-          <TrainGroupForm formMode={FormMode.ADD} />
-          <TrainGroupDateGrid formMode={FormMode.ADD} />
+          <TrainGroupFormComponent formMode={FormMode.ADD} />
+          <TrainGroupDateGridComponent formMode={FormMode.ADD} />
         </div>
       </GenericDialogComponent>
 
@@ -182,8 +182,8 @@ export default function TrainGroupAdminCalendarPage() {
         onSave={onSaveEdit}
       >
         <div className="w-full">
-          <TrainGroupForm formMode={FormMode.EDIT} />
-          <TrainGroupDateGrid formMode={FormMode.EDIT} />
+          <TrainGroupFormComponent formMode={FormMode.EDIT} />
+          <TrainGroupDateGridComponent formMode={FormMode.EDIT} />
         </div>
       </GenericDialogComponent>
     </>

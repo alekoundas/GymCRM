@@ -12,7 +12,7 @@ interface IField {
   formMode: FormMode;
 }
 
-export default function TrainGroupForm({ formMode }: IField) {
+export default function TrainGroupFormComponent({ formMode }: IField) {
   const { trainGroupDto, updateTrainGroupDto } = useTrainGroupStore();
 
   // Preset TrainerId

@@ -1,14 +1,10 @@
 import { ScrollPanel } from "primereact/scrollpanel";
 import { Route, Routes } from "react-router-dom";
 import NavLeft from "../../components/core/navbar-left/NavLeft";
-import CustomerForm from "../customer/CustomerForm";
-import Customers from "../customer/Customers";
-import MakerModels from "../maker-model/MakerModels";
-import Makers from "../maker/Makers";
-import Users from "../user/Users";
 import TrainGroupAdminPage from "../train-group/TrainGroupAdminPage";
 import TrainGroupAdminCalendarPage from "../train-group/TrainGroupAdminCalendarPage";
 import RolesPage from "../role/RolesPage";
+import UsersPage from "../user/UsersPage";
 
 export default function Administrator() {
   return (
@@ -32,41 +28,14 @@ export default function Administrator() {
                 element={<TrainGroupAdminPage />}
               />
 
-              <Route
-                path="customers"
-                element={<Customers />}
-              />
-              <Route
-                path="customers/add"
-                element={<CustomerForm />}
-              />
-              <Route
-                path="customers/:id/edit"
-                element={<CustomerForm />}
-              />
-              <Route
-                path="customers/:id/view"
-                element={<CustomerForm />}
-              />
-
               {/* Users */}
               <Route
                 path="users"
-                element={<Users />}
+                element={<UsersPage />}
               />
               <Route
                 path="roles"
                 element={<RolesPage />}
-              />
-
-              {/* Lookups */}
-              <Route
-                path="makers"
-                element={<Makers />}
-              />
-              <Route
-                path="makermodels"
-                element={<MakerModels />}
               />
             </Routes>
           </ScrollPanel>

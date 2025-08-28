@@ -19,7 +19,7 @@ export default function TrainGroupsBookingCalendarPage() {
 
     const timeSlotDto = new TimeSlotRequestDto();
     timeSlotDto.selectedDate = value;
-    ApiService.timeslots("TrainGroupDate/TimeSlots", timeSlotDto).then(
+    ApiService.timeslots("TrainGroupDates/TimeSlots", timeSlotDto).then(
       (response) => {
         if (response) {
           setTimeSlots(response);
@@ -37,7 +37,7 @@ export default function TrainGroupsBookingCalendarPage() {
         // userId: userId, // Uncomment and adjust as needed
       };
 
-      ApiService.create("TrainGroupParticipant", bookingDto)
+      ApiService.create("TrainGroups", bookingDto)
         .then((response) => {
           if (response) {
             alert(

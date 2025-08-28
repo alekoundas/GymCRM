@@ -3,10 +3,10 @@ import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import ApiService from "../../services/ApiService";
 import { useAuth } from "../../contexts/AuthContext";
-import { UserRegisterRequestDto } from "../../model/UserRegisterRequestDto";
 import { useNavigate } from "react-router-dom";
+import { UserRegisterRequestDto } from "../../model/entities/user/UserRegisterRequestDto";
 
-export default function Register() {
+export default function RegisterPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 

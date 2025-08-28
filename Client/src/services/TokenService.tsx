@@ -1,6 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import { LocalStorageService } from "./LocalStorageService";
-import { UserRefreshTokenDto } from "../model/UserRefreshTokenDto";
+import { UserRefreshTokenDto } from "../model/entities/user/UserRefreshTokenDto";
 
 interface TokenData {
   exp?: number;

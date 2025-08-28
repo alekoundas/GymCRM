@@ -1,11 +1,11 @@
 import { ApiResponse } from "../model/ApiResponse";
 import { DataTableDto } from "../model/datatable/DataTableDto";
+import { UserLoginRequestDto } from "../model/entities/user/UserLoginRequestDto";
+import { UserRefreshTokenDto } from "../model/entities/user/UserRefreshTokenDto";
+import { UserRegisterRequestDto } from "../model/entities/user/UserRegisterRequestDto";
 import { LookupDto } from "../model/lookup/LookupDto";
 import { TimeSlotRequestDto } from "../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../model/TimeSlotResponseDto";
-import { UserLoginRequestDto } from "../model/UserLoginRequestDto";
-import { UserRefreshTokenDto } from "../model/UserRefreshTokenDto";
-import { UserRegisterRequestDto } from "../model/UserRegisterRequestDto";
 import { LocalStorageService } from "./LocalStorageService";
 import { ToastService } from "./ToastService";
 import { TokenService } from "./TokenService";
