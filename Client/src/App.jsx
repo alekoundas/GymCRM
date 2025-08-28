@@ -86,16 +86,6 @@ export default function App() {
                   path="roles"
                   element={<RolesPage />}
                 />
-
-                {/* Lookups */}
-                {/* <Route
-                  path="makers"
-                  element={<Makers />}
-                />
-                <Route
-                  path="makermodels"
-                  element={<MakerModels />}
-                /> */}
               </Route>
 
               {/* Users */}
@@ -111,70 +101,6 @@ export default function App() {
           </ScrollPanel>
         </div>
       </div>
-      {/* 
-      <div className=" w-full ">
-        <div className="flex flex-row pb-3">
-          <div className="flex flex-column w-full">
-            <NavTop />
-          </div>
-        </div>
-
-        <div className="flex flex-row  gap-3">
-          <div className="flex-column">
-            <NavLeft />
-          </div>
-
-          <div className="flex-column flex-auto ">
-            <ScrollPanel
-              style={{ height: "100%", width: "100%" }}
-              className="custombar2"
-            >
-              <Routes>
-                <Route
-                  path="/"
-                  element={<Home />}
-                />
-
-                <Route
-                  path="/customers"
-                  element={<Customers />}
-                />
-                <Route
-                  path="/customers/add"
-                  element={<CustomerForm />}
-                />
-                <Route
-                  path="/customers/:id/edit"
-                  element={<CustomerForm />}
-                />
-                <Route
-                  path="/customers/:id/view"
-                  element={<CustomerForm />}
-                />
-
-                <Route
-                  path="/tickets"
-                  element={<Tickets />}
-                />
-
-                <Route
-                  path="/users/login"
-                  element={<Login />}
-                />
-                <Route
-                  path="/users"
-                  element={<Users />}
-                />
-
-                <Route
-                  path="/roles"
-                  element={<Roles />}
-                />
-              </Routes>
-            </ScrollPanel>
-          </div>
-        </div>
-      </div> */}
     </>
   );
 }

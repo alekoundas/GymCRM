@@ -58,6 +58,9 @@ export default function TrainGroupsBookingCalendarPage() {
 
   return (
     <>
+      {/*                  */}
+      {/*     Calendar     */}
+      {/*                  */}
       <div className="grid w-full">
         <div className="col-12 lg:col-6 xl:col-6">
           <Card
@@ -75,6 +78,9 @@ export default function TrainGroupsBookingCalendarPage() {
           </Card>
         </div>
 
+        {/*                  */}
+        {/*     Timeslots    */}
+        {/*                  */}
         <div className="col-12 lg:col-6 xl:col-6">
           <Card
             header={
@@ -115,7 +121,9 @@ export default function TrainGroupsBookingCalendarPage() {
             )}
           </Card>
 
-          {/* Selected Slot Info and Booking */}
+          {/*                       */}
+          {/*     Timeslot Info     */}
+          {/*                       */}
           {selectedSlot && (
             <Card
               title="Selected Time Slot Details"

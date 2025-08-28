@@ -6,7 +6,7 @@ interface RoleStoreState {
   roleDto: RoleDto;
   setRoleDto: (data: RoleDto) => void;
   updateRoleDto: (updates: Partial<RoleDto>) => void;
-  resetRoleDto: (id?: number) => Promise<any>;
+  resetRoleDto: () => void;
 }
 
 export const useRoleStore = create<RoleStoreState>((set) => ({
@@ -22,20 +22,15 @@ export const useRoleStore = create<RoleStoreState>((set) => ({
     set((state) => ({
       roleDto: { ...state.roleDto, ...updates },
     })),
-  resetRoleDto: async (id?: number) => {
-    if (id)
-      return await ApiService.get<RoleDto>("roles", id).then((value) =>
-        value ? set({ roleDto: value }) : null
-      );
-    else
-      set({
-        roleDto: {
-          id: "",
-          name: "",
-          normalizedName: "",
-          concurrencyStamp: "",
-          claims: [],
-        },
-      });
+  resetRoleDto: () => {
+    set({
+      roleDto: {
+        id: "",
+        name: "",
+        normalizedName: "",
+        concurrencyStamp: "",
+        claims: [],
+      },
+    });
   },
 }));
