@@ -69,6 +69,9 @@ export default function TrainGroupAdminCalendarPage() {
 
   return (
     <>
+      {/*                  */}
+      {/*     Calendar     */}
+      {/*                  */}
       <div className="grid w-full">
         <div className="col-12 lg:col-6 xl:col-6">
           <Card
@@ -86,9 +89,9 @@ export default function TrainGroupAdminCalendarPage() {
           </Card>
         </div>
 
-        {/*                     */}
-        {/* Time Slots Section  */}
-        {/*                     */}
+        {/*                  */}
+        {/*     Timeslots    */}
+        {/*                  */}
         <div className=" col-12  lg:col-6 xl:col-6">
           <Card
             header={
@@ -101,20 +104,18 @@ export default function TrainGroupAdminCalendarPage() {
                 }}
               >
                 <h2 style={{ margin: 0 }}>Available Timeslots</h2>
-                {TokenService.isUserAllowed("TrainGroup_Add") && (
-                  <Button
-                    className="m-2"
-                    type="button"
-                    icon="pi pi-plus"
-                    label="Add"
-                    outlined
-                    visible={TokenService.isUserAllowed("TrainGroup_Add")}
-                    onClick={() => {
-                      setAddModalVisibility(true);
-                      resetTrainGroupDto();
-                    }}
-                  />
-                )}
+                <Button
+                  className="m-2"
+                  type="button"
+                  icon="pi pi-plus"
+                  label="Add"
+                  outlined
+                  visible={TokenService.isUserAllowed("TrainGroups_Add")}
+                  onClick={() => {
+                    setAddModalVisibility(true);
+                    resetTrainGroupDto();
+                  }}
+                />
               </div>
             }
           >
@@ -140,9 +141,15 @@ export default function TrainGroupAdminCalendarPage() {
                     <Button
                       key={slot.trainGroupDateId}
                       label={
-                        new Date(slot.startOn).getHours() +
+                        (new Date(slot.startOn).getHours().toString().length ===
+                        1
+                          ? "0" + new Date(slot.startOn).getHours().toString()
+                          : new Date(slot.startOn).getHours()) +
                         ":" +
-                        new Date(slot.startOn).getMinutes()
+                        (new Date(slot.startOn).getMinutes().toString()
+                          .length === 1
+                          ? "0" + new Date(slot.startOn).getMinutes().toString()
+                          : new Date(slot.startOn).getMinutes())
                       }
                       onClick={() => {
                         resetTrainGroupDto(slot.trainGroupDateId).then((x) => {

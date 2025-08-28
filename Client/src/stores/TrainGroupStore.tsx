@@ -38,7 +38,7 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
     })),
   resetTrainGroupDto: async (id?: number) => {
     if (id)
-      return await ApiService.get<TrainGroupDto>("TrainGroup", id).then(
+      return await ApiService.get<TrainGroupDto>("TrainGroups", id).then(
         (value) => (value ? set({ trainGroupDto: value }) : null)
       );
     else
