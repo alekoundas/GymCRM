@@ -233,6 +233,7 @@ namespace API.Controllers
 
         // POST: api/Users/Logout
         [HttpPost("Logout")]
+        [Authorize]
         public async Task<ApiResponse<bool>> Logout()
         {
             if (User.Identity?.IsAuthenticated == null || !User.Identity.IsAuthenticated)
