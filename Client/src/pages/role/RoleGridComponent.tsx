@@ -153,8 +153,6 @@ export default function RoleGridComponent({
         break;
       case ButtonTypeEnum.DELETE:
         break;
-      case ButtonTypeEnum.SAVE:
-        break;
 
       default:
         break;

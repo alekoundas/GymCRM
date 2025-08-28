@@ -1,5 +1,5 @@
 import { Card } from "primereact/card";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FormMode } from "../../enum/FormMode";
 import ApiService from "../../services/ApiService";
 import GenericDialogComponent, {
@@ -18,6 +18,8 @@ import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 export default function TrainGroupAdminPage() {
   const { trainGroupDto, resetTrainGroupDto, setTrainGroupDto } =
     useTrainGroupStore();
+  const onRefreshDataTable = useRef<(() => void) | undefined>(undefined);
+
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisibility] = useState(false); // Dialog visibility
@@ -101,6 +103,7 @@ export default function TrainGroupAdminPage() {
     if (response) {
       dialogControlAdd.hideDialog();
       resetTrainGroupDto();
+      if (onRefreshDataTable.current) onRefreshDataTable.current();
     }
   };
 
@@ -114,6 +117,7 @@ export default function TrainGroupAdminPage() {
     if (response) {
       dialogControlEdit.hideDialog();
       resetTrainGroupDto();
+      if (onRefreshDataTable.current) onRefreshDataTable.current();
     }
   };
 
@@ -135,11 +139,6 @@ export default function TrainGroupAdminPage() {
         break;
       case ButtonTypeEnum.DELETE:
         break;
-      case ButtonTypeEnum.SAVE:
-        // triggerFormSave();
-        dialogControlAdd.hideDialog();
-        dialogControlEdit.hideDialog();
-        break;
 
       default:
         break;
@@ -159,7 +158,7 @@ export default function TrainGroupAdminPage() {
             filterDisplay={DataTableFilterDisplayEnum.ROW}
             enableAddAction={true}
             dataTableColumns={dataTableColumns}
-            // triggerRefreshData={onRefreshDataTable}
+            triggerRefreshData={onRefreshDataTable}
           />
         </div>
       </Card>
