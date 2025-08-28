@@ -9,7 +9,6 @@ export interface TrainGroupDto {
   startOn: Date;
   maxParticipants: number;
   trainerId: string;
-  repeatingParticipants: TrainGroupParticipantDto[];
   trainGroupDates: TrainGroupDateDto[];
 }
 
@@ -21,6 +20,5 @@ export class TrainGroupDto {
   startOn: Date;
   maxParticipants: number;
   trainerId: string;
-  repeatingParticipants: TrainGroupParticipantDto[];
   trainGroupDates: TrainGroupDateDto[];
 }

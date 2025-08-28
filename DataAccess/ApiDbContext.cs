@@ -22,8 +22,8 @@ namespace DataAccess
         public DbSet<TrainGroupDate> TrainGroupDates { get; set; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
         public DbSet<ContactInformation> ContactInformations { get; set; }
-        public DbSet<TrainGroupParticipant> TrainGroupParticipants { get; set; }
-        public DbSet<TrainGroupCancellationSubscriber> TrainGroupCancellationSubscribers { get; set; }
+        public DbSet<TrainGroupDateParticipant> TrainGroupParticipants { get; set; }
+        public DbSet<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -46,7 +46,7 @@ namespace DataAccess
             builder.ApplyConfiguration(new TrainGroupDateConfiguration());
             builder.ApplyConfiguration(new ContactInformationConfiguration());
             builder.ApplyConfiguration(new TrainGroupParticipantConfiguration());
-            builder.ApplyConfiguration(new TrainGroupCancellationSubscriberConfiguration());
+            builder.ApplyConfiguration(new TrainGroupDateCancellationSubscriberConfiguration());
         }
 
         public void RunMigrations()

@@ -38,16 +38,16 @@ namespace DataAccess.Configurations
                 .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
 
             // Relationship with RepeatingParticipants (many-to-many with User)
-            builder.HasMany(x => x.RepeatingParticipants)
-                .WithMany(x=>x.RepeatingTrainGroups)
-                .UsingEntity(j => j.ToTable("TrainGroupRepeatingParticipants"));
+            //builder.HasMany(x => x.RepeatingParticipants)
+            //    .WithMany(x=>x.RepeatingTrainGroups)
+            //    .UsingEntity(j => j.ToTable("TrainGroupRepeatingParticipants"));
 
             // Relationship with TrainGroupDates (one-to-many)
-            builder.HasMany(x => x.TrainGroupDates)
-                .WithOne(x => x.TrainGroup)
-                .HasForeignKey(x=> x.TrainGroupId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade); // Delete dates if group is deleted
+            //builder.HasMany(x => x.TrainGroupDates)
+            //    .WithOne(x => x.TrainGroup)
+            //    .HasForeignKey(x=> x.TrainGroupId)
+            //    .IsRequired()
+            //    .OnDelete(DeleteBehavior.Cascade); // Delete dates if group is deleted
         }
     }
 }

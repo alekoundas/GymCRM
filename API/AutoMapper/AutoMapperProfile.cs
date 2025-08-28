@@ -59,11 +59,11 @@ namespace API.AutoMapper
             CreateMap<ContactInformation, ContactInformationDto>();
             CreateMap<ContactInformationDto, ContactInformation>();
 
-            CreateMap<TrainGroupParticipant, TrainGroupParticipantDto>();
-            CreateMap<TrainGroupParticipantDto, TrainGroupParticipant>();
+            CreateMap<TrainGroupDateParticipant, TrainGroupParticipantDto>();
+            CreateMap<TrainGroupParticipantDto, TrainGroupDateParticipant>();
 
-            CreateMap<TrainGroupCancellationSubscriber, TrainGroupCancellationSubscriberDto>();
-            CreateMap<TrainGroupCancellationSubscriberDto, TrainGroupCancellationSubscriber>();
+            CreateMap<TrainGroupDateCancellationSubscriber, TrainGroupCancellationSubscriberDto>();
+            CreateMap<TrainGroupCancellationSubscriberDto, TrainGroupDateCancellationSubscriber>();
 
 
             // Identity mappings.

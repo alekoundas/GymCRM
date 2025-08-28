@@ -4,30 +4,28 @@ using Core.Models;
 
 namespace DataAccess.Configurations
 {
-    public class TrainGroupParticipantConfiguration : IEntityTypeConfiguration<TrainGroupParticipant>
+    public class TrainGroupParticipantConfiguration : IEntityTypeConfiguration<TrainGroupDateParticipant>
     {
-        public void Configure(EntityTypeBuilder<TrainGroupParticipant> builder)
+        public void Configure(EntityTypeBuilder<TrainGroupDateParticipant> builder)
         {
             builder.HasIndex(x => x.Id).IsUnique();
             builder.HasKey(x => x.Id);
 
-            // Properties
-            builder.Property(x => x.SelectedDate)
-                .IsRequired();
+            
 
-            // Relationship with TrainGroupDate (many-to-one)
+            // Relationship with TrainGroupDate (one-to-many)
             builder.HasOne(x => x.TrainGroupDate)
-                .WithMany(x => x.TrainGroupParticipants)
+                .WithMany(x => x.TrainGroupDateParticipants)
                 .HasForeignKey(x => x.TrainGroupDateId)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade); // Delete if parent date is deleted
+                .OnDelete(DeleteBehavior.Cascade); // Delete if parent TrainGroupDate is deleted
 
-            // Relationship with Participant (User)
-            builder.HasOne(x => x.Participant)
-                .WithMany(x=>x.TrainGroupParticipants)
-                .HasForeignKey(x => x.ParticipantId)
+            // Relationship with User (one-to-many)
+            builder.HasOne(x => x.User)
+                .WithMany(x=>x.TrainGroupDatesParticipant)
+                .HasForeignKey(x => x.UserId)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
+                .OnDelete(DeleteBehavior.Cascade); // Delete if user TrainGroupDate is deleted
         }
     }
 }

@@ -109,44 +109,6 @@ namespace DataAccess.Migrations
                     b.ToTable("TrainGroups");
                 });
 
-            modelBuilder.Entity("Core.Models.TrainGroupCancellationSubscriber", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("CancellationSubscriberId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedBy_FullName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedBy_Id")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("SelectedDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TrainGroupDateId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CancellationSubscriberId");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("TrainGroupDateId");
-
-                    b.ToTable("TrainGroupCancellationSubscribers");
-                });
-
             modelBuilder.Entity("Core.Models.TrainGroupDate", b =>
                 {
                     b.Property<int>("Id")
@@ -170,7 +132,7 @@ namespace DataAccess.Migrations
                     b.Property<DateTime?>("RecurrenceDayOfMonth")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("RecurrenceDayOfWeek")
+                    b.Property<DateTime?>("RecurrenceDayOfWeek")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TrainGroupDateType")
@@ -189,7 +151,7 @@ namespace DataAccess.Migrations
                     b.ToTable("TrainGroupDates");
                 });
 
-            modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
+            modelBuilder.Entity("Core.Models.TrainGroupDateCancellationSubscriber", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -206,23 +168,61 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("ParticipantId")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("SelectedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TrainGroupDateId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("ParticipantId");
+                    b.HasIndex("TrainGroupDateId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TrainGroupCancellationSubscribers");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupDateParticipant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SelectedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TrainGroupDateId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.HasIndex("TrainGroupDateId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("TrainGroupParticipants");
                 });
@@ -451,21 +451,6 @@ namespace DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TrainGroupUser", b =>
-                {
-                    b.Property<Guid>("RepeatingParticipantsId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("RepeatingTrainGroupsId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("RepeatingParticipantsId", "RepeatingTrainGroupsId");
-
-                    b.HasIndex("RepeatingTrainGroupsId");
-
-                    b.ToTable("TrainGroupRepeatingParticipants", (string)null);
-                });
-
             modelBuilder.Entity("Core.Models.ContactInformation", b =>
                 {
                     b.HasOne("Core.Models.User", "User")
@@ -488,25 +473,6 @@ namespace DataAccess.Migrations
                     b.Navigation("Trainer");
                 });
 
-            modelBuilder.Entity("Core.Models.TrainGroupCancellationSubscriber", b =>
-                {
-                    b.HasOne("Core.Models.User", "CancellationSubscriber")
-                        .WithMany("TrainGroupCancellationSubscribers")
-                        .HasForeignKey("CancellationSubscriberId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Core.Models.TrainGroupDate", "TrainGroupDate")
-                        .WithMany("TrainGroupCancellationSubscribers")
-                        .HasForeignKey("TrainGroupDateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CancellationSubscriber");
-
-                    b.Navigation("TrainGroupDate");
-                });
-
             modelBuilder.Entity("Core.Models.TrainGroupDate", b =>
                 {
                     b.HasOne("Core.Models.TrainGroup", "TrainGroup")
@@ -518,23 +484,42 @@ namespace DataAccess.Migrations
                     b.Navigation("TrainGroup");
                 });
 
-            modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
+            modelBuilder.Entity("Core.Models.TrainGroupDateCancellationSubscriber", b =>
                 {
-                    b.HasOne("Core.Models.User", "Participant")
-                        .WithMany("TrainGroupParticipants")
-                        .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Core.Models.TrainGroupDate", "TrainGroupDate")
-                        .WithMany("TrainGroupParticipants")
+                        .WithMany("TrainGroupDateCancellationSubscribers")
                         .HasForeignKey("TrainGroupDateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Participant");
+                    b.HasOne("Core.Models.User", "User")
+                        .WithMany("TrainGroupDatesCancellationSubscriber")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("TrainGroupDate");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupDateParticipant", b =>
+                {
+                    b.HasOne("Core.Models.TrainGroupDate", "TrainGroupDate")
+                        .WithMany("TrainGroupDateParticipants")
+                        .HasForeignKey("TrainGroupDateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Models.User", "User")
+                        .WithMany("TrainGroupDatesParticipant")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TrainGroupDate");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -588,21 +573,6 @@ namespace DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TrainGroupUser", b =>
-                {
-                    b.HasOne("Core.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("RepeatingParticipantsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Models.TrainGroup", null)
-                        .WithMany()
-                        .HasForeignKey("RepeatingTrainGroupsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Core.Models.TrainGroup", b =>
                 {
                     b.Navigation("TrainGroupDates");
@@ -610,18 +580,18 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Core.Models.TrainGroupDate", b =>
                 {
-                    b.Navigation("TrainGroupCancellationSubscribers");
+                    b.Navigation("TrainGroupDateCancellationSubscribers");
 
-                    b.Navigation("TrainGroupParticipants");
+                    b.Navigation("TrainGroupDateParticipants");
                 });
 
             modelBuilder.Entity("Core.Models.User", b =>
                 {
                     b.Navigation("ContactInformations");
 
-                    b.Navigation("TrainGroupCancellationSubscribers");
+                    b.Navigation("TrainGroupDatesCancellationSubscriber");
 
-                    b.Navigation("TrainGroupParticipants");
+                    b.Navigation("TrainGroupDatesParticipant");
 
                     b.Navigation("Trainers");
                 });

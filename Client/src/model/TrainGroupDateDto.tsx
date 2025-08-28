@@ -12,8 +12,8 @@ export interface TrainGroupDateDto {
   recurrenceDayOfMonth?: Date;
   trainGroupId?: number;
   trainGroup?: TrainGroupDto;
-  trainGroupParticipants: TrainGroupParticipantDto[];
-  trainGroupCancellationSubscribers: TrainGroupCancellationSubscriberDto[];
+  trainGroupDateParticipants: TrainGroupParticipantDto[];
+  trainGroupDateCancellationSubscribers: TrainGroupCancellationSubscriberDto[];
 }
 
 export class TrainGroupDateDto {
@@ -24,6 +24,7 @@ export class TrainGroupDateDto {
   recurrenceDayOfMonth?: Date;
   trainGroupId?: number;
   trainGroup?: TrainGroupDto;
-  trainGroupParticipants: TrainGroupParticipantDto[] = [];
-  trainGroupCancellationSubscribers: TrainGroupCancellationSubscriberDto[] = [];
+  trainGroupDateParticipants: TrainGroupParticipantDto[] = [];
+  trainGroupDateCancellationSubscribers: TrainGroupCancellationSubscriberDto[] =
+    [];
 }

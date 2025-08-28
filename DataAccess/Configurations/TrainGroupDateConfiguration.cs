@@ -17,21 +17,17 @@ namespace DataAccess.Configurations
             builder.Property(x => x.TrainGroupDateType)
                 .HasConversion<string>();
 
-            // Store enum as string
-            builder.Property(x => x.RecurrenceDayOfWeek)
-                .HasConversion<string>();
-
             builder.Property(x => x.FixedDay)
-                .IsRequired(false); // Nullable
+                .IsRequired(false); 
 
             builder.Property(x => x.RecurrenceDayOfWeek)
                 .IsRequired(false); 
 
             builder.Property(x => x.RecurrenceDayOfMonth)
-                .IsRequired(false); // Nullable, range 1-31 validated by data annotation
+                .IsRequired(false); 
 
 
-            // Relationship with TrainGroup (many-to-one)
+            // Relationship with TrainGroup (one-to-many)
             builder.HasOne(x => x.TrainGroup)
                 .WithMany(x => x.TrainGroupDates)
                 .HasForeignKey(x => x.TrainGroupId)
@@ -39,18 +35,19 @@ namespace DataAccess.Configurations
                 .OnDelete(DeleteBehavior.Cascade); // Delete if parent group is deleted
 
             // Relationship with Participants (one-to-many)
-            builder.HasMany(x => x.TrainGroupParticipants)
-                .WithOne(x => x.TrainGroupDate)
-                .HasForeignKey(x => x.TrainGroupDateId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade); // Delete participants if date is deleted
+            //builder.HasMany(x => x.TrainGroupDateParticipants)
+            //    .WithOne(x => x.TrainGroupDate)
+            //    .HasForeignKey(x => x.TrainGroupDateId)
+            //    .IsRequired()
+            //    .OnDelete(DeleteBehavior.Cascade); // Delete participants if date is deleted
 
             // Relationship with CancellationSubscribers (one-to-many)
-            builder.HasMany(x => x.TrainGroupCancellationSubscribers)
-                .WithOne(x => x.TrainGroupDate)
-                .HasForeignKey(x => x.TrainGroupDateId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade); // Delete subscribers if date is deleted
+            //builder
+            //    .HasMany(x => x.TrainGroupDateCancellationSubscribers)
+            //    .WithOne(x => x.TrainGroupDate)
+            //    .HasForeignKey(x => x.TrainGroupDateId)
+            //    .IsRequired()
+            //    .OnDelete(DeleteBehavior.Cascade); // Delete subscribers if date is deleted
         }
     }
 }

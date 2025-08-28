@@ -4,10 +4,9 @@ export interface TimeSlotResponseDto {
   trainerId: number;
   trainGroupId: number;
   trainGroupDateId: number;
-  spotsLeft: number;
   duration: Date;
   startOn: Date;
-  isAvailable: boolean;
+  spotsLeft: number;
 }
 
 export class TimeSlotResponseDto {
@@ -16,8 +15,7 @@ export class TimeSlotResponseDto {
   trainerId: number;
   trainGroupId: number;
   trainGroupDateId: number;
-  spotsLeft: number;
   duration: Date;
   startOn: Date;
-  isAvailable: boolean;
+  spotsLeft: number;
 }

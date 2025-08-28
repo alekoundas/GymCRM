@@ -15,8 +15,8 @@ namespace Business.Services
         IGenericRepository<TrainGroup> TrainGroups { get; }
         IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
         IGenericRepository<ContactInformation> ContactInformations { get; }
-        IGenericRepository<TrainGroupParticipant> TrainGroupParticipants { get; }
-        IGenericRepository<TrainGroupCancellationSubscriber> TrainGroupCancellationSubscribers { get; }
+        IGenericRepository<TrainGroupDateParticipant> TrainGroupParticipants { get; }
+        IGenericRepository<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; }
 
         // Identity.
         IGenericRepository<IdentityRole<Guid>> Roles { get; }

@@ -12,6 +12,5 @@ namespace Core.Dtos.TrainGroupDate
         public DateTime Duration { get; set; }
         public DateTime StartOn { get; set; }
         public int SpotsLeft { get; set; }
-        public bool IsAvailable { get; set; }
     }
 }
