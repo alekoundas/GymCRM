@@ -8,14 +8,13 @@ import { Toast } from "primereact/toast";
 import NavTop from "./components/core/navbar-top/NavTop.tsx";
 import Home from "./pages/home/Home.tsx";
 import Login from "./pages/user/Login.tsx";
-import Roles from "./pages/role/Roles.tsx";
 import Users from "./pages/user/Users.tsx";
 import Register from "./pages/user/Register.tsx";
 import Administrator from "./pages/administrator/administrator.tsx";
-import Appointment from "./pages/appointment/Appointment.tsx";
 import TrainGroupAdminCalendarPage from "./pages/train-group/TrainGroupAdminCalendarPage.tsx";
 import TrainGroupAdminPage from "./pages/train-group/TrainGroupAdminPage.tsx";
 import TrainGroupsBookingCalendarPage from "./pages/train-group/TrainGroupsBookingCalendarPage.tsx";
+import RolesPage from "./pages/role/RolesPage.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -93,7 +92,7 @@ export default function App() {
                 />
                 <Route
                   path="roles"
-                  element={<Roles />}
+                  element={<RolesPage />}
                 />
 
                 {/* Lookups */}

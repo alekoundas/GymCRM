@@ -15,11 +15,11 @@ import TrainGroupForm from "./TrainGroupForm";
 import TrainGroupDateGrid from "../train-group-date/TrainGroupDateGrid";
 
 export default function TrainGroupAdminCalendarPage() {
+  const { trainGroupDto, resetTrainGroupDto } = useTrainGroupStore();
   const [isEditModalVisible, setEditModalVisibility] = useState(false); // Dialog visibility
   const [isAddModalVisible, setAddModalVisibility] = useState(false); // Dialog visibility
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
-  const { resetTrainGroupDto, trainGroupDto } = useTrainGroupStore();
 
   const handleChangeDate = (value: Date) => {
     setSelectedDate(value);
@@ -36,20 +36,20 @@ export default function TrainGroupAdminCalendarPage() {
   };
 
   const dialogControlAdd: DialogControl = {
-    showdialog: () => setAddModalVisibility(true),
-    hidedialog: () => setAddModalVisibility(false),
+    showDialog: () => setAddModalVisibility(true),
+    hideDialog: () => setAddModalVisibility(false),
   };
 
   const dialogControlEdit: DialogControl = {
-    showdialog: () => setEditModalVisibility(true),
-    hidedialog: () => setEditModalVisibility(false),
+    showDialog: () => setEditModalVisibility(true),
+    hideDialog: () => setEditModalVisibility(false),
   };
 
   const onSaveAdd = async () => {
     const response = await ApiService.create("trainGroup", trainGroupDto);
 
     if (response) {
-      dialogControlAdd.hidedialog();
+      dialogControlAdd.hideDialog();
       resetTrainGroupDto();
     }
   };
@@ -62,7 +62,7 @@ export default function TrainGroupAdminCalendarPage() {
     );
 
     if (response) {
-      dialogControlEdit.hidedialog();
+      dialogControlEdit.hideDialog();
       resetTrainGroupDto();
     }
   };

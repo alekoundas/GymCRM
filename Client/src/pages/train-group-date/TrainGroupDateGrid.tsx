@@ -14,7 +14,6 @@ import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
-import { TrainGroupDto } from "../../model/TrainGroupDto";
 import { DateService } from "../../services/DateService";
 
 interface IField {
@@ -274,30 +273,6 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
   const onAfterDataLoaded = (data: DataTableDto<TrainGroupDateDto> | null) => {
     if (data) {
       trainGroupDto.trainGroupDates = data.data;
-
-      // Update recurrenceDayOfWeek value to Local
-      // Update recurrenceDayOfMonth value to Local
-      // (trainGroupDto.trainGroupDates = trainGroupDto.trainGroupDates.map(
-      //   (dateDto: TrainGroupDateDto) => {
-      //     if (dateDto.recurrenceDayOfWeek) {
-      //       const utcDayOfWeek = DateService.getLocalDayOfWeek(
-      //         dateDto.recurrenceDayOfWeek
-      //       );
-      //       dateDto.recurrenceDayOfWeek = utcDayOfWeek;
-      //       return dateDto;
-      //     }
-
-      //     if (dateDto.recurrenceDayOfMonth) {
-      //       const utcDayOfMonth = DateService.getLocalDayOfMonth(
-      //         dateDto.recurrenceDayOfMonth
-      //       );
-      //       dateDto.recurrenceDayOfMonth = utcDayOfMonth;
-      //       return dateDto;
-      //     }
-
-      //     return dateDto;
-      //   }
-      // )),
       setTrainGroupDto(trainGroupDto);
       data.data = [];
     }
@@ -377,7 +352,10 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
         dataTableColumns={dataTableColumns}
         filterDisplay={DataTableFilterDisplayEnum.ROW}
         enableAddAction={true}
-        editMode={DataTableEditModeEnum.ROW}
+        // editMode={DataTableEditModeEnum.ROW}
+        editMode={
+          formMode !== FormMode.VIEW ? DataTableEditModeEnum.ROW : undefined
+        }
         onButtonClick={onDataTableClick}
         onRowEditComplete={onRowEditComplete}
         onRowEditInit={onRowEditInit}

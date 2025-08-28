@@ -119,6 +119,7 @@ export default function Users() {
     <>
       <Card title="Users">
         <DataTableComponent
+          formMode={FormMode.EDIT}
           onButtonClick={onDataTableClick}
           controller="users"
           enableGridRowActions={true}

@@ -3,7 +3,7 @@ import { TrainGroupDateDto } from "../model/TrainGroupDateDto";
 import { TrainGroupDto } from "../model/TrainGroupDto";
 import ApiService from "../services/ApiService";
 
-interface TrainGroupState {
+interface TrainGroupStoreState {
   trainGroupDto: TrainGroupDto;
   setTrainGroupDto: (data: TrainGroupDto) => void;
   updateTrainGroupDto: (updates: Partial<TrainGroupDto>) => void;
@@ -11,7 +11,7 @@ interface TrainGroupState {
   resetTrainGroupDto: (id?: number) => Promise<any>;
 }
 
-export const useTrainGroupStore = create<TrainGroupState>((set) => ({
+export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
   trainGroupDto: {
     id: -1,
     title: "",
