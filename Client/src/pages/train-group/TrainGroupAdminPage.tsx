@@ -153,7 +153,7 @@ export default function TrainGroupAdminPage() {
             dataTable={datatableDto}
             formMode={FormMode.EDIT}
             onButtonClick={onDataTableClick}
-            controller="TrainGroup"
+            controller="TrainGroups"
             enableGridRowActions={true}
             filterDisplay={DataTableFilterDisplayEnum.ROW}
             enableAddAction={true}

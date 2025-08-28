@@ -344,7 +344,7 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
   return (
     <>
       <DataTableComponent
-        controller="TrainGroupDate"
+        controller="TrainGroupDates"
         formMode={formMode}
         dataTable={datatableDto}
         dataTableColumns={dataTableColumns}
@@ -359,6 +359,7 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
         onRowEditInit={onRowEditInit}
         onRowEditCancel={onRowEditCancel}
         onAfterDataLoaded={onAfterDataLoaded}
+        authorize={true}
       />
     </>
   );

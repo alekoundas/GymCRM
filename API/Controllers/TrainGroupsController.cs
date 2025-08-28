@@ -13,13 +13,13 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
-    public class TrainGroupController : GenericController<TrainGroup, TrainGroupDto, TrainGroupAddDto>
+    public class TrainGroupsController : GenericController<TrainGroup, TrainGroupDto, TrainGroupAddDto>
     {
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         //private readonly ILogger<TrainGroupController> _logger;
 
-        public TrainGroupController(IDataService dataService, IMapper mapper) : base(dataService, mapper)
+        public TrainGroupsController(IDataService dataService, IMapper mapper) : base(dataService, mapper)
         {
             _dataService = dataService;
             _mapper = mapper;

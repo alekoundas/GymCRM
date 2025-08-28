@@ -94,7 +94,9 @@ export class TokenService {
   public static isUserAllowed = (claim: string): boolean => {
     const permissions: string[] = TokenService.getClaim("Permission");
     if (permissions) {
-      const isAllowed = permissions.includes(claim);
+      const isAllowed = permissions
+        .map((x) => x.toLocaleLowerCase())
+        .includes(claim.toLowerCase());
       return isAllowed;
     }
 

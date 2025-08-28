@@ -26,7 +26,7 @@ export default function TrainGroupAdminCalendarPage() {
 
     const timeSlotDto = new TimeSlotRequestDto();
     timeSlotDto.selectedDate = value;
-    ApiService.timeslots("TrainGroupDate/TimeSlots", timeSlotDto).then(
+    ApiService.timeslots("TrainGroupDates/TimeSlots", timeSlotDto).then(
       (response) => {
         if (response) {
           setTimeSlots(response);
@@ -46,7 +46,7 @@ export default function TrainGroupAdminCalendarPage() {
   };
 
   const onSaveAdd = async () => {
-    const response = await ApiService.create("trainGroup", trainGroupDto);
+    const response = await ApiService.create("trainGroups", trainGroupDto);
 
     if (response) {
       dialogControlAdd.hideDialog();
@@ -108,6 +108,7 @@ export default function TrainGroupAdminCalendarPage() {
                     icon="pi pi-plus"
                     label="Add"
                     outlined
+                    visible={TokenService.isUserAllowed("TrainGroup_Add")}
                     onClick={() => {
                       setAddModalVisibility(true);
                       resetTrainGroupDto();

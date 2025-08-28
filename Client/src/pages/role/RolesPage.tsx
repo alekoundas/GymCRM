@@ -131,6 +131,7 @@ export default function RolesPage() {
             dataTable={datatableDto}
             dataTableColumns={dataTableColumns}
             triggerRefreshData={onRefreshDataTable}
+            authorize={true}
           />
         </div>
       </Card>

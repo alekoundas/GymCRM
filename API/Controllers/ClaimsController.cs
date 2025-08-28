@@ -3,9 +3,9 @@ using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.Identity;
-using Core.Enums;
 using Core.Models;
 using Core.System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -13,6 +13,7 @@ using System.Security.Claims;
 namespace API.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class ClaimsController : ControllerBase
     {

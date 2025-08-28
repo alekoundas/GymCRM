@@ -13,6 +13,7 @@ import { FormMode } from "../../../enum/FormMode";
 import { DataTableColumns } from "../../../model/datatable/DataTableColumns";
 import DataTableService from "../../../services/DataTableService";
 import { DataTableDto } from "../../../model/datatable/DataTableDto";
+import { TokenService } from "../../../services/TokenService";
 
 interface IField<TEntity> {
   controller: string;
@@ -23,6 +24,7 @@ interface IField<TEntity> {
   enableAddAction?: boolean;
   editMode?: DataTableEditModeEnum;
   filterDisplay?: DataTableFilterDisplayEnum;
+  authorize?: boolean;
   onRowEditInit?: (e: any) => void;
   onRowEditComplete?: (e: DataTableRowEditCompleteEvent) => void;
   onRowEditCancel?: (e: any) => void;
@@ -43,6 +45,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   enableAddAction = false,
   editMode,
   filterDisplay,
+  authorize = false,
   onRowEditInit,
   onRowEditComplete,
   onRowEditCancel,
@@ -142,6 +145,9 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         rounded
         outlined
         className="mr-2"
+        visible={
+          authorize ? TokenService.isUserAllowed(controller + "_View") : true
+        }
         severity="secondary"
         onClick={() => onButtonClick(ButtonTypeEnum.VIEW, rowData)}
       />
@@ -150,6 +156,9 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         rounded
         outlined
         className="mr-2"
+        visible={
+          authorize ? TokenService.isUserAllowed(controller + "_Edit") : true
+        }
         onClick={() => onButtonClick(ButtonTypeEnum.EDIT, rowData)}
       />
       <Button
@@ -157,6 +166,9 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         rounded
         outlined
         severity="danger"
+        visible={
+          authorize ? TokenService.isUserAllowed(controller + "_Delete") : true
+        }
         onClick={() => onButtonClick(ButtonTypeEnum.DELETE, rowData)}
       />
     </React.Fragment>
@@ -171,6 +183,9 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
           icon="pi pi-plus"
           label="Add"
           outlined
+          visible={
+            authorize ? TokenService.isUserAllowed(controller + "_Add") : true
+          }
           onClick={() => {
             onButtonClick(ButtonTypeEnum.ADD);
           }}
