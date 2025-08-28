@@ -91,12 +91,6 @@ export default function RolesPage() {
       case ButtonTypeEnum.DELETE:
         // setDeleteDialogVisibility(true);
         break;
-      case ButtonTypeEnum.SAVE:
-        setAddDialogVisibility(false);
-        setEditDialogVisibility(false);
-
-        if (onRefreshDataTable.current) onRefreshDataTable.current();
-        break;
 
       default:
         break;
@@ -109,6 +103,7 @@ export default function RolesPage() {
     if (response) {
       dialogControlAdd.hideDialog();
       resetRoleDto();
+      if (onRefreshDataTable.current) onRefreshDataTable.current();
     }
   };
 
@@ -118,6 +113,7 @@ export default function RolesPage() {
     if (response) {
       dialogControlEdit.hideDialog();
       resetRoleDto();
+      if (onRefreshDataTable.current) onRefreshDataTable.current();
     }
   };
 

@@ -335,8 +335,6 @@ export default function TrainGroupDateGrid({ formMode }: IField) {
         break;
       case ButtonTypeEnum.DELETE:
         break;
-      case ButtonTypeEnum.SAVE:
-        break;
 
       default:
         break;
