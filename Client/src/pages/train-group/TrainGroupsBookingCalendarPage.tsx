@@ -5,6 +5,9 @@ import { useState } from "react";
 import ApiService from "../../services/ApiService";
 import { TimeSlotRequestDto } from "../../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../../model/TimeSlotResponseDto";
+import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
+import { Tag } from "primereact/tag";
+import { DateService } from "../../services/DateService";
 
 export default function TrainGroupsBookingCalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -14,11 +17,20 @@ export default function TrainGroupsBookingCalendarPage() {
   );
 
   const handleChangeDate = (value: Date) => {
-    setSelectedDate(value);
+    const dateCleaned = new Date(
+      value.getFullYear(),
+      value.getMonth(),
+      value.getDate(),
+      0,
+      0,
+      0,
+      0
+    );
+    setSelectedDate(dateCleaned);
     setSelectedSlot(null); // Reset selected slot when date changes
 
     const timeSlotDto = new TimeSlotRequestDto();
-    timeSlotDto.selectedDate = value;
+    timeSlotDto.selectedDate = dateCleaned;
     ApiService.timeslots("TrainGroupDates/TimeSlots", timeSlotDto).then(
       (response) => {
         if (response) {
@@ -153,6 +165,61 @@ export default function TrainGroupsBookingCalendarPage() {
                 <strong>Available:</strong>{" "}
                 {selectedSlot.spotsLeft > 0 ? "Yes" : "No"}
               </p>
+
+              <h3 className="mt-6">Group is also recurring on </h3>
+
+              <p></p>
+
+              {selectedSlot.recurrenceDates.filter(
+                (x) =>
+                  x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK
+              ).length > 0 ? (
+                <p>
+                  <strong>Days of the week:</strong>
+                </p>
+              ) : null}
+
+              <div>
+                {selectedSlot.recurrenceDates
+                  .filter(
+                    (x) =>
+                      x.trainGroupDateType ===
+                      TrainGroupDateTypeEnum.DAY_OF_WEEK
+                  )
+                  .map((x) => (
+                    <Tag
+                      className="p-2 m-1"
+                      key={x.trainGroupDateId}
+                      value={DateService.getDayOfWeekFromDate(new Date(x.date))}
+                    ></Tag>
+                  ))}
+              </div>
+
+              {selectedSlot.recurrenceDates.filter(
+                (x) =>
+                  x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH
+              ).length > 0 ? (
+                <p>
+                  <strong>Days of the month:</strong>
+                </p>
+              ) : null}
+
+              <div>
+                {selectedSlot.recurrenceDates
+                  .filter(
+                    (x) =>
+                      x.trainGroupDateType ===
+                      TrainGroupDateTypeEnum.DAY_OF_MONTH
+                  )
+                  .map((x) => (
+                    <Tag
+                      className="p-2 m-1"
+                      key={x.trainGroupDateId}
+                      value={new Date(x.date).getDate()}
+                    ></Tag>
+                  ))}
+              </div>
+
               <Button
                 label="Book Now"
                 icon="pi pi-check"

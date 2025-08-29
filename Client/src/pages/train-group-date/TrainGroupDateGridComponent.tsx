@@ -326,8 +326,8 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
           recurrenceDayOfWeek: undefined,
           recurrenceDayOfMonth: undefined,
           trainGroupId: trainGroupDto.id > 0 ? trainGroupDto.id : -1,
-          trainGroupParticipants: [],
-          trainGroupCancellationSubscribers: [],
+          trainGroupDateParticipants: [],
+          trainGroupDateCancellationSubscribers: [],
         };
         addTrainGroupDate(newRow);
         break;

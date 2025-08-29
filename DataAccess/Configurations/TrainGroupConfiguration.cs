@@ -12,6 +12,10 @@ namespace DataAccess.Configurations
             builder.HasKey(x => x.Id);
 
             // Properties
+            builder.Property(x => x.Title)
+               .IsRequired(true)
+               .HasMaxLength(500);
+
             builder.Property(x => x.Duration)
                 .IsRequired();
 
@@ -20,10 +24,6 @@ namespace DataAccess.Configurations
 
             builder.Property(x => x.StartOn)
                 .IsRequired();
-
-            builder.Property(x => x.Title)
-               .IsRequired(false)
-               .HasMaxLength(500);
 
             builder.Property(x => x.Description)
                 .IsRequired(false)

@@ -56,7 +56,7 @@ export default function TrainGroupAdminCalendarPage() {
 
   const onSaveEdit = async () => {
     const response = await ApiService.update(
-      "trainGroup",
+      "trainGroups",
       trainGroupDto,
       trainGroupDto.id
     );

@@ -58,7 +58,7 @@ namespace Business.Repository
         TEntity? FirstOrDefault(Expression<Func<TEntity, bool>>? predicate);
         Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? predicate);
 
-        List<TEntity> ToList();
-        Task<List<TEntity>> ToListAsync();
+        List<TEntity> ToList(bool isTrackingEnabled = false);
+        Task<List<TEntity>> ToListAsync(bool isTrackingEnabled = false);
     }
 }
