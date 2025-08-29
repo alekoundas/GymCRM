@@ -1,8 +1,8 @@
 import { ScrollPanel } from "primereact/scrollpanel";
 import { Route, Routes } from "react-router-dom";
 import NavLeft from "../../components/core/navbar-left/NavLeft";
-import TrainGroupAdminPage from "../train-group/TrainGroupAdminPage";
-import TrainGroupAdminCalendarPage from "../train-group/TrainGroupAdminCalendarPage";
+import TrainGroupAdminPage from "../train-group-admin/TrainGroupAdminPage";
+import TrainGroupAdminCalendarPage from "../train-group-admin/TrainGroupAdminCalendarPage";
 import RolesPage from "../role/RolesPage";
 import UsersPage from "../user/UsersPage";
 

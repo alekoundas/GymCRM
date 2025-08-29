@@ -152,7 +152,7 @@ export default function TrainGroupAdminCalendarPage() {
                           : new Date(slot.startOn).getMinutes())
                       }
                       onClick={() => {
-                        resetTrainGroupDto(slot.trainGroupDateId).then((x) => {
+                        resetTrainGroupDto(slot.trainGroupId).then((x) => {
                           setEditModalVisibility(true);
                         });
                       }}

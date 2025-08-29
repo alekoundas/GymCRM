@@ -8,13 +8,13 @@ import { Toast } from "primereact/toast";
 import NavTop from "./components/core/navbar-top/NavTop.tsx";
 import Home from "./pages/home/Home.tsx";
 import Administrator from "./pages/administrator/administrator.tsx";
-import TrainGroupAdminCalendarPage from "./pages/train-group/TrainGroupAdminCalendarPage.tsx";
-import TrainGroupAdminPage from "./pages/train-group/TrainGroupAdminPage.tsx";
-import TrainGroupsBookingCalendarPage from "./pages/train-group/TrainGroupsBookingCalendarPage.tsx";
+import TrainGroupAdminCalendarPage from "./pages/train-group-admin/TrainGroupAdminCalendarPage.tsx";
+import TrainGroupAdminPage from "./pages/train-group-admin/TrainGroupAdminPage.tsx";
 import RolesPage from "./pages/role/RolesPage.tsx";
 import UsersPage from "./pages/user/UsersPage.tsx";
 import LoginPage from "./pages/user/LoginPage.tsx";
 import RegisterPage from "./pages/user/RegisterPage.tsx";
+import TrainGroupsBookingCalendarPage from "./pages/train-group-booking/TrainGroupsBookingCalendarPage.tsx";
 
 export default function App() {
   // Set Toast messages here

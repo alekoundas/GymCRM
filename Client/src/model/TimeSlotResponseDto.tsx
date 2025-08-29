@@ -3,7 +3,7 @@ import { TimeSlotRecurrenceDateDto } from "./TimeSlotRecurrenceDateDto";
 export interface TimeSlotResponseDto {
   title: string;
   description: string;
-  trainerId: number;
+  trainerId: string;
   trainGroupId: number;
   trainGroupDateId: number;
   duration: Date;
@@ -15,7 +15,7 @@ export interface TimeSlotResponseDto {
 export class TimeSlotResponseDto {
   title: string;
   description: string;
-  trainerId: number;
+  trainerId: string;
   trainGroupId: number;
   trainGroupDateId: number;
   duration: Date;
