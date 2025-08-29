@@ -1,20 +1,43 @@
 import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { Card } from "primereact/card";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ApiService from "../../services/ApiService";
 import { TimeSlotRequestDto } from "../../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../../model/TimeSlotResponseDto";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
 import { Tag } from "primereact/tag";
 import { DateService } from "../../services/DateService";
+import GenericDialogComponent, {
+  DialogControl,
+} from "../../components/core/dialog/GenericDialogComponent";
+import { TokenService } from "../../services/TokenService";
+import { TrainGroupDateParticipantDto } from "../../model/TrainGroupDateParticipantDto";
+import { Checkbox } from "primereact/checkbox";
+import { FormMode } from "../../enum/FormMode";
 
 export default function TrainGroupsBookingCalendarPage() {
+  //  const { t } = useTranslation();
+  const [isDialogVisible, setDialogVisibility] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlotResponseDto | null>(
     null
   );
+  const [bookCurrentDate, setBookCurrentDate] = useState<boolean>(false);
+  const [selectedRecurrenceDates, setSelectedRecurrenceDates] = useState<
+    number[]
+  >([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const dialogControl: DialogControl = {
+    showDialog: () => setDialogVisibility(true),
+    hideDialog: () => {
+      setDialogVisibility(false);
+      setBookCurrentDate(false);
+      setSelectedRecurrenceDates([]);
+    },
+  };
 
   const handleChangeDate = (value: Date) => {
     const dateCleaned = new Date(
@@ -31,42 +54,81 @@ export default function TrainGroupsBookingCalendarPage() {
 
     const timeSlotDto = new TimeSlotRequestDto();
     timeSlotDto.selectedDate = dateCleaned;
-    ApiService.timeslots("TrainGroupDates/TimeSlots", timeSlotDto).then(
-      (response) => {
+    ApiService.timeslots("TrainGroupDates/TimeSlots", timeSlotDto)
+      .then((response) => {
         if (response) {
           setTimeSlots(response);
         }
-      }
-    );
+      })
+      .finally(() => setLoading(false));
   };
 
   const handleBooking = () => {
     if (selectedDate && selectedSlot) {
-      // Assuming you have a way to get the current user ID, e.g., from TokenService
-      // const userId = TokenService.getUserId();
-      const bookingDto = {
-        trainGroupDateId: selectedSlot.trainGroupDateId,
-        // userId: userId, // Uncomment and adjust as needed
-      };
-
-      ApiService.create("TrainGroups", bookingDto)
-        .then((response) => {
-          if (response) {
-            alert(
-              `Booking confirmed for ${selectedDate.toDateString()} at ${new Date(
-                selectedSlot.startOn
-              ).toLocaleTimeString()}`
-            );
-            // Refresh time slots after booking
-            handleChangeDate(selectedDate);
-          }
-        })
-        .catch((error) => {
-          alert("Booking failed. Please try again.");
-          console.error(error);
-        });
+      setBookCurrentDate(true);
+      setDialogVisibility(true);
     }
   };
+
+  const handleConfirmBooking = () => {
+    if (!selectedSlot || !selectedDate) return;
+
+    const userId = TokenService.getUserId();
+    const participants: TrainGroupDateParticipantDto[] = [];
+
+    // Add participant for current selected date if checked
+    if (bookCurrentDate) {
+      participants.push({
+        selectedDate: selectedDate.toISOString(),
+        trainGroupDateId: selectedSlot.trainGroupDateId,
+        userId,
+      });
+    }
+
+    // Add participants for selected recurring dates
+    selectedRecurrenceDates.forEach((trainGroupDateId) => {
+      participants.push({
+        selectedDate: null,
+        trainGroupDateId,
+        userId,
+      });
+    });
+
+    if (participants.length === 0) {
+      // toast.current?.show({
+      //   severity: "warn",
+      //   summary: t("datatable.warning"),
+      //   detail: t("datatable.no_dates_selected"),
+      // });
+      return;
+    }
+
+    setLoading(true);
+    ApiService.create("TrainGroups/CreateParticipants", participants)
+      .then((response) => {
+        dialogControl.hideDialog();
+        handleChangeDate(selectedDate); // Refresh time slots
+        // if (response.isSucceed) {
+        //   toast.current?.show({
+        //     severity: "success",
+        //     summary: t("datatable.success"),
+        //     detail: t("datatable.booking_confirmed"),
+        //   });
+        // }
+      })
+      .catch((error) => {
+        // toast.current?.show({
+        //   severity: "error",
+        //   summary: t("datatable.error"),
+        //   detail: t("datatable.booking_failed"),
+        // });
+      })
+      .finally(() => setLoading(false));
+  };
+
+  // const onDialogDelete = ()=>{
+  //   handleConfirmBooking
+  // }
 
   return (
     <>
@@ -219,18 +281,170 @@ export default function TrainGroupsBookingCalendarPage() {
                     ></Tag>
                   ))}
               </div>
-
-              <Button
-                label="Book Now"
-                icon="pi pi-check"
-                className="mt-4"
-                onClick={handleBooking}
-                disabled={!(selectedSlot.spotsLeft > 0)}
-              />
+              <div className="flex justify-content-center">
+                <Button
+                  label="Book Now"
+                  icon="pi pi-check"
+                  className="mt-4 pr-5 pl-5 pt-3 pb-3"
+                  onClick={handleBooking}
+                  disabled={!(selectedSlot.spotsLeft > 0)}
+                />
+              </div>
             </Card>
           )}
         </div>
       </div>
+
+      {/*                                      */}
+      {/*           Book a timeslot            */}
+      {/*                                      */}
+
+      <GenericDialogComponent
+        header={"datatable.book_training_session"}
+        visible={isDialogVisible}
+        control={dialogControl}
+        formMode={FormMode.ADD}
+        // onDelete={() => handleConfirmBooking()}
+        onSave={() => handleConfirmBooking()}
+      >
+        <>
+          {selectedSlot && (
+            <div className="p-fluid">
+              <h3>{"datatable.select_booking_options"}</h3>
+              <div className="field">
+                <Checkbox
+                  inputId="bookCurrentDate"
+                  checked={bookCurrentDate}
+                  onChange={(e) => setBookCurrentDate(e.checked ?? false)}
+                  disabled={selectedSlot.spotsLeft <= 0}
+                />
+                <label
+                  htmlFor="bookCurrentDate"
+                  className="ml-2"
+                >
+                  {selectedDate?.toLocaleDateString()}
+                  {/* {t("datatable.book_current_date", {
+                  date: selectedDate?.toLocaleDateString(),
+                  time: new Date(selectedSlot.startOn).toLocaleTimeString(),
+                })} */}
+                </label>
+              </div>
+
+              {selectedSlot.recurrenceDates.length > 0 && (
+                <>
+                  <h4>{"datatable.recurring_dates"}</h4>
+                  {selectedSlot.recurrenceDates.filter(
+                    (x) =>
+                      x.trainGroupDateType ===
+                      TrainGroupDateTypeEnum.DAY_OF_WEEK
+                  ).length > 0 && (
+                    <div className="field">
+                      <p>
+                        <strong>{"datatable.days_of_week"}:</strong>
+                      </p>
+                      {selectedSlot.recurrenceDates
+                        .filter(
+                          (x) =>
+                            x.trainGroupDateType ===
+                            TrainGroupDateTypeEnum.DAY_OF_WEEK
+                        )
+                        .map((x) => (
+                          <div
+                            key={x.trainGroupDateId}
+                            className="field-checkbox"
+                          >
+                            <Checkbox
+                              inputId={`recurrence-${x.trainGroupDateId}`}
+                              checked={selectedRecurrenceDates.includes(
+                                x.trainGroupDateId
+                              )}
+                              onChange={(e) => {
+                                setSelectedRecurrenceDates(
+                                  e.checked
+                                    ? [
+                                        ...selectedRecurrenceDates,
+                                        x.trainGroupDateId,
+                                      ]
+                                    : selectedRecurrenceDates.filter(
+                                        (id) => id !== x.trainGroupDateId
+                                      )
+                                );
+                              }}
+                            />
+                            <label
+                              htmlFor={`recurrence-${x.trainGroupDateId}`}
+                              className="ml-2"
+                            >
+                              {DateService.getDayOfWeekFromDate(
+                                new Date(x.date)
+                              )}
+                            </label>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+
+                  {selectedSlot.recurrenceDates.filter(
+                    (x) =>
+                      x.trainGroupDateType ===
+                      TrainGroupDateTypeEnum.DAY_OF_MONTH
+                  ).length > 0 && (
+                    <div className="field">
+                      <p>
+                        <strong>{"datatable.days_of_month"}:</strong>
+                      </p>
+                      {selectedSlot.recurrenceDates
+                        .filter(
+                          (x) =>
+                            x.trainGroupDateType ===
+                            TrainGroupDateTypeEnum.DAY_OF_MONTH
+                        )
+                        .map((x) => (
+                          <div
+                            key={x.trainGroupDateId}
+                            className="field-checkbox"
+                          >
+                            <Checkbox
+                              inputId={`recurrence-${x.trainGroupDateId}`}
+                              checked={selectedRecurrenceDates.includes(
+                                x.trainGroupDateId
+                              )}
+                              onChange={(e) => {
+                                setSelectedRecurrenceDates(
+                                  e.checked
+                                    ? [
+                                        ...selectedRecurrenceDates,
+                                        x.trainGroupDateId,
+                                      ]
+                                    : selectedRecurrenceDates.filter(
+                                        (id) => id !== x.trainGroupDateId
+                                      )
+                                );
+                              }}
+                            />
+                            <label
+                              htmlFor={`recurrence-${x.trainGroupDateId}`}
+                              className="ml-2"
+                            >
+                              {new Date(x.date).getDate()}
+                            </label>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        </>
+      </GenericDialogComponent>
+      {/* <GenericDialogComponent
+        header=""
+        visible={isDialogVisible}
+        control={dialogControl}
+      >
+        <div className="w-full"></div>
+      </GenericDialogComponent> */}
     </>
   );
 }

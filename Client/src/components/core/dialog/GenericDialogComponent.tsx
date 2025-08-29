@@ -1,9 +1,10 @@
 import React, { ReactNode, useState } from "react";
-import { Dialog } from "primereact/dialog";
+import { Dialog, DialogProps } from "primereact/dialog";
 import { Button } from "primereact/button";
 import "primereact/resources/themes/saga-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
+import { FormMode } from "../../../enum/FormMode";
 
 // Interface for child component props
 export interface DialogChildProps {
@@ -19,40 +20,81 @@ export interface DialogControl {
 
 interface DialogComponentProps {
   header?: string;
+  formMode?: FormMode;
   visible: boolean;
   control: DialogControl;
   children: ReactNode;
   onSave?: () => void;
+  onDelete?: () => void;
 }
 
 const DialogComponent: React.FC<DialogComponentProps> = ({
   header = "Dialog",
+  formMode = FormMode.EDIT,
   visible,
   control,
   children,
   onSave,
+  onDelete,
 }) => {
   const [isSaveEnabled, setIsSaveEnabled] = useState<boolean>(true);
 
-  const footer = (
-    <div>
-      <Button
-        label="Cancel"
-        icon="pi pi-times"
-        onClick={control.hideDialog}
-        className="p-button-text"
-      />
-      {onSave && (
-        <Button
-          label="Save"
-          icon="pi pi-check"
-          onClick={onSave}
-          disabled={!isSaveEnabled}
-          autoFocus
-        />
-      )}
-    </div>
-  );
+  const footer = () => {
+    if (formMode === FormMode.VIEW)
+      return (
+        <div>
+          <Button
+            label="Cancel"
+            icon="pi pi-times"
+            onClick={control.hideDialog}
+            className="p-button-text"
+          />
+        </div>
+      );
+
+    if (formMode === FormMode.ADD || formMode === FormMode.EDIT)
+      return (
+        <div>
+          <Button
+            label="Cancel"
+            icon="pi pi-times"
+            onClick={control.hideDialog}
+            className="p-button-text"
+          />
+          {onSave && (
+            <Button
+              label="Save"
+              icon="pi pi-check"
+              onClick={onSave}
+              disabled={!isSaveEnabled}
+              autoFocus
+            />
+          )}
+        </div>
+      );
+
+    if (formMode === FormMode.DELETE)
+      return (
+        <div>
+          <Button
+            label="Cancel"
+            icon="pi pi-times"
+            onClick={control.hideDialog}
+            className="p-button-text"
+          />
+          {onDelete && (
+            <Button
+              label="Delete"
+              icon="pi pi-danger"
+              severity="danger"
+              onClick={onDelete}
+              // disabled={!isSaveEnabled}
+              autoFocus
+            />
+          )}
+        </div>
+      );
+  };
 
   // Recursively process children to pass props to components that accept DialogChildProps
   const renderChildrenWithProps = (child: ReactNode): ReactNode => {
