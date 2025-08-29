@@ -58,6 +58,6 @@ export class DateService {
 
     if (!date) return undefined;
 
-    return dayOfWeekMap[new Date(date).getDay()];
+    return dayOfWeekMap[date.getDay()];
   };
 }

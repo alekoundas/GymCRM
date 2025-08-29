@@ -136,6 +136,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TrainGroupDateType")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TrainGroupId")

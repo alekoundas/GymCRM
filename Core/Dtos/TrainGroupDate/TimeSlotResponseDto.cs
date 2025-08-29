@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.ObjectModel;
 
 namespace Core.Dtos.TrainGroupDate
 {
@@ -12,5 +12,7 @@ namespace Core.Dtos.TrainGroupDate
         public DateTime Duration { get; set; }
         public DateTime StartOn { get; set; }
         public int SpotsLeft { get; set; }
+        public List<TimeSlotRecurrenceDateDto> RecurrenceDates { get; set; } = new List<TimeSlotRecurrenceDateDto>();
+
     }
 }

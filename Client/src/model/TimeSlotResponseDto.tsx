@@ -1,3 +1,5 @@
+import { TimeSlotRecurrenceDateDto } from "./TimeSlotRecurrenceDateDto";
+
 export interface TimeSlotResponseDto {
   title: string;
   description: string;
@@ -7,6 +9,7 @@ export interface TimeSlotResponseDto {
   duration: Date;
   startOn: Date;
   spotsLeft: number;
+  recurrenceDates: TimeSlotRecurrenceDateDto[];
 }
 
 export class TimeSlotResponseDto {
@@ -18,4 +21,5 @@ export class TimeSlotResponseDto {
   duration: Date;
   startOn: Date;
   spotsLeft: number;
+  recurrenceDates: TimeSlotRecurrenceDateDto[];
 }

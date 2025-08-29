@@ -360,34 +360,13 @@ namespace Business.Repository
             return result;
         }
 
-        //public async Task<TEntity> FindAndUpdateAsync<TProperty>(int id, TEntity updateEntity, Expression<Func<TEntity, TProperty>> navigationProperty)
-        //{
-
-        //    ApiDbContext dbContext = _contextFactory.CreateDbContext();
-        //    TEntity existingEntity = await dbContext.Set<TEntity>()
-        //        .Include(navigationProperty)
-        //        .FilterEqualsByColumn("Id",id)
-        //        .FirstAsync();
-
-
-        //    dbContext.Entry(existingEntity).CurrentValues.SetValues(updateEntity);
-        //    await dbContext.SaveChangesAsync();
-
-        //    dbContext.Dispose();
-        //    Dispose();
-        //    return existingEntity;
-        //}
-
-
-
         public async Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> filter)
         {
             TEntity? result = null;
-
             if (_query == null)
-                result = await _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().FirstAsync(filter);
-            else
-                result = await _query.AsNoTracking().FirstAsync(filter);
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+
+            result = await _query.AsNoTracking().FirstAsync(filter);
 
             Dispose();
             return result;
@@ -397,20 +376,13 @@ namespace Business.Repository
         public TEntity? FirstOrDefault(Expression<Func<TEntity, bool>>? filter = null)
         {
             TEntity? result = null;
+            if (_query == null)
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+
             if (filter != null)
-            {
-                if (_query == null)
-                    result = _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().FirstOrDefault(filter);
-                else
-                    result = _query.AsNoTracking().FirstOrDefault(filter);
-            }
+                result = _query.AsNoTracking().FirstOrDefault(filter);
             else
-            {
-                if (_query == null)
-                    result = _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().FirstOrDefault();
-                else
-                    result = _query.AsNoTracking().FirstOrDefault();
-            }
+                result = _query.AsNoTracking().FirstOrDefault();
 
             Dispose();
             return result;
@@ -419,61 +391,45 @@ namespace Business.Repository
         public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? filter = null)
         {
             TEntity? result = null;
+            if (_query == null)
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+
             if (filter != null)
-            {
-                if (_query == null)
-                    result = await _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(filter);
-                else
-                    result = await _query.AsNoTracking().FirstOrDefaultAsync(filter);
-            }
+                result = await _query.AsNoTracking().FirstOrDefaultAsync(filter);
             else
-            {
-                if (_query == null)
-                    result = await _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().FirstOrDefaultAsync();
-                else
-                    result = await _query.AsNoTracking().FirstOrDefaultAsync();
-            }
-            Dispose();
-            return result;
-        }
-
-
-        //public async Task<List<TEntity>> GetFiltered(Expression<Func<TEntity, bool>> filter)
-        //{
-        //    using var context = _contextFactory.CreateDbContext();
-        //    return await context.Set<TEntity>().Where(filter).ToListAsync();
-        //}
-
-        //public IEnumerable<TEntity> Where(Expression<Func<TEntity, bool>> expression)
-        //{
-        //    using var context = _contextFactory.CreateDbContext();
-        //    return context.Set<TEntity>().Where(expression).ToList();
-        //}
-
-
-        public List<TEntity> ToList()
-        {
-            List<TEntity>? result = null;
-
-            if (_query == null)
-                result = _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().ToList();
-            else
-                result = _query.AsNoTracking().ToList();
-
+                result = await _query.AsNoTracking().FirstOrDefaultAsync();
 
             Dispose();
             return result;
         }
 
-        public async Task<List<TEntity>> ToListAsync()
+        public List<TEntity> ToList(bool isTrackingEnabled = false)
         {
             List<TEntity>? result = null;
 
             if (_query == null)
-                result = await _contextFactory.CreateDbContext().Set<TEntity>().AsNoTracking().ToListAsync();
-            else
-                result = await _query.AsNoTracking().ToListAsync();
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
+            if (isTrackingEnabled)
+                _query = _query.AsNoTracking();
+
+            result = _query.ToList();
+
+            Dispose();
+            return result;
+        }
+
+        public async Task<List<TEntity>> ToListAsync(bool isTrackingEnabled = false)
+        {
+            List<TEntity>? result = null;
+
+            if (_query == null)
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+
+            if (!isTrackingEnabled)
+                _query = _query.AsNoTracking();
+
+            result = await _query.ToListAsync();
 
             Dispose();
             return result;

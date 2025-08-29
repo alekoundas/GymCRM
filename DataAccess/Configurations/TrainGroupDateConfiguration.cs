@@ -15,7 +15,8 @@ namespace DataAccess.Configurations
             // Properties
             // Store enum as string
             builder.Property(x => x.TrainGroupDateType)
-                .HasConversion<string>();
+                .HasConversion<string>()
+                .IsRequired(true);
 
             builder.Property(x => x.FixedDay)
                 .IsRequired(false); 

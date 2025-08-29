@@ -109,7 +109,7 @@ export default function TrainGroupAdminPage() {
 
   const OnSaveEdit = async () => {
     const response = await ApiService.update(
-      "trainGroup",
+      "trainGroups",
       trainGroupDto,
       trainGroupDto.id
     );
