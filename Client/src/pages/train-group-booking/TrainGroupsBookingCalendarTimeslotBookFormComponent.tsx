@@ -22,54 +22,85 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
     <>
       {selectedTimeSlot && (
         <div className="p-fluid">
-          <h3>{"datatable.select_booking_options"}</h3>
-          <div className="field">
-            <Checkbox
-              inputId="bookCurrentDate"
-              checked={
-                trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                  (y) => y.selectedDate == timeSlotRequestDto.selectedDate
-                ).length === 1
-              }
-              onChange={(e) => {
-                updateTrainGroupDateParticipantUpdateDto({
-                  trainGroupParticipantDtos: e.checked
-                    ? [
-                        ...trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos,
-                        {
-                          selectedDate: timeSlotRequestDto.selectedDate,
-                          trainGroupId: selectedTimeSlot.trainGroupId,
-                          trainGroupDateId: undefined,
-                          userId: TokenService.getUserId(),
-                        },
-                      ]
-                    : trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                        (x) => x.trainGroupId !== selectedTimeSlot.trainGroupId
-                      ),
-                });
-              }}
-              disabled={selectedTimeSlot.spotsLeft <= 0}
-            />
-            <label
-              htmlFor="bookCurrentDate"
-              className="ml-2"
-            >
-              {timeSlotRequestDto.selectedDate
-                ? new Date(timeSlotRequestDto.selectedDate).toLocaleDateString()
-                : ""}
-            </label>
-          </div>
-
           {selectedTimeSlot.recurrenceDates.length > 0 && (
             <>
-              <h4>{"datatable.recurring_dates"}</h4>
+              {/* <h4>{"datatable.select_booking_options"}</h4> */}
+              {selectedTimeSlot.recurrenceDates.filter(
+                (x) => x.trainGroupDateType === undefined
+              ).length > 0 && (
+                <div className="field">
+                  <p>
+                    <strong>{"Current Date"}:</strong>
+                  </p>
+                  {selectedTimeSlot.recurrenceDates
+                    .filter((x) => x.trainGroupDateType === undefined)
+                    .map((x) => (
+                      <div
+                        key={x.trainGroupDateId}
+                        className="field-checkbox"
+                      >
+                        <Checkbox
+                          inputId={`recurrence-${x.trainGroupDateId}`}
+                          checked={
+                            trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
+                              (y) => y.trainGroupDateId == x.trainGroupDateId
+                            ).length === 1
+                          }
+                          onChange={(e) => {
+                            updateTrainGroupDateParticipantUpdateDto({
+                              trainGroupParticipantDtos: e.checked
+                                ? [
+                                    ...trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos,
+                                    {
+                                      selectedDate:
+                                        timeSlotRequestDto.selectedDate,
+                                      trainGroupId:
+                                        selectedTimeSlot.trainGroupId,
+                                      trainGroupDateId: undefined,
+                                      userId: TokenService.getUserId(),
+                                    },
+                                  ]
+                                : trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
+                                    (y) =>
+                                      y.selectedDate !==
+                                      timeSlotRequestDto.selectedDate
+                                  ),
+                            });
+                          }}
+                          disabled={selectedTimeSlot.spotsLeft <= 0}
+                        />
+                        <label
+                          htmlFor={`recurrence-${x.trainGroupDateId}`}
+                          className="ml-2"
+                        >
+                          {timeSlotRequestDto.selectedDate
+                            ? new Date(
+                                timeSlotRequestDto.selectedDate
+                              ).getDate() +
+                              "/" +
+                              (new Date(
+                                timeSlotRequestDto.selectedDate
+                              ).getMonth() +
+                                1) +
+                              "/" +
+                              new Date(
+                                timeSlotRequestDto.selectedDate
+                              ).getFullYear()
+                            : ""}
+                        </label>
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              <h4>{"Reccuring Dates:"}</h4>
               {selectedTimeSlot.recurrenceDates.filter(
                 (x) =>
                   x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK
               ).length > 0 && (
                 <div className="field">
                   <p>
-                    <strong>{"datatable.days_of_week"}:</strong>
+                    <strong>{"Days of Week"}:</strong>
                   </p>
                   {selectedTimeSlot.recurrenceDates
                     .filter(
@@ -103,8 +134,8 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                     },
                                   ]
                                 : trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                                    (x) =>
-                                      x.trainGroupDateId !== x.trainGroupDateId
+                                    (y) =>
+                                      y.trainGroupDateId !== x.trainGroupDateId
                                   ),
                             });
                           }}
@@ -127,7 +158,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
               ).length > 0 && (
                 <div className="field">
                   <p>
-                    <strong>{"datatable.days_of_month"}:</strong>
+                    <strong>{"Days of Month"}:</strong>
                   </p>
                   {selectedTimeSlot.recurrenceDates
                     .filter(
@@ -161,8 +192,8 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                     },
                                   ]
                                 : trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                                    (x) =>
-                                      x.trainGroupDateId !== x.trainGroupDateId
+                                    (y) =>
+                                      y.trainGroupDateId !== x.trainGroupDateId
                                   ),
                             });
                           }}
