@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Business;
 using Business.Services;
 using Core.Dtos;
 using Core.Dtos.TrainGroup;
@@ -35,9 +34,10 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return new ApiResponse<TrainGroup>().SetErrorResponse("error", "Invalid data provided.");
 
+            if (CustomValidatePUT(entityDto, out string[] errors))
+                return BadRequest(new ApiResponse<TrainGroupDto>().SetErrorResponse("error", errors));
+
             TrainGroup entity = _mapper.Map<TrainGroup>(entityDto);
-
-
             ApiDbContext dbContext = _dataService.GetDbContext();
 
             // Load existing entity with related data
@@ -61,7 +61,7 @@ namespace API.Controllers
             var existingDates = existingEntity.TrainGroupDates.ToList();
 
             // Remove deleted TrainGroupDates
-            foreach (var existingDate in existingDates)
+            foreach (TrainGroupDate existingDate in existingDates)
             {
                 if (!incomingDates.Any(d => d.Id == existingDate.Id && d.Id > 0))
                 {
@@ -70,9 +70,9 @@ namespace API.Controllers
             }
 
             // Update or add TrainGroupDates
-            foreach (var incomingDate in incomingDates)
+            foreach (TrainGroupDate incomingDate in incomingDates)
             {
-                var existingDate = existingDates.FirstOrDefault(d => d.Id == incomingDate.Id && incomingDate.Id > 0);
+                TrainGroupDate? existingDate = existingDates.FirstOrDefault(d => d.Id == incomingDate.Id && incomingDate.Id > 0);
                 if (existingDate != null)
                 {
                     // Update existing TrainGroupDate
@@ -86,14 +86,12 @@ namespace API.Controllers
                     dbContext.Add(incomingDate);
                     existingEntity.TrainGroupDates.Add(incomingDate);
                 }
-
-
-
-
             }
-                await dbContext.SaveChangesAsync();
-                dbContext.Dispose();
-                return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity);
+
+
+            await dbContext.SaveChangesAsync();
+            dbContext.Dispose();
+            return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity);
         }
 
 
@@ -114,11 +112,11 @@ namespace API.Controllers
             return errors.Length > 0;
         }
 
-        protected override bool CustomValidatePUT(TrainGroupDto entityAddDto, out string[] errors)
+        protected override bool CustomValidatePUT(TrainGroupDto entityDto, out string[] errors)
         {
             List<string> errorList = new List<string>();
 
-            foreach (var groupDate in entityAddDto.TrainGroupDates)
+            foreach (var groupDate in entityDto.TrainGroupDates)
             {
                 if (groupDate.TrainGroupDateType == Core.Enums.TrainGroupDateTypeEnum.FIXED_DAY && groupDate.FixedDay == null)
                     errorList.Add("Each TrainGroupDate must have at least one of FixedDay, RecurrenceDayOfMonth, or RecurrenceDayOfWeek set.");

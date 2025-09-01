@@ -243,9 +243,37 @@ export default class ApiService {
   public static async create<TEntity>(
     controller: string,
     data: TEntity
-  ): Promise<TEntity | null> {
+  ): Promise<TEntity[] | null> {
     const url = this.buildUrl(controller);
-    return this.apiRequest<TEntity, TEntity>(url, "POST", data);
+    return this.apiRequest<TEntity[], TEntity[]>(url, "POST", [data]);
+  }
+
+  public static async createRange<TEntity>(
+    controller: string,
+    data: TEntity[]
+  ): Promise<TEntity[] | null> {
+    const url = this.buildUrl(controller);
+    return this.apiRequest<TEntity[], TEntity[]>(url, "POST", data);
+  }
+
+  
+  public static async update<TEntity>(
+    controller: string,
+    data: TEntity,
+    id: number | string
+  ): Promise<TEntity[] | null> {
+    const url = this.buildUrl(controller, "", id);
+    return this.apiRequest<TEntity[], TEntity[]>(url, "PUT", data[]);
+  }
+
+  
+  public static async updateRange<TEntity>(
+    controller: string,
+    data: TEntity[],
+    id: number | string
+  ): Promise<TEntity[] | null> {
+    const url = this.buildUrl(controller, "", id);
+    return this.apiRequest<TEntity[], TEntity[]>(url, "PUT", data);
   }
 
   public static async timeslots(
@@ -268,14 +296,6 @@ export default class ApiService {
     return this.apiRequest<TEntity, TEntity>(url, "DELETE");
   }
 
-  public static async update<TEntity>(
-    controller: string,
-    data: TEntity,
-    id: number | string
-  ): Promise<TEntity | null> {
-    const url = this.buildUrl(controller, "", id);
-    return this.apiRequest<TEntity, TEntity>(url, "PUT", data);
-  }
 
   public static async login(
     data: UserLoginRequestDto,
