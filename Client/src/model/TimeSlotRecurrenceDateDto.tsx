@@ -1,6 +1,7 @@
 import { TrainGroupDateTypeEnum } from "../enum/TrainGroupDateTypeEnum";
 
 export interface TimeSlotRecurrenceDateDto {
+  trainGroupParticipantId: number | undefined;
   trainGroupDateId: number;
   trainGroupDateType: TrainGroupDateTypeEnum;
   date: string; // UTC string
@@ -8,6 +9,7 @@ export interface TimeSlotRecurrenceDateDto {
 }
 
 export class TimeSlotRecurrenceDateDto {
+  trainGroupParticipantId: number | undefined;
   trainGroupDateId: number;
   trainGroupDateType: TrainGroupDateTypeEnum;
   date: string; // UTC string

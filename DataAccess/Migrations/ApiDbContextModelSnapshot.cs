@@ -214,7 +214,7 @@ namespace DataAccess.Migrations
                     b.Property<int?>("TrainGroupDateId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("TrainGroupId")
+                    b.Property<int>("TrainGroupId")
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid>("UserId")
@@ -520,7 +520,8 @@ namespace DataAccess.Migrations
                     b.HasOne("Core.Models.TrainGroup", "TrainGroup")
                         .WithMany("TrainGroupParticipants")
                         .HasForeignKey("TrainGroupId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Core.Models.User", "User")
                         .WithMany("TrainGroupParticipants")
