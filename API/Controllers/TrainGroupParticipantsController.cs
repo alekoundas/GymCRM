@@ -51,6 +51,28 @@ namespace API.Controllers
             }
 
 
+            // Validate uiser selection.
+            // Cant have curent date selected with a recurring date.
+            bool isCurrentDateWithConflict = updateDto.TrainGroupParticipantDtos
+                .Where(x => x.SelectedDate != null)
+                .Any(x => updateDto.TrainGroupParticipantDtos
+                    .Where(y => y.SelectedDate == null)
+                    .Any(y => existingEntity.TrainGroupDates
+                        .Where(z => z.Id == y.TrainGroupDateId)
+                        .Any(z =>
+                            (z.RecurrenceDayOfMonth.HasValue && z.RecurrenceDayOfMonth.Value.Day == x.SelectedDate!.Value.Day) ||
+                            (z.RecurrenceDayOfWeek.HasValue && z.RecurrenceDayOfWeek.Value.DayOfWeek == x.SelectedDate!.Value.DayOfWeek)
+                        )
+                    )
+                );
+
+            if (isCurrentDateWithConflict)
+                return new ApiResponse<TrainGroup>().SetErrorResponse("error", $"Current date is already selected in a Recurrence date! Please select one of them.");
+
+
+
+
+
             List<TrainGroupParticipant> incomingParticipants = _mapper.Map<List<TrainGroupParticipant>>(updateDto.TrainGroupParticipantDtos);
             List<TrainGroupParticipant> existingTrainGroupParticipants = existingEntity.TrainGroupParticipants
                 .Where(x => x.UserId == new Guid(updateDto.UserId))
@@ -61,12 +83,12 @@ namespace API.Controllers
                 .Where(x => x.UserId == new Guid(updateDto.UserId))
                 .ToList();
 
-            // Remove deleted TrainGroup
+            // Remove deleted TrainGroupParticipants
             foreach (TrainGroupParticipant existingParticipant in existingTrainGroupDateParticipants)
                 if (!incomingParticipants.Any(d => d.Id == existingParticipant.Id && d.Id > 0))
                     dbContext.Remove(existingParticipant);
 
-            // Remove deleted TrainGroupDates
+            // Remove deleted TrainGroupDatesParticipants
             foreach (TrainGroupParticipant existingParticipant in existingTrainGroupParticipants)
                 if (!incomingParticipants.Any(d => d.Id == existingParticipant.Id && d.Id > 0))
                     dbContext.Remove(existingParticipant);

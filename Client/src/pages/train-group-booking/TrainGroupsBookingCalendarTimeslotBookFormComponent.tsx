@@ -61,9 +61,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                     },
                                   ]
                                 : trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                                    (y) =>
-                                      y.selectedDate !==
-                                      timeSlotRequestDto.selectedDate
+                                    (y) => y.selectedDate === null
                                   ),
                             });
                           }}
