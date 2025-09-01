@@ -2,78 +2,106 @@ import { create } from "zustand";
 import { TimeSlotRequestDto } from "../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../model/TimeSlotResponseDto";
 import { TimeSlotRecurrenceDateDto } from "../model/TimeSlotRecurrenceDateDto";
+import { TokenService } from "../services/TokenService";
+import { TrainGroupParticipantUpdateDto } from "../model/TrainGroupParticipantUpdateDto";
+import ApiService from "../services/ApiService";
 
 interface useTrainGroupBookingStoreState {
   timeSlotRequestDto: TimeSlotRequestDto;
   timeSlotResponseDto: TimeSlotResponseDto[];
+  trainGroupDateParticipantUpdateDto: TrainGroupParticipantUpdateDto;
+
+  selectedTimeSlot: TimeSlotResponseDto | undefined;
   timeSlotRecurrenceDateDto: TimeSlotRecurrenceDateDto[];
-  selectedTimeSlotResponseDto: TimeSlotResponseDto | undefined;
 
   setTimeSlotRequestDto: (data: TimeSlotRequestDto) => void;
   setTimeSlotResponseDto: (data: TimeSlotResponseDto[]) => void;
-  setSelectedTimeSlotResponseDto: (data: TimeSlotResponseDto) => void;
 
+  setSelectedTimeSlot: (data: TimeSlotResponseDto) => void;
+  resetSelectedTimeSlotResponseDto: () => void;
+
+  updateTrainGroupDateParticipantUpdateDto: (
+    updates: Partial<TrainGroupParticipantUpdateDto>
+  ) => void;
   updateTimeSlotResponseDto: (updates: Partial<TimeSlotResponseDto>) => void;
-  addTimeSlotRecurrenceDateDto: (newRow: TimeSlotRecurrenceDateDto) => void;
+
+  resetTrainGroupDateParticipantUpdateDto: (id?: number) => void;
   resetTimeSlotResponseDto: (id?: TimeSlotResponseDto) => void;
+  resetTimeSlotRequestDto: (date?: string) => void;
 }
 
 export const useTrainGroupBookingStore = create<useTrainGroupBookingStoreState>(
   (set) => ({
-    timeSlotRequestDto: { selectedDate: new Date() },
+    timeSlotRequestDto: {
+      selectedDate: new Date().toISOString(),
+      userId: TokenService.getUserId() ?? "",
+    },
     timeSlotResponseDto: [],
+    trainGroupDateParticipantUpdateDto: {
+      userId: TokenService.getUserId(),
+      trainGroupId: -1,
+      selectedDate: "",
+      trainGroupParticipantDtos: [],
+    },
+    selectedTimeSlot: undefined,
+
     timeSlotRecurrenceDateDto: [],
-    selectedTimeSlotResponseDto: undefined,
 
     setTimeSlotRequestDto: (data) => set({ timeSlotRequestDto: data }),
     setTimeSlotResponseDto: (data) => set({ timeSlotResponseDto: data }),
-    setSelectedTimeSlotResponseDto: (data: TimeSlotResponseDto) => {
-      set({ selectedTimeSlotResponseDto: data });
+    setSelectedTimeSlot: (data: TimeSlotResponseDto) => {
+      set({ selectedTimeSlot: data });
     },
 
+    updateTrainGroupDateParticipantUpdateDto: (updates) =>
+      set((state) => ({
+        trainGroupDateParticipantUpdateDto: {
+          ...state.trainGroupDateParticipantUpdateDto,
+          ...updates,
+        },
+      })),
     updateTimeSlotResponseDto: (updates) =>
       set((state) => ({
         timeSlotResponseDto: { ...state.timeSlotResponseDto, ...updates },
       })),
-    addTimeSlotRecurrenceDateDto: (newRow) =>
-      set((state) => ({
-        timeSlotRecurrenceDateDto: [...state.timeSlotRecurrenceDateDto, newRow],
-      })),
+
     resetTimeSlotResponseDto: (id?: TimeSlotResponseDto) => {
       set({
         timeSlotResponseDto: [],
-        // {
-        //   title: "",
-        //   description: "",
-        //   trainerId: "",
-        //   trainGroupId: -1,
-        //   trainGroupDateId: -1,
-        //   duration: new Date(),
-        //   startOn: new Date(),
-        //   spotsLeft: 0,
-        //   recurrenceDates: [],
-        // },
       });
     },
-    // resetTrainGroupDto: async (id?: number) => {
-    //   if (id)
-    //     return await ApiService.get<TrainGroupDto>("TrainGroups", id).then(
-    //       (value) => (value ? set({ trainGroupDto: value }) : null)
-    //     );
-    //   else
-    //     set({
-    //       timeSlotResponseDto: {
-    //         title: "",
-    //         description: "",
-    //         trainerId: "",
-    //         trainGroupId: -1,
-    //         trainGroupDateId: -1,
-    //         duration: new Date(),
-    //         startOn: new Date(),
-    //         spotsLeft: 0,
-    //         recurrenceDates: [],
-    //       },
-    //     });
-    // },
+    resetTrainGroupDateParticipantUpdateDto: (id?: number) => {
+      set({
+        trainGroupDateParticipantUpdateDto: {
+          userId: TokenService.getUserId(),
+          trainGroupId: -1,
+          selectedDate: "",
+          trainGroupParticipantDtos: [],
+        },
+      });
+    },
+    resetSelectedTimeSlotResponseDto: () =>
+      set({ selectedTimeSlot: undefined }),
+    resetTimeSlotRequestDto: (date?: string) => {
+      if (date) {
+        set((state) => ({
+          timeSlotRequestDto: {
+            ...state.timeSlotRequestDto,
+            selectedDate: date,
+          },
+        }));
+
+        ApiService.timeslots("TrainGroupDates/TimeSlots", {
+          userId: TokenService.getUserId() ?? "",
+          selectedDate: date,
+        }).then((response) => {
+          if (response) {
+            set((state) => ({ timeSlotResponseDto: response }));
+          }
+        });
+      } else {
+        set({ selectedTimeSlot: undefined });
+      }
+    },
   })
 );

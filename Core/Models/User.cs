@@ -11,8 +11,8 @@ namespace Core.Models
         public virtual ICollection<ContactInformation> ContactInformations { get; set; } = new Collection<ContactInformation>();
 
         // TrainGroup.
-        public virtual ICollection<TrainGroup> Trainers { get; set; } = new Collection<TrainGroup>();
-        public virtual ICollection<TrainGroupDateParticipant> TrainGroupDatesParticipant { get; set; } = new Collection<TrainGroupDateParticipant>();
+        public virtual ICollection<TrainGroup> TrainGroups { get; set; } = new Collection<TrainGroup>();
+        public virtual ICollection<TrainGroupParticipant> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipant>();
         public virtual ICollection<TrainGroupDateCancellationSubscriber> TrainGroupDatesCancellationSubscriber { get; set; } = new Collection<TrainGroupDateCancellationSubscriber>();
 
     }

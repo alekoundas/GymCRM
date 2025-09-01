@@ -1,7 +1,9 @@
 export interface TimeSlotRequestDto {
-  selectedDate: Date;
+  selectedDate: string;
+  userId: string;
 }
 
 export class TimeSlotRequestDto {
-  selectedDate: Date;
+  selectedDate: string;
+  userId: string;
 }

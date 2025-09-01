@@ -1,21 +1,10 @@
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
-import { useState } from "react";
-import ApiService from "../../services/ApiService";
-import { TimeSlotRequestDto } from "../../model/TimeSlotRequestDto";
-import { TimeSlotResponseDto } from "../../model/TimeSlotResponseDto";
 import { useTrainGroupBookingStore } from "../../stores/TrainGroupBookingStore";
 
 export default function TrainGroupsBookingCalendarTimeslotComponent() {
-  const {
-    timeSlotRequestDto,
-    timeSlotResponseDto,
-    selectedTimeSlotResponseDto,
-    setTimeSlotRequestDto,
-    setTimeSlotResponseDto,
-    setSelectedTimeSlotResponseDto,
-    resetTimeSlotResponseDto,
-  } = useTrainGroupBookingStore();
+  const { timeSlotResponseDto, selectedTimeSlot, setSelectedTimeSlot } =
+    useTrainGroupBookingStore();
 
   return (
     <>
@@ -49,13 +38,12 @@ export default function TrainGroupsBookingCalendarTimeslotComponent() {
                   slot.title || "Train Group"
                 }`}
                 className={
-                  selectedTimeSlotResponseDto?.trainGroupDateId ===
-                  slot.trainGroupDateId
+                  selectedTimeSlot?.trainGroupDateId === slot.trainGroupDateId
                     ? "p-button-raised p-button-primary"
                     : "p-button-outlined"
                 }
                 // disabled={!slot.isAvailable}
-                onClick={() => setSelectedTimeSlotResponseDto(slot)}
+                onClick={() => setSelectedTimeSlot(slot)}
               />
             ))}
           </div>

@@ -51,6 +51,15 @@ export default function UsersPage() {
 
   const dataTableColumns: DataTableColumns[] = [
     {
+      field: "id",
+      header: "Id",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "20%" },
+      body: null,
+    },
+    {
       field: "userName",
       header: "User Name",
       sortable: true,

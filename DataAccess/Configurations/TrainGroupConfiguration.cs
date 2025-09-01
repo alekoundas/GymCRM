@@ -30,16 +30,16 @@ namespace DataAccess.Configurations
                 .HasMaxLength(2000);
 
 
-            // Relationship with Trainer (User)
+            // Relationship with Trainer (User) (one-to-many)
             builder.HasOne(x => x.Trainer)
-                .WithMany(x=>x.Trainers)
+                .WithMany(x=>x.TrainGroups)
                 .HasForeignKey(x => x.TrainerId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
 
             // Relationship with RepeatingParticipants (many-to-many with User)
             //builder.HasMany(x => x.RepeatingParticipants)
-            //    .WithMany(x=>x.RepeatingTrainGroups)
+            //    .WithMany(x => x.RepeatingTrainGroups)
             //    .UsingEntity(j => j.ToTable("TrainGroupRepeatingParticipants"));
 
             // Relationship with TrainGroupDates (one-to-many)

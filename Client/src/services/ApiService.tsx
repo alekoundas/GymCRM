@@ -6,6 +6,7 @@ import { UserRegisterRequestDto } from "../model/entities/user/UserRegisterReque
 import { LookupDto } from "../model/lookup/LookupDto";
 import { TimeSlotRequestDto } from "../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../model/TimeSlotResponseDto";
+import { TrainGroupParticipantUpdateDto } from "../model/TrainGroupParticipantUpdateDto";
 import { LocalStorageService } from "./LocalStorageService";
 import { ToastService } from "./ToastService";
 import { TokenService } from "./TokenService";
@@ -256,24 +257,21 @@ export default class ApiService {
     return this.apiRequest<TEntity[], TEntity[]>(url, "POST", data);
   }
 
-  
   public static async update<TEntity>(
     controller: string,
     data: TEntity,
     id: number | string
-  ): Promise<TEntity[] | null> {
+  ): Promise<TEntity | null> {
     const url = this.buildUrl(controller, "", id);
-    return this.apiRequest<TEntity[], TEntity[]>(url, "PUT", data[]);
+    return this.apiRequest<TEntity, TEntity>(url, "PUT", data);
   }
 
-  
-  public static async updateRange<TEntity>(
+  public static async delete<TEntity>(
     controller: string,
-    data: TEntity[],
     id: number | string
-  ): Promise<TEntity[] | null> {
+  ): Promise<TEntity | null> {
     const url = this.buildUrl(controller, "", id);
-    return this.apiRequest<TEntity[], TEntity[]>(url, "PUT", data);
+    return this.apiRequest<TEntity, TEntity>(url, "DELETE");
   }
 
   public static async timeslots(
@@ -288,14 +286,15 @@ export default class ApiService {
     );
   }
 
-  public static async delete<TEntity>(
-    controller: string,
-    id: number | string
-  ): Promise<TEntity | null> {
-    const url = this.buildUrl(controller, "", id);
-    return this.apiRequest<TEntity, TEntity>(url, "DELETE");
+  public static async updateParticipants(
+    data: TrainGroupParticipantUpdateDto
+  ): Promise<TrainGroupParticipantUpdateDto | null> {
+    const url = this.buildUrl("TrainGroupParticipants/UpdateParticipants");
+    return this.apiRequest<
+      TrainGroupParticipantUpdateDto,
+      TrainGroupParticipantUpdateDto
+    >(url, "POST", data);
   }
-
 
   public static async login(
     data: UserLoginRequestDto,

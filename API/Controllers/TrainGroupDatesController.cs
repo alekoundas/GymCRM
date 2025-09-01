@@ -2,14 +2,11 @@
 using AutoMapper;
 using Business.Services;
 using Core.Dtos;
-using Core.Dtos.TrainGroup;
 using Core.Dtos.TrainGroupDate;
 using Core.Enums;
 using Core.Models;
-using DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -42,7 +39,8 @@ namespace API.Controllers
 
             List<TrainGroupDate>? timeslots = await _dataService.TrainGroupDates
                 .Include(x => x.TrainGroup.TrainGroupDates)
-                .Include(x => x.TrainGroupDateParticipants)
+                .Include(x => x.TrainGroup.TrainGroupParticipants)
+                .Include(x => x.TrainGroupParticipants)
                 .Where(x =>
                     x.FixedDay == timeSlotRequestDto.SelectedDate
                     || x.RecurrenceDayOfMonth!.Value.Day == timeSlotRequestDto.SelectedDate.Day
@@ -70,8 +68,24 @@ namespace API.Controllers
                                 Date = y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
                                     ? y.RecurrenceDayOfWeek!.Value
                                     : y.RecurrenceDayOfMonth!.Value,
+                                IsUserJoined = y.TrainGroupParticipants.Any(z => z.UserId == new Guid(timeSlotRequestDto.UserId))
                             }
                         )
+                        .Concat(
+                            new List<TimeSlotRecurrenceDateDto>()
+                            {
+                                new TimeSlotRecurrenceDateDto()
+                                {
+                                    TrainGroupDateId = null,
+                                    TrainGroupDateType = null,
+                                    Date = timeSlotRequestDto.SelectedDate,
+                                    IsUserJoined = x.TrainGroup.TrainGroupParticipants
+                                        .Where(y => y.UserId == new Guid(timeSlotRequestDto.UserId))
+                                        .Where(y => y.SelectedDate.HasValue)
+                                        .Where(y => y.SelectedDate!.Value == timeSlotRequestDto.SelectedDate)
+                                        .Any()
+                                }
+                            })
                         .ToList(),
                     SpotsLeft =
                     (
@@ -82,84 +96,19 @@ namespace API.Controllers
                             || (y.RecurrenceDayOfMonth.HasValue ? y.RecurrenceDayOfMonth.Value.Day == timeSlotRequestDto.SelectedDate.Day : false)
                             || (y.RecurrenceDayOfWeek.HasValue ? y.RecurrenceDayOfWeek.Value.DayOfWeek == timeSlotRequestDto.SelectedDate.DayOfWeek : false)
                          )
-                        .SelectMany(y => y.TrainGroupDateParticipants)
+                        .SelectMany(y => y.TrainGroupParticipants)
                         .Where(y => y.SelectedDate == null || y.SelectedDate == timeSlotRequestDto.SelectedDate)
                         .DistinctBy(y => y.UserId)
                         .Count()
                     ),
                 })
-                .DistinctBy(x => x.TrainGroupId)
+                .DistinctBy(x => x.TrainGroupDateId)
                 .ToList();
 
             if (timeSlotRequestDtos == null)
                 return new ApiResponse<List<TimeSlotResponseDto>>().SetErrorResponse("error", $"Requested data not found!");
 
             return new ApiResponse<List<TimeSlotResponseDto>>().SetSuccessResponse(timeSlotRequestDtos);
-        }
-
-
-        // PUT: api/controller/5
-        [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResponse<TrainGroupDate>>> UpdateParticipants([FromBody] TrainGroupDate entityDto)
-        {
-            if (!IsUserAuthorized("Edit"))
-                return new ApiResponse<TrainGroupDate>().SetErrorResponse("error", "User is not authorized to perform this action.");
-
-            if (!ModelState.IsValid)
-                return new ApiResponse<TrainGroupDate>().SetErrorResponse("error", "Invalid data provided.");
-
-
-            TrainGroupDate entity = _mapper.Map<TrainGroupDate>(entityDto);
-            ApiDbContext dbContext = _dataService.GetDbContext();
-
-            // Load existing entity with related data
-            TrainGroupDate? existingEntity = await dbContext.Set<TrainGroupDate>()
-                .Include(x => x.TrainGroupDateParticipants)
-                .Where(x => x.Id == entity.Id)
-                .FirstOrDefaultAsync();
-
-            if (existingEntity == null)
-            {
-                string className = typeof(TrainGroupDate).Name;
-                return new ApiResponse<TrainGroupDate>().SetErrorResponse("error", $"Requested {className} not found!");
-            }
-
-
-            // Update scalar properties
-            //dbContext.Entry(existingEntity).CurrentValues.SetValues(entity);
-
-            // Map incoming TrainGroupDates to existing ones
-            List<TrainGroupDateParticipant> incomingParticipants = entity.TrainGroupDateParticipants.ToList();
-            List<TrainGroupDateParticipant> existingParticipants = existingEntity.TrainGroupDateParticipants.ToList();
-
-            // Remove deleted TrainGroupDates
-            foreach (TrainGroupDateParticipant existingParticipant in existingParticipants)
-                if (!incomingParticipants.Any(d => d.Id == existingParticipant.Id && d.Id > 0))
-                    dbContext.Remove(existingParticipant);
-
-            // Update or add TrainGroupDates
-            foreach (TrainGroupDateParticipant incomingParticipant in incomingParticipants)
-            {
-                TrainGroupDateParticipant? existingDate = existingParticipants.FirstOrDefault(d => d.Id == incomingParticipant.Id && incomingParticipant.Id > 0);
-                if (existingDate != null)
-                {
-                    // Update existing TrainGroupDate
-                    dbContext.Entry(existingDate).CurrentValues.SetValues(incomingParticipant);
-                }
-                else
-                {
-                    // Add new TrainGroupDate
-                    incomingParticipant.Id = 0;
-                    incomingParticipant.TrainGroupDateId = entity.Id;
-                    dbContext.Add(incomingParticipant);
-                    existingEntity.TrainGroupDateParticipants.Add(incomingParticipant);
-                }
-            }
-
-
-            await dbContext.SaveChangesAsync();
-            dbContext.Dispose();
-            return new ApiResponse<TrainGroupDate>().SetSuccessResponse(existingEntity);
         }
     }
 }

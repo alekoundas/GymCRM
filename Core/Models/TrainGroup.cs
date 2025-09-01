@@ -15,5 +15,6 @@ namespace Core.Models
         public User Trainer { get; set; } = null!; 
 
         public virtual ICollection<TrainGroupDate> TrainGroupDates { get; set; } = new Collection<TrainGroupDate>();
+        public virtual ICollection<TrainGroupParticipant> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipant>();
     }
 }

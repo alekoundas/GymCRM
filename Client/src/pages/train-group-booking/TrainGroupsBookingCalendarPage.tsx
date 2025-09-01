@@ -1,54 +1,35 @@
-import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { Card } from "primereact/card";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import ApiService from "../../services/ApiService";
-import { TimeSlotRequestDto } from "../../model/TimeSlotRequestDto";
-import { TimeSlotResponseDto } from "../../model/TimeSlotResponseDto";
-import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
-import { Tag } from "primereact/tag";
-import { DateService } from "../../services/DateService";
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import { TokenService } from "../../services/TokenService";
-import { TrainGroupDateParticipantDto } from "../../model/TrainGroupDateParticipantDto";
-import { Checkbox } from "primereact/checkbox";
 import { FormMode } from "../../enum/FormMode";
 import TrainGroupsBookingCalendarTimeslotComponent from "./TrainGroupsBookingCalendarTimeslotComponent";
 import { useTrainGroupBookingStore } from "../../stores/TrainGroupBookingStore";
 import TrainGroupsBookingCalendarTimeslotInfoComponent from "./TrainGroupsBookingCalendarTimeslotInfoComponent";
 import TrainGroupsBookingCalendarTimeslotBookFormComponent from "./TrainGroupsBookingCalendarTimeslotBookFormComponent";
+import { ToastService } from "../../services/ToastService";
+import { TrainGroupParticipantDto } from "../../model/TrainGroupParticipantDto";
 
 export default function TrainGroupsBookingCalendarPage() {
   const {
     timeSlotRequestDto,
-    selectedTimeSlotResponseDto,
-    setTimeSlotRequestDto,
-    setTimeSlotResponseDto,
-    setSelectedTimeSlotResponseDto,
+    selectedTimeSlot,
+    trainGroupDateParticipantUpdateDto,
+    resetTimeSlotRequestDto,
+    updateTrainGroupDateParticipantUpdateDto,
     resetTimeSlotResponseDto,
+    resetSelectedTimeSlotResponseDto,
   } = useTrainGroupBookingStore();
-  //  const { t } = useTranslation();
   const [isDialogVisible, setDialogVisibility] = useState(false);
-  // const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  // const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
-  // const [selectedSlot, setSelectedSlot] = useState<TimeSlotResponseDto | null>(
-  //   null
-  // );
-  const [bookCurrentDate, setBookCurrentDate] = useState<boolean>(false);
-  const [selectedRecurrenceDates, setSelectedRecurrenceDates] = useState<
-    number[]
-  >([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const dialogControl: DialogControl = {
     showDialog: () => setDialogVisibility(true),
-    hideDialog: () => {
-      setDialogVisibility(false);
-      setBookCurrentDate(false);
-      setSelectedRecurrenceDates([]);
-    },
+    hideDialog: () => setDialogVisibility(false),
   };
 
   const handleChangeDate = (value: Date) => {
@@ -61,89 +42,56 @@ export default function TrainGroupsBookingCalendarPage() {
       0,
       0
     );
-    // setSelectedDate(dateCleaned);
-    setTimeSlotRequestDto({ selectedDate: dateCleaned });
-    // setSelectedSlot(null); // Reset selected slot when date changes
-    resetTimeSlotResponseDto(); // Reset selected slot when date changes
 
-    const timeSlotDto = new TimeSlotRequestDto();
-    timeSlotDto.selectedDate = dateCleaned;
-    ApiService.timeslots("TrainGroupDates/TimeSlots", timeSlotDto)
-      .then((response) => {
-        if (response) {
-          setTimeSlotResponseDto(response);
-        }
-      })
-      .finally(() => setLoading(false));
-  };
+    // Reset selected slot when date changes
+    resetTimeSlotResponseDto();
+    resetSelectedTimeSlotResponseDto();
 
-  const handleBooking = () => {
-    if (timeSlotRequestDto.selectedDate && selectedTimeSlotResponseDto) {
-      setBookCurrentDate(true);
-      setDialogVisibility(true);
-    }
-  };
-
-  const handleConfirmBooking = () => {
-    if (!timeSlotRequestDto.selectedDate || !selectedTimeSlotResponseDto)
-      return;
-
-    const userId = TokenService.getUserId();
-    const participants: TrainGroupDateParticipantDto[] = [];
-
-    // Add participant for current selected date if checked
-    if (bookCurrentDate) {
-      participants.push({
-        selectedDate: timeSlotRequestDto.selectedDate.toISOString(),
-        trainGroupDateId: selectedTimeSlotResponseDto.trainGroupDateId,
-        userId,
-      });
-    }
-
-    // Add participants for selected recurring dates
-    selectedRecurrenceDates.forEach((trainGroupDateId) => {
-      participants.push({
-        selectedDate: null,
-        trainGroupDateId,
-        userId,
-      });
+    resetTimeSlotRequestDto(dateCleaned.toISOString());
+    updateTrainGroupDateParticipantUpdateDto({
+      selectedDate: dateCleaned.toISOString(),
     });
+  };
 
-    if (participants.length === 0) {
-      // toast.current?.show({
-      //   severity: "warn",
-      //   summary: t("datatable.warning"),
-      //   detail: t("datatable.no_dates_selected"),
-      // });
-      return;
+  const onBookNowClick = () => {
+    const trainGroupParticipants = selectedTimeSlot?.recurrenceDates
+      .filter((x) => x.isUserJoined)
+      .map(
+        (x) =>
+          ({
+            selectedDate: x.date,
+            trainGroupDateId: x.trainGroupDateId,
+            userId: TokenService.getUserId(),
+            trainGroupId: selectedTimeSlot.trainGroupId,
+          } as TrainGroupParticipantDto)
+      );
+
+    updateTrainGroupDateParticipantUpdateDto({
+      trainGroupParticipantDtos: trainGroupParticipants,
+    });
+    setDialogVisibility(true);
+  };
+
+  const onSave = () => {
+    if (!timeSlotRequestDto.selectedDate || !selectedTimeSlot) return;
+
+    trainGroupDateParticipantUpdateDto.trainGroupId =
+      selectedTimeSlot.trainGroupId;
+
+    if (
+      trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.length === 0
+    ) {
+      ToastService.showWarn("No dates selected!");
     }
 
     setLoading(true);
-    ApiService.create("TrainGroups/CreateParticipants", participants)
+    ApiService.updateParticipants(trainGroupDateParticipantUpdateDto)
       .then((response) => {
         dialogControl.hideDialog();
-        handleChangeDate(timeSlotRequestDto.selectedDate); // Refresh time slots
-        // if (response.isSucceed) {
-        //   toast.current?.show({
-        //     severity: "success",
-        //     summary: t("datatable.success"),
-        //     detail: t("datatable.booking_confirmed"),
-        //   });
-        // }
-      })
-      .catch((error) => {
-        // toast.current?.show({
-        //   severity: "error",
-        //   summary: t("datatable.error"),
-        //   detail: t("datatable.booking_failed"),
-        // });
+        handleChangeDate(new Date(timeSlotRequestDto.selectedDate)); // Refresh time slots
       })
       .finally(() => setLoading(false));
   };
-
-  // const onDialogDelete = ()=>{
-  //   handleConfirmBooking
-  // }
 
   return (
     <>
@@ -157,7 +105,7 @@ export default function TrainGroupsBookingCalendarPage() {
             subTitle="Select a date to view available time slots"
           >
             <Calendar
-              value={timeSlotRequestDto.selectedDate}
+              value={new Date(timeSlotRequestDto.selectedDate)}
               onChange={(e) => handleChangeDate(e.value as Date)}
               inline
               showIcon={false}
@@ -170,7 +118,7 @@ export default function TrainGroupsBookingCalendarPage() {
         <div className="col-12 lg:col-6 xl:col-6">
           <TrainGroupsBookingCalendarTimeslotComponent />
           <TrainGroupsBookingCalendarTimeslotInfoComponent
-            onBook={handleBooking}
+            onBook={onBookNowClick}
           />
         </div>
       </div>
@@ -184,8 +132,7 @@ export default function TrainGroupsBookingCalendarPage() {
         visible={isDialogVisible}
         control={dialogControl}
         formMode={FormMode.ADD}
-        // onDelete={() => handleConfirmBooking()}
-        onSave={() => handleConfirmBooking()}
+        onSave={() => onSave()}
       >
         <TrainGroupsBookingCalendarTimeslotBookFormComponent />
       </GenericDialogComponent>

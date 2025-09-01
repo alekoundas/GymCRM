@@ -1,0 +1,18 @@
+﻿namespace Core.Models
+{
+    public class 
+        TrainGroupParticipant : BaseModel
+    {
+        public DateTime? SelectedDate { get; set; } // If null repeating subscriber,if not specific date participant
+
+        public int? TrainGroupDateId { get; set; }
+        public TrainGroupDate? TrainGroupDate { get; set; } = null!;
+
+        public int? TrainGroupId { get; set; }
+        public TrainGroup? TrainGroup { get; set; } = null!;
+
+
+        public Guid UserId { get; set; } 
+        public User User { get; set; } = null!; 
+    }
+}

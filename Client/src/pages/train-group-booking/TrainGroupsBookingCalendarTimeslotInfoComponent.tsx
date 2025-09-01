@@ -12,56 +12,84 @@ interface IField {
 export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
   onBook,
 }: IField) {
-  const {
-    timeSlotRequestDto,
-    timeSlotResponseDto,
-    selectedTimeSlotResponseDto,
-    setTimeSlotRequestDto,
-    setTimeSlotResponseDto,
-    setSelectedTimeSlotResponseDto,
-    resetTimeSlotResponseDto,
-  } = useTrainGroupBookingStore();
+  const { timeSlotRequestDto, selectedTimeSlot } = useTrainGroupBookingStore();
 
   return (
     <>
-      {timeSlotRequestDto.selectedDate && selectedTimeSlotResponseDto && (
+      {timeSlotRequestDto.selectedDate && selectedTimeSlot && (
         <Card
           title="Selected Time Slot Details"
           className="mt-4"
         >
           <p>
             <strong>Time:</strong>{" "}
-            {new Date(selectedTimeSlotResponseDto.startOn).toLocaleTimeString()}
+            {new Date(selectedTimeSlot.startOn).toLocaleTimeString()}
           </p>
           <p>
-            <strong>Group Name:</strong>{" "}
-            {selectedTimeSlotResponseDto.title || "N/A"}
+            <strong>Group Name:</strong> {selectedTimeSlot.title || "N/A"}
           </p>
           <p>
-            <strong>Trainer:</strong>{" "}
-            {selectedTimeSlotResponseDto.trainerId || "N/A"}
+            <strong>Trainer:</strong> {selectedTimeSlot.trainerId || "N/A"}
           </p>
           <p>
             <strong>Description:</strong>{" "}
-            {selectedTimeSlotResponseDto.description ||
-              "No description available."}
+            {selectedTimeSlot.description || "No description available."}
           </p>
           <p>
             <strong>Spots Left:</strong>{" "}
-            {selectedTimeSlotResponseDto.spotsLeft !== undefined
-              ? selectedTimeSlotResponseDto.spotsLeft
+            {selectedTimeSlot.spotsLeft !== undefined
+              ? selectedTimeSlot.spotsLeft
               : "N/A"}
           </p>
           <p>
             <strong>Available:</strong>{" "}
-            {selectedTimeSlotResponseDto.spotsLeft > 0 ? "Yes" : "No"}
+            {selectedTimeSlot.spotsLeft > 0 ? "Yes" : "No"}
           </p>
 
-          <h3 className="mt-6">Group is also recurring on </h3>
+          <h3 className="mt-6">Group is occurring on </h3>
 
-          <p></p>
+          <p>
+            <strong>Current Date:</strong>{" "}
+            {selectedTimeSlot.spotsLeft > 0 ? "Yes" : "No"}
+          </p>
 
-          {selectedTimeSlotResponseDto.recurrenceDates.filter(
+          <div>
+            {selectedTimeSlot.recurrenceDates
+              .filter((x) => x.trainGroupDateType === undefined)
+              .map((x) => {
+                if (x.isUserJoined)
+                  return (
+                    <Tag
+                      className="p-2 m-1"
+                      key={x.trainGroupDateId}
+                      severity={"success"}
+                    >
+                      {new Date(x.date).getDate() +
+                        "/" +
+                        (new Date(x.date).getMonth() + 1) +
+                        "/" +
+                        new Date(x.date).getFullYear()}
+                      <span> </span>
+                      <i className="pi pi-check"></i>
+                    </Tag>
+                  );
+                else
+                  return (
+                    <Tag
+                      className="p-2 m-1"
+                      key={x.trainGroupDateId}
+                    >
+                      {new Date(x.date).getDate() +
+                        "/" +
+                        (new Date(x.date).getMonth() + 1) +
+                        "/" +
+                        new Date(x.date).getFullYear()}
+                    </Tag>
+                  );
+              })}
+          </div>
+
+          {selectedTimeSlot.recurrenceDates.filter(
             (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK
           ).length > 0 ? (
             <p>
@@ -70,21 +98,37 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
           ) : null}
 
           <div>
-            {selectedTimeSlotResponseDto.recurrenceDates
+            {selectedTimeSlot.recurrenceDates
               .filter(
                 (x) =>
                   x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK
               )
-              .map((x) => (
-                <Tag
-                  className="p-2 m-1"
-                  key={x.trainGroupDateId}
-                  value={DateService.getDayOfWeekFromDate(new Date(x.date))}
-                ></Tag>
-              ))}
+              .map((x) => {
+                if (x.isUserJoined)
+                  return (
+                    <Tag
+                      className="p-2 m-1"
+                      key={x.trainGroupDateId}
+                      severity={"success"}
+                    >
+                      {DateService.getDayOfWeekFromDate(new Date(x.date))}
+                      <span> </span>
+                      <i className="pi pi-check"></i>
+                    </Tag>
+                  );
+                else
+                  return (
+                    <Tag
+                      className="p-2 m-1"
+                      key={x.trainGroupDateId}
+                    >
+                      {DateService.getDayOfWeekFromDate(new Date(x.date))}
+                    </Tag>
+                  );
+              })}
           </div>
 
-          {selectedTimeSlotResponseDto.recurrenceDates.filter(
+          {selectedTimeSlot.recurrenceDates.filter(
             (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH
           ).length > 0 ? (
             <p>
@@ -93,18 +137,33 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
           ) : null}
 
           <div>
-            {selectedTimeSlotResponseDto.recurrenceDates
+            {selectedTimeSlot.recurrenceDates
               .filter(
                 (x) =>
                   x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH
               )
-              .map((x) => (
-                <Tag
-                  className="p-2 m-1"
-                  key={x.trainGroupDateId}
-                  value={new Date(x.date).getDate()}
-                ></Tag>
-              ))}
+              .map((x) => {
+                if (x.isUserJoined)
+                  return (
+                    <Tag
+                      className="p-2 m-1"
+                      key={x.trainGroupDateId}
+                      severity={"success"}
+                    >
+                      {new Date(x.date).getDate()}
+                      <i className="pi pi-check"></i>
+                    </Tag>
+                  );
+                else
+                  return (
+                    <Tag
+                      className="p-2 m-1"
+                      key={x.trainGroupDateId}
+                    >
+                      {new Date(x.date).getDate()}
+                    </Tag>
+                  );
+              })}
           </div>
           <div className="flex justify-content-center">
             <Button
@@ -112,7 +171,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
               icon="pi pi-check"
               className="mt-4 pr-5 pl-5 pt-3 pb-3"
               onClick={onBook}
-              disabled={!(selectedTimeSlotResponseDto.spotsLeft > 0)}
+              disabled={!(selectedTimeSlot.spotsLeft > 0)}
             />
           </div>
         </Card>

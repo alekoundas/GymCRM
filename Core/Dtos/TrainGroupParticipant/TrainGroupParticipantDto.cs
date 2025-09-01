@@ -2,13 +2,12 @@
 
 namespace Core.Models
 {
-    public class TrainGroupDateParticipantDto
+    public class TrainGroupParticipantDto
     {
         public DateTime? SelectedDate { get; set; } // If null repeating subscriber,if not specific date participant
 
-        [Required(ErrorMessage = "TrainGroupDateId is required")]
-        public int TrainGroupDateId { get; set; }
-        //public TrainGroupDate TrainGroupDate { get; set; } = null!;
+        public int? TrainGroupDateId { get; set; }
+        public int? TrainGroupId { get; set; }
 
 
         [Required(ErrorMessage = "UserId is required")]
