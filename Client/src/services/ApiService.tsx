@@ -33,19 +33,19 @@ export default class ApiService {
   ) {
     if (!messages) return;
     const allMessages = Object.values(messages).flat();
-    if (allMessages.length > 1) {
-      const summary = isSuccess
-        ? "Operation completed with messages."
-        : "Multiple errors occurred.";
-      isSuccess
-        ? ToastService.showSuccess(summary)
-        : ToastService.showError(summary);
-      console.log("Messages:", allMessages); // Log details for debugging
-    } else {
-      allMessages.forEach((msg) =>
-        isSuccess ? ToastService.showSuccess(msg) : ToastService.showError(msg)
-      );
-    }
+    // if (allMessages.length > 1) {
+    //   const summary = isSuccess
+    //     ? "Operation completed with messages."
+    //     : "Multiple errors occurred.";
+    //   isSuccess
+    //     ? ToastService.showSuccess(summary)
+    //     : ToastService.showError(summary);
+    //   console.log("Messages:", allMessages); // Log details for debugging
+    // } else {
+    allMessages.forEach((msg) =>
+      isSuccess ? ToastService.showSuccess(msg) : ToastService.showError(msg)
+    );
+    // }
   }
 
   private static async apiFetch<TRequest, TResponse>(
