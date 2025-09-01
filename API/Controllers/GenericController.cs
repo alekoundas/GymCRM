@@ -2,8 +2,8 @@
 using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
-using Core.Dtos.TrainGroup;
 using Core.Enums;
+using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,26 +47,49 @@ namespace API.Controllers
             return new ApiResponse<TEntityDto>().SetSuccessResponse(entityDto);
         }
 
+        // TODO Remove this method ad replace with bellow metthod.
+        // POST: api/controller
+        //[HttpPost]
+        //public virtual async Task<ActionResult<ApiResponse<TEntity>>> Post([FromBody] TEntityAddDto entityDto)
+        //{
+        //    if (!IsUserAuthorized("Add"))
+        //        return new ApiResponse<TEntity>().SetErrorResponse("error", "User is not authorized to perform this action.");
+
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", "Invalid data provided."));
+
+        //    if (CustomValidatePOST(entityDto, out string[] errors))
+        //        return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", errors));
+
+        //    TEntity entity = _mapper.Map<TEntity>(entityDto);
+
+        //    int result = await _dataService.GetGenericRepository<TEntity>().AddAsync(entity);
+        //    if (result <= 0)
+        //        return new ApiResponse<TEntity>().SetErrorResponse("error", "An error occurred while creating the entity.");
+
+        //    return new ApiResponse<TEntity>().SetSuccessResponse(entity);
+        //}
         // POST: api/controller
         [HttpPost]
-        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Post([FromBody] TEntityAddDto entityDto)
+        public virtual async Task<ActionResult<ApiResponse<List<TEntity>>>> Post([FromBody] List<TEntityAddDto> entityDtos)
         {
             if (!IsUserAuthorized("Add"))
-                return new ApiResponse<TEntity>().SetErrorResponse("error", "User is not authorized to perform this action.");
+                return new ApiResponse<List<TEntity>>().SetErrorResponse("error", "User is not authorized to perform this action.");
 
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", "Invalid data provided."));
+                return BadRequest(new ApiResponse<List<TEntity>>().SetErrorResponse("error", "Invalid data provided."));
 
-            if(CustomValidatePOST(entityDto, out string[] errors))
-                return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", errors));
+            foreach (var entityDto in entityDtos)
+                if (CustomValidatePOST(entityDto, out string[] errors))
+                    return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", errors));
 
-            TEntity entity = _mapper.Map<TEntity>(entityDto);
+            List<TEntity> entities = _mapper.Map<List<TEntity>>(entityDtos);
 
-            int result = await _dataService.GetGenericRepository<TEntity>().AddAsync(entity);
+            int result = await _dataService.GetGenericRepository<TEntity>().AddRangeAsync(entities);
             if (result <= 0)
-                return new ApiResponse<TEntity>().SetErrorResponse("error", "An error occurred while creating the entity.");
+                return new ApiResponse<List<TEntity>>().SetErrorResponse("error", "An error occurred while creating the entity.");
 
-            return new ApiResponse<TEntity>().SetSuccessResponse(entity);
+            return new ApiResponse<List<TEntity>>().SetSuccessResponse(entities);
         }
 
         // PUT: api/controller/5
@@ -78,6 +101,9 @@ namespace API.Controllers
 
             if (!ModelState.IsValid)
                 return new ApiResponse<TEntity>().SetErrorResponse("error", "Invalid data provided.");
+
+            if (CustomValidatePUT(entityDto, out string[] errors))
+                return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", errors));
 
             TEntity entity = _mapper.Map<TEntity>(entityDto);
 
@@ -192,13 +218,13 @@ namespace API.Controllers
             return true;
         }
 
-        protected bool IsUserAuthorized(string action)
+        protected virtual bool IsUserAuthorized(string action)
         {
             string controllerName = ControllerContext.ActionDescriptor.ControllerName;
             string claimName = controllerName + "_" + action;
             bool hasClaim = User.HasClaim("Permission", claimName);
             var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
-            return hasClaim; 
+            return hasClaim;
         }
     }
 }
