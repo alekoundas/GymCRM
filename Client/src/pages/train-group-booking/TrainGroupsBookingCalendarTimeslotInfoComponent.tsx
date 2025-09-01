@@ -50,7 +50,6 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
 
           <p>
             <strong>Current Date:</strong>{" "}
-            {selectedTimeSlot.spotsLeft > 0 ? "Yes" : "No"}
           </p>
 
           <div>
@@ -69,7 +68,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                         (new Date(x.date).getMonth() + 1) +
                         "/" +
                         new Date(x.date).getFullYear()}
-                      <span> </span>
+                      {"  "}
                       <i className="pi pi-check"></i>
                     </Tag>
                   );
@@ -111,8 +110,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                       key={x.trainGroupDateId}
                       severity={"success"}
                     >
-                      {DateService.getDayOfWeekFromDate(new Date(x.date))}
-                      <span> </span>
+                      {DateService.getDayOfWeekFromDate(new Date(x.date))}{" "}
                       <i className="pi pi-check"></i>
                     </Tag>
                   );
@@ -150,7 +148,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                       key={x.trainGroupDateId}
                       severity={"success"}
                     >
-                      {new Date(x.date).getDate()}
+                      {new Date(x.date).getDate()}{" "}
                       <i className="pi pi-check"></i>
                     </Tag>
                   );
