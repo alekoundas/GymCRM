@@ -59,7 +59,7 @@ export default function TrainGroupsBookingCalendarPage() {
       .map(
         (x) =>
           ({
-            selectedDate: x.date,
+            selectedDate: x.trainGroupDateId ? undefined : x.date,
             trainGroupDateId: x.trainGroupDateId,
             userId: TokenService.getUserId(),
             trainGroupId: selectedTimeSlot.trainGroupId,
@@ -87,8 +87,10 @@ export default function TrainGroupsBookingCalendarPage() {
     setLoading(true);
     ApiService.updateParticipants(trainGroupDateParticipantUpdateDto)
       .then((response) => {
-        dialogControl.hideDialog();
-        handleChangeDate(new Date(timeSlotRequestDto.selectedDate)); // Refresh time slots
+        if (response) {
+          dialogControl.hideDialog();
+          handleChangeDate(new Date(timeSlotRequestDto.selectedDate)); // Refresh time slots
+        }
       })
       .finally(() => setLoading(false));
   };
