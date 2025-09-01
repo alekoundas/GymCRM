@@ -16,12 +16,12 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
     id: -1,
     title: "",
     description: "",
-    isRepeating: false,
     duration: new Date(2000, 0, 1, 0, 0, 0),
     startOn: new Date(2000, 0, 1, 0, 0, 0),
     maxParticipants: 1,
     trainerId: "",
     trainGroupDates: [],
+    TrainGroupParticipants: [],
   },
   setTrainGroupDto: (data) => set({ trainGroupDto: data }),
   updateTrainGroupDto: (updates) =>
@@ -51,6 +51,7 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
           maxParticipants: 1,
           trainerId: "",
           trainGroupDates: [],
+          TrainGroupParticipants: [],
         },
       });
   },

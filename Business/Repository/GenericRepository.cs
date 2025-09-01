@@ -35,6 +35,7 @@ namespace Business.Repository
             return this;
         }
 
+
         //TODO: Find a way to combine Select methods.
         public GenericRepository<User> Select<TResult>(Expression<Func<TEntity, User>> selector)
         {

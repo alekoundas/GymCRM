@@ -93,6 +93,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
@@ -190,7 +191,7 @@ namespace DataAccess.Migrations
                     b.ToTable("TrainGroupCancellationSubscribers");
                 });
 
-            modelBuilder.Entity("Core.Models.TrainGroupDateParticipant", b =>
+            modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -210,7 +211,10 @@ namespace DataAccess.Migrations
                     b.Property<DateTime?>("SelectedDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("TrainGroupDateId")
+                    b.Property<int?>("TrainGroupDateId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("TrainGroupId")
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid>("UserId")
@@ -222,6 +226,8 @@ namespace DataAccess.Migrations
                         .IsUnique();
 
                     b.HasIndex("TrainGroupDateId");
+
+                    b.HasIndex("TrainGroupId");
 
                     b.HasIndex("UserId");
 
@@ -466,7 +472,7 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("Core.Models.TrainGroup", b =>
                 {
                     b.HasOne("Core.Models.User", "Trainer")
-                        .WithMany("Trainers")
+                        .WithMany("TrainGroups")
                         .HasForeignKey("TrainerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -504,19 +510,25 @@ namespace DataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Core.Models.TrainGroupDateParticipant", b =>
+            modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
                 {
                     b.HasOne("Core.Models.TrainGroupDate", "TrainGroupDate")
-                        .WithMany("TrainGroupDateParticipants")
+                        .WithMany("TrainGroupParticipants")
                         .HasForeignKey("TrainGroupDateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Core.Models.TrainGroup", "TrainGroup")
+                        .WithMany("TrainGroupParticipants")
+                        .HasForeignKey("TrainGroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Core.Models.User", "User")
-                        .WithMany("TrainGroupDatesParticipant")
+                        .WithMany("TrainGroupParticipants")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("TrainGroup");
 
                     b.Navigation("TrainGroupDate");
 
@@ -577,13 +589,15 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("Core.Models.TrainGroup", b =>
                 {
                     b.Navigation("TrainGroupDates");
+
+                    b.Navigation("TrainGroupParticipants");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroupDate", b =>
                 {
                     b.Navigation("TrainGroupDateCancellationSubscribers");
 
-                    b.Navigation("TrainGroupDateParticipants");
+                    b.Navigation("TrainGroupParticipants");
                 });
 
             modelBuilder.Entity("Core.Models.User", b =>
@@ -592,9 +606,9 @@ namespace DataAccess.Migrations
 
                     b.Navigation("TrainGroupDatesCancellationSubscriber");
 
-                    b.Navigation("TrainGroupDatesParticipant");
+                    b.Navigation("TrainGroupParticipants");
 
-                    b.Navigation("Trainers");
+                    b.Navigation("TrainGroups");
                 });
 #pragma warning restore 612, 618
         }

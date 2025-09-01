@@ -1,5 +1,4 @@
 import { TrainGroupDateDto } from "./TrainGroupDateDto";
-import { TrainGroupParticipantDto } from "./TrainGroupParticipantDto";
 
 export interface TrainGroupDto {
   id: number;
@@ -10,6 +9,7 @@ export interface TrainGroupDto {
   maxParticipants: number;
   trainerId: string;
   trainGroupDates: TrainGroupDateDto[];
+  TrainGroupParticipants: TrainGroupDateDto[];
 }
 
 export class TrainGroupDto {
@@ -21,4 +21,5 @@ export class TrainGroupDto {
   maxParticipants: number;
   trainerId: string;
   trainGroupDates: TrainGroupDateDto[];
+  TrainGroupParticipants: TrainGroupDateDto[];
 }

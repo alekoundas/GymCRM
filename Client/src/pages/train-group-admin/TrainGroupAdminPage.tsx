@@ -98,7 +98,7 @@ export default function TrainGroupAdminPage() {
   ];
 
   const OnSaveAdd = async () => {
-    const response = await ApiService.create("trainGroup", trainGroupDto);
+    const response = await ApiService.create("trainGroups", trainGroupDto);
 
     if (response) {
       dialogControlAdd.hideDialog();

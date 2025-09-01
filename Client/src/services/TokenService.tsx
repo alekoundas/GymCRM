@@ -48,10 +48,10 @@ export class TokenService {
     }
   };
 
-  public static getTokenClaims = (): TokenData | null => {
+  public static getTokenClaims = (): TokenData | undefined => {
     const token = LocalStorageService.getAccessToken();
     if (!token) {
-      return null;
+      return undefined;
     }
 
     try {
@@ -59,35 +59,35 @@ export class TokenService {
       return decodedToken;
     } catch (error) {
       console.error("Error decoding token:", error);
-      return null;
+      return undefined;
     }
   };
 
   // Get specific claim by key
   public static getClaim = (claimKey: keyof TokenData): any => {
     const claims = TokenService.getTokenClaims();
-    const result = claims ? claims[claimKey] : null;
+    const result = claims ? claims[claimKey] : undefined;
     return result;
   };
 
   // Get role claims
-  public static getRoleClaims = (): string[] | null => {
-    return TokenService.getClaim("roleClaim") || null;
+  public static getRoleClaims = (): string[] | undefined => {
+    return TokenService.getClaim("roleClaim") || undefined;
   };
 
   // Get user ID
-  public static getUserId = (): string | null => {
-    return TokenService.getClaim("Id") || null;
+  public static getUserId = (): string | undefined => {
+    return TokenService.getClaim("Id") || undefined;
   };
 
   // Get username
-  public static getUserName = (): string | null => {
-    return TokenService.getClaim("userName") || null;
+  public static getUserName = (): string | undefined => {
+    return TokenService.getClaim("userName") || undefined;
   };
 
   // Get RoleName
-  public static getRoleName = (): string | null => {
-    return TokenService.getClaim("RoleName") || null;
+  public static getRoleName = (): string | undefined => {
+    return TokenService.getClaim("RoleName") || undefined;
   };
 
   // Is user allowed
