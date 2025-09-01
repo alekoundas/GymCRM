@@ -2,14 +2,12 @@
 using Business.Services;
 using Core.Dtos;
 using Core.Dtos.TrainGroup;
-using Core.Dtos.TrainGroupDate;
 using Core.Enums;
 using Core.Models;
 using DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace API.Controllers
 {
@@ -121,7 +119,7 @@ namespace API.Controllers
 
 
             if (entityAddDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
-                && entityAddDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK))
+                && entityAddDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH))
                 errorList.Add("Day of week and Day of Month doesnt mix! Please select only one of those types.");
 
             if (entityAddDto.TrainGroupDates.Any(x =>
@@ -175,7 +173,7 @@ namespace API.Controllers
 
 
             if (entityDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
-                && entityDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK))
+                && entityDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH))
                 errorList.Add("Day of week and Day of Month doesnt mix! Please select only one of those types.");
 
             if (entityDto.TrainGroupDates.Any(x =>

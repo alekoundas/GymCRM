@@ -59,6 +59,7 @@ export default function TrainGroupsBookingCalendarPage() {
       .map(
         (x) =>
           ({
+            id: x.trainGroupParticipantId,
             selectedDate: x.trainGroupDateId ? undefined : x.date,
             trainGroupDateId: x.trainGroupDateId,
             userId: TokenService.getUserId(),

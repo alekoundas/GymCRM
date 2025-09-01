@@ -8,8 +8,8 @@
         public int? TrainGroupDateId { get; set; }
         public TrainGroupDate? TrainGroupDate { get; set; } = null!;
 
-        public int? TrainGroupId { get; set; }
-        public TrainGroup? TrainGroup { get; set; } = null!;
+        public int TrainGroupId { get; set; }
+        public TrainGroup TrainGroup { get; set; } = null!;
 
 
         public Guid UserId { get; set; } 

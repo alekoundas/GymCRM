@@ -169,7 +169,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
               icon="pi pi-check"
               className="mt-4 pr-5 pl-5 pt-3 pb-3"
               onClick={onBook}
-              disabled={!(selectedTimeSlot.spotsLeft > 0)}
+              // disabled={!(selectedTimeSlot.spotsLeft > 0)}
             />
           </div>
         </Card>

@@ -5,6 +5,7 @@ namespace Core.Dtos.TrainGroupDate
     public class TimeSlotRecurrenceDateDto
     {
         public int? TrainGroupDateId { get; set; }
+        public int? TrainGroupParticipantId { get; set; }
         public TrainGroupDateTypeEnum? TrainGroupDateType { get; set; }
         public DateTime Date { get; set; } 
         public bool IsUserJoined { get; set; }

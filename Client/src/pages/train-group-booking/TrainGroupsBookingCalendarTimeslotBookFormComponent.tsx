@@ -14,10 +14,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
     trainGroupDateParticipantUpdateDto,
     updateTrainGroupDateParticipantUpdateDto,
   } = useTrainGroupBookingStore();
-  const [bookCurrentDate, setBookCurrentDate] = useState<boolean>(false);
-  const [selectedRecurrenceDates, setSelectedRecurrenceDates] = useState<
-    number[]
-  >([]);
+
   return (
     <>
       {selectedTimeSlot && (
@@ -52,6 +49,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                 ? [
                                     ...trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos,
                                     {
+                                      id: 0,
                                       selectedDate:
                                         timeSlotRequestDto.selectedDate,
                                       trainGroupId:
@@ -65,7 +63,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                   ),
                             });
                           }}
-                          disabled={selectedTimeSlot.spotsLeft <= 0}
+                          // disabled={selectedTimeSlot.spotsLeft <= 0}
                         />
                         <label
                           htmlFor={`recurrence-${x.trainGroupDateId}`}
@@ -124,6 +122,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                 ? [
                                     ...trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos,
                                     {
+                                      id: 0,
                                       selectedDate: undefined,
                                       trainGroupId:
                                         selectedTimeSlot.trainGroupId,
@@ -137,7 +136,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                   ),
                             });
                           }}
-                          disabled={selectedTimeSlot.spotsLeft <= 0}
+                          // disabled={selectedTimeSlot.spotsLeft <= 0}
                         />
                         <label
                           htmlFor={`recurrence-${x.trainGroupDateId}`}
@@ -182,6 +181,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                 ? [
                                     ...trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos,
                                     {
+                                      id: 0,
                                       selectedDate: undefined,
                                       trainGroupId:
                                         selectedTimeSlot.trainGroupId,
@@ -195,7 +195,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                   ),
                             });
                           }}
-                          disabled={selectedTimeSlot.spotsLeft <= 0}
+                          // disabled={selectedTimeSlot.spotsLeft <= 0}
                         />
                         <label
                           htmlFor={`recurrence-${x.trainGroupDateId}`}
