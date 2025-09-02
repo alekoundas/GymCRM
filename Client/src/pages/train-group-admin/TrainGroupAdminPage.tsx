@@ -97,7 +97,7 @@ export default function TrainGroupAdminPage() {
     },
   ];
 
-  const OnSaveAdd = async () => {
+  const OnSaveAdd = async (): Promise<void> => {
     const response = await ApiService.create("trainGroups", trainGroupDto);
 
     if (response) {
@@ -107,7 +107,7 @@ export default function TrainGroupAdminPage() {
     }
   };
 
-  const OnSaveEdit = async () => {
+  const OnSaveEdit = async (): Promise<void> => {
     const response = await ApiService.update(
       "trainGroups",
       trainGroupDto,

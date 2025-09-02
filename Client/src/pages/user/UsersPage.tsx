@@ -111,7 +111,7 @@ export default function UsersPage() {
     }
   };
 
-  const OnSaveAdd = async () => {
+  const OnSaveAdd = async (): Promise<void> => {
     const response = await ApiService.create("users", userDto);
 
     if (response) {
@@ -119,9 +119,11 @@ export default function UsersPage() {
       resetUserDto();
       if (onRefreshDataTable.current) onRefreshDataTable.current();
     }
+
+    return Promise.resolve();
   };
 
-  const OnSaveEdit = async () => {
+  const OnSaveEdit = async (): Promise<void> => {
     const response = await ApiService.update("users", userDto, userDto.id);
 
     if (response) {
@@ -129,6 +131,7 @@ export default function UsersPage() {
       resetUserDto();
       if (onRefreshDataTable.current) onRefreshDataTable.current();
     }
+    return Promise.resolve();
   };
 
   return (

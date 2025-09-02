@@ -45,7 +45,7 @@ export default function TrainGroupAdminCalendarPage() {
     hideDialog: () => setEditModalVisibility(false),
   };
 
-  const onSaveAdd = async () => {
+  const onSaveAdd = async (): Promise<void> => {
     const response = await ApiService.create("trainGroups", trainGroupDto);
 
     if (response) {
@@ -54,7 +54,7 @@ export default function TrainGroupAdminCalendarPage() {
     }
   };
 
-  const onSaveEdit = async () => {
+  const onSaveEdit = async (): Promise<void> => {
     const response = await ApiService.update(
       "trainGroups",
       trainGroupDto,
