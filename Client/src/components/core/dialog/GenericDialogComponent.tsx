@@ -24,7 +24,7 @@ interface DialogComponentProps {
   visible: boolean;
   control: DialogControl;
   children: ReactNode;
-  onSave?: () => void;
+  onSave?: () => Promise<void>;
   onDelete?: () => void;
 }
 
@@ -38,6 +38,13 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
   onDelete,
 }) => {
   const [isSaveEnabled, setIsSaveEnabled] = useState<boolean>(true);
+
+  const handleSave = () => {
+    setIsSaveEnabled(false);
+    if (onSave) {
+      onSave().finally(() => setIsSaveEnabled(true));
+    }
+  };
 
   const footer = () => {
     if (formMode === FormMode.VIEW)
@@ -65,7 +72,7 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
             <Button
               label="Save"
               icon="pi pi-check"
-              onClick={onSave}
+              onClick={handleSave}
               disabled={!isSaveEnabled}
               autoFocus
             />

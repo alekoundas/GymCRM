@@ -73,8 +73,9 @@ export default function TrainGroupsBookingCalendarPage() {
     setDialogVisibility(true);
   };
 
-  const onSave = () => {
-    if (!timeSlotRequestDto.selectedDate || !selectedTimeSlot) return;
+  const onSave = async (): Promise<void> => {
+    if (!timeSlotRequestDto.selectedDate || !selectedTimeSlot)
+      return Promise.resolve();
 
     trainGroupDateParticipantUpdateDto.trainGroupId =
       selectedTimeSlot.trainGroupId;
@@ -86,14 +87,16 @@ export default function TrainGroupsBookingCalendarPage() {
     }
 
     setLoading(true);
-    ApiService.updateParticipants(trainGroupDateParticipantUpdateDto)
+    return await ApiService.updateParticipants(
+      trainGroupDateParticipantUpdateDto
+    )
       .then((response) => {
         if (response) {
           dialogControl.hideDialog();
           handleChangeDate(new Date(timeSlotRequestDto.selectedDate)); // Refresh time slots
         }
       })
-      .finally(() => setLoading(false));
+      .then(() => setLoading(false));
   };
 
   return (
@@ -135,7 +138,7 @@ export default function TrainGroupsBookingCalendarPage() {
         visible={isDialogVisible}
         control={dialogControl}
         formMode={FormMode.ADD}
-        onSave={() => onSave()}
+        onSave={onSave}
       >
         <TrainGroupsBookingCalendarTimeslotBookFormComponent />
       </GenericDialogComponent>
