@@ -125,7 +125,7 @@ export default function TrainGroupDateParticipantGridComponent({
 
     setDatatableDto(newDto);
 
-    if (formMode === FormMode.EDIT && triggerRefreshDataTable.current) {
+    if (formMode !== FormMode.ADD && triggerRefreshDataTable.current) {
       triggerRefreshDataTable.current(newDto);
     }
   }, [selectedTrainGroupDate]);
