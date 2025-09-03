@@ -10,12 +10,10 @@ import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnu
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
-import TrainGroupParticipantFormComponent from "./TrainGroupParticipantFormComponent";
 import ApiService from "../../services/ApiService";
 import { useParams } from "react-router-dom";
 import TrainGroupDateParticipantFormComponent from "./TrainGroupDateParticipantFormComponent";
 import { DataTableFilterDto } from "../../model/datatable/DataTableFilterDto";
-import { TokenService } from "../../services/TokenService";
 
 interface IField {
   formMode: FormMode;
@@ -33,10 +31,7 @@ export default function TrainGroupDateParticipantGridComponent({
     addTrainGroupDateParticipant,
     editTrainGroupDateParticipant,
     resetTrainGroupDateParticipant,
-    setTrainGroupDto,
-    setSelectedTrainGroupDate,
     setTrainGroupParticipant,
-    updateTrainGroupDto,
     resetTrainGroupParticipant,
   } = useTrainGroupStore();
 
@@ -143,7 +138,18 @@ export default function TrainGroupDateParticipantGridComponent({
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "30%" },
-      body: null,
+      body: (rowData: TrainGroupParticipantDto) => {
+        if (rowData.selectedDate) {
+          const date = new Date(rowData.selectedDate);
+          return (
+            date.getDate() +
+            "/" +
+            (date.getMonth() + 1) +
+            "/" +
+            date.getFullYear()
+          );
+        }
+      },
     },
     {
       field: "trainGroupId",

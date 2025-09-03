@@ -13,6 +13,7 @@ import GenericDialogComponent, {
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import TrainGroupFormComponent from "./TrainGroupFormComponent";
 import TrainGroupDateGridComponent from "../train-group-date/TrainGroupDateGridComponent";
+import TrainGroupDateAdminCalenndarGridComponent from "../train-group-date/TrainGroupDateAdminCalenndarGridComponent";
 
 export default function TrainGroupAdminCalendarPage() {
   const { trainGroupDto, resetTrainGroupDto } = useTrainGroupStore();
@@ -177,7 +178,7 @@ export default function TrainGroupAdminCalendarPage() {
       >
         <div className="w-full">
           <TrainGroupFormComponent formMode={FormMode.ADD} />
-          <TrainGroupDateGridComponent formMode={FormMode.ADD} />
+          <TrainGroupDateAdminCalenndarGridComponent formMode={FormMode.ADD} />
         </div>
       </GenericDialogComponent>
 
@@ -191,7 +192,7 @@ export default function TrainGroupAdminCalendarPage() {
       >
         <div className="w-full">
           <TrainGroupFormComponent formMode={FormMode.EDIT} />
-          <TrainGroupDateGridComponent formMode={FormMode.EDIT} />
+          <TrainGroupDateAdminCalenndarGridComponent formMode={FormMode.EDIT} />
         </div>
       </GenericDialogComponent>
     </>
