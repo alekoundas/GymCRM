@@ -4,9 +4,11 @@ import { TrainGroupDto } from "../model/TrainGroupDto";
 import ApiService from "../services/ApiService";
 import { TrainGroupParticipantDto } from "../model/TrainGroupParticipantDto";
 import { TokenService } from "../services/TokenService";
+import { TrainGroupDateTypeEnum } from "../enum/TrainGroupDateTypeEnum";
 
 interface TrainGroupStoreState {
   trainGroupDto: TrainGroupDto;
+  trainGroupDateDto: TrainGroupDateDto;
   trainGroupParticipant: TrainGroupParticipantDto;
   selectedTrainGroupDate: TrainGroupDateDto | undefined;
 
@@ -16,6 +18,9 @@ interface TrainGroupStoreState {
 
   setTrainGroupParticipant: (data: TrainGroupParticipantDto) => void;
   resetTrainGroupParticipant: () => Promise<any>;
+
+  setTrainGroupDateDto: (data: TrainGroupDateDto) => void;
+  resetTrainGroupDateDto: () => Promise<any>;
 
   setSelectedTrainGroupDate: (data: TrainGroupDateDto) => void;
   resetSelectedTrainGroupDate: () => Promise<any>;
@@ -39,6 +44,17 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
     trainerId: "",
     trainGroupDates: [],
     trainGroupParticipants: [],
+  },
+  trainGroupDateDto: {
+    id: 0,
+    fixedDay: undefined,
+    recurrenceDayOfMonth: undefined,
+    recurrenceDayOfWeek: undefined,
+    trainGroup: undefined,
+    trainGroupDateType: TrainGroupDateTypeEnum.FIXED_DAY,
+    trainGroupId: undefined,
+    trainGroupParticipants: [],
+    trainGroupDateCancellationSubscribers: [],
   },
   trainGroupParticipant: {
     id: 0,
@@ -94,6 +110,24 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
         trainGroupId: 0,
         trainGroupDateId: undefined,
         userId: TokenService.getUserId() ?? "",
+      },
+    });
+  },
+
+  setTrainGroupDateDto: (data: TrainGroupDateDto) =>
+    set({ trainGroupDateDto: data }),
+  resetTrainGroupDateDto: async () => {
+    set({
+      trainGroupDateDto: {
+        id: 0,
+        fixedDay: undefined,
+        recurrenceDayOfMonth: undefined,
+        recurrenceDayOfWeek: undefined,
+        trainGroup: undefined,
+        trainGroupDateType: TrainGroupDateTypeEnum.FIXED_DAY,
+        trainGroupId: undefined,
+        trainGroupParticipants: [],
+        trainGroupDateCancellationSubscribers: [],
       },
     });
   },

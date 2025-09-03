@@ -1,5 +1,5 @@
 import { Card } from "primereact/card";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { FormMode } from "../../enum/FormMode";
 import ApiService from "../../services/ApiService";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
@@ -18,8 +18,7 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
   const params = useParams();
   const navigate = useNavigate();
 
-  const { trainGroupDto, resetTrainGroupDto, resetSelectedTrainGroupDate } =
-    useTrainGroupStore();
+  const { trainGroupDto, resetTrainGroupDto } = useTrainGroupStore();
 
   // Load Initial data
   useEffect(() => {
@@ -30,14 +29,6 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
   }, []);
 
   const onSave = async () => {
-    // Reset negative ids
-    // trainGroupDto.trainGroupDates = trainGroupDto.trainGroupDates.map((x) => ({
-    //   ...x,
-    //   id: 0,
-    // }));
-    // trainGroupDto.trainGroupParticipants =
-    //   trainGroupDto.trainGroupParticipants.map((x) => ({ ...x, id: 0 }));
-
     if (formMode === FormMode.ADD) {
       const response = await ApiService.create("trainGroups", trainGroupDto);
       if (response?.[0]) {
