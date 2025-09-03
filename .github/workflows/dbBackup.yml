@@ -2,8 +2,8 @@ name: Backup SQLite Database to Google Drive
 
 on:
   schedule:
-    # Runs at 6:00 AM and 6:00 PM UTC every day
-    - cron: '0 6,18 * * *'
+    # Runs at 6:00 AM and 6:00 PM EEST (3:00 AM and 3:00 PM UTC)
+    - cron: '0 3,15 * * *'
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Deploy to DigitalOcean Droplet using SSH
+      # Backup to Google Drive using SSH
       - name: Backup Database to Google Drive
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -19,6 +19,10 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Update and install latest rclone version
+            echo "[INFO]: Installing latest rclone version"
+            curl https://rclone.org/install.sh | bash
+
             # Set up rclone config
             echo "[INFO]: Setting up rclone config"
             mkdir -p ~/.config/rclone
@@ -33,13 +37,21 @@ jobs:
               exit 1
             fi
 
-            # Rename sqlite.db on Google Drive to include date
-            echo "[INFO]: Renaming sqlite.db on Google Drive"
-            DATE=$(date +%Y%m%d_%H%M%S)
-            rclone moveto gdrive:/DB_Backups/Damianakos/sqlite.db gdrive:/DB_Backups/Damianakos/sqlite_${DATE}.db --ignore-errors
+            # Create the Google Drive directory if it doesn't exist
+            echo "[INFO]: Ensuring Google Drive directory exists"
+            rclone mkdir gdrive:/DB_Backups/Damianakos/
+
+            # Check if sqlite.db exists on Google Drive and rename it
+            if rclone ls gdrive:/DB_Backups/Damianakos/sqlite.db >/dev/null 2>&1; then
+              echo "[INFO]: Renaming sqlite.db on Google Drive"
+              DATE=$(date +%Y%m%d_%H%M%S)
+              rclone moveto gdrive:/DB_Backups/Damianakos/sqlite.db gdrive:/DB_Backups/Damianakos/sqlite_${DATE}.db --ignore-errors -v
+            else
+              echo "[INFO]: sqlite.db not found on Google Drive, skipping rename"
+            fi
 
             # Upload local sqlite.db to Google Drive
             echo "[INFO]: Uploading local sqlite.db to Google Drive"
-            rclone copy sqlite.db gdrive:/DB_Backups/Damianakos/ --ignore-errors
+            rclone copy sqlite.db gdrive:/DB_Backups/Damianakos/ --ignore-errors -v
 
             echo "[INFO]: Database backup completed successfully"
