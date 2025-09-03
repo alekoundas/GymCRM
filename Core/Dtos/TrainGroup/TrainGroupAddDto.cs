@@ -33,6 +33,6 @@ namespace Core.Dtos.TrainGroup
 
 
         public ICollection<TrainGroupDateAddDto> TrainGroupDates { get; set; } = new Collection<TrainGroupDateAddDto>();
-        public ICollection<TrainGroupParticipantDto> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipantDto>();
+        public ICollection<TrainGroupParticipantAddDto> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipantAddDto>();
     }
 }

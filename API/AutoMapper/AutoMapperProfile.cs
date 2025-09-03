@@ -18,7 +18,15 @@ namespace API.AutoMapper
 
             // TrainGroupAddDto
             CreateMap<TrainGroup, TrainGroupAddDto>();
-            CreateMap<TrainGroupAddDto, TrainGroup>();
+            CreateMap<TrainGroupAddDto, TrainGroup>()
+                .AfterMap((src, dest) =>
+                {
+                    // Set TrainGroupId for all TrainGroupParticipants
+                    foreach (var date in dest.TrainGroupDates)
+                        foreach (var participant in date.TrainGroupParticipants)
+                            //participant.TrainGroupId = src.Id; // Set TrainGroupId
+                            participant.TrainGroup = dest; // Optional: Set navigation property
+                });
 
             // TrainGroupDateDto
             CreateMap<TrainGroupDate, TrainGroupDateDto>();
@@ -37,6 +45,7 @@ namespace API.AutoMapper
             CreateMap<TrainGroupParticipantDto, TrainGroupParticipant>();
             CreateMap<TrainGroupParticipant, TrainGroupParticipantAddDto>();
             CreateMap<TrainGroupParticipantAddDto, TrainGroupParticipant>();
+                //.ForMember(dest=>dest.TrainGroup,src=> src.ma)
 
             CreateMap<TrainGroupDateCancellationSubscriber, TrainGroupCancellationSubscriberDto>();
             CreateMap<TrainGroupCancellationSubscriberDto, TrainGroupDateCancellationSubscriber>();

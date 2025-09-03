@@ -82,7 +82,7 @@ namespace API.Controllers
             foreach (var entityDto in entityDtos)
                 if (CustomValidatePOST(entityDto, out string[] errors))
                     return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", errors));
-
+ 
             List<TEntity> entities = _mapper.Map<List<TEntity>>(entityDtos);
 
             int result = await _dataService.GetGenericRepository<TEntity>().AddRangeAsync(entities);
