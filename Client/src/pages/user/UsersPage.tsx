@@ -16,10 +16,12 @@ import ApiService from "../../services/ApiService";
 
 export default function UsersPage() {
   const { userDto, setUserDto, resetUserDto } = useUserStore();
-  const onRefreshDataTable = useRef<(() => void) | undefined>(undefined);
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisibility] = useState(false); // Dialog visibility
+  const triggerRefreshDataTable = useRef<
+    ((dto: DataTableDto<UserDto>) => void) | undefined
+  >(undefined);
 
   const dialogControlView: DialogControl = {
     showDialog: () => setViewDialogVisibility(true),
@@ -35,19 +37,19 @@ export default function UsersPage() {
     showDialog: () => setEditDialogVisibility(true),
     hideDialog: () => setEditDialogVisibility(false),
   };
-
-  const datatableDto: DataTableDto<UserDto> = {
+  const [datatableDto, setDatatableDto] = useState<DataTableDto<UserDto>>({
     data: [],
     first: 0,
     rows: 10,
     page: 1,
     pageCount: 0,
+    filters: [],
     dataTableSorts: [],
-    dataTableFilters: {
-      userName: { value: "", matchMode: "contains" },
-      email: { value: "", matchMode: "contains" },
-    },
-  };
+    // dataTableFilters: {
+    //   userName: { value: "", matchMode: "contains" },
+    //   email: { value: "", matchMode: "contains" },
+    // },
+  });
 
   const dataTableColumns: DataTableColumns[] = [
     {
@@ -117,7 +119,8 @@ export default function UsersPage() {
     if (response) {
       dialogControlAdd.hideDialog();
       resetUserDto();
-      if (onRefreshDataTable.current) onRefreshDataTable.current();
+      if (triggerRefreshDataTable.current)
+        triggerRefreshDataTable.current(datatableDto);
     }
 
     return Promise.resolve();
@@ -129,7 +132,8 @@ export default function UsersPage() {
     if (response) {
       dialogControlEdit.hideDialog();
       resetUserDto();
-      if (onRefreshDataTable.current) onRefreshDataTable.current();
+      if (triggerRefreshDataTable.current)
+        triggerRefreshDataTable.current(datatableDto);
     }
     return Promise.resolve();
   };
@@ -138,15 +142,16 @@ export default function UsersPage() {
     <>
       <Card title="Users">
         <DataTableComponent
+          controller="users"
+          dataTableDto={datatableDto}
+          setDataTableDto={setDatatableDto}
           formMode={FormMode.EDIT}
           onButtonClick={onDataTableClick}
-          controller="users"
           enableGridRowActions={true}
           enableAddAction={false}
           filterDisplay={DataTableFilterDisplayEnum.ROW}
-          dataTable={datatableDto}
           dataTableColumns={dataTableColumns}
-          triggerRefreshData={onRefreshDataTable}
+          triggerRefreshData={triggerRefreshDataTable}
         />
       </Card>
 

@@ -34,6 +34,6 @@ namespace Core.Dtos.TrainGroup
         public string? TrainerId { get; set; }
 
         public ICollection<TrainGroupDateDto> TrainGroupDates { get; set; } = new Collection<TrainGroupDateDto>();
-        public ICollection<TrainGroupParticipant> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipant>();
+        public ICollection<TrainGroupParticipantDto> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipantDto>();
     }
 }

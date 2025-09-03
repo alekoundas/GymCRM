@@ -31,12 +31,6 @@ export default function RoleGridComponent({
       { fieldName: "RoleName", filterType: "contains", value: roleDto.name },
     ],
     dataTableSorts: [],
-    dataTableFilters: {
-      roleName: {
-        value: roleDto.name,
-        matchMode: "contains",
-      },
-    },
   });
 
   const cellBody = (value: boolean) => {
@@ -163,8 +157,9 @@ export default function RoleGridComponent({
     <>
       <DataTableComponent
         controller="claims"
+        dataTableDto={datatableDto}
+        setDataTableDto={setDatatableDto}
         formMode={formMode === FormMode.VIEW ? formMode : FormMode.EDIT}
-        dataTable={datatableDto}
         dataTableColumns={dataTableColumns}
         // filterDisplay={}
         enableGridRowActions={false}

@@ -15,6 +15,7 @@ import UsersPage from "./pages/user/UsersPage.tsx";
 import LoginPage from "./pages/user/LoginPage.tsx";
 import RegisterPage from "./pages/user/RegisterPage.tsx";
 import TrainGroupsBookingCalendarPage from "./pages/train-group-booking/TrainGroupsBookingCalendarPage.tsx";
+import TrainGroupAdminFormPage from "./pages/train-group-admin/TrainGroupAdminFormPage.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -75,6 +76,19 @@ export default function App() {
                 <Route
                   path="train-groups"
                   element={<TrainGroupAdminPage />}
+                />
+
+                <Route
+                  path="train-groups/add"
+                  element={<TrainGroupAdminFormPage />}
+                />
+                <Route
+                  path="train-groups/:id/edit"
+                  element={<TrainGroupAdminFormPage />}
+                />
+                <Route
+                  path="train-groups/:id/view"
+                  element={<TrainGroupAdminFormPage />}
                 />
 
                 {/* Users */}

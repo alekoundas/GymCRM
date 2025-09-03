@@ -9,9 +9,9 @@ export interface DataTableDto<TEntity> {
   page: number;
   pageCount: number;
   sorts?: DataTableSortDto[];
-  filters?: DataTableFilterDto[];
+  filters: DataTableFilterDto[];
   dataTableSorts: DataTableSortMeta[];
-  dataTableFilters: DataTableFilterMeta;
+  dataTableFilters?: DataTableFilterMeta;
 }
 
 export class DataTableDto<TEntity> {
@@ -21,7 +21,7 @@ export class DataTableDto<TEntity> {
   page: number = 0;
   pageCount: number = 0;
   sorts?: DataTableSortDto[] = [];
-  filters?: DataTableFilterDto[] = [];
+  filters: DataTableFilterDto[] = [];
   dataTableSorts: DataTableSortMeta[] = [];
-  dataTableFilters: DataTableFilterMeta = {};
+  dataTableFilters?: DataTableFilterMeta = {};
 }

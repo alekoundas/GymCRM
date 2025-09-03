@@ -9,11 +9,10 @@ import ApiService from "./ApiService";
 import { ColumnEvent } from "primereact/column";
 import { FormMode } from "../enum/FormMode";
 import { DataTableDto } from "../model/datatable/DataTableDto";
-import { DataTableSortDto } from "../model/datatable/DataTableSortDto";
 
 export default class DataTableService<TEntity> {
   private controller: string;
-  private dataTableDto: DataTableDto<TEntity>;
+  // private dataTableDto: DataTableDto<TEntity>;
   private setLoading: any;
   private defaultUrlSearchQuery: string | null = null;
   private formMode: FormMode;
@@ -23,7 +22,7 @@ export default class DataTableService<TEntity> {
 
   public constructor(
     controller: string,
-    dataTableDto: DataTableDto<TEntity>,
+    // dataTableDto: DataTableDto<TEntity>,
     setLoading: any,
     defaultUrlSearchQuery: string | null,
     formMode: FormMode,
@@ -32,7 +31,7 @@ export default class DataTableService<TEntity> {
     ) => DataTableDto<TEntity> | null
   ) {
     this.controller = controller;
-    this.dataTableDto = dataTableDto;
+    // this.dataTableDto = dataTableDto;
     this.setLoading = setLoading;
     this.defaultUrlSearchQuery = defaultUrlSearchQuery;
     this.formMode = formMode;
@@ -40,56 +39,66 @@ export default class DataTableService<TEntity> {
   }
 
   public loadData = async (
+    dataTableDto: DataTableDto<TEntity>,
     urlQuery: string | null
   ): Promise<DataTableDto<TEntity> | null> => {
-    if (urlQuery) {
-      try {
-        // Decode datatable filters and ordering from base 64
-        const dtaTableQuery: DataTableDto<TEntity> = JSON.parse(atob(urlQuery));
-        this.dataTableDto = dtaTableQuery;
-      } catch (e: any) {
-        console.log(e.message);
-      }
-    }
-    return this.refreshData();
+    // if (urlQuery) {
+    //   try {
+    // Decode datatable filters and ordering from base 64
+    // const dtaTableQuery: DataTableDto<TEntity> = JSON.parse(atob(urlQuery));
+    // dataTableDto = dtaTableQuery;
+    //   } catch (e: any) {
+    //     console.log(e.message);
+    //   }
+    // }
+    return this.refreshData(dataTableDto);
   };
 
-  public onSort = (event: DataTableSortEvent) => {
-    this.dataTableDto.sorts = [];
+  public onSort = (
+    dataTableDto: DataTableDto<TEntity>,
+    event: DataTableSortEvent
+  ) => {
+    dataTableDto.sorts = [];
     if (event.multiSortMeta) {
-      this.dataTableDto.dataTableSorts = event.multiSortMeta;
+      dataTableDto.dataTableSorts = event.multiSortMeta;
       event.multiSortMeta.forEach((value: DataTableSortMeta, index: number) =>
-        this.dataTableDto.sorts?.push({
+        dataTableDto.sorts?.push({
           fieldName: value.field,
           order: value.order,
         })
       );
     }
-    this.refreshData();
+    this.refreshData(dataTableDto);
   };
 
-  public onFilter = (event: DataTableFilterEvent) => {
-    this.dataTableDto.filters = [];
-    this.dataTableDto.dataTableFilters = event.filters;
+  public onFilter = (
+    dataTableDto: DataTableDto<TEntity>,
+    event: DataTableFilterEvent
+  ) => {
+    dataTableDto.filters = [];
+    dataTableDto.dataTableFilters = event.filters;
 
     // This doesnt work  [...event.filters]
     Object.entries(event.filters).map(([value, index]) =>
-      this.dataTableDto.filters?.push({
+      dataTableDto.filters?.push({
         fieldName: value,
         filterType: event.filters[value]["matchMode"],
         value: event.filters[value]["value"],
       })
     );
 
-    this.refreshData();
+    this.refreshData(dataTableDto);
   };
 
-  public onPage = (event: DataTablePageEvent) => {
-    if (event.page) this.dataTableDto.page = event.page;
-    if (event.rows) this.dataTableDto.rows = event.rows;
-    if (event.pageCount) this.dataTableDto.pageCount = event.pageCount;
+  public onPage = (
+    dataTableDto: DataTableDto<TEntity>,
+    event: DataTablePageEvent
+  ) => {
+    if (event.page) dataTableDto.page = event.page;
+    if (event.rows) dataTableDto.rows = event.rows;
+    if (event.pageCount) dataTableDto.pageCount = event.pageCount;
 
-    this.refreshData();
+    this.refreshData(dataTableDto);
   };
 
   public onCellEditComplete = (e: ColumnEvent) => {
@@ -98,25 +107,30 @@ export default class DataTableService<TEntity> {
     event.preventDefault();
   };
 
-  public onRowEditComplete = (e: DataTableRowEditCompleteEvent) => {
+  public onRowEditComplete = (
+    dataTableDto: DataTableDto<TEntity>,
+    e: DataTableRowEditCompleteEvent
+  ) => {
     let { newData, field, index } = e;
 
-    this.dataTableDto.data[index] = newData as TEntity;
-    this.refreshData();
+    dataTableDto.data[index] = newData as TEntity;
+    this.refreshData(dataTableDto);
   };
 
-  public refreshData = async (): Promise<DataTableDto<TEntity> | null> => {
+  public refreshData = async (
+    dataTableDto: DataTableDto<TEntity>
+  ): Promise<DataTableDto<TEntity> | null> => {
     if (this.formMode === FormMode.ADD) {
       if (this.afterDataLoaded) {
-        this.afterDataLoaded(this.dataTableDto);
+        this.afterDataLoaded(dataTableDto);
       }
 
-      return this.dataTableDto;
+      return dataTableDto;
     } else {
       this.setLoading(true);
       return await ApiService.getDataGrid<TEntity>(
         this.controller,
-        this.dataTableDto
+        dataTableDto
       )
         .then(this.afterDataLoaded)
         .then((response) => {
@@ -131,18 +145,17 @@ export default class DataTableService<TEntity> {
   };
 
   private setUrlSearchQuery = (response: DataTableDto<TEntity> | null) => {
-    if (response) {
-      const queryData = { ...response, data: [] };
-
-      // Encode datatable filters and ordering to base 64
-      const searchQuery = btoa(JSON.stringify(queryData));
-      if (searchQuery !== this.defaultUrlSearchQuery) {
-        window.history.replaceState(
-          null,
-          "New Page Title",
-          `/${this.controller}?search=${searchQuery}`
-        );
-      }
-    }
+    // if (response) {
+    //   const queryData = { ...response, data: [] };
+    //   // Encode datatable filters and ordering to base 64
+    //   const searchQuery = btoa(JSON.stringify(queryData));
+    //   if (searchQuery !== this.defaultUrlSearchQuery) {
+    //     window.history.replaceState(
+    //       null,
+    //       "New Page Title",
+    //       `/${this.controller}?search=${searchQuery}`
+    //     );
+    //   }
+    // }
   };
 }

@@ -26,6 +26,7 @@ export default function TrainGroupAdminCalendarPage() {
 
     const timeSlotDto = new TimeSlotRequestDto();
     timeSlotDto.selectedDate = value.toISOString();
+    timeSlotDto.userId = TokenService.getUserId() ?? "";
     ApiService.timeslots("TrainGroupDates/TimeSlots", timeSlotDto).then(
       (response) => {
         if (response) {

@@ -17,7 +17,9 @@ import RoleGridComponent from "./RoleGridComponent";
 
 export default function RolesPage() {
   const { roleDto, setRoleDto, resetRoleDto } = useRoleStore();
-  const onRefreshDataTable = useRef<(() => void) | undefined>(undefined);
+  const triggerRefreshDataTable = useRef<
+    ((dto: DataTableDto<RoleDto>) => void) | undefined
+  >(undefined);
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisibility] = useState(false); // Dialog visibility
@@ -36,8 +38,7 @@ export default function RolesPage() {
     showDialog: () => setEditDialogVisibility(true),
     hideDialog: () => setEditDialogVisibility(false),
   };
-
-  const datatableDto: DataTableDto<RoleDto> = {
+  const [datatableDto, setDatatableDto] = useState<DataTableDto<RoleDto>>({
     data: [],
     first: 0,
     rows: 10,
@@ -48,11 +49,7 @@ export default function RolesPage() {
       { fieldName: "Description", filterType: "contains" },
     ],
     dataTableSorts: [],
-    dataTableFilters: {
-      value: { value: "", matchMode: "contains" },
-      description: { value: "", matchMode: "contains" },
-    },
-  };
+  });
 
   const dataTableColumns: DataTableColumns[] = [
     {
@@ -103,7 +100,8 @@ export default function RolesPage() {
     if (response) {
       dialogControlAdd.hideDialog();
       resetRoleDto();
-      if (onRefreshDataTable.current) onRefreshDataTable.current();
+      if (triggerRefreshDataTable.current)
+        triggerRefreshDataTable.current(datatableDto);
     }
   };
 
@@ -113,7 +111,8 @@ export default function RolesPage() {
     if (response) {
       dialogControlEdit.hideDialog();
       resetRoleDto();
-      if (onRefreshDataTable.current) onRefreshDataTable.current();
+      if (triggerRefreshDataTable.current)
+        triggerRefreshDataTable.current(datatableDto);
     }
   };
 
@@ -122,15 +121,16 @@ export default function RolesPage() {
       <Card title="Roles">
         <div className="card">
           <DataTableComponent
+            controller="roles"
+            dataTableDto={datatableDto}
+            setDataTableDto={setDatatableDto}
             formMode={FormMode.EDIT}
             onButtonClick={onDataTableClick}
-            controller="roles"
             enableGridRowActions={true}
             filterDisplay={DataTableFilterDisplayEnum.ROW}
             enableAddAction={true}
-            dataTable={datatableDto}
             dataTableColumns={dataTableColumns}
-            triggerRefreshData={onRefreshDataTable}
+            triggerRefreshData={triggerRefreshDataTable}
             authorize={true}
           />
         </div>

@@ -48,7 +48,7 @@ namespace DataAccess
                 await TrySeedAdminRolesAndClaimsAsync(roleManager);
                 await TrySeedTrainerRolesAndClaimsAsync(roleManager);
                 await TrySeedSimpleUserRolesAndClaimsAsync(roleManager);
-                
+
                 await TrySeedAdminUserAsync(userManager, roleManager);
                 await TrySeedTrainerUserAsync(userManager, roleManager);
                 await TrySeedSimpleUserUserAsync(userManager, roleManager);
@@ -97,6 +97,10 @@ namespace DataAccess
                     new Claim("Permission", "TrainGroupDates_Add"),
                     new Claim("Permission", "TrainGroupDates_Edit"),
                     new Claim("Permission", "TrainGroupDates_Delete"),
+                    new Claim("Permission", "TrainGroupParticipants_View"),
+                    new Claim("Permission", "TrainGroupParticipants_Add"),
+                    new Claim("Permission", "TrainGroupParticipants_Edit"),
+                    new Claim("Permission", "TrainGroupParticipants_Delete"),
                 };
 
                 foreach (var claim in claims)
@@ -128,6 +132,10 @@ namespace DataAccess
                     new Claim("Permission", "TrainGroupDates_Add"),
                     new Claim("Permission", "TrainGroupDates_Edit"),
                     new Claim("Permission", "TrainGroupDates_Delete"),
+                    new Claim("Permission", "TrainGroupParticipants_View"),
+                    new Claim("Permission", "TrainGroupParticipants_Add"),
+                    new Claim("Permission", "TrainGroupParticipants_Edit"),
+                    new Claim("Permission", "TrainGroupParticipants_Delete")
                 };
 
                 foreach (var claim in claims)

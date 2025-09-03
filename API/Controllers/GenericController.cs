@@ -175,7 +175,7 @@ namespace API.Controllers
             // Handle Filtering of DataTable.
             foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.equals))
             {
-                query.FilterEqualsByColumn(filter.FieldName, filter.Value);
+                query.FilterEqualsByColumn(filter.FieldName, filter.Value == "null"?null: filter.Value);
             }
             foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.contains))
             {
@@ -210,12 +210,12 @@ namespace API.Controllers
         protected virtual bool CustomValidatePOST(TEntityAddDto entity, out string[] errors)
         {
             errors = Array.Empty<string>();
-            return true;
+            return false;
         }
         protected virtual bool CustomValidatePUT(TEntityDto entity, out string[] errors)
         {
             errors = Array.Empty<string>();
-            return true;
+            return false;
         }
 
         protected virtual bool IsUserAuthorized(string action)

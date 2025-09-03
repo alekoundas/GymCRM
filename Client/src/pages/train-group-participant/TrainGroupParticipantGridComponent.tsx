@@ -1,0 +1,275 @@
+import { useState, useEffect, useRef } from "react";
+import DataTableComponent from "../../components/core/datatable/DataTableComponent";
+import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
+import { FormMode } from "../../enum/FormMode";
+import { DataTableColumns } from "../../model/datatable/DataTableColumns";
+import { useTrainGroupStore } from "../../stores/TrainGroupStore";
+import { DataTableDto } from "../../model/datatable/DataTableDto";
+import { TrainGroupParticipantDto } from "../../model/TrainGroupParticipantDto";
+import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
+import GenericDialogComponent, {
+  DialogControl,
+} from "../../components/core/dialog/GenericDialogComponent";
+import TrainGroupParticipantFormComponent from "./TrainGroupParticipantFormComponent";
+import ApiService from "../../services/ApiService";
+import { useParams } from "react-router-dom";
+
+interface IField {
+  formMode: FormMode;
+}
+
+export default function TrainGroupParticipantGridComponent({
+  formMode,
+}: IField) {
+  const params = useParams();
+
+  const {
+    trainGroupDto,
+    trainGroupParticipant,
+    addTrainGroupParticipant,
+    setTrainGroupDto,
+    setTrainGroupParticipant,
+    updateTrainGroupDto,
+    resetTrainGroupParticipant,
+  } = useTrainGroupStore();
+
+  const [isViewDialogVisible, setViewDialogVisible] = useState(false); // Dialog visibility
+  const [isAddDialogVisible, setAddDialogVisible] = useState(false); // Dialog visibility
+  const [isEditDialogVisible, setEditDialogVisible] = useState(false); // Dialog visibility
+  const triggerRefreshDataTable = useRef<
+    ((dto: DataTableDto<TrainGroupParticipantDto>) => void) | undefined
+  >(undefined);
+
+  const dialogControlAdd: DialogControl = {
+    showDialog: () => setAddDialogVisible(true),
+    hideDialog: () => setAddDialogVisible(false),
+  };
+
+  const dialogControlView: DialogControl = {
+    showDialog: () => setViewDialogVisible(true),
+    hideDialog: () => setViewDialogVisible(false),
+  };
+
+  const dialogControlEdit: DialogControl = {
+    showDialog: () => setEditDialogVisible(true),
+    hideDialog: () => setEditDialogVisible(false),
+  };
+
+  const [datatableDto, setDatatableDto] = useState<
+    DataTableDto<TrainGroupParticipantDto>
+  >({
+    data: trainGroupDto.trainGroupParticipants,
+    first: 0,
+    rows: 10,
+    page: 1,
+    pageCount: 0,
+    dataTableSorts: [],
+    filters: [
+      {
+        fieldName: "TrainGroupId",
+        value:
+          trainGroupDto.id > 0 ? trainGroupDto.id.toString() : params["id"],
+
+        filterType: "equals",
+      },
+      {
+        fieldName: "TrainGroupDateId",
+        value: "null",
+        filterType: "equals",
+      },
+    ],
+  });
+
+  // Update datatableDto when trainGroupDto.trainGroupDates changes
+  useEffect(() => {
+    setDatatableDto((prev) => ({
+      ...prev,
+      data: trainGroupDto.trainGroupParticipants,
+      pageCount: trainGroupDto.trainGroupParticipants.length,
+    }));
+  }, [trainGroupDto.trainGroupParticipants]);
+
+  const dataTableColumns: DataTableColumns[] = [
+    {
+      field: "selectedDate",
+      header: "Selected Date",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "30%" },
+      body: null,
+    },
+    {
+      field: "trainGroupId",
+      header: "TrainGroupId",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "10%" },
+      body: null,
+    },
+    {
+      field: "trainGroupDateId",
+      header: "TrainGroupDateId",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "10%" },
+      body: null,
+    },
+    {
+      field: "userId",
+      header: "Participant",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "10%" },
+      body: null,
+    },
+  ];
+
+  const onAfterDataLoaded = (
+    data: DataTableDto<TrainGroupParticipantDto> | null
+  ) => {
+    if (data) {
+      updateTrainGroupDto({ trainGroupParticipants: data.data });
+      data.data = [];
+    }
+    return data;
+  };
+
+  const OnSaveAdd = async (): Promise<void> => {
+    trainGroupParticipant.trainGroupId = trainGroupDto.id;
+    setTrainGroupParticipant(trainGroupParticipant);
+
+    if (formMode === FormMode.ADD) {
+      trainGroupParticipant.id =
+        (trainGroupDto.trainGroupParticipants.filter((x) => x.id < 0).length +
+          1) *
+        -1;
+      addTrainGroupParticipant(trainGroupParticipant);
+      resetTrainGroupParticipant();
+      dialogControlAdd.hideDialog();
+    } else {
+      const response = await ApiService.create(
+        "trainGroupParticipants",
+        trainGroupParticipant
+      );
+      if (response) {
+        dialogControlAdd.hideDialog();
+        resetTrainGroupParticipant();
+        if (triggerRefreshDataTable.current)
+          triggerRefreshDataTable.current(datatableDto);
+      }
+    }
+  };
+
+  const OnSaveEdit = async (): Promise<void> => {
+    if (formMode === FormMode.ADD) {
+      const trainGroupParticipants =
+        trainGroupDto.trainGroupParticipants.filter(
+          (x) => x.id != trainGroupParticipant.id
+        );
+      trainGroupParticipant.trainGroupId = trainGroupDto.id;
+      trainGroupParticipants.push(trainGroupParticipant);
+
+      updateTrainGroupDto({ trainGroupParticipants: trainGroupParticipants });
+      resetTrainGroupParticipant();
+      dialogControlEdit.hideDialog();
+    } else {
+      const response = await ApiService.update(
+        "TrainGroupParticipants",
+        trainGroupParticipant,
+        trainGroupParticipant.id
+      );
+      if (response) {
+        dialogControlEdit.hideDialog();
+        resetTrainGroupParticipant();
+        if (triggerRefreshDataTable.current)
+          triggerRefreshDataTable.current(datatableDto);
+      }
+    }
+  };
+
+  const onDataTableClick = (
+    buttonType: ButtonTypeEnum,
+    rowData?: TrainGroupParticipantDto
+  ) => {
+    switch (buttonType) {
+      case ButtonTypeEnum.VIEW:
+        if (rowData) {
+          setTrainGroupParticipant(rowData);
+        }
+        setViewDialogVisible(true);
+        break;
+      case ButtonTypeEnum.ADD:
+        setAddDialogVisible(true);
+        break;
+      case ButtonTypeEnum.EDIT:
+        if (rowData) {
+          setTrainGroupParticipant(rowData);
+        }
+        setEditDialogVisible(true);
+        break;
+      case ButtonTypeEnum.DELETE:
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  return (
+    <>
+      <DataTableComponent
+        controller="TrainGroupParticipants"
+        dataTableDto={datatableDto}
+        setDataTableDto={setDatatableDto}
+        formMode={formMode}
+        dataTableColumns={dataTableColumns}
+        filterDisplay={DataTableFilterDisplayEnum.ROW}
+        enableAddAction={formMode !== FormMode.VIEW}
+        enableGridRowActions={formMode !== FormMode.VIEW}
+        onButtonClick={onDataTableClick}
+        onAfterDataLoaded={onAfterDataLoaded}
+        triggerRefreshData={triggerRefreshDataTable}
+        authorize={false}
+      />
+
+      {/*                                      */}
+      {/*           View Participant           */}
+      {/*                                      */}
+
+      <GenericDialogComponent
+        visible={isViewDialogVisible}
+        control={dialogControlView}
+      >
+        <TrainGroupParticipantFormComponent formMode={FormMode.VIEW} />
+      </GenericDialogComponent>
+
+      {/*                                      */}
+      {/*            Add Participant           */}
+      {/*                                      */}
+
+      <GenericDialogComponent
+        visible={isAddDialogVisible}
+        control={dialogControlAdd}
+        onSave={OnSaveAdd}
+      >
+        <TrainGroupParticipantFormComponent formMode={FormMode.ADD} />
+      </GenericDialogComponent>
+
+      {/*                                      */}
+      {/*           Edit Participant           */}
+      {/*                                      */}
+
+      <GenericDialogComponent
+        visible={isEditDialogVisible}
+        control={dialogControlEdit}
+        onSave={OnSaveEdit}
+      >
+        <TrainGroupParticipantFormComponent formMode={FormMode.EDIT} />
+      </GenericDialogComponent>
+    </>
+  );
+}

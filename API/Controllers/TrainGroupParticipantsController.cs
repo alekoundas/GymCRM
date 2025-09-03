@@ -1,7 +1,7 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using Business.Services;
 using Core.Dtos;
+using Core.Dtos.DataTable;
 using Core.Enums;
 using Core.Models;
 using DataAccess;
@@ -13,13 +13,13 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
-    public class TrainGroupParticipantsController : ControllerBase
+    public class TrainGroupParticipantsController :   GenericController<TrainGroupParticipant, TrainGroupParticipantDto, TrainGroupParticipantAddDto>
     {
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         //private readonly ILogger<TrainGroupDateController> _logger;
 
-        public TrainGroupParticipantsController(IDataService dataService, IMapper mapper)
+        public TrainGroupParticipantsController(IDataService dataService, IMapper mapper): base(dataService, mapper)
         {
             _dataService = dataService;
             _mapper = mapper;
@@ -217,5 +217,63 @@ namespace API.Controllers
             return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity);
         }
 
+
+
+
+        //// POST: api/controller/GetDataTable
+        //[HttpPost("GetDataTable")]
+        //public async Task<ApiResponse<DataTableDto<TrainGroupParticipantDto>>> GetDataTable([FromBody] DataTableDto<TrainGroupParticipantDto> dataTable)
+        //{
+        //    var query = _dataService.GetGenericRepository<TrainGroupParticipant>();
+
+        //    // Handle Sorting of DataTable.
+        //    if (dataTable.Sorts.Count() > 0)
+        //    {
+        //        // Create the first OrderBy().
+        //        DataTableSortDto? dataTableSort = dataTable.Sorts.First();
+        //        if (dataTableSort.Order > 0)
+        //            query.OrderBy(dataTableSort.FieldName.Substring(0, 1).ToUpper() + dataTableSort.FieldName.Substring(1, dataTableSort.FieldName.Length), OrderDirectionEnum.ASCENDING);
+        //        else if (dataTableSort.Order < 0)
+        //            query.OrderBy(dataTableSort.FieldName.Substring(0, 1).ToUpper() + dataTableSort.FieldName.Substring(1, dataTableSort.FieldName.Length), OrderDirectionEnum.DESCENDING);
+
+        //        // Create the rest OrderBy methods as ThenBy() if any.
+        //        foreach (var sortInfo in dataTable.Sorts.Skip(1))
+        //        {
+        //            if (dataTableSort.Order > 0)
+        //                query.ThenBy(sortInfo.FieldName.Substring(0, 1).ToUpper() + sortInfo.FieldName.Substring(1, sortInfo.FieldName.Length), OrderDirectionEnum.ASCENDING);
+        //            else if (dataTableSort.Order < 0)
+        //                query.ThenBy(sortInfo.FieldName.Substring(0, 1).ToUpper() + sortInfo.FieldName.Substring(1, sortInfo.FieldName.Length), OrderDirectionEnum.DESCENDING);
+        //        }
+        //    }
+
+        //    // Handle Filtering of DataTable.
+        //    foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.equals))
+        //        query.FilterEqualsByColumn(filter.FieldName, filter.Value);
+
+        //    foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.contains))
+        //        query.FilterByColumnContains(filter.FieldName, filter.Value);
+
+        //    // Handle Pagging of DataTable.
+        //    int skip = (dataTable.Page - 1) * dataTable.Rows;
+        //    int take = dataTable.Rows;
+        //    query.AddPagging(skip, take);
+
+
+
+        //    // Retrieve Data.
+        //    List<TrainGroupParticipant> result = await query.ToListAsync();
+        //    List<TrainGroupParticipantDto> customerDto = _mapper.Map<List<TrainGroupParticipantDto>>(result);
+
+        //    //TODO add filter
+        //    int rows = await _dataService
+        //        .GetGenericRepository<TrainGroupParticipant>()
+        //        //.Where()
+        //        .CountAsync();
+
+        //    dataTable.Data = customerDto;
+        //    dataTable.PageCount = rows;
+
+        //    return new ApiResponse<DataTableDto<TrainGroupParticipantDto>>().SetSuccessResponse(dataTable);
+        //}
     }
 }
