@@ -139,7 +139,7 @@ namespace API.Controllers
                 errorList.Add("Fixed Date has the same Day of week with a Day of Month row!");
 
             var duplicates = entityAddDto.TrainGroupDates
-               .GroupBy(x => new { x.RecurrenceDayOfWeek, x.RecurrenceDayOfMonth }) // Group by composite key
+               .GroupBy(x => new { x.RecurrenceDayOfWeek, x.RecurrenceDayOfMonth, x.FixedDay }) // Group by composite key
                .Where(g => g.Count() > 1)                                           // Find groups with more than one item
                .ToList();
 
