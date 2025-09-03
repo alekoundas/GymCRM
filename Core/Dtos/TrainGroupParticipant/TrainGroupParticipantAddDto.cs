@@ -2,10 +2,8 @@
 
 namespace Core.Models
 {
-    public class TrainGroupParticipantDto
+    public class TrainGroupParticipantAddDto
     {
-        public int Id { get; set; }
-
         public DateTime? SelectedDate { get; set; } // If null repeating subscriber,if not specific date participant
 
         public int? TrainGroupDateId { get; set; }

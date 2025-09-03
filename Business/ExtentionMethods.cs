@@ -36,6 +36,42 @@ using System.Reflection;
 
 
 
+        //public static IQueryable<T> FilterEqualsByColumn<T>(this IQueryable<T> source, string columnPath, object value)
+        //{
+        //    // Guard clauses
+        //    if (source == null) throw new ArgumentNullException(nameof(source));
+        //    if (string.IsNullOrEmpty(columnPath)) throw new ArgumentException("Column path cannot be null or empty.", nameof(columnPath));
+
+        //    // Create parameter expression (e.g., 'item' in 'item => item.Property')
+        //    ParameterExpression parameter = Expression.Parameter(typeof(T), "item");
+
+        //    // Build property access expression (e.g., 'item.Property' or 'item.Address.City')
+        //    Expression member = columnPath
+        //        .Split('.')
+        //        .Aggregate((Expression)parameter, Expression.PropertyOrField);
+
+        //    // Convert the value to the correct type (if necessary)
+        //    Type memberType = member.Type;
+        //    object convertedValue = Convert.ChangeType(value, memberType);
+
+        //    // Create equality expression (e.g., 'item.Property == value')
+        //    Expression constant = Expression.Constant(convertedValue, memberType);
+        //    Expression equality = Expression.Equal(member, constant);
+
+        //    // Create lambda expression (e.g., 'item => item.Property == value')
+        //    LambdaExpression lambda = Expression.Lambda(equality, parameter);
+
+        //    // Build the Where method call
+        //    MethodCallExpression methodCall = Expression.Call(
+        //        typeof(Queryable),
+        //        "Where",
+        //        new[] { typeof(T) },
+        //        source.Expression,
+        //        Expression.Quote(lambda));
+
+        //    // Execute the query
+        //    return source.Provider.CreateQuery<T>(methodCall);
+        //}
         public static IQueryable<T> FilterEqualsByColumn<T>(this IQueryable<T> source, string columnPath, object value)
         {
             // Guard clauses
@@ -50,9 +86,34 @@ using System.Reflection;
                 .Split('.')
                 .Aggregate((Expression)parameter, Expression.PropertyOrField);
 
-            // Convert the value to the correct type (if necessary)
+            // Get the target type
             Type memberType = member.Type;
-            object convertedValue = Convert.ChangeType(value, memberType);
+            object convertedValue;
+
+            // Handle nullable types
+            if (Nullable.GetUnderlyingType(memberType) != null)
+            {
+                Type underlyingType = Nullable.GetUnderlyingType(memberType);
+                if (value == null)
+                {
+                    convertedValue = null; // Nullable field can accept null
+                }
+                else if (value is string stringValue && underlyingType == typeof(int))
+                {
+                    // Parse string to int for int? fields
+                    convertedValue = string.IsNullOrEmpty(stringValue) ? null : int.Parse(stringValue);
+                }
+                else
+                {
+                    // Convert to the underlying type
+                    convertedValue = Convert.ChangeType(value, underlyingType);
+                }
+            }
+            else
+            {
+                // Non-nullable type
+                convertedValue = Convert.ChangeType(value, memberType);
+            }
 
             // Create equality expression (e.g., 'item.Property == value')
             Expression constant = Expression.Constant(convertedValue, memberType);

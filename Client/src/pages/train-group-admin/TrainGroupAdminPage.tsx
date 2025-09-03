@@ -14,11 +14,20 @@ import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnu
 import { DataTableDto } from "../../model/datatable/DataTableDto";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
+import { useNavigate } from "react-router-dom";
 
 export default function TrainGroupAdminPage() {
-  const { trainGroupDto, resetTrainGroupDto, setTrainGroupDto } =
-    useTrainGroupStore();
-  const onRefreshDataTable = useRef<(() => void) | undefined>(undefined);
+  const navigate = useNavigate();
+  const {
+    trainGroupDto,
+    resetTrainGroupDto,
+    setTrainGroupDto,
+    resetSelectedTrainGroupDate,
+    resetTrainGroupParticipant,
+  } = useTrainGroupStore();
+  const triggerRefreshDataTable = useRef<
+    ((dto: DataTableDto<TrainGroupDto>) => void) | undefined
+  >(undefined);
 
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
@@ -38,16 +47,17 @@ export default function TrainGroupAdminPage() {
     showDialog: () => setEditDialogVisibility(true),
     hideDialog: () => setEditDialogVisibility(false),
   };
-
-  const datatableDto: DataTableDto<TrainGroupDto> = {
-    data: [],
-    first: 0,
-    rows: 10,
-    page: 1,
-    pageCount: 0,
-    dataTableSorts: [],
-    dataTableFilters: {},
-  };
+  const [datatableDto, setDatatableDto] = useState<DataTableDto<TrainGroupDto>>(
+    {
+      data: [],
+      first: 0,
+      rows: 10,
+      page: 1,
+      pageCount: 0,
+      filters: [],
+      dataTableSorts: [],
+    }
+  );
 
   const dataTableColumns: DataTableColumns[] = [
     {
@@ -103,7 +113,8 @@ export default function TrainGroupAdminPage() {
     if (response) {
       dialogControlAdd.hideDialog();
       resetTrainGroupDto();
-      if (onRefreshDataTable.current) onRefreshDataTable.current();
+      if (triggerRefreshDataTable.current)
+        triggerRefreshDataTable.current(datatableDto);
     }
   };
 
@@ -117,7 +128,8 @@ export default function TrainGroupAdminPage() {
     if (response) {
       dialogControlEdit.hideDialog();
       resetTrainGroupDto();
-      if (onRefreshDataTable.current) onRefreshDataTable.current();
+      if (triggerRefreshDataTable.current)
+        triggerRefreshDataTable.current(datatableDto);
     }
   };
 
@@ -125,17 +137,24 @@ export default function TrainGroupAdminPage() {
     buttonType: ButtonTypeEnum,
     rowData?: TrainGroupDto
   ) => {
-    if (rowData) setTrainGroupDto({ ...rowData });
+    resetSelectedTrainGroupDate();
+    resetTrainGroupParticipant();
     switch (buttonType) {
       case ButtonTypeEnum.VIEW:
-        dialogControlView.showDialog();
+        if (rowData) {
+          setTrainGroupDto(rowData);
+          navigate(rowData.id + "/view");
+        }
         break;
       case ButtonTypeEnum.ADD:
         resetTrainGroupDto();
-        dialogControlAdd.showDialog();
+        navigate("add");
         break;
       case ButtonTypeEnum.EDIT:
-        dialogControlEdit.showDialog();
+        if (rowData) {
+          setTrainGroupDto(rowData);
+          navigate(rowData.id + "/edit");
+        }
         break;
       case ButtonTypeEnum.DELETE:
         break;
@@ -150,7 +169,8 @@ export default function TrainGroupAdminPage() {
       <Card title="Train Groups">
         <div className="card">
           <DataTableComponent
-            dataTable={datatableDto}
+            dataTableDto={datatableDto}
+            setDataTableDto={setDatatableDto}
             formMode={FormMode.EDIT}
             onButtonClick={onDataTableClick}
             controller="TrainGroups"
@@ -158,7 +178,7 @@ export default function TrainGroupAdminPage() {
             filterDisplay={DataTableFilterDisplayEnum.ROW}
             enableAddAction={true}
             dataTableColumns={dataTableColumns}
-            triggerRefreshData={onRefreshDataTable}
+            triggerRefreshData={triggerRefreshDataTable}
           />
         </div>
       </Card>

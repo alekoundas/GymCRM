@@ -15,14 +15,27 @@ import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
 import { DateService } from "../../services/DateService";
+import { useParams } from "react-router-dom";
+import {
+  DataTableSelectionSingleChangeEvent,
+  DataTableValueArray,
+} from "primereact/datatable";
 
 interface IField {
   formMode: FormMode;
 }
 
 export default function TrainGroupDateGridComponent({ formMode }: IField) {
-  const { trainGroupDto, addTrainGroupDate, setTrainGroupDto } =
-    useTrainGroupStore();
+  const params = useParams();
+  const {
+    trainGroupDto,
+    selectedTrainGroupDate,
+    setSelectedTrainGroupDate,
+    addTrainGroupDate,
+    setTrainGroupDto,
+    updateTrainGroupDto,
+    resetSelectedTrainGroupDate,
+  } = useTrainGroupStore();
 
   const [editingRows, setEditingRows] = useState<
     {
@@ -44,13 +57,11 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
     filters: [
       {
         fieldName: "TrainGroupId",
-        value: trainGroupDto.id.toString(),
+        value:
+          trainGroupDto.id > 0 ? trainGroupDto.id.toString() : params["id"],
         filterType: "equals",
       },
     ],
-    dataTableFilters: {
-      TrainGroupId: { value: trainGroupDto.id, matchMode: "equals" },
-    },
   });
 
   // Update datatableDto when trainGroupDto.trainGroupDates changes
@@ -272,8 +283,8 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
 
   const onAfterDataLoaded = (data: DataTableDto<TrainGroupDateDto> | null) => {
     if (data) {
-      trainGroupDto.trainGroupDates = data.data;
-      setTrainGroupDto(trainGroupDto);
+      // trainGroupDto.trainGroupDates = data.data;
+      updateTrainGroupDto({ trainGroupDates: data.data });
       data.data = [];
     }
     return data;
@@ -307,6 +318,16 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
     const rowId = newData.id;
     const rows = editingRows.filter((x) => x.rowId !== rowId);
     setEditingRows(rows);
+  };
+
+  const onSelect = (
+    e: DataTableSelectionSingleChangeEvent<DataTableValueArray>
+  ) => {
+    if (e.value) {
+      setSelectedTrainGroupDate(e.value as TrainGroupDateDto);
+    } else {
+      resetSelectedTrainGroupDate();
+    }
   };
 
   const onDataTableClick = (
@@ -345,12 +366,12 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
     <>
       <DataTableComponent
         controller="TrainGroupDates"
+        dataTableDto={datatableDto}
+        setDataTableDto={setDatatableDto}
         formMode={formMode}
-        dataTable={datatableDto}
         dataTableColumns={dataTableColumns}
         filterDisplay={DataTableFilterDisplayEnum.ROW}
-        enableAddAction={true}
-        // editMode={DataTableEditModeEnum.ROW}
+        enableAddAction={formMode !== FormMode.VIEW}
         editMode={
           formMode !== FormMode.VIEW ? DataTableEditModeEnum.ROW : undefined
         }
@@ -359,6 +380,8 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
         onRowEditInit={onRowEditInit}
         onRowEditCancel={onRowEditCancel}
         onAfterDataLoaded={onAfterDataLoaded}
+        selectedObject={selectedTrainGroupDate}
+        onSelect={onSelect}
         authorize={true}
       />
     </>

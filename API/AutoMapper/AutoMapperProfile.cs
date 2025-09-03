@@ -35,6 +35,8 @@ namespace API.AutoMapper
 
             CreateMap<TrainGroupParticipant, TrainGroupParticipantDto>();
             CreateMap<TrainGroupParticipantDto, TrainGroupParticipant>();
+            CreateMap<TrainGroupParticipant, TrainGroupParticipantAddDto>();
+            CreateMap<TrainGroupParticipantAddDto, TrainGroupParticipant>();
 
             CreateMap<TrainGroupDateCancellationSubscriber, TrainGroupCancellationSubscriberDto>();
             CreateMap<TrainGroupCancellationSubscriberDto, TrainGroupDateCancellationSubscriber>();

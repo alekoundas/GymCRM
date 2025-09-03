@@ -5,6 +5,8 @@ import TrainGroupAdminPage from "../train-group-admin/TrainGroupAdminPage";
 import TrainGroupAdminCalendarPage from "../train-group-admin/TrainGroupAdminCalendarPage";
 import RolesPage from "../role/RolesPage";
 import UsersPage from "../user/UsersPage";
+import TrainGroupAdminFormPage from "../train-group-admin/TrainGroupAdminFormPage";
+import { FormMode } from "../../enum/FormMode";
 
 export default function Administrator() {
   return (
@@ -26,6 +28,19 @@ export default function Administrator() {
               <Route
                 path="train-groups"
                 element={<TrainGroupAdminPage />}
+              />
+
+              <Route
+                path="train-groups/:id/view"
+                element={<TrainGroupAdminFormPage formMode={FormMode.VIEW} />}
+              />
+              <Route
+                path="train-groups/add"
+                element={<TrainGroupAdminFormPage formMode={FormMode.ADD} />}
+              />
+              <Route
+                path="train-groups/:id/edit"
+                element={<TrainGroupAdminFormPage formMode={FormMode.EDIT} />}
               />
 
               {/* Users */}

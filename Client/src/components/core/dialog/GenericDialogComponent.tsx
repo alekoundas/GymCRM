@@ -150,7 +150,7 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
     <Dialog
       header={header}
       visible={visible}
-      style={{ width: "50vw" }}
+      style={{ width: "70vw" }}
       footer={footer}
       onHide={control.hideDialog}
       draggable={false}
