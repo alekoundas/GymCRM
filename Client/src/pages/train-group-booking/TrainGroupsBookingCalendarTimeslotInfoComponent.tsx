@@ -53,39 +53,81 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
           </p>
 
           <div>
-            {selectedTimeSlot.recurrenceDates
-              .filter((x) => x.trainGroupDateType === undefined)
-              .map((x) => {
-                if (x.isUserJoined)
-                  return (
-                    <Tag
-                      className="p-2 m-1"
-                      key={x.trainGroupDateId}
-                      severity={"success"}
-                    >
-                      {new Date(x.date).getDate() +
-                        "/" +
-                        (new Date(x.date).getMonth() + 1) +
-                        "/" +
-                        new Date(x.date).getFullYear()}
-                      {"  "}
-                      <i className="pi pi-check"></i>
-                    </Tag>
-                  );
-                else
-                  return (
-                    <Tag
-                      className="p-2 m-1"
-                      key={x.trainGroupDateId}
-                    >
-                      {new Date(x.date).getDate() +
-                        "/" +
-                        (new Date(x.date).getMonth() + 1) +
-                        "/" +
-                        new Date(x.date).getFullYear()}
-                    </Tag>
-                  );
-              })}
+            {selectedTimeSlot.recurrenceDates.some(
+              (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
+            ) &&
+              selectedTimeSlot.recurrenceDates
+                .filter((x) => x.trainGroupDateType === undefined)
+                .map((x) => {
+                  if (x.isUserJoined)
+                    return (
+                      <Tag
+                        className="p-2 m-1"
+                        key={x.trainGroupDateId}
+                        severity={"success"}
+                      >
+                        {new Date(x.date).getDate() +
+                          "/" +
+                          (new Date(x.date).getMonth() + 1) +
+                          "/" +
+                          new Date(x.date).getFullYear()}
+                        {"  "}
+                        <i className="pi pi-check"></i>
+                      </Tag>
+                    );
+                  else
+                    return (
+                      <Tag
+                        className="p-2 m-1"
+                        key={x.trainGroupDateId}
+                      >
+                        {new Date(x.date).getDate() +
+                          "/" +
+                          (new Date(x.date).getMonth() + 1) +
+                          "/" +
+                          new Date(x.date).getFullYear()}
+                      </Tag>
+                    );
+                })}
+          </div>
+
+          <div>
+            {selectedTimeSlot.recurrenceDates.some(
+              (x) => x.trainGroupDateType !== TrainGroupDateTypeEnum.FIXED_DAY
+            ) &&
+              selectedTimeSlot.recurrenceDates
+                .filter((x) => x.trainGroupDateType === undefined)
+                .map((x) => {
+                  if (x.isUserJoined)
+                    return (
+                      <Tag
+                        className="p-2 m-1"
+                        key={x.trainGroupDateId}
+                        severity={"success"}
+                      >
+                        {new Date(x.date).getDate() +
+                          "/" +
+                          (new Date(x.date).getMonth() + 1) +
+                          "/" +
+                          new Date(x.date).getFullYear()}
+                        {"  "}
+                        <i className="pi pi-check"></i>
+                      </Tag>
+                    );
+                  else
+                    return (
+                      <Tag
+                        className="p-2 m-1"
+                        key={x.trainGroupDateId}
+                      >
+                        {new Date(x.date).getDate() +
+                          "/" +
+                          (new Date(x.date).getMonth() + 1) +
+                          "/" +
+                          new Date(x.date).getFullYear()}
+                      </Tag>
+                    );
+                })}
           </div>
 
           {selectedTimeSlot.recurrenceDates.filter(
