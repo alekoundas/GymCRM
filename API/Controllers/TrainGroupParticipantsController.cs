@@ -26,7 +26,7 @@ namespace API.Controllers
         }
 
 
-
+        // Handle Booking. 
         // PUT: api/controller/5
         [HttpPost("UpdateParticipants")]
         public async Task<ActionResult<ApiResponse<TrainGroup>>> UpdateParticipants([FromBody] TrainGroupParticipantUpdateDto updateDto)
@@ -61,9 +61,7 @@ namespace API.Controllers
                     .Where(y => y.SelectedDate == null)
                     .Any(y => existingEntity.TrainGroupDates
                         .Where(z => z.Id == y.TrainGroupDateId)
-                        .Any(z =>
-                            (z.RecurrenceDayOfMonth.HasValue && z.RecurrenceDayOfMonth.Value.Day == x.SelectedDate!.Value.Day) ||
-                            (z.RecurrenceDayOfWeek.HasValue && z.RecurrenceDayOfWeek.Value.DayOfWeek == x.SelectedDate!.Value.DayOfWeek)
+                        .Any(z =>z.RecurrenceDayOfMonth?.Day == x.SelectedDate?.Day || z.RecurrenceDayOfWeek?.DayOfWeek == x.SelectedDate?.DayOfWeek
                         )
                     )
                 );
@@ -217,6 +215,46 @@ namespace API.Controllers
             return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity);
         }
 
+        
+        protected override bool CustomValidatePOST(TrainGroupParticipantAddDto entityAddDto, out string[] errors)
+        {
+            List<string> errorList = new List<string>();
+
+            bool isAlreadyParticipant = _dataService.TrainGroupParticipants
+                  .Where(x => x.UserId == new Guid(entityAddDto.UserId))
+                  .Where(x => x.TrainGroupId == entityAddDto.TrainGroupId)
+                  .Any(x =>
+                      x.SelectedDate == entityAddDto.SelectedDate
+                      || (x.TrainGroupDate != null && x.TrainGroupDate.RecurrenceDayOfWeek != null && entityAddDto.SelectedDate != null && x.TrainGroupDate.RecurrenceDayOfWeek.Value.DayOfWeek == entityAddDto.SelectedDate.Value.DayOfWeek)
+                      || (x.TrainGroupDate != null && x.TrainGroupDate.RecurrenceDayOfMonth != null && entityAddDto.SelectedDate != null && x.TrainGroupDate.RecurrenceDayOfMonth.Value.Day == entityAddDto.SelectedDate.Value.Day)
+                  );
+
+            if (isAlreadyParticipant)
+                errorList.Add("Participant already joined!");
+
+            errors = errorList.ToArray();
+            return errors.Length > 0;
+        }
+
+        protected override bool CustomValidatePUT(TrainGroupParticipantDto entityDto, out string[] errors)
+        {
+            List<string> errorList = new List<string>();
+
+            bool isAlreadyParticipant = _dataService.TrainGroupParticipants
+                  .Where(x => x.UserId == new Guid(entityDto.UserId))
+                  .Where(x => x.TrainGroupId == entityDto.TrainGroupId)
+                  .Any(x =>
+                      x.SelectedDate == entityDto.SelectedDate
+                      || (x.TrainGroupDate != null && x.TrainGroupDate.RecurrenceDayOfWeek != null && entityDto.SelectedDate != null && x.TrainGroupDate.RecurrenceDayOfWeek.Value.DayOfWeek == entityDto.SelectedDate.Value.DayOfWeek)
+                      || (x.TrainGroupDate != null && x.TrainGroupDate.RecurrenceDayOfMonth != null && entityDto.SelectedDate != null && x.TrainGroupDate.RecurrenceDayOfMonth.Value.Day == entityDto.SelectedDate.Value.Day)
+                  );
+
+            if (isAlreadyParticipant)
+                errorList.Add("Participant already joined!");
+
+            errors = errorList.ToArray();
+            return errors.Length > 0;
+        }
 
 
 

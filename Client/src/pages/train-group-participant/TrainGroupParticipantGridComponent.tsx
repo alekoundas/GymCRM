@@ -99,7 +99,18 @@ export default function TrainGroupParticipantGridComponent({
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "30%" },
-      body: null,
+      body: (rowData: TrainGroupParticipantDto) => {
+        if (rowData.selectedDate) {
+          const date = new Date(rowData.selectedDate);
+          return (
+            date.getDate() +
+            "/" +
+            (date.getMonth() + 1) +
+            "/" +
+            date.getFullYear()
+          );
+        }
+      },
     },
     {
       field: "trainGroupId",

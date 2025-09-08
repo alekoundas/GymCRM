@@ -47,28 +47,6 @@ namespace API.Controllers
             return new ApiResponse<TEntityDto>().SetSuccessResponse(entityDto);
         }
 
-        // TODO Remove this method ad replace with bellow metthod.
-        // POST: api/controller
-        //[HttpPost]
-        //public virtual async Task<ActionResult<ApiResponse<TEntity>>> Post([FromBody] TEntityAddDto entityDto)
-        //{
-        //    if (!IsUserAuthorized("Add"))
-        //        return new ApiResponse<TEntity>().SetErrorResponse("error", "User is not authorized to perform this action.");
-
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", "Invalid data provided."));
-
-        //    if (CustomValidatePOST(entityDto, out string[] errors))
-        //        return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", errors));
-
-        //    TEntity entity = _mapper.Map<TEntity>(entityDto);
-
-        //    int result = await _dataService.GetGenericRepository<TEntity>().AddAsync(entity);
-        //    if (result <= 0)
-        //        return new ApiResponse<TEntity>().SetErrorResponse("error", "An error occurred while creating the entity.");
-
-        //    return new ApiResponse<TEntity>().SetSuccessResponse(entity);
-        //}
         // POST: api/controller
         [HttpPost]
         public virtual async Task<ActionResult<ApiResponse<List<TEntity>>>> Post([FromBody] List<TEntityAddDto> entityDtos)

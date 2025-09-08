@@ -37,7 +37,7 @@ namespace API.Controllers
             DateOnly selectedDate = DateOnly.FromDateTime(timeSlotRequestDto.SelectedDate);
             DayOfWeekEnum dayOfWeekEnum = (DayOfWeekEnum)selectedDate.DayOfWeek;
 
-            List<TrainGroupDate>? timeslots = await _dataService.TrainGroupDates
+            List<TrainGroupDate>? trainGroupDates = await _dataService.TrainGroupDates
                 .Include(x => x.TrainGroup.TrainGroupDates)
                 .Include(x => x.TrainGroup.TrainGroupParticipants)
                 .Include(x => x.TrainGroupParticipants)
@@ -48,7 +48,7 @@ namespace API.Controllers
                 .ToListAsync(true);
 
 
-            List<TimeSlotResponseDto>? timeSlotRequestDtos = timeslots
+            List<TimeSlotResponseDto>? timeSlotRequestDtos = trainGroupDates
                 .Select(x => new TimeSlotResponseDto()
                 {
                     Title = x.TrainGroup.Title,
@@ -112,25 +112,30 @@ namespace API.Controllers
                     (
                         x.TrainGroup.MaxParticipants -
                         (
-                            x.TrainGroup.TrainGroupDates
-                                .Where(y =>
-                                    (y.FixedDay == timeSlotRequestDto.SelectedDate)
-                                    || (y.RecurrenceDayOfMonth?.Day == timeSlotRequestDto.SelectedDate.Day)
-                                    || (y.RecurrenceDayOfWeek?.DayOfWeek == timeSlotRequestDto.SelectedDate.DayOfWeek)
-                                )
-                                .SelectMany(y => y.TrainGroupParticipants)
-                                .Where(y => y.SelectedDate == null || y.SelectedDate == timeSlotRequestDto.SelectedDate)
-                                .DistinctBy(y => y.UserId)
-                                .Count()
-                            +
+                            //x.TrainGroup.TrainGroupDates
+                            //    .Where(y =>
+                            //        (y.FixedDay == timeSlotRequestDto.SelectedDate)
+                            //        || (y.RecurrenceDayOfMonth?.Day == timeSlotRequestDto.SelectedDate.Day)
+                            //        || (y.RecurrenceDayOfWeek?.DayOfWeek == timeSlotRequestDto.SelectedDate.DayOfWeek)
+                            //    )
+                            //    .SelectMany(y => y.TrainGroupParticipants)
+                            //    .Where(y => y.SelectedDate == null || y.SelectedDate == timeSlotRequestDto.SelectedDate)
+                            //    .DistinctBy(y => y.UserId)
+                            //    .Count()
+                            //+
                             x.TrainGroup.TrainGroupParticipants
-                                .Where(y => y.SelectedDate == timeSlotRequestDto.SelectedDate)
-                                .DistinctBy(y => y.UserId)
+                                .Where(y =>
+                                    y.SelectedDate == timeSlotRequestDto.SelectedDate
+                                    || y.TrainGroupDate?.FixedDay == timeSlotRequestDto.SelectedDate
+                                    || y.TrainGroupDate?.RecurrenceDayOfMonth?.Day == timeSlotRequestDto.SelectedDate.Day
+                                    || y.TrainGroupDate?.RecurrenceDayOfWeek?.DayOfWeek == timeSlotRequestDto.SelectedDate.DayOfWeek
+                                )
+                                //.DistinctBy(y => y.UserId)
                                 .Count()
                         )
                     ),
                 })
-                .DistinctBy(x => x.TrainGroupDateId)
+                //.DistinctBy(x => x.TrainGroupDateId)
                 .ToList();
 
             if (timeSlotRequestDtos == null)
