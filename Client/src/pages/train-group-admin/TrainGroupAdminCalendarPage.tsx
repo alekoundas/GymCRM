@@ -12,12 +12,11 @@ import GenericDialogComponent, {
 } from "../../components/core/dialog/GenericDialogComponent";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import TrainGroupFormComponent from "./TrainGroupFormComponent";
-import TrainGroupDateGridComponent from "../train-group-date/TrainGroupDateGridComponent";
 import TrainGroupDateAdminCalenndarGridComponent from "../train-group-date/TrainGroupDateAdminCalenndarGridComponent";
 
 export default function TrainGroupAdminCalendarPage() {
   const { trainGroupDto, resetTrainGroupDto } = useTrainGroupStore();
-  const [isEditModalVisible, setEditModalVisibility] = useState(false); // Dialog visibility
+  const [isViewModalVisible, setViewModalVisibility] = useState(false); // Dialog visibility
   const [isAddModalVisible, setAddModalVisibility] = useState(false); // Dialog visibility
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
@@ -42,9 +41,9 @@ export default function TrainGroupAdminCalendarPage() {
     hideDialog: () => setAddModalVisibility(false),
   };
 
-  const dialogControlEdit: DialogControl = {
-    showDialog: () => setEditModalVisibility(true),
-    hideDialog: () => setEditModalVisibility(false),
+  const dialogControlView: DialogControl = {
+    showDialog: () => setViewModalVisibility(true),
+    hideDialog: () => setViewModalVisibility(false),
   };
 
   const onSaveAdd = async (): Promise<void> => {
@@ -64,7 +63,7 @@ export default function TrainGroupAdminCalendarPage() {
     );
 
     if (response) {
-      dialogControlEdit.hideDialog();
+      dialogControlView.hideDialog();
       resetTrainGroupDto();
     }
   };
@@ -155,7 +154,7 @@ export default function TrainGroupAdminCalendarPage() {
                       }
                       onClick={() => {
                         resetTrainGroupDto(slot.trainGroupId).then((x) => {
-                          setEditModalVisibility(true);
+                          setViewModalVisibility(true);
                         });
                       }}
                     />
@@ -183,16 +182,15 @@ export default function TrainGroupAdminCalendarPage() {
       </GenericDialogComponent>
 
       {/*                                     */}
-      {/*          Edit Train Group           */}
+      {/*          View Train Group           */}
       {/*                                     */}
       <GenericDialogComponent
-        visible={isEditModalVisible}
-        control={dialogControlEdit}
-        onSave={onSaveEdit}
+        visible={isViewModalVisible}
+        control={dialogControlView}
       >
         <div className="w-full">
-          <TrainGroupFormComponent formMode={FormMode.EDIT} />
-          <TrainGroupDateAdminCalenndarGridComponent formMode={FormMode.EDIT} />
+          <TrainGroupFormComponent formMode={FormMode.VIEW} />
+          <TrainGroupDateAdminCalenndarGridComponent formMode={FormMode.VIEW} />
         </div>
       </GenericDialogComponent>
     </>
