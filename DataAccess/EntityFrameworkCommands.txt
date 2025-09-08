@@ -91,3 +91,12 @@ Run the bellow to encode rclone.conf as base64: (powershell)
 [Convert]::ToBase64String([System.IO.File]::ReadAllBytes("C:\Users\<YourUsername>\AppData\Roaming\rclone\rclone.conf"))
 
 Use result in github secret
+
+
+
+
+Rclone commands:
+rclone ls gdrive:/DB_Backups/Damianakos/
+rclone config show
+rclone version
+

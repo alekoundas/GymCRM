@@ -73,6 +73,21 @@ namespace API.Controllers
                             }
                         )
                         .Concat(
+                            x.TrainGroup.TrainGroupDates
+                            .Where(y => y.FixedDay.HasValue)
+                            .Where(y => y.FixedDay!.Value == timeSlotRequestDto.SelectedDate)
+                            .Select(y =>
+                                new TimeSlotRecurrenceDateDto()
+                                {
+                                    TrainGroupDateId = y.Id,
+                                    TrainGroupDateType = y.TrainGroupDateType,
+                                    Date = y.FixedDay!.Value,
+                                    IsUserJoined = y.TrainGroupParticipants.Any(z => z.UserId == new Guid(timeSlotRequestDto.UserId)),
+                                    TrainGroupParticipantId = y.TrainGroupParticipants.FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?.Id
+                                }
+                            )
+                        )
+                        .Concat(
                             new List<TimeSlotRecurrenceDateDto>()
                             {
                                 new TimeSlotRecurrenceDateDto()
