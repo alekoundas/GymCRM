@@ -36,6 +36,7 @@ export default function App() {
         ref={theme}
         rel="stylesheet"
         type="text/css"
+        position="bottom-right"
       />
 
       {/* Display messages */}

@@ -21,7 +21,7 @@ export namespace ToastService {
       severity: "info",
       summary: "Info",
       detail: message,
-      life: 3000,
+      life: 2000,
     });
   }
 
@@ -30,7 +30,7 @@ export namespace ToastService {
       severity: "warn",
       summary: "Warning",
       detail: message,
-      life: 3000,
+      life: 5000,
     });
   }
 
@@ -39,7 +39,7 @@ export namespace ToastService {
       severity: "error",
       summary: "Error",
       detail: message,
-      life: 3000,
+      life: 5000,
     });
   }
 
