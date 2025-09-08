@@ -57,7 +57,10 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
               (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
             ) &&
               selectedTimeSlot.recurrenceDates
-                .filter((x) => x.trainGroupDateType === undefined)
+                .filter(
+                  (x) =>
+                    x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
+                )
                 .map((x) => {
                   if (x.isUserJoined)
                     return (
@@ -92,8 +95,8 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
           </div>
 
           <div>
-            {selectedTimeSlot.recurrenceDates.some(
-              (x) => x.trainGroupDateType !== TrainGroupDateTypeEnum.FIXED_DAY
+            {!selectedTimeSlot.recurrenceDates.some(
+              (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
             ) &&
               selectedTimeSlot.recurrenceDates
                 .filter((x) => x.trainGroupDateType === undefined)

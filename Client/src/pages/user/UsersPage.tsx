@@ -13,7 +13,6 @@ import GenericDialogComponent, {
 } from "../../components/core/dialog/GenericDialogComponent";
 import { useUserStore } from "../../stores/UserStore";
 import ApiService from "../../services/ApiService";
-import DeleteDialogComponent from "../../components/core/dialog/DeleteDialogComponent";
 
 export default function UsersPage() {
   const { userDto, setUserDto, resetUserDto } = useUserStore();

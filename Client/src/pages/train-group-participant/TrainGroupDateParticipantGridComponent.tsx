@@ -324,8 +324,8 @@ export default function TrainGroupDateParticipantGridComponent({
       case ButtonTypeEnum.VIEW:
         if (rowData) {
           setTrainGroupParticipant(rowData);
+          setViewDialogVisible(true);
         }
-        setViewDialogVisible(true);
         break;
       case ButtonTypeEnum.ADD:
         setAddDialogVisible(true);
@@ -333,11 +333,14 @@ export default function TrainGroupDateParticipantGridComponent({
       case ButtonTypeEnum.EDIT:
         if (rowData) {
           setTrainGroupParticipant(rowData);
+          setEditDialogVisible(true);
         }
-        setEditDialogVisible(true);
         break;
       case ButtonTypeEnum.DELETE:
-        setDeleteDialogVisible(true);
+        if (rowData) {
+          setTrainGroupParticipant(rowData);
+          setDeleteDialogVisible(true);
+        }
         break;
 
       default:
