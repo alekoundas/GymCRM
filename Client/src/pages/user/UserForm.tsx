@@ -5,9 +5,7 @@ import LookupComponent from "../../components/core/dropdown/LookupComponent";
 import { useUserStore } from "../../stores/UserStore";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 
-interface IField extends DialogChildProps {
-  formMode: FormMode;
-}
+interface IField extends DialogChildProps {}
 
 export default function UserForm({ formMode }: IField) {
   const { userDto, updateUserDto } = useUserStore();

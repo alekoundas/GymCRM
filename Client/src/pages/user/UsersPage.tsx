@@ -13,12 +13,14 @@ import GenericDialogComponent, {
 } from "../../components/core/dialog/GenericDialogComponent";
 import { useUserStore } from "../../stores/UserStore";
 import ApiService from "../../services/ApiService";
+import DeleteDialogComponent from "../../components/core/dialog/DeleteDialogComponent";
 
 export default function UsersPage() {
   const { userDto, setUserDto, resetUserDto } = useUserStore();
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisibility] = useState(false); // Dialog visibility
+  const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
   const triggerRefreshDataTable = useRef<
     ((dto: DataTableDto<UserDto>) => void) | undefined
   >(undefined);
@@ -27,16 +29,19 @@ export default function UsersPage() {
     showDialog: () => setViewDialogVisibility(true),
     hideDialog: () => setViewDialogVisibility(false),
   };
-
   const dialogControlAdd: DialogControl = {
     showDialog: () => setAddDialogVisibility(true),
     hideDialog: () => setAddDialogVisibility(false),
   };
-
   const dialogControlEdit: DialogControl = {
     showDialog: () => setEditDialogVisibility(true),
     hideDialog: () => setEditDialogVisibility(false),
   };
+  const dialogControlDelete: DialogControl = {
+    showDialog: () => setDeleteDialogVisibility(true),
+    hideDialog: () => setDeleteDialogVisibility(false),
+  };
+
   const [datatableDto, setDatatableDto] = useState<DataTableDto<UserDto>>({
     data: [],
     first: 0,
@@ -105,7 +110,7 @@ export default function UsersPage() {
         setEditDialogVisibility(true);
         break;
       case ButtonTypeEnum.DELETE:
-        // setDeleteDialogVisibility(true);
+        setDeleteDialogVisibility(true);
         break;
 
       default:
@@ -113,7 +118,7 @@ export default function UsersPage() {
     }
   };
 
-  const OnSaveAdd = async (): Promise<void> => {
+  const onSaveAdd = async (): Promise<void> => {
     const response = await ApiService.create("users", userDto);
 
     if (response) {
@@ -122,11 +127,9 @@ export default function UsersPage() {
       if (triggerRefreshDataTable.current)
         triggerRefreshDataTable.current(datatableDto);
     }
-
-    return Promise.resolve();
   };
 
-  const OnSaveEdit = async (): Promise<void> => {
+  const onSaveEdit = async (): Promise<void> => {
     const response = await ApiService.update("users", userDto, userDto.id);
 
     if (response) {
@@ -135,7 +138,14 @@ export default function UsersPage() {
       if (triggerRefreshDataTable.current)
         triggerRefreshDataTable.current(datatableDto);
     }
-    return Promise.resolve();
+  };
+
+  const onDelete = async (): Promise<void> => {
+    const response = await ApiService.delete("users", userDto.id);
+
+    dialogControlDelete.hideDialog();
+    if (triggerRefreshDataTable.current)
+      triggerRefreshDataTable.current(datatableDto);
   };
 
   return (
@@ -162,9 +172,10 @@ export default function UsersPage() {
       <GenericDialogComponent
         visible={isViewDialogVisible}
         control={dialogControlView}
+        formMode={FormMode.VIEW}
       >
         <div className="w-full">
-          <UserForm formMode={FormMode.VIEW} />
+          <UserForm />
         </div>
       </GenericDialogComponent>
 
@@ -175,10 +186,11 @@ export default function UsersPage() {
       <GenericDialogComponent
         visible={isAddDialogVisible}
         control={dialogControlAdd}
-        onSave={OnSaveAdd}
+        onSave={onSaveAdd}
+        formMode={FormMode.ADD}
       >
         <div className="w-full">
-          <UserForm formMode={FormMode.ADD} />
+          <UserForm />
         </div>
       </GenericDialogComponent>
 
@@ -188,20 +200,27 @@ export default function UsersPage() {
       <GenericDialogComponent
         visible={isEditDialogVisible}
         control={dialogControlEdit}
-        onSave={OnSaveEdit}
+        onSave={onSaveEdit}
+        formMode={FormMode.EDIT}
       >
         <div className="w-full">
-          <UserForm formMode={FormMode.EDIT} />
+          <UserForm />
         </div>
       </GenericDialogComponent>
 
-      {/* Delete Modal */}
-      {/* <DeleteDialogComponent
-        onAfterRowDeletion={afterSave}
-        triggerDialogVisibility={(fn) => (setDeleteDialogVisibility = fn)}
-        id={userDto.id}
-        name={userDto.userName}
-      /> */}
+      {/*                                       */}
+      {/*          Delete Train Group           */}
+      {/*                                       */}
+      <GenericDialogComponent
+        visible={isDeleteDialogVisible}
+        control={dialogControlDelete}
+        onDelete={onDelete}
+        formMode={FormMode.DELETE}
+      >
+        <div className="flex justify-content-center">
+          <p>Are you sure?</p>
+        </div>
+      </GenericDialogComponent>
     </>
   );
 }

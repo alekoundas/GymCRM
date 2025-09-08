@@ -1,5 +1,4 @@
-﻿using Core.Dtos.Identity;
-using Core.Dtos.TrainGroupDate;
+﻿using Core.Dtos.TrainGroupDate;
 using Core.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;

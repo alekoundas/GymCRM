@@ -7,10 +7,9 @@ import { Calendar } from "primereact/calendar";
 import { DateService } from "../../services/DateService";
 import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
 import { useState } from "react";
+import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 
-interface IField {
-  formMode: FormMode;
-}
+interface IField extends DialogChildProps {}
 
 export default function TrainGroupDateFormComponent({ formMode }: IField) {
   const { trainGroupDateDto, setTrainGroupDateDto } = useTrainGroupStore();

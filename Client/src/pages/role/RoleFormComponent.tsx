@@ -3,9 +3,7 @@ import { InputText } from "primereact/inputtext";
 import { useRoleStore } from "../../stores/RoleStore";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 
-interface IField extends DialogChildProps {
-  formMode: FormMode;
-}
+interface IField extends DialogChildProps {}
 
 export default function RoleFormComponent({ formMode }: IField) {
   const { roleDto, updateRoleDto } = useRoleStore();

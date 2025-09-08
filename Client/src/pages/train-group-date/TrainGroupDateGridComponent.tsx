@@ -14,14 +14,13 @@ import {
   DataTableValueArray,
 } from "primereact/datatable";
 import GenericDialogComponent, {
+  DialogChildProps,
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import TrainGroupDateFormComponent from "./TrainGroupDateFormComponent";
 import ApiService from "../../services/ApiService";
 
-interface IField {
-  formMode: FormMode;
-}
+interface IField extends DialogChildProps {}
 
 export default function TrainGroupDateGridComponent({ formMode }: IField) {
   const params = useParams();
@@ -42,6 +41,7 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
   const [isViewDialogVisible, setViewDialogVisible] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisible] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisible] = useState(false); // Dialog visibility
+  const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
   const triggerRefreshDataTable = useRef<
     ((dto: DataTableDto<TrainGroupDateDto>) => void) | undefined
   >(undefined);
@@ -50,15 +50,17 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
     showDialog: () => setAddDialogVisible(true),
     hideDialog: () => setAddDialogVisible(false),
   };
-
   const dialogControlView: DialogControl = {
     showDialog: () => setViewDialogVisible(true),
     hideDialog: () => setViewDialogVisible(false),
   };
-
   const dialogControlEdit: DialogControl = {
     showDialog: () => setEditDialogVisible(true),
     hideDialog: () => setEditDialogVisible(false),
+  };
+  const dialogControlDelete: DialogControl = {
+    showDialog: () => setDeleteDialogVisibility(true),
+    hideDialog: () => setDeleteDialogVisibility(false),
   };
 
   useEffect(() => {}, []);
@@ -215,6 +217,26 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
     }
   };
 
+  const onDelete = async (): Promise<void> => {
+    if (formMode === FormMode.ADD) {
+      const trainGroupDateDtos = trainGroupDto.trainGroupDates.filter(
+        (x) => x.id != trainGroupDateDto.id
+      );
+
+      updateTrainGroupDto({ trainGroupDates: trainGroupDateDtos });
+      resetTrainGroupDateDto();
+      dialogControlDelete.hideDialog();
+    } else {
+      const response = await ApiService.delete(
+        "TrainGroupDates",
+        trainGroupDateDto.id
+      );
+      dialogControlDelete.hideDialog();
+      if (triggerRefreshDataTable.current)
+        triggerRefreshDataTable.current(datatableDto);
+    }
+  };
+
   const onDataTableClick = (
     buttonType: ButtonTypeEnum,
     rowData?: TrainGroupDateDto
@@ -223,8 +245,8 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       case ButtonTypeEnum.VIEW:
         if (rowData) {
           setTrainGroupDateDto(rowData);
+          setViewDialogVisible(true);
         }
-        setViewDialogVisible(true);
         break;
       case ButtonTypeEnum.ADD:
         setAddDialogVisible(true);
@@ -232,10 +254,14 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       case ButtonTypeEnum.EDIT:
         if (rowData) {
           setTrainGroupDateDto(rowData);
+          setEditDialogVisible(true);
         }
-        setEditDialogVisible(true);
         break;
       case ButtonTypeEnum.DELETE:
+        if (rowData) {
+          setTrainGroupDateDto(rowData);
+          setDeleteDialogVisibility(true);
+        }
         break;
 
       default:
@@ -247,7 +273,7 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
     <>
       <DataTableComponent
         controller="TrainGroupDates"
-        formMode={formMode}
+        formMode={formMode ?? FormMode.VIEW}
         dataTableDto={datatableDto}
         setDataTableDto={setDatatableDto}
         dataTableColumns={dataTableColumns}
@@ -267,10 +293,11 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       {/*                                      */}
 
       <GenericDialogComponent
+        formMode={FormMode.VIEW}
         visible={isViewDialogVisible}
         control={dialogControlView}
       >
-        <TrainGroupDateFormComponent formMode={FormMode.VIEW} />
+        <TrainGroupDateFormComponent />
       </GenericDialogComponent>
 
       {/*                                      */}
@@ -278,11 +305,12 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       {/*                                      */}
 
       <GenericDialogComponent
+        formMode={FormMode.ADD}
         visible={isAddDialogVisible}
         control={dialogControlAdd}
         onSave={OnSaveAdd}
       >
-        <TrainGroupDateFormComponent formMode={FormMode.ADD} />
+        <TrainGroupDateFormComponent />
       </GenericDialogComponent>
 
       {/*                                      */}
@@ -290,11 +318,26 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       {/*                                      */}
 
       <GenericDialogComponent
+        formMode={FormMode.EDIT}
         visible={isEditDialogVisible}
         control={dialogControlEdit}
         onSave={OnSaveEdit}
       >
-        <TrainGroupDateFormComponent formMode={FormMode.EDIT} />
+        <TrainGroupDateFormComponent />
+      </GenericDialogComponent>
+
+      {/*                                       */}
+      {/*        Delete TrainGroupDate          */}
+      {/*                                       */}
+      <GenericDialogComponent
+        visible={isDeleteDialogVisible}
+        control={dialogControlDelete}
+        onDelete={onDelete}
+        formMode={FormMode.DELETE}
+      >
+        <div className="flex justify-content-center">
+          <p>Are you sure?</p>
+        </div>
       </GenericDialogComponent>
     </>
   );

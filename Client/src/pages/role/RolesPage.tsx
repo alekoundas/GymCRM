@@ -23,21 +23,25 @@ export default function RolesPage() {
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisibility] = useState(false); // Dialog visibility
+  const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
 
   const dialogControlView: DialogControl = {
     showDialog: () => setViewDialogVisibility(true),
     hideDialog: () => setViewDialogVisibility(false),
   };
-
   const dialogControlAdd: DialogControl = {
     showDialog: () => setAddDialogVisibility(true),
     hideDialog: () => setAddDialogVisibility(false),
   };
-
   const dialogControlEdit: DialogControl = {
     showDialog: () => setEditDialogVisibility(true),
     hideDialog: () => setEditDialogVisibility(false),
   };
+  const dialogControlDelete: DialogControl = {
+    showDialog: () => setDeleteDialogVisibility(true),
+    hideDialog: () => setDeleteDialogVisibility(false),
+  };
+
   const [datatableDto, setDatatableDto] = useState<DataTableDto<RoleDto>>({
     data: [],
     first: 0,
@@ -86,7 +90,7 @@ export default function RolesPage() {
         setEditDialogVisibility(true);
         break;
       case ButtonTypeEnum.DELETE:
-        // setDeleteDialogVisibility(true);
+        setDeleteDialogVisibility(true);
         break;
 
       default:
@@ -116,6 +120,14 @@ export default function RolesPage() {
     }
   };
 
+  const onDelete = async (): Promise<void> => {
+    const response = await ApiService.delete("roles", roleDto.id);
+
+    dialogControlDelete.hideDialog();
+    if (triggerRefreshDataTable.current)
+      triggerRefreshDataTable.current(datatableDto);
+  };
+
   return (
     <>
       <Card title="Roles">
@@ -141,12 +153,13 @@ export default function RolesPage() {
       {/*                                     */}
 
       <GenericDialogComponent
+        formMode={FormMode.VIEW}
         visible={isViewDialogVisible}
         control={dialogControlView}
       >
         <div className="w-full">
-          <RoleFormComponent formMode={FormMode.VIEW} />
-          <RoleGridComponent formMode={FormMode.VIEW} />
+          <RoleFormComponent />
+          <RoleGridComponent />
         </div>
       </GenericDialogComponent>
 
@@ -158,10 +171,11 @@ export default function RolesPage() {
         visible={isAddDialogVisible}
         control={dialogControlAdd}
         onSave={OnSaveAdd}
+        formMode={FormMode.ADD}
       >
         <div className="w-full">
-          <RoleFormComponent formMode={FormMode.ADD} />
-          <RoleGridComponent formMode={FormMode.ADD} />
+          <RoleFormComponent />
+          <RoleGridComponent />
         </div>
       </GenericDialogComponent>
 
@@ -172,20 +186,27 @@ export default function RolesPage() {
         visible={isEditDialogVisible}
         control={dialogControlEdit}
         onSave={OnSaveEdit}
+        formMode={FormMode.EDIT}
       >
         <div className="w-full">
-          <RoleFormComponent formMode={FormMode.EDIT} />
-          <RoleGridComponent formMode={FormMode.EDIT} />
+          <RoleFormComponent />
+          <RoleGridComponent />
         </div>
       </GenericDialogComponent>
 
-      {/* Delete Dialog */}
-      {/* <DeleteDialogComponent
-        onAfterRowDeletion={afterSave}
-        triggerDialogVisibility={(fn) => (setDeleteDialogVisibility = fn)}
-        id={identityRoleDto.id}
-        name={identityRoleDto.name}
-      /> */}
+      {/*                                       */}
+      {/*          Delete Train Group           */}
+      {/*                                       */}
+      <GenericDialogComponent
+        visible={isDeleteDialogVisible}
+        control={dialogControlDelete}
+        onDelete={onDelete}
+        formMode={FormMode.DELETE}
+      >
+        <div className="flex justify-content-center">
+          <p>Are you sure?</p>
+        </div>
+      </GenericDialogComponent>
     </>
   );
 }

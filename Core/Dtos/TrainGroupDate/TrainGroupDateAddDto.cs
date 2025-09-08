@@ -10,7 +10,7 @@ namespace Core.Dtos.TrainGroupDate
         [Required(ErrorMessage = "TrainGroupDateType is required")]
         public TrainGroupDateTypeEnum TrainGroupDateType { get; set; }
 
-
+        public int? TrainGroupId { get; set; }
         public DateTime? FixedDay { get; set; }
         public DateTime? RecurrenceDayOfMonth { get; set; }
         public DateTime? RecurrenceDayOfWeek { get; set; }

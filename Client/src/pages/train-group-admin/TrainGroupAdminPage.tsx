@@ -32,20 +32,23 @@ export default function TrainGroupAdminPage() {
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisibility] = useState(false); // Dialog visibility
+  const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
 
   const dialogControlView: DialogControl = {
     showDialog: () => setViewDialogVisibility(true),
     hideDialog: () => setViewDialogVisibility(false),
   };
-
   const dialogControlAdd: DialogControl = {
     showDialog: () => setAddDialogVisibility(true),
     hideDialog: () => setAddDialogVisibility(false),
   };
-
   const dialogControlEdit: DialogControl = {
     showDialog: () => setEditDialogVisibility(true),
     hideDialog: () => setEditDialogVisibility(false),
+  };
+  const dialogControlDelete: DialogControl = {
+    showDialog: () => setDeleteDialogVisibility(true),
+    hideDialog: () => setDeleteDialogVisibility(false),
   };
   const [datatableDto, setDatatableDto] = useState<DataTableDto<TrainGroupDto>>(
     {
@@ -133,6 +136,14 @@ export default function TrainGroupAdminPage() {
     }
   };
 
+  const onDelete = async (): Promise<void> => {
+    const response = await ApiService.delete("trainGroups", trainGroupDto.id);
+
+    dialogControlDelete.hideDialog();
+    if (triggerRefreshDataTable.current)
+      triggerRefreshDataTable.current(datatableDto);
+  };
+
   const onDataTableClick = (
     buttonType: ButtonTypeEnum,
     rowData?: TrainGroupDto
@@ -157,6 +168,10 @@ export default function TrainGroupAdminPage() {
         }
         break;
       case ButtonTypeEnum.DELETE:
+        if (rowData) {
+          setTrainGroupDto(rowData);
+          dialogControlDelete.showDialog();
+        }
         break;
 
       default:
@@ -188,12 +203,13 @@ export default function TrainGroupAdminPage() {
       {/*                                      */}
 
       <GenericDialogComponent
+        formMode={FormMode.VIEW}
         visible={isViewDialogVisible}
         control={dialogControlView}
       >
         <div className="w-full">
-          <TrainGroupFormComponent formMode={FormMode.VIEW} />
-          <TrainGroupDateGridComponent formMode={FormMode.VIEW} />
+          <TrainGroupFormComponent />
+          <TrainGroupDateGridComponent />
         </div>
       </GenericDialogComponent>
 
@@ -202,13 +218,14 @@ export default function TrainGroupAdminPage() {
       {/*                                     */}
 
       <GenericDialogComponent
+        formMode={FormMode.ADD}
         visible={isAddDialogVisible}
         control={dialogControlAdd}
         onSave={OnSaveAdd}
       >
         <div className="w-full">
-          <TrainGroupFormComponent formMode={FormMode.ADD} />
-          <TrainGroupDateGridComponent formMode={FormMode.ADD} />
+          <TrainGroupFormComponent />
+          <TrainGroupDateGridComponent />
         </div>
       </GenericDialogComponent>
 
@@ -216,13 +233,28 @@ export default function TrainGroupAdminPage() {
       {/*          Edit Train Group           */}
       {/*                                     */}
       <GenericDialogComponent
+        formMode={FormMode.EDIT}
         visible={isEditDialogVisible}
         control={dialogControlEdit}
         onSave={OnSaveEdit}
       >
         <div className="w-full">
-          <TrainGroupFormComponent formMode={FormMode.EDIT} />
-          <TrainGroupDateGridComponent formMode={FormMode.EDIT} />
+          <TrainGroupFormComponent />
+          <TrainGroupDateGridComponent />
+        </div>
+      </GenericDialogComponent>
+
+      {/*                                       */}
+      {/*          Delete Train Group           */}
+      {/*                                       */}
+      <GenericDialogComponent
+        visible={isDeleteDialogVisible}
+        control={dialogControlDelete}
+        onDelete={onDelete}
+        formMode={FormMode.DELETE}
+      >
+        <div className="flex justify-content-center">
+          <p>Are you sure?</p>
         </div>
       </GenericDialogComponent>
     </>

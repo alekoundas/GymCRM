@@ -2,10 +2,9 @@ import { FormMode } from "../../enum/FormMode";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { Calendar } from "primereact/calendar";
 import LookupComponent from "../../components/core/dropdown/LookupComponent";
+import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 
-interface IField {
-  formMode: FormMode;
-}
+interface IField extends DialogChildProps {}
 
 export default function TrainGroupParticipantFormComponent({
   formMode,

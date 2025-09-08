@@ -134,10 +134,10 @@ export default function TrainGroupsBookingCalendarPage() {
       {/*                                      */}
 
       <GenericDialogComponent
+        formMode={FormMode.ADD}
         header={"datatable.book_training_session"}
         visible={isDialogVisible}
         control={dialogControl}
-        formMode={FormMode.ADD}
         onSave={onSave}
       >
         <TrainGroupsBookingCalendarTimeslotBookFormComponent />

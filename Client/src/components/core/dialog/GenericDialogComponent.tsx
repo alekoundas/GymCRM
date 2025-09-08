@@ -11,6 +11,7 @@ export interface DialogChildProps {
   showDialog?: () => void;
   hideDialog?: () => void;
   toggleDialogSave?: (isEnabled: React.SetStateAction<boolean>) => void;
+  formMode?: FormMode;
 }
 
 export interface DialogControl {
@@ -20,7 +21,7 @@ export interface DialogControl {
 
 interface DialogComponentProps {
   header?: string;
-  formMode?: FormMode;
+  formMode: FormMode;
   visible: boolean;
   control: DialogControl;
   children: ReactNode;
@@ -112,6 +113,7 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
           showDialog: control.showDialog,
           hideDialog: control.hideDialog,
           toggleDialogSave: setIsSaveEnabled,
+          formMode: formMode,
         });
       }
 
@@ -126,6 +128,7 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
                 showDialog: control.showDialog,
                 hideDialog: control.hideDialog,
                 toggleDialogSave: setIsSaveEnabled,
+                formMode: formMode,
               })
             );
           } else {
@@ -134,10 +137,14 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
               className?: string;
               children?: any;
             };
+
+            if (schildProps.children.type === "p") return child;
+
             return React.cloneElement(schildProps.children, {
               showDialog: control.showDialog,
               hideDialog: control.hideDialog,
               toggleDialogSave: setIsSaveEnabled,
+              formMode: formMode,
             });
           }
         }

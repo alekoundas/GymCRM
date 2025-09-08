@@ -2,10 +2,9 @@ import { FormMode } from "../../enum/FormMode";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import LookupComponent from "../../components/core/dropdown/LookupComponent";
 import { InputNumber } from "primereact/inputnumber";
+import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 
-interface IField {
-  formMode: FormMode;
-}
+interface IField extends DialogChildProps {}
 
 export default function TrainGroupDateParticipantFormComponent({
   formMode,

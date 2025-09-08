@@ -112,35 +112,6 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
           </Card>
         </div>
       </div>
-
-      {/*                                     */}
-      {/*           Add Train Group           */}
-      {/*                                     */}
-
-      {/* <GenericDialogComponent
-        visible={isAddDialogVisible}
-        control={dialogControlAdd}
-        onSave={OnSaveAdd}
-      >
-        <div className="w-full">
-          <TrainGroupFormComponent formMode={FormMode.ADD} />
-          <TrainGroupDateGridComponent formMode={FormMode.ADD} />
-        </div>
-      </GenericDialogComponent> */}
-
-      {/*                                     */}
-      {/*          Edit Train Group           */}
-      {/*                                     */}
-      {/* <GenericDialogComponent
-        visible={isEditDialogVisible}
-        control={dialogControlEdit}
-        onSave={OnSaveEdit}
-      >
-        <div className="w-full">
-          <TrainGroupFormComponent formMode={FormMode.EDIT} />
-          <TrainGroupDateGridComponent formMode={FormMode.EDIT} />
-        </div>
-      </GenericDialogComponent> */}
     </>
   );
 }
