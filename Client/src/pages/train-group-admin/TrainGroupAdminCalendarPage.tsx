@@ -40,7 +40,6 @@ export default function TrainGroupAdminCalendarPage() {
     showDialog: () => setAddModalVisibility(true),
     hideDialog: () => setAddModalVisibility(false),
   };
-
   const dialogControlView: DialogControl = {
     showDialog: () => setViewModalVisibility(true),
     hideDialog: () => setViewModalVisibility(false),
@@ -55,18 +54,18 @@ export default function TrainGroupAdminCalendarPage() {
     }
   };
 
-  const onSaveEdit = async (): Promise<void> => {
-    const response = await ApiService.update(
-      "trainGroups",
-      trainGroupDto,
-      trainGroupDto.id
-    );
+  // const onSaveEdit = async (): Promise<void> => {
+  //   const response = await ApiService.update(
+  //     "trainGroups",
+  //     trainGroupDto,
+  //     trainGroupDto.id
+  //   );
 
-    if (response) {
-      dialogControlView.hideDialog();
-      resetTrainGroupDto();
-    }
-  };
+  //   if (response) {
+  //     dialogControlView.hideDialog();
+  //     resetTrainGroupDto();
+  //   }
+  // };
 
   return (
     <>
@@ -171,13 +170,14 @@ export default function TrainGroupAdminCalendarPage() {
       {/*                                     */}
 
       <GenericDialogComponent
+        formMode={FormMode.ADD}
         visible={isAddModalVisible}
         control={dialogControlAdd}
         onSave={onSaveAdd}
       >
         <div className="w-full">
-          <TrainGroupFormComponent formMode={FormMode.ADD} />
-          <TrainGroupDateAdminCalenndarGridComponent formMode={FormMode.ADD} />
+          <TrainGroupFormComponent />
+          <TrainGroupDateAdminCalenndarGridComponent />
         </div>
       </GenericDialogComponent>
 
@@ -185,12 +185,13 @@ export default function TrainGroupAdminCalendarPage() {
       {/*          View Train Group           */}
       {/*                                     */}
       <GenericDialogComponent
+        formMode={FormMode.VIEW}
         visible={isViewModalVisible}
         control={dialogControlView}
       >
         <div className="w-full">
-          <TrainGroupFormComponent formMode={FormMode.VIEW} />
-          <TrainGroupDateAdminCalenndarGridComponent formMode={FormMode.VIEW} />
+          <TrainGroupFormComponent />
+          <TrainGroupDateAdminCalenndarGridComponent />
         </div>
       </GenericDialogComponent>
     </>

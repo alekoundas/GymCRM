@@ -32,12 +32,14 @@ export default function TrainGroupDateParticipantGridComponent({
     editTrainGroupDateParticipant,
     resetTrainGroupDateParticipant,
     setTrainGroupParticipant,
+    deleteTrainGroupDateParticipant,
     resetTrainGroupParticipant,
   } = useTrainGroupStore();
 
   const [isViewDialogVisible, setViewDialogVisible] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisible] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisible] = useState(false); // Dialog visibility
+  const [isDeleteDialogVisible, setDeleteDialogVisible] = useState(false); // Dialog visibility
   const triggerRefreshDataTable = useRef<
     ((dto: DataTableDto<TrainGroupParticipantDto>) => void) | undefined
   >(undefined);
@@ -46,15 +48,17 @@ export default function TrainGroupDateParticipantGridComponent({
     showDialog: () => setAddDialogVisible(true),
     hideDialog: () => setAddDialogVisible(false),
   };
-
   const dialogControlView: DialogControl = {
     showDialog: () => setViewDialogVisible(true),
     hideDialog: () => setViewDialogVisible(false),
   };
-
   const dialogControlEdit: DialogControl = {
     showDialog: () => setEditDialogVisible(true),
     hideDialog: () => setEditDialogVisible(false),
+  };
+  const dialogControlDelete: DialogControl = {
+    showDialog: () => setDeleteDialogVisible(true),
+    hideDialog: () => setDeleteDialogVisible(false),
   };
 
   const [datatableDto, setDatatableDto] = useState<
@@ -225,6 +229,8 @@ export default function TrainGroupDateParticipantGridComponent({
           pageCount: participants.length,
         }));
       } else {
+        trainGroupParticipant.trainGroupId = trainGroupDto.id;
+        trainGroupParticipant.trainGroupDateId = selectedTrainGroupDate.id;
         const response = await ApiService.create(
           "trainGroupParticipants",
           trainGroupParticipant
@@ -271,6 +277,45 @@ export default function TrainGroupDateParticipantGridComponent({
     }
   };
 
+  const onDelete = async (): Promise<void> => {
+    if (selectedTrainGroupDate) {
+      if (formMode === FormMode.ADD) {
+        const id =
+          (trainGroupDto.trainGroupDates
+            .find((x) => x.id === selectedTrainGroupDate.id)
+            ?.trainGroupParticipants.filter((x) => x.id < 0).length ?? 0 + 1) *
+          -1;
+
+        deleteTrainGroupDateParticipant(
+          trainGroupParticipant.id,
+          selectedTrainGroupDate.id
+        );
+        resetTrainGroupParticipant();
+        dialogControlDelete.hideDialog();
+
+        // Force DTO refresh to pick up new participant
+        const participants =
+          trainGroupDto.trainGroupDates.find(
+            (x) => x.id === selectedTrainGroupDate.id
+          )?.trainGroupParticipants ?? [];
+        setDatatableDto((prev) => ({
+          ...prev,
+          data: participants,
+          pageCount: participants.length,
+        }));
+      } else {
+        const response = await ApiService.delete(
+          "trainGroupParticipants",
+          trainGroupParticipant.id
+        );
+
+        dialogControlDelete.hideDialog();
+        if (triggerRefreshDataTable.current)
+          triggerRefreshDataTable.current(datatableDto);
+      }
+    }
+  };
+
   const onDataTableClick = (
     buttonType: ButtonTypeEnum,
     rowData?: TrainGroupParticipantDto
@@ -292,6 +337,7 @@ export default function TrainGroupDateParticipantGridComponent({
         setEditDialogVisible(true);
         break;
       case ButtonTypeEnum.DELETE:
+        setDeleteDialogVisible(true);
         break;
 
       default:
@@ -324,10 +370,11 @@ export default function TrainGroupDateParticipantGridComponent({
       {/*                                      */}
 
       <GenericDialogComponent
+        formMode={FormMode.VIEW}
         visible={isViewDialogVisible}
         control={dialogControlView}
       >
-        <TrainGroupDateParticipantFormComponent formMode={FormMode.VIEW} />
+        <TrainGroupDateParticipantFormComponent />
       </GenericDialogComponent>
 
       {/*                                      */}
@@ -335,11 +382,12 @@ export default function TrainGroupDateParticipantGridComponent({
       {/*                                      */}
 
       <GenericDialogComponent
+        formMode={FormMode.ADD}
         visible={isAddDialogVisible}
         control={dialogControlAdd}
         onSave={OnSaveAdd}
       >
-        <TrainGroupDateParticipantFormComponent formMode={FormMode.ADD} />
+        <TrainGroupDateParticipantFormComponent />
       </GenericDialogComponent>
 
       {/*                                      */}
@@ -347,11 +395,26 @@ export default function TrainGroupDateParticipantGridComponent({
       {/*                                      */}
 
       <GenericDialogComponent
+        formMode={FormMode.EDIT}
         visible={isEditDialogVisible}
         control={dialogControlEdit}
         onSave={OnSaveEdit}
       >
-        <TrainGroupDateParticipantFormComponent formMode={FormMode.EDIT} />
+        <TrainGroupDateParticipantFormComponent />
+      </GenericDialogComponent>
+
+      {/*                                       */}
+      {/*          Delete Participant           */}
+      {/*                                       */}
+      <GenericDialogComponent
+        visible={isDeleteDialogVisible}
+        control={dialogControlDelete}
+        onDelete={onDelete}
+        formMode={FormMode.DELETE}
+      >
+        <div className="flex justify-content-center">
+          <p>Are you sure?</p>
+        </div>
       </GenericDialogComponent>
     </>
   );

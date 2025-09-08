@@ -20,10 +20,9 @@ import {
   DataTableSelectionSingleChangeEvent,
   DataTableValueArray,
 } from "primereact/datatable";
+import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 
-interface IField {
-  formMode: FormMode;
-}
+interface IField extends DialogChildProps {}
 
 export default function TrainGroupDateAdminCalenndarGridComponent({
   formMode,
@@ -370,7 +369,7 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
         controller="TrainGroupDates"
         dataTableDto={datatableDto}
         setDataTableDto={setDatatableDto}
-        formMode={formMode}
+        formMode={formMode ?? FormMode.VIEW}
         dataTableColumns={dataTableColumns}
         filterDisplay={DataTableFilterDisplayEnum.ROW}
         enableAddAction={formMode !== FormMode.VIEW}

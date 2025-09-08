@@ -27,7 +27,6 @@ export default function TrainGroupParticipantGridComponent({
     trainGroupDto,
     trainGroupParticipant,
     addTrainGroupParticipant,
-    setTrainGroupDto,
     setTrainGroupParticipant,
     updateTrainGroupDto,
     resetTrainGroupParticipant,
@@ -36,6 +35,7 @@ export default function TrainGroupParticipantGridComponent({
   const [isViewDialogVisible, setViewDialogVisible] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisible] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisible] = useState(false); // Dialog visibility
+  const [isDeleteDialogVisible, setDeleteDialogVisible] = useState(false); // Dialog visibility
   const triggerRefreshDataTable = useRef<
     ((dto: DataTableDto<TrainGroupParticipantDto>) => void) | undefined
   >(undefined);
@@ -44,15 +44,17 @@ export default function TrainGroupParticipantGridComponent({
     showDialog: () => setAddDialogVisible(true),
     hideDialog: () => setAddDialogVisible(false),
   };
-
   const dialogControlView: DialogControl = {
     showDialog: () => setViewDialogVisible(true),
     hideDialog: () => setViewDialogVisible(false),
   };
-
   const dialogControlEdit: DialogControl = {
     showDialog: () => setEditDialogVisible(true),
     hideDialog: () => setEditDialogVisible(false),
+  };
+  const dialogControlDelete: DialogControl = {
+    showDialog: () => setDeleteDialogVisible(true),
+    hideDialog: () => setDeleteDialogVisible(false),
   };
 
   const [datatableDto, setDatatableDto] = useState<
@@ -191,6 +193,28 @@ export default function TrainGroupParticipantGridComponent({
     }
   };
 
+  const onDelete = async (): Promise<void> => {
+    if (formMode === FormMode.ADD) {
+      const trainGroupParticipants =
+        trainGroupDto.trainGroupParticipants.filter(
+          (x) => x.id != trainGroupParticipant.id
+        );
+
+      updateTrainGroupDto({ trainGroupParticipants: trainGroupParticipants });
+      resetTrainGroupParticipant();
+      dialogControlDelete.hideDialog();
+    } else {
+      const response = await ApiService.delete(
+        "TrainGroupParticipants",
+        trainGroupParticipant.id
+      );
+
+      dialogControlDelete.hideDialog();
+      if (triggerRefreshDataTable.current)
+        triggerRefreshDataTable.current(datatableDto);
+    }
+  };
+
   const onDataTableClick = (
     buttonType: ButtonTypeEnum,
     rowData?: TrainGroupParticipantDto
@@ -199,8 +223,8 @@ export default function TrainGroupParticipantGridComponent({
       case ButtonTypeEnum.VIEW:
         if (rowData) {
           setTrainGroupParticipant(rowData);
+          setViewDialogVisible(true);
         }
-        setViewDialogVisible(true);
         break;
       case ButtonTypeEnum.ADD:
         setAddDialogVisible(true);
@@ -208,10 +232,14 @@ export default function TrainGroupParticipantGridComponent({
       case ButtonTypeEnum.EDIT:
         if (rowData) {
           setTrainGroupParticipant(rowData);
+          setEditDialogVisible(true);
         }
-        setEditDialogVisible(true);
         break;
       case ButtonTypeEnum.DELETE:
+        if (rowData) {
+          setTrainGroupParticipant(rowData);
+          setDeleteDialogVisible(true);
+        }
         break;
 
       default:
@@ -233,7 +261,7 @@ export default function TrainGroupParticipantGridComponent({
         onButtonClick={onDataTableClick}
         onAfterDataLoaded={onAfterDataLoaded}
         triggerRefreshData={triggerRefreshDataTable}
-        authorize={false}
+        authorize={true}
       />
 
       {/*                                      */}
@@ -241,10 +269,11 @@ export default function TrainGroupParticipantGridComponent({
       {/*                                      */}
 
       <GenericDialogComponent
+        formMode={FormMode.VIEW}
         visible={isViewDialogVisible}
         control={dialogControlView}
       >
-        <TrainGroupParticipantFormComponent formMode={FormMode.VIEW} />
+        <TrainGroupParticipantFormComponent />
       </GenericDialogComponent>
 
       {/*                                      */}
@@ -252,11 +281,12 @@ export default function TrainGroupParticipantGridComponent({
       {/*                                      */}
 
       <GenericDialogComponent
+        formMode={FormMode.ADD}
         visible={isAddDialogVisible}
         control={dialogControlAdd}
         onSave={OnSaveAdd}
       >
-        <TrainGroupParticipantFormComponent formMode={FormMode.ADD} />
+        <TrainGroupParticipantFormComponent />
       </GenericDialogComponent>
 
       {/*                                      */}
@@ -264,11 +294,26 @@ export default function TrainGroupParticipantGridComponent({
       {/*                                      */}
 
       <GenericDialogComponent
+        formMode={FormMode.EDIT}
         visible={isEditDialogVisible}
         control={dialogControlEdit}
         onSave={OnSaveEdit}
       >
-        <TrainGroupParticipantFormComponent formMode={FormMode.EDIT} />
+        <TrainGroupParticipantFormComponent />
+      </GenericDialogComponent>
+
+      {/*                                       */}
+      {/*          Delete Train Group           */}
+      {/*                                       */}
+      <GenericDialogComponent
+        visible={isDeleteDialogVisible}
+        control={dialogControlDelete}
+        onDelete={onDelete}
+        formMode={FormMode.DELETE}
+      >
+        <div className="flex justify-content-center">
+          <p>Are you sure?</p>
+        </div>
       </GenericDialogComponent>
     </>
   );

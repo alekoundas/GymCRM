@@ -7,10 +7,9 @@ import LookupComponent from "../../components/core/dropdown/LookupComponent";
 import { FormMode } from "../../enum/FormMode";
 import { TokenService } from "../../services/TokenService";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
+import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 
-interface IField {
-  formMode: FormMode;
-}
+interface IField extends DialogChildProps {}
 
 export default function TrainGroupFormComponent({ formMode }: IField) {
   const { trainGroupDto, updateTrainGroupDto } = useTrainGroupStore();

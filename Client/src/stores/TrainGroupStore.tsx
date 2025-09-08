@@ -30,6 +30,10 @@ interface TrainGroupStoreState {
 
   addTrainGroupDateParticipant: (newRow: TrainGroupParticipantDto) => void;
   editTrainGroupDateParticipant: (newRow: TrainGroupParticipantDto) => void;
+  deleteTrainGroupDateParticipant: (
+    participantId: number,
+    trainGroupDateId: number
+  ) => void;
   resetTrainGroupDateParticipant: (id: number) => void;
 }
 
@@ -220,6 +224,55 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
         ],
       },
     })),
+
+  deleteTrainGroupDateParticipant: (
+    participantId: number,
+    trainGroupDateId: number
+  ) =>
+    set((state) => {
+      // Find the TrainGroupDateDto to update
+      const targetDate = state.trainGroupDto.trainGroupDates.find(
+        (x) => x.id === trainGroupDateId
+      );
+
+      if (!targetDate) {
+        // If the date is not found, return the current state unchanged
+        return state;
+      }
+
+      // Create updated TrainGroupDateDto with the participant removed
+      const updatedDate = {
+        ...targetDate,
+        trainGroupParticipants: targetDate.trainGroupParticipants.filter(
+          (participant) => participant.id !== participantId
+        ),
+      };
+
+      // Update the trainGroupDates array
+      const updatedDates = [
+        ...state.trainGroupDto.trainGroupDates.filter(
+          (x) => x.id !== trainGroupDateId
+        ),
+        updatedDate,
+      ];
+
+      // Update the trainGroupDto with the new dates array
+      const newTrainGroupDto = {
+        ...state.trainGroupDto,
+        trainGroupDates: updatedDates,
+      };
+
+      // Update selectedTrainGroupDate if it matches the modified trainGroupDateId
+      let newSelected = state.selectedTrainGroupDate;
+      if (state.selectedTrainGroupDate?.id === trainGroupDateId) {
+        newSelected = updatedDates.find((x) => x.id === trainGroupDateId);
+      }
+
+      return {
+        trainGroupDto: newTrainGroupDto,
+        selectedTrainGroupDate: newSelected,
+      };
+    }),
 
   resetTrainGroupDateParticipant: (id: number) =>
     set((state) => ({

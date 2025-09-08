@@ -8,18 +8,16 @@ import DataTableComponent from "../../components/core/datatable/DataTableCompone
 import { DataTableDto } from "../../model/datatable/DataTableDto";
 import { useRoleStore } from "../../stores/RoleStore";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 
-interface IField extends DialogChildProps {
-  formMode: FormMode;
-}
+interface IField extends DialogChildProps {}
 
 export default function RoleGridComponent({
   formMode,
   toggleDialogSave,
 }: IField) {
-  const { roleDto, updateRoleDto, setRoleDto } = useRoleStore();
+  const { roleDto, setRoleDto } = useRoleStore();
 
   const [datatableDto, setDatatableDto] = useState<DataTableDto<ClaimDto>>({
     data: roleDto.claims,
