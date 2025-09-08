@@ -113,14 +113,10 @@ namespace API.Controllers
                 return errors.Length > 0;
             }
 
-
             // Check for date mixing
             bool isDayOfWeekAndMonthMixing =
-                entityAddDto.TrainGroupDates
-                .Any(x =>
-                    x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
-                    || x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH
-                );
+                entityAddDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
+                && entityAddDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH);
             if (isDayOfWeekAndMonthMixing)
                 errorList.Add("Day of week and Day of Month doesnt mix! Please select only one of those types.");
 
@@ -186,84 +182,82 @@ namespace API.Controllers
             List<string> errorList = new List<string>();
 
             // Check required fields
-            foreach (var groupDate in entityDto.TrainGroupDates)
-            {
-                if (groupDate.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY && groupDate.FixedDay == null)
-                    errorList.Add("Each TrainGroupDate must have FixedDay set.");
-                if (groupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH && groupDate.RecurrenceDayOfMonth == null)
-                    errorList.Add("Each TrainGroupDate must have RecurrenceDayOfMonth set.");
-                if (groupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK && groupDate.RecurrenceDayOfWeek == null)
-                    errorList.Add("Each TrainGroupDate must have RecurrenceDayOfWeek set.");
-            }
-            if (errorList.Count > 0)
-            {
-                errors = errorList.ToArray();
-                return errors.Length > 0;
-            }
-
-
-            // Check for date mixing
-            bool isDayOfWeekAndMonthMixing =
-                entityDto.TrainGroupDates
-                .Any(x =>
-                    x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
-                    || x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH
-                );
-            if (isDayOfWeekAndMonthMixing)
-                errorList.Add("Day of week and Day of Month doesnt mix! Please select only one of those types.");
+            //foreach (var groupDate in entityDto.TrainGroupDates)
+            //{
+            //    if (groupDate.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY && groupDate.FixedDay == null)
+            //        errorList.Add("Each TrainGroupDate must have FixedDay set.");
+            //    if (groupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH && groupDate.RecurrenceDayOfMonth == null)
+            //        errorList.Add("Each TrainGroupDate must have RecurrenceDayOfMonth set.");
+            //    if (groupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK && groupDate.RecurrenceDayOfWeek == null)
+            //        errorList.Add("Each TrainGroupDate must have RecurrenceDayOfWeek set.");
+            //}
+            //if (errorList.Count > 0)
+            //{
+            //    errors = errorList.ToArray();
+            //    return errors.Length > 0;
+            //}
 
 
 
-            // Check for date mixing
-            bool isFixedDateValid =
-                entityDto.TrainGroupDates
-                .Where(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY)
-                .Any(x =>
-                    entityDto.TrainGroupDates
-                        .Where(y => y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
-                        .Any(y => x.FixedDay!.Value.DayOfWeek == y.RecurrenceDayOfWeek!.Value.DayOfWeek)
-                );
-            if (isFixedDateValid)
-                errorList.Add("Fixed Date has the same Day of week with a Day of Week row!");
+            //// Check for date mixing
+            //bool isDayOfWeekAndMonthMixing =
+            //    entityDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
+            //    && entityDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH);
+            //if (isDayOfWeekAndMonthMixing)
+            //    errorList.Add("Day of week and Day of Month doesnt mix! Please select only one of those types.");
 
 
 
-            // Check for fixed date validity
-            isFixedDateValid =
-                entityDto.TrainGroupDates
-                .Where(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY)
-                .Any(x =>
-                    entityDto.TrainGroupDates
-                        .Where(y => y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH)
-                        .Any(y => x.FixedDay!.Value.DayOfWeek == y.RecurrenceDayOfMonth!.Value.DayOfWeek)
-                );
-            if (isFixedDateValid)
-                errorList.Add("Fixed Date has the same Day of week with a Day of Month row!");
+            //// Check for date mixing
+            //bool isFixedDateValid =
+            //    entityDto.TrainGroupDates
+            //    .Where(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY)
+            //    .Any(x =>
+            //        entityDto.TrainGroupDates
+            //            .Where(y => y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
+            //            .Any(y => x.FixedDay!.Value.DayOfWeek == y.RecurrenceDayOfWeek!.Value.DayOfWeek)
+            //    );
+            //if (isFixedDateValid)
+            //    errorList.Add("Fixed Date has the same Day of week with a Day of Week row!");
 
 
 
-            // Check for duplicates
-            var duplicates = entityDto.TrainGroupDates
-               .GroupBy(x => new { x.RecurrenceDayOfWeek, x.RecurrenceDayOfMonth, x.FixedDay }) // Group by composite key
-               .Where(g => g.Count() > 1)                                                       // Find groups with more than one item
-               .ToList();
-            if (duplicates.Count() > 0)
-                errorList.Add("Duplicate rows found!");
+            //// Check for fixed date validity
+            //isFixedDateValid =
+            //    entityDto.TrainGroupDates
+            //    .Where(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY)
+            //    .Any(x =>
+            //        entityDto.TrainGroupDates
+            //            .Where(y => y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH)
+            //            .Any(y => x.FixedDay!.Value.DayOfWeek == y.RecurrenceDayOfMonth!.Value.DayOfWeek)
+            //    );
+            //if (isFixedDateValid)
+            //    errorList.Add("Fixed Date has the same Day of week with a Day of Month row!");
 
 
 
-            // Check for TrainGroup participant selected date validity
-            bool isTrainGroupParticipantValid =
-                entityDto.TrainGroupParticipants
-                    .Where(x => x.SelectedDate.HasValue)
-                    .Any(x =>
-                        entityDto.TrainGroupDates.Any(y =>
-                            x.SelectedDate == y.FixedDay
-                            || x.SelectedDate!.Value.Day == y.RecurrenceDayOfMonth?.Day
-                            || x.SelectedDate!.Value.DayOfWeek == y.RecurrenceDayOfWeek?.DayOfWeek)
-                    );
-            if (isTrainGroupParticipantValid)
-                errorList.Add("Duplicate rows found!");
+            //// Check for duplicates
+            //var duplicates = entityDto.TrainGroupDates
+            //   .GroupBy(x => new { x.RecurrenceDayOfWeek, x.RecurrenceDayOfMonth, x.FixedDay }) // Group by composite key
+            //   .Where(g => g.Count() > 1)                                                       // Find groups with more than one item
+            //   .ToList();
+            //if (duplicates.Count() > 0)
+            //    errorList.Add("Duplicate rows found!");
+
+
+
+            //// Check for TrainGroup participant selected date validity
+            //bool isTrainGroupParticipantValid =
+            //    entityDto.TrainGroupParticipants
+            //        .Where(x => x.SelectedDate.HasValue)
+            //        .Any(x =>
+            //            entityDto.TrainGroupDates.Any(y =>
+            //                x.SelectedDate == y.FixedDay
+            //                || x.SelectedDate!.Value.Day == y.RecurrenceDayOfMonth?.Day
+            //                || x.SelectedDate!.Value.DayOfWeek == y.RecurrenceDayOfWeek?.DayOfWeek)
+            //        );
+            //if (isTrainGroupParticipantValid)
+            //    errorList.Add("Duplicate rows found!");
 
             errors = errorList.ToArray();
             return errors.Length > 0;

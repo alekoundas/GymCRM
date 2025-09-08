@@ -36,11 +36,12 @@ export default function App() {
         ref={theme}
         rel="stylesheet"
         type="text/css"
-        position="bottom-right"
       />
 
       {/* Display messages */}
-      <Toast ref={toast} />
+      <Toast
+        ref={toast}
+      />
 
       <div className="grid">
         <div className="col-12 ">
