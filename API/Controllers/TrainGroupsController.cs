@@ -93,12 +93,12 @@ namespace API.Controllers
         //}
 
 
-        protected override bool CustomValidatePOST(TrainGroupAddDto entityAddDto, out string[] errors)
+        protected override bool CustomValidatePOST(TrainGroupAddDto entityDto, out string[] errors)
         {
             List<string> errorList = new List<string>();
 
             // Check required fields
-            foreach (var groupDate in entityAddDto.TrainGroupDates)
+            foreach (var groupDate in entityDto.TrainGroupDates)
             {
                 if (groupDate.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY && groupDate.FixedDay == null)
                     errorList.Add("Each TrainGroupDate must have FixedDay set.");
@@ -115,19 +115,19 @@ namespace API.Controllers
 
             // Check for date mixing
             bool isDayOfWeekAndMonthMixing =
-                entityAddDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
-                && entityAddDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH);
+                entityDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
+                && entityDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH);
             if (isDayOfWeekAndMonthMixing)
                 errorList.Add("Day of week and Day of Month doesnt mix! Please select only one of those types.");
 
 
 
-            // Check for date mixing
+            // Check for fixed date validity
             bool isFixedDateValid =
-                entityAddDto.TrainGroupDates
+                entityDto.TrainGroupDates
                 .Where(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY)
                 .Any(x =>
-                    entityAddDto.TrainGroupDates
+                    entityDto.TrainGroupDates
                         .Where(y => y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
                         .Any(y => x.FixedDay!.Value.DayOfWeek == y.RecurrenceDayOfWeek!.Value.DayOfWeek)
                 );
@@ -138,10 +138,10 @@ namespace API.Controllers
 
             // Check for fixed date validity
             isFixedDateValid =
-                entityAddDto.TrainGroupDates
+                entityDto.TrainGroupDates
                 .Where(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY)
                 .Any(x =>
-                    entityAddDto.TrainGroupDates
+                    entityDto.TrainGroupDates
                         .Where(y => y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH)
                         .Any(y => x.FixedDay!.Value.DayOfWeek == y.RecurrenceDayOfMonth!.Value.DayOfWeek)
                 );
@@ -151,7 +151,7 @@ namespace API.Controllers
 
 
             // Check for duplicates
-            var duplicates = entityAddDto.TrainGroupDates
+            var duplicates = entityDto.TrainGroupDates
                .GroupBy(x => new { x.RecurrenceDayOfWeek, x.RecurrenceDayOfMonth, x.FixedDay }) // Group by composite key
                .Where(g => g.Count() > 1)                                                       // Find groups with more than one item
                .ToList();
@@ -162,16 +162,16 @@ namespace API.Controllers
 
             // Check for TrainGroup participant selected date validity
             bool isTrainGroupParticipantValid =
-                entityAddDto.TrainGroupParticipants
+                entityDto.TrainGroupParticipants
                     .Where(x => x.SelectedDate.HasValue)
                     .Any(x =>
-                        entityAddDto.TrainGroupDates.Any(y =>
+                        entityDto.TrainGroupDates.Any(y =>
                             x.SelectedDate == y.FixedDay
                             || x.SelectedDate!.Value.Day == y.RecurrenceDayOfMonth?.Day
                             || x.SelectedDate!.Value.DayOfWeek == y.RecurrenceDayOfWeek?.DayOfWeek)
                     );
             if (isTrainGroupParticipantValid)
-                errorList.Add("Duplicate rows found!");
+                errorList.Add("Participant selected date doesnt match any of the Train Group Dates!");
 
             errors = errorList.ToArray();
             return errors.Length > 0;
