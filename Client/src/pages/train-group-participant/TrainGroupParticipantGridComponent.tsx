@@ -164,6 +164,7 @@ export default function TrainGroupParticipantGridComponent({
       resetTrainGroupParticipant();
       dialogControlAdd.hideDialog();
     } else {
+      trainGroupParticipant.trainGroupDateId = undefined;
       const response = await ApiService.create(
         "trainGroupParticipants",
         trainGroupParticipant

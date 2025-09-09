@@ -238,6 +238,11 @@ export default function TrainGroupDateParticipantGridComponent({
         if (response) {
           dialogControlAdd.hideDialog();
           resetTrainGroupParticipant();
+          datatableDto.filters.push({
+            fieldName: "TrainGroupDateId",
+            value: selectedTrainGroupDate.id.toString(),
+            filterType: "equals",
+          });
           if (triggerRefreshDataTable.current)
             triggerRefreshDataTable.current(datatableDto);
         }
@@ -270,6 +275,11 @@ export default function TrainGroupDateParticipantGridComponent({
         if (response) {
           dialogControlEdit.hideDialog();
           resetTrainGroupParticipant();
+          datatableDto.filters.push({
+            fieldName: "TrainGroupDateId",
+            value: selectedTrainGroupDate.id.toString(),
+            filterType: "equals",
+          });
           if (triggerRefreshDataTable.current)
             triggerRefreshDataTable.current(datatableDto);
         }
@@ -286,10 +296,7 @@ export default function TrainGroupDateParticipantGridComponent({
             ?.trainGroupParticipants.filter((x) => x.id < 0).length ?? 0 + 1) *
           -1;
 
-        deleteTrainGroupDateParticipant(
-          trainGroupParticipant.id,
-          selectedTrainGroupDate.id
-        );
+        deleteTrainGroupDateParticipant(trainGroupParticipant);
         resetTrainGroupParticipant();
         dialogControlDelete.hideDialog();
 
@@ -310,6 +317,13 @@ export default function TrainGroupDateParticipantGridComponent({
         );
 
         dialogControlDelete.hideDialog();
+        resetTrainGroupParticipant();
+
+        datatableDto.filters.push({
+          fieldName: "TrainGroupDateId",
+          value: selectedTrainGroupDate.id.toString(),
+          filterType: "equals",
+        });
         if (triggerRefreshDataTable.current)
           triggerRefreshDataTable.current(datatableDto);
       }

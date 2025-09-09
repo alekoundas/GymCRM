@@ -55,8 +55,6 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                     ...trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos,
                                     {
                                       id: 0,
-                                      selectedDate:
-                                        timeSlotRequestDto.selectedDate,
                                       trainGroupId:
                                         selectedTimeSlot.trainGroupId,
                                       trainGroupDateId:
