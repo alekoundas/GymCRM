@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     public class GenericController<TEntity, TEntityDto, TEntityAddDto> : ControllerBase
         where TEntity : class

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Business.Services;
 using Core.Dtos;
-using Core.Dtos.TrainGroup;
 using Core.Enums;
 using Core.Models;
 using DataAccess;

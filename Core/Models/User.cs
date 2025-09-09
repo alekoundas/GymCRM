@@ -8,7 +8,7 @@ namespace Core.Models
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
 
-        public virtual ICollection<ContactInformation> ContactInformations { get; set; } = new Collection<ContactInformation>();
+        public virtual ICollection<PhoneNumber> PhoneNumbers { get; set; } = new Collection<PhoneNumber>();
 
         // TrainGroup.
         public virtual ICollection<TrainGroup> TrainGroups { get; set; } = new Collection<TrainGroup>();

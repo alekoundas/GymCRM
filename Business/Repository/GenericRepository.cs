@@ -2,10 +2,8 @@
 using Core.Models;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Business.Repository
 {
@@ -49,30 +47,30 @@ namespace Business.Repository
                 _query = newQuery
             };
         }
-        public GenericRepository<ContactInformation> Select<TResult>(Expression<Func<TEntity, ContactInformation>> selector)
-        {
-            if (_query == null)
-                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+        //public GenericRepository<ContactInformation> Select<TResult>(Expression<Func<TEntity, ContactInformation>> selector)
+        //{
+        //    if (_query == null)
+        //        _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
-            var newQuery = _query.Select(selector);
-            return new GenericRepository<ContactInformation>(_contextFactory)
-            {
-                //_context = _context,
-                _query = newQuery
-            };
-        }
-        public GenericRepository<Customer> Select<TResult>(Expression<Func<TEntity, Customer>> selector)
-        {
-            if (_query == null)
-                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+        //    var newQuery = _query.Select(selector);
+        //    return new GenericRepository<ContactInformation>(_contextFactory)
+        //    {
+        //        //_context = _context,
+        //        _query = newQuery
+        //    };
+        //}
+        //public GenericRepository<Customer> Select<TResult>(Expression<Func<TEntity, Customer>> selector)
+        //{
+        //    if (_query == null)
+        //        _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
-            var newQuery = _query.Select(selector);
-            return new GenericRepository<Customer>(_contextFactory)
-            {
-                //_context = _context,
-                _query = newQuery
-            };
-        }
+        //    var newQuery = _query.Select(selector);
+        //    return new GenericRepository<Customer>(_contextFactory)
+        //    {
+        //        //_context = _context,
+        //        _query = newQuery
+        //    };
+        //}
 
 
         //TODO: Find a way to combine Select Many methods.
@@ -88,30 +86,30 @@ namespace Business.Repository
                 _query = newQuery
             };
         }
-        public GenericRepository<ContactInformation> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<ContactInformation>>> selector)
-        {
-            if (_query == null)
-                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+        //public GenericRepository<ContactInformation> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<ContactInformation>>> selector)
+        //{
+        //    if (_query == null)
+        //        _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
-            var newQuery = _query.SelectMany(selector);
-            return new GenericRepository<ContactInformation>(_contextFactory)
-            {
-                //_context = _context,
-                _query = newQuery
-            };
-        }
-        public GenericRepository<Customer> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<Customer>>> selector)
-        {
-            if (_query == null)
-                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+        //    var newQuery = _query.SelectMany(selector);
+        //    return new GenericRepository<ContactInformation>(_contextFactory)
+        //    {
+        //        //_context = _context,
+        //        _query = newQuery
+        //    };
+        //}
+        //public GenericRepository<Customer> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<Customer>>> selector)
+        //{
+        //    if (_query == null)
+        //        _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
-            var newQuery = _query.SelectMany(selector);
-            return new GenericRepository<Customer>(_contextFactory)
-            {
-                //_context = _context,
-                _query = newQuery
-            };
-        }
+        //    var newQuery = _query.SelectMany(selector);
+        //    return new GenericRepository<Customer>(_contextFactory)
+        //    {
+        //        //_context = _context,
+        //        _query = newQuery
+        //    };
+        //}
 
 
 
