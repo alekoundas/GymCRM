@@ -4,24 +4,23 @@ import { useState } from "react";
 import ApiService from "../../services/ApiService";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { UserRegisterRequestDto } from "../../model/entities/user/UserRegisterRequestDto";
+import { UserRegisterDto } from "../../model/entities/user/UserRegisterDto";
+import { classNames } from "primereact/utils";
 
 export default function RegisterPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [userRegisterDto, setUserLoginDto] = useState(
-    new UserRegisterRequestDto()
-  );
+  const [userRegisterDto, setUserRegisterDto] = useState(new UserRegisterDto());
   const handleChange = (event: React.ChangeEvent<any>) => {
     const name = event.target.name;
     const value = event.target.value;
 
     userRegisterDto[name] = value;
-    setUserLoginDto({ ...userRegisterDto });
+    setUserRegisterDto({ ...userRegisterDto });
   };
 
-  const onRegister = () => {
+  const onSave = () => {
     ApiService.register(userRegisterDto, login).then((isSuccessful) => {
       if (isSuccessful) {
         navigate("/");
@@ -97,6 +96,24 @@ export default function RegisterPage() {
             </div>
 
             <label
+              htmlFor="phoneNumber"
+              className="block text-900 font-medium mb-2"
+            >
+              Phone Number
+            </label>
+            <InputText
+              id="phoneNumber"
+              onChange={(e) =>
+                (userRegisterDto.phoneNumbers = [
+                  { number: e.target.value, isPrimary: true },
+                ])
+              }
+              type="text"
+              placeholder="Phone Number"
+              className="w-full mb-3"
+            />
+
+            <label
               htmlFor="email"
               className="block text-900 font-medium mb-2"
             >
@@ -143,7 +160,7 @@ export default function RegisterPage() {
             <Button
               label="Register"
               className="w-full"
-              onClick={onRegister}
+              onClick={onSave}
             />
           </div>
         </div>

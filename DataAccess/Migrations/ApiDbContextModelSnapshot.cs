@@ -17,7 +17,7 @@ namespace DataAccess.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.19");
 
-            modelBuilder.Entity("Core.Models.ContactInformation", b =>
+            modelBuilder.Entity("Core.Models.PhoneNumber", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -34,22 +34,15 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsFavorite")
+                    b.Property<bool>("IsPrimary")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("Number")
                         .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -59,7 +52,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ContactInformations");
+                    b.ToTable("PhoneNumbers");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroup", b =>
@@ -458,10 +451,10 @@ namespace DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Models.ContactInformation", b =>
+            modelBuilder.Entity("Core.Models.PhoneNumber", b =>
                 {
                     b.HasOne("Core.Models.User", "User")
-                        .WithMany("ContactInformations")
+                        .WithMany("PhoneNumbers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -603,7 +596,7 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Core.Models.User", b =>
                 {
-                    b.Navigation("ContactInformations");
+                    b.Navigation("PhoneNumbers");
 
                     b.Navigation("TrainGroupDatesCancellationSubscriber");
 

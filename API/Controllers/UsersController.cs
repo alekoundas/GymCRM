@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Linq.Expressions;
 
 namespace API.Controllers
@@ -101,7 +102,7 @@ namespace API.Controllers
 
 
             lookupDto.Data = users
-                .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.UserName?? "" })
+                .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.UserName ?? "" })
                 .ToList();
 
             return new ApiResponse<LookupDto>().SetSuccessResponse(lookupDto);
@@ -191,11 +192,21 @@ namespace API.Controllers
                 Email = request.Email,
             };
 
+            // Create user.
             string? result = await _userService.AddNewUser(user, request.Password);
-            if (result == null)
-                return new ApiResponse<bool>().SetSuccessResponse(true);
-            else
+            if (result != null)
                 return new ApiResponse<bool>().SetErrorResponse("error", result);
+
+            // Check if SimpleUser role exists, if not create it.
+            var role = new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "SimpleUser", NormalizedName = "SIMPLEUSER" };
+            if (!await _roleManager.RoleExistsAsync(role.Name))
+                await _roleManager.CreateAsync(role);
+
+            // Assign role.
+            await _userService.AssignSingleRoleAsync(user, role.Name);
+
+
+            return new ApiResponse<bool>().SetSuccessResponse(true);
         }
 
 

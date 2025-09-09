@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Core.Dtos;
 using Core.Dtos.Identity;
+using Core.Dtos.PhoneNumber;
 using Core.Dtos.TrainGroup;
 using Core.Dtos.TrainGroupDate;
 using Core.Models;
@@ -25,7 +26,7 @@ namespace API.AutoMapper
                     foreach (var date in dest.TrainGroupDates)
                         foreach (var participant in date.TrainGroupParticipants)
                             //participant.TrainGroupId = src.Id; // Set TrainGroupId
-                            participant.TrainGroup = dest; // Optional: Set navigation property
+                            participant.TrainGroup = dest; //Set navigation property
                 });
 
             // TrainGroupDateDto
@@ -35,17 +36,22 @@ namespace API.AutoMapper
             // TrainGroupDateAddDto
             CreateMap<TrainGroupDate, TrainGroupDateAddDto>();
             CreateMap<TrainGroupDateAddDto, TrainGroupDate>();
-                //.ForMember(dest => dest.FixedDay, opt => opt.MapFrom<TrainGroupDateAddDtoDateTimeToDateOnlyResolver>());
+            //.ForMember(dest => dest.FixedDay, opt => opt.MapFrom<TrainGroupDateAddDtoDateTimeToDateOnlyResolver>());
 
 
-            CreateMap<ContactInformation, ContactInformationDto>();
-            CreateMap<ContactInformationDto, ContactInformation>();
+            CreateMap<PhoneNumber, PhoneNumberDto>();
+            CreateMap<PhoneNumberDto, PhoneNumber>();
+
+            CreateMap<PhoneNumber, PhoneNumberAddDto>();
+            CreateMap<PhoneNumberAddDto, PhoneNumber>();
+
 
             CreateMap<TrainGroupParticipant, TrainGroupParticipantDto>();
             CreateMap<TrainGroupParticipantDto, TrainGroupParticipant>();
+
             CreateMap<TrainGroupParticipant, TrainGroupParticipantAddDto>();
             CreateMap<TrainGroupParticipantAddDto, TrainGroupParticipant>();
-                //.ForMember(dest=>dest.TrainGroup,src=> src.ma)
+
 
             CreateMap<TrainGroupDateCancellationSubscriber, TrainGroupCancellationSubscriberDto>();
             CreateMap<TrainGroupCancellationSubscriberDto, TrainGroupDateCancellationSubscriber>();

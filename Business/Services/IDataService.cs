@@ -13,8 +13,8 @@ namespace Business.Services
         // Repositories.
         IGenericRepository<User> Users { get; }
         IGenericRepository<TrainGroup> TrainGroups { get; }
+        IGenericRepository<PhoneNumber> PhoneNumbers { get; }
         IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
-        IGenericRepository<ContactInformation> ContactInformations { get; }
         IGenericRepository<TrainGroupParticipant> TrainGroupParticipants { get; }
         IGenericRepository<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; }
 

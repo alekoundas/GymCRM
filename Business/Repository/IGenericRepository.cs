@@ -9,12 +9,12 @@ namespace Business.Repository
         GenericRepository<TEntity> Include<TProperty>(Expression<Func<TEntity, TProperty>> navigationProperty);
 
         GenericRepository<User> Select<TResult>(Expression<Func<TEntity, User>> selector);
-        GenericRepository<ContactInformation> Select<TResult>(Expression<Func<TEntity, ContactInformation>> selector);
-        GenericRepository<Customer> Select<TResult>(Expression<Func<TEntity, Customer>> selector);
+        //GenericRepository<ContactInformation> Select<TResult>(Expression<Func<TEntity, ContactInformation>> selector);
+        //GenericRepository<Customer> Select<TResult>(Expression<Func<TEntity, Customer>> selector);
 
         GenericRepository<User> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<User>>> selector);
-        GenericRepository<ContactInformation> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<ContactInformation>>> selector);
-        GenericRepository<Customer> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<Customer>>> selector);
+        //GenericRepository<ContactInformation> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<ContactInformation>>> selector);
+        //GenericRepository<Customer> SelectMany<TResult>(Expression<Func<TEntity, IEnumerable<Customer>>> selector);
 
 
         GenericRepository<TEntity> OrderBy<TKey>(Expression<Func<TEntity, TKey>> keySelector);
