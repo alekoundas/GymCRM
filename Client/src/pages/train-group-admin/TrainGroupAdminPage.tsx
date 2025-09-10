@@ -62,7 +62,7 @@ export default function TrainGroupAdminPage() {
     }
   );
 
-  const dataTableColumns: DataTableColumns[] = [
+  const dataTableColumns: DataTableColumns<TrainGroupDto>[] = [
     {
       field: "title",
       header: "Title",
@@ -70,7 +70,6 @@ export default function TrainGroupAdminPage() {
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "30%" },
-      body: null,
     },
     {
       field: "startOn",
@@ -79,7 +78,6 @@ export default function TrainGroupAdminPage() {
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "10%" },
-      body: null,
     },
     {
       field: "duration",
@@ -88,7 +86,6 @@ export default function TrainGroupAdminPage() {
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "10%" },
-      body: null,
     },
     {
       field: "maxParticipants",
@@ -97,7 +94,6 @@ export default function TrainGroupAdminPage() {
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "10%" },
-      body: null,
     },
     {
       field: "trainerId",
@@ -106,7 +102,6 @@ export default function TrainGroupAdminPage() {
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "20%" },
-      body: null,
     },
   ];
 

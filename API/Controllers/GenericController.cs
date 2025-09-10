@@ -3,8 +3,6 @@ using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Enums;
-using Core.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers

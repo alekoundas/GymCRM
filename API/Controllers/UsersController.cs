@@ -48,11 +48,11 @@ namespace API.Controllers
         public async Task<ApiResponse<User>> Get(string? id)
         {
             if (id == null)
-                return new ApiResponse<User>().SetErrorResponse("error", "Role ID not set!");
+                return new ApiResponse<User>().SetErrorResponse("error", "User ID not set!");
 
-            User? user = await _dataService.Users.FirstOrDefaultAsync(x => x.Id.ToString() == id);
+            User? user = await _dataService.Users.FirstOrDefaultAsync(x => x.Id == new Guid(id));
             if (user == null)
-                return new ApiResponse<User>().SetErrorResponse("error", "Role not found!");
+                return new ApiResponse<User>().SetErrorResponse("error", "User not found!");
 
             return new ApiResponse<User>().SetSuccessResponse(user);
         }
@@ -73,7 +73,7 @@ namespace API.Controllers
 
             IdentityRole<Guid>? role = await _dataService.Roles.FirstOrDefaultAsync(x => x.Id.ToString() == request.RoleId);
             if (role?.Name == null)
-                return new ApiResponse<bool>().SetErrorResponse("error", "Role not found");
+                return new ApiResponse<bool>().SetErrorResponse("error", "User not found");
 
 
             // Update user properties

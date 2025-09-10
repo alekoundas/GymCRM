@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
     [Authorize]
+    [Route("api/[controller]")]
     public class TrainGroupsController : GenericController<TrainGroup, TrainGroupDto, TrainGroupAddDto>
     {
         private readonly IDataService _dataService;

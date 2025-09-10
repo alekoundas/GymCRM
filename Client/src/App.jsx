@@ -16,6 +16,7 @@ import LoginPage from "./pages/user/LoginPage.tsx";
 import RegisterPage from "./pages/user/RegisterPage.tsx";
 import TrainGroupsBookingCalendarPage from "./pages/train-group-booking/TrainGroupsBookingCalendarPage.tsx";
 import TrainGroupAdminFormPage from "./pages/train-group-admin/TrainGroupAdminFormPage.tsx";
+import UserProfilePage from "./pages/user/UserProfilePage.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -39,9 +40,7 @@ export default function App() {
       />
 
       {/* Display messages */}
-      <Toast
-        ref={toast}
-      />
+      <Toast ref={toast} />
 
       <div className="grid">
         <div className="col-12 ">
@@ -112,6 +111,10 @@ export default function App() {
               <Route
                 path="/users/register"
                 element={<RegisterPage />}
+              />
+              <Route
+                path="/users/profile"
+                element={<UserProfilePage />}
               />
             </Routes>
           </ScrollPanel>

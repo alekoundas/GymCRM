@@ -1,4 +1,4 @@
-import { PhoneNumber } from "../phone-number/PhoneNumber";
+import { PhoneNumberDto } from "../phone-number/PhoneNumberDto";
 
 export interface UserRegisterDto {
   userName: string;
@@ -6,7 +6,7 @@ export interface UserRegisterDto {
   firstName: string;
   lastName: string;
   password: string;
-  phoneNumbers: PhoneNumber[];
+  phoneNumbers: PhoneNumberDto[];
 }
 
 export class UserRegisterDto {
@@ -16,5 +16,5 @@ export class UserRegisterDto {
   firstName: string = "";
   lastName: string = "";
   password: string = "";
-  phoneNumbers: PhoneNumber[];
+  phoneNumbers: PhoneNumberDto[];
 }

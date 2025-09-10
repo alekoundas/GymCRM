@@ -2,7 +2,7 @@ import { ApiResponse } from "../model/ApiResponse";
 import { DataTableDto } from "../model/datatable/DataTableDto";
 import { UserLoginRequestDto } from "../model/entities/user/UserLoginRequestDto";
 import { UserRefreshTokenDto } from "../model/entities/user/UserRefreshTokenDto";
-import { UserRegisterRequestDto } from "../model/entities/user/UserRegisterRequestDto";
+import { UserRegisterDto } from "../model/entities/user/UserRegisterDto";
 import { LookupDto } from "../model/lookup/LookupDto";
 import { TimeSlotRequestDto } from "../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../model/TimeSlotResponseDto";
@@ -325,7 +325,7 @@ export default class ApiService {
   }
 
   public static async register(
-    data: UserRegisterRequestDto,
+    data: UserRegisterDto,
     authLogin: () => void
   ): Promise<boolean> {
     const url = this.buildUrl("users", "register");

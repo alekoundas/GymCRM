@@ -1,5 +1,4 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using Business.Services;
 using Core.Dtos.PhoneNumber;
 using Core.Models;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class PhoneNumbersController : GenericController<PhoneNumber, PhoneNumberDto, PhoneNumberAddDto>
     {
@@ -19,6 +19,11 @@ namespace API.Controllers
         {
             _dataService = dataService;
             _mapper = mapper;
+        }
+
+        protected override bool IsUserAuthorized(string action)
+        {
+            return true;
         }
     }
 }

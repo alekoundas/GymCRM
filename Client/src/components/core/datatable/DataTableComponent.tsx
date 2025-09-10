@@ -23,7 +23,7 @@ interface IField<TEntity> {
   controller: string;
   dataTableDto: DataTableDto<TEntity>;
   setDataTableDto: (dataTableDto: DataTableDto<TEntity>) => void;
-  dataTableColumns: DataTableColumns[];
+  dataTableColumns: DataTableColumns<TEntity>[];
   formMode: FormMode;
   enableGridRowActions?: boolean;
   enableAddAction?: boolean;
@@ -155,7 +155,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         filter: false,
         filterPlaceholder: "",
         style: { width: "10%" },
-        body: null,
+        body: undefined,
         editor: true, // enables row edit
       });
 

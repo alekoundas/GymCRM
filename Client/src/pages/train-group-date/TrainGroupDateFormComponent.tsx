@@ -6,7 +6,6 @@ import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
 import { Calendar } from "primereact/calendar";
 import { DateService } from "../../services/DateService";
 import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
-import { useState } from "react";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 
 interface IField extends DialogChildProps {}
@@ -16,7 +15,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
 
   return (
     <>
-      <div className="flex justify-content-center p-3">
+      <div className="flex flex-column md:flex-row justify-content-center p-3">
         <div className="field p-3">
           <label
             htmlFor="trainGroupDateType"
@@ -50,6 +49,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
             className="w-full"
             checkmark={true}
             highlightOnSelect={true}
+            disabled={formMode !== FormMode.EDIT}
           />
         </div>
 
@@ -78,6 +78,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
               minDate={new Date(new Date().setHours(0, 0, 0, 0))} // Prevent selecting past dates
               className="w-full"
               dateFormat="dd/mm/yy"
+              disabled={formMode !== FormMode.EDIT}
             />
           </div>
         )}
@@ -115,6 +116,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
               }}
               min={0}
               max={31}
+              disabled={formMode !== FormMode.EDIT}
             />
           </div>
         )}
@@ -151,6 +153,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
               className="w-full"
               checkmark={true}
               highlightOnSelect={true}
+              disabled={formMode !== FormMode.EDIT}
             />
           </div>
         )}

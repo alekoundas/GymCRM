@@ -1,14 +1,18 @@
-import { ColumnEditorOptions, ColumnEvent } from "primereact/column";
-import { DataTableRowEditCompleteEvent } from "primereact/datatable";
+import {
+  ColumnBodyOptions,
+  ColumnEditorOptions,
+  ColumnEvent,
+} from "primereact/column";
 
-export interface DataTableColumns {
+export interface DataTableColumns<TEntity> {
   field: string;
   header: string;
   sortable: boolean;
   filter: boolean;
   filterPlaceholder: string;
   style: React.CSSProperties;
-  body: any | null;
+  // body?: (rowData: TEntity, options?: ColumnBodyOptions) => JSX.Element;
+  body?: ((rowData: TEntity, options: ColumnBodyOptions) => any) | undefined;
   editor?: boolean; // enables row edit
 
   cellEditor?: (options: ColumnEditorOptions) => React.ReactNode;
