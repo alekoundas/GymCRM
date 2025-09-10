@@ -92,7 +92,7 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
     }));
   }, [trainGroupDto.trainGroupDates]);
 
-  const dataTableColumns: DataTableColumns[] = [
+  const dataTableColumns: DataTableColumns<TrainGroupDateDto>[] = [
     {
       field: "trainGroupDateType",
       header: "Type",
@@ -100,7 +100,6 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       filter: formMode !== FormMode.ADD,
       filterPlaceholder: "Search",
       style: { width: "20%" },
-      body: null,
     },
     {
       field: "fixedDay",

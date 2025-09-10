@@ -134,7 +134,7 @@ export default function TrainGroupDateParticipantGridComponent({
     }
   }, [selectedTrainGroupDate]);
 
-  const dataTableColumns: DataTableColumns[] = [
+  const dataTableColumns: DataTableColumns<TrainGroupParticipantDto>[] = [
     {
       field: "selectedDate",
       header: "Selected Date",
@@ -162,7 +162,6 @@ export default function TrainGroupDateParticipantGridComponent({
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "10%" },
-      body: null,
     },
     {
       field: "trainGroupDateId",
@@ -171,7 +170,6 @@ export default function TrainGroupDateParticipantGridComponent({
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "10%" },
-      body: null,
     },
     {
       field: "userId",
@@ -180,7 +178,6 @@ export default function TrainGroupDateParticipantGridComponent({
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "10%" },
-      body: null,
     },
   ];
 

@@ -105,7 +105,7 @@ export default function RegisterPage() {
               id="phoneNumber"
               onChange={(e) =>
                 (userRegisterDto.phoneNumbers = [
-                  { number: e.target.value, isPrimary: true },
+                  { id: 0, number: e.target.value, isPrimary: true },
                 ])
               }
               type="text"

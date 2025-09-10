@@ -10,6 +10,7 @@ import { useRoleStore } from "../../stores/RoleStore";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { useState } from "react";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
+import { RoleDto } from "../../model/entities/role/RoleDto";
 
 interface IField extends DialogChildProps {}
 
@@ -58,7 +59,7 @@ export default function RoleGridComponent({
       toggleDialogSave(true);
     }
   };
-  const dataTableColumns: DataTableColumns[] = [
+  const dataTableColumns: DataTableColumns<ClaimDto>[] = [
     {
       field: "controller",
       header: "Controller",
@@ -66,7 +67,6 @@ export default function RoleGridComponent({
       filter: false,
       filterPlaceholder: "Search",
       style: { width: "1%" },
-      body: null,
     },
     {
       field: "view",

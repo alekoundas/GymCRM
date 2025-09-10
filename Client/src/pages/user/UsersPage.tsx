@@ -55,7 +55,7 @@ export default function UsersPage() {
     // },
   });
 
-  const dataTableColumns: DataTableColumns[] = [
+  const dataTableColumns: DataTableColumns<UserDto>[] = [
     {
       field: "id",
       header: "Id",
@@ -63,7 +63,6 @@ export default function UsersPage() {
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "20%" },
-      body: null,
     },
     {
       field: "userName",
@@ -72,7 +71,6 @@ export default function UsersPage() {
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "20%" },
-      body: null,
     },
     {
       field: "email",
@@ -81,7 +79,6 @@ export default function UsersPage() {
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "20%" },
-      body: null,
     },
     {
       field: "roleId",
@@ -90,7 +87,6 @@ export default function UsersPage() {
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "20%" },
-      body: null,
     },
   ];
 

@@ -5,28 +5,22 @@ import ApiService from "../../services/ApiService";
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
-import { useTrainGroupStore } from "../../stores/TrainGroupStore";
-import TrainGroupFormComponent from "./TrainGroupFormComponent";
-import TrainGroupDateGridComponent from "../train-group-date/TrainGroupDateGridComponent";
-import { TrainGroupDto } from "../../model/TrainGroupDto";
 import DataTableComponent from "../../components/core/datatable/DataTableComponent";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
-import { useNavigate } from "react-router-dom";
+import { PhoneNumberDto } from "../../model/entities/phone-number/PhoneNumberDto";
+import PhoneNumberFormComponent from "./PhoneNumberFormComponent";
+import { usePhoneNumberStore } from "../../stores/PhoneNumberStore";
+import { InputSwitch } from "primereact/inputswitch";
 
-export default function TrainGroupAdminPage() {
-  const navigate = useNavigate();
-  const {
-    trainGroupDto,
-    resetTrainGroupDto,
-    setTrainGroupDto,
-    resetSelectedTrainGroupDate,
-    resetTrainGroupParticipant,
-  } = useTrainGroupStore();
+export default function PhoneNumberGridComponent() {
+  const { phoneNumberDto, setPhoneNumberDto, resetPhoneNumberDto } =
+    usePhoneNumberStore();
+
   const triggerRefreshDataTable = useRef<
-    ((dto: DataTableDto<TrainGroupDto>) => void) | undefined
+    ((dto: DataTableDto<PhoneNumberDto>) => void) | undefined
   >(undefined);
 
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
@@ -50,121 +44,110 @@ export default function TrainGroupAdminPage() {
     showDialog: () => setDeleteDialogVisibility(true),
     hideDialog: () => setDeleteDialogVisibility(false),
   };
-  const [datatableDto, setDatatableDto] = useState<DataTableDto<TrainGroupDto>>(
-    {
-      data: [],
-      first: 0,
-      rows: 10,
-      page: 1,
-      pageCount: 0,
-      filters: [],
-      dataTableSorts: [],
-    }
-  );
+  const [datatableDto, setDatatableDto] = useState<
+    DataTableDto<PhoneNumberDto>
+  >({
+    data: [],
+    first: 0,
+    rows: 10,
+    page: 1,
+    pageCount: 0,
+    filters: [],
+    dataTableSorts: [],
+  });
 
-  const dataTableColumns: DataTableColumns<TrainGroupDto>[] = [
+  const dataTableColumns: DataTableColumns<PhoneNumberDto>[] = [
     {
-      field: "title",
-      header: "Title",
-      sortable: true,
-      filter: true,
+      field: "number",
+      header: "Number",
+      sortable: false,
+      filter: false,
       filterPlaceholder: "Search",
-      style: { width: "30%" },
+      style: { width: "40%" },
     },
     {
-      field: "startOn",
-      header: "Start On",
-      sortable: true,
-      filter: true,
-      filterPlaceholder: "Search",
-      style: { width: "10%" },
-    },
-    {
-      field: "duration",
-      header: "Duration",
-      sortable: true,
-      filter: true,
-      filterPlaceholder: "Search",
-      style: { width: "10%" },
-    },
-    {
-      field: "maxParticipants",
-      header: "Max Participants",
-      sortable: true,
-      filter: true,
-      filterPlaceholder: "Search",
-      style: { width: "10%" },
-    },
-    {
-      field: "trainerId",
-      header: "Trainer",
-      sortable: true,
-      filter: true,
+      field: "isPrimary",
+      header: "Primary",
+      sortable: false,
+      filter: false,
       filterPlaceholder: "Search",
       style: { width: "20%" },
+      body: (x) => {
+        <InputSwitch
+          checked={x.isPrimary}
+          disabled
+        />;
+      },
     },
   ];
 
   const OnSaveAdd = async (): Promise<void> => {
-    const response = await ApiService.create("trainGroups", trainGroupDto);
+    const response = await ApiService.create("PhoneNumbers", phoneNumberDto);
 
     if (response) {
       dialogControlAdd.hideDialog();
-      resetTrainGroupDto();
+      resetPhoneNumberDto();
+
       if (triggerRefreshDataTable.current)
         triggerRefreshDataTable.current(datatableDto);
     }
   };
 
   const OnSaveEdit = async (): Promise<void> => {
-    const response = await ApiService.update(
-      "trainGroups",
-      trainGroupDto,
-      trainGroupDto.id
-    );
+    if (phoneNumberDto.id) {
+      const response = await ApiService.update(
+        "PhoneNumbers",
+        phoneNumberDto,
+        phoneNumberDto.id
+      );
 
-    if (response) {
-      dialogControlEdit.hideDialog();
-      resetTrainGroupDto();
+      if (response) {
+        dialogControlEdit.hideDialog();
+        setPhoneNumberDto(new PhoneNumberDto());
+
+        if (triggerRefreshDataTable.current)
+          triggerRefreshDataTable.current(datatableDto);
+      }
+    }
+  };
+
+  const onDelete = async (): Promise<void> => {
+    if (phoneNumberDto.id) {
+      const response = await ApiService.delete(
+        "PhoneNumbers",
+        phoneNumberDto.id
+      );
+
+      dialogControlDelete.hideDialog();
       if (triggerRefreshDataTable.current)
         triggerRefreshDataTable.current(datatableDto);
     }
   };
 
-  const onDelete = async (): Promise<void> => {
-    const response = await ApiService.delete("trainGroups", trainGroupDto.id);
-
-    dialogControlDelete.hideDialog();
-    if (triggerRefreshDataTable.current)
-      triggerRefreshDataTable.current(datatableDto);
-  };
-
   const onDataTableClick = (
     buttonType: ButtonTypeEnum,
-    rowData?: TrainGroupDto
+    rowData?: PhoneNumberDto
   ) => {
-    resetSelectedTrainGroupDate();
-    resetTrainGroupParticipant();
     switch (buttonType) {
       case ButtonTypeEnum.VIEW:
         if (rowData) {
-          setTrainGroupDto(rowData);
-          navigate(rowData.id + "/view");
+          setPhoneNumberDto(rowData);
+          dialogControlView.showDialog();
         }
         break;
       case ButtonTypeEnum.ADD:
-        resetTrainGroupDto();
-        navigate("add");
+        resetPhoneNumberDto();
+        dialogControlAdd.showDialog();
         break;
       case ButtonTypeEnum.EDIT:
         if (rowData) {
-          setTrainGroupDto(rowData);
-          navigate(rowData.id + "/edit");
+          setPhoneNumberDto(rowData);
+          dialogControlEdit.showDialog();
         }
         break;
       case ButtonTypeEnum.DELETE:
         if (rowData) {
-          setTrainGroupDto(rowData);
+          setPhoneNumberDto(rowData);
           dialogControlDelete.showDialog();
         }
         break;
@@ -176,22 +159,18 @@ export default function TrainGroupAdminPage() {
 
   return (
     <>
-      <Card title="Train Groups">
-        <div className="card">
-          <DataTableComponent
-            dataTableDto={datatableDto}
-            setDataTableDto={setDatatableDto}
-            formMode={FormMode.EDIT}
-            onButtonClick={onDataTableClick}
-            controller="TrainGroups"
-            enableGridRowActions={true}
-            filterDisplay={DataTableFilterDisplayEnum.ROW}
-            enableAddAction={true}
-            dataTableColumns={dataTableColumns}
-            triggerRefreshData={triggerRefreshDataTable}
-          />
-        </div>
-      </Card>
+      <DataTableComponent
+        dataTableDto={datatableDto}
+        setDataTableDto={setDatatableDto}
+        formMode={FormMode.EDIT}
+        onButtonClick={onDataTableClick}
+        controller="PhoneNumbers"
+        enableGridRowActions={true}
+        filterDisplay={DataTableFilterDisplayEnum.ROW}
+        enableAddAction={true}
+        dataTableColumns={dataTableColumns}
+        triggerRefreshData={triggerRefreshDataTable}
+      />
 
       {/*                                      */}
       {/*           View Train Group           */}
@@ -203,8 +182,7 @@ export default function TrainGroupAdminPage() {
         control={dialogControlView}
       >
         <div className="w-full">
-          <TrainGroupFormComponent />
-          <TrainGroupDateGridComponent />
+          <PhoneNumberFormComponent />
         </div>
       </GenericDialogComponent>
 
@@ -219,8 +197,7 @@ export default function TrainGroupAdminPage() {
         onSave={OnSaveAdd}
       >
         <div className="w-full">
-          <TrainGroupFormComponent />
-          <TrainGroupDateGridComponent />
+          <PhoneNumberFormComponent />
         </div>
       </GenericDialogComponent>
 
@@ -234,8 +211,7 @@ export default function TrainGroupAdminPage() {
         onSave={OnSaveEdit}
       >
         <div className="w-full">
-          <TrainGroupFormComponent />
-          <TrainGroupDateGridComponent />
+          <PhoneNumberFormComponent />
         </div>
       </GenericDialogComponent>
 

@@ -74,7 +74,7 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
     }));
   }, [trainGroupDto.trainGroupDates]);
 
-  const dataTableColumns: DataTableColumns[] = [
+  const dataTableColumns: DataTableColumns<TrainGroupDateDto>[] = [
     {
       field: "trainGroupDateType",
       header: "Type",
@@ -82,7 +82,6 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
       filter: formMode !== FormMode.ADD,
       filterPlaceholder: "Search",
       style: { width: "20%" },
-      body: null,
       cellEditor: (options: ColumnEditorOptions) => {
         if (options.field === "trainGroupDateType") {
           return (

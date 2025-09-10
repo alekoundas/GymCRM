@@ -55,7 +55,7 @@ export default function RolesPage() {
     dataTableSorts: [],
   });
 
-  const dataTableColumns: DataTableColumns[] = [
+  const dataTableColumns: DataTableColumns<RoleDto>[] = [
     {
       field: "name",
       header: "Name",
@@ -63,7 +63,6 @@ export default function RolesPage() {
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "30%" },
-      body: null,
     },
     {
       field: "normalizedName",
@@ -72,7 +71,6 @@ export default function RolesPage() {
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "30%" },
-      body: null,
     },
   ];
 
