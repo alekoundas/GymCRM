@@ -1,3 +1,5 @@
+import { TokenService } from "../services/TokenService";
+
 export interface TimeSlotRequestDto {
   selectedDate: string;
   userId: string;
@@ -5,5 +7,5 @@ export interface TimeSlotRequestDto {
 
 export class TimeSlotRequestDto {
   selectedDate: string;
-  userId: string;
+  userId: string = TokenService.getUserId() ?? "";
 }

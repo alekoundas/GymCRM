@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useUserStore } from "../../stores/UserStore";
 import UserProfileFormComponent from "./UserProfileFormComponent";
 import PhoneNumberGridComponent from "../phone-number/PhoneNumberGridComponent";
+import UserProfileTimeslotsComponent from "./UserProfileTimeslotsComponent";
 
 export default function UserProfilePage() {
   const { userDto, updateUserDto, setUserDto } = useUserStore();
@@ -136,7 +137,9 @@ export default function UserProfilePage() {
           style={{
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
           }}
-        ></Card>
+        >
+          <UserProfileTimeslotsComponent />
+        </Card>
       </div>
     </div>
   );

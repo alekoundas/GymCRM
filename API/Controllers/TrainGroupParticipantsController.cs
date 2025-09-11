@@ -288,17 +288,17 @@ namespace API.Controllers
                     )
                   )
                   .Any(x =>
-                      x.SelectedDate == entityDto.SelectedDate
+                      (x.TrainGroupDate != null && entityDto.SelectedDate != null && x.SelectedDate == entityDto.SelectedDate)
 
-                      // Validate incoming Reccurence TrainGroupDate vs SelectedDate 
+                      // Validate incoming TrainGroupDateParticipant vs TrainGroupParticipant
                       // If TrainGroupParticipant exists with selected date greater than current date, check if incoming TrainGroupDateParticipant overlaps
                       || (x.SelectedDate != null && x.TrainGroup.TrainGroupDates.Any(y => y.Id == entityDto.TrainGroupDateId && y.RecurrenceDayOfWeek != null && x.SelectedDate.Value.DayOfWeek == y.RecurrenceDayOfWeek.Value.DayOfWeek))
                       || (x.SelectedDate != null && x.TrainGroup.TrainGroupDates.Any(y => y.Id == entityDto.TrainGroupDateId && y.RecurrenceDayOfMonth != null && x.SelectedDate.Value.Day == y.RecurrenceDayOfMonth.Value.Day))
 
                       // Validate incoming SelectedDate vs FixedDay, RecurrenceDayOfWeek, RecurrenceDayOfMonth 
-                      || (x.TrainGroupDate != null && x.TrainGroupDate.FixedDay != null && entityDto.SelectedDate != null && x.TrainGroupDate.FixedDay.Value == entityDto.SelectedDate.Value)
-                      || (x.TrainGroupDate != null && x.TrainGroupDate.RecurrenceDayOfWeek != null && entityDto.SelectedDate != null && x.TrainGroupDate.RecurrenceDayOfWeek.Value.DayOfWeek == entityDto.SelectedDate.Value.DayOfWeek)
-                      || (x.TrainGroupDate != null && x.TrainGroupDate.RecurrenceDayOfMonth != null && entityDto.SelectedDate != null && x.TrainGroupDate.RecurrenceDayOfMonth.Value.Day == entityDto.SelectedDate.Value.Day)
+                      || (x.TrainGroupDate != null && entityDto.SelectedDate != null && x.TrainGroupDate.FixedDay != null && x.TrainGroupDate.FixedDay.Value == entityDto.SelectedDate.Value)
+                      || (x.TrainGroupDate != null && entityDto.SelectedDate != null && x.TrainGroupDate.RecurrenceDayOfWeek != null && x.TrainGroupDate.RecurrenceDayOfWeek.Value.DayOfWeek == entityDto.SelectedDate.Value.DayOfWeek)
+                      || (x.TrainGroupDate != null && entityDto.SelectedDate != null && x.TrainGroupDate.RecurrenceDayOfMonth != null && x.TrainGroupDate.RecurrenceDayOfMonth.Value.Day == entityDto.SelectedDate.Value.Day)
                   );
 
 
