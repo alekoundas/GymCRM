@@ -4,6 +4,7 @@ using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.Identity;
 using Core.Dtos.Lookup;
+using Core.Dtos.TrainGroupDate;
 using Core.Enums;
 using Core.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -269,6 +270,109 @@ namespace API.Controllers
         {
             return new ApiResponse<bool>().SetSuccessResponse(true);
         }
+
+        // POST: api/Users/TimeSlots
+        [HttpPost("TimeSlots")]
+        [Authorize]
+        public async Task<ActionResult<ApiResponse<List<TimeSlotResponseDto>>>> TimeSlots([FromBody] TimeSlotRequestDto timeSlotRequestDto)
+        {
+            List<TrainGroupParticipant>? trainGroupParticipants = await _dataService.TrainGroupParticipants
+                    .Include(x => x.TrainGroup)
+                    .Include(x => x.TrainGroupDate)
+                    .Where(x => x.UserId == new Guid(timeSlotRequestDto.UserId))
+                    .Where(x =>
+                        (
+                            x.SelectedDate.HasValue &&
+                            x.SelectedDate >= timeSlotRequestDto.SelectedDate &&
+                            x.SelectedDate <= timeSlotRequestDto.SelectedDate.AddDays(6)
+                        )
+                        ||
+                        (
+                            x.TrainGroupDate != null &&
+                            x.TrainGroupDate.FixedDay.HasValue &&
+                            x.TrainGroupDate.FixedDay >= timeSlotRequestDto.SelectedDate &&
+                            x.TrainGroupDate.FixedDay <= timeSlotRequestDto.SelectedDate.AddDays(6)
+                        )
+                        ||
+                        (
+                            x.TrainGroupDate != null &&
+                            x.TrainGroupDate.RecurrenceDayOfMonth.HasValue &&
+                            x.TrainGroupDate.RecurrenceDayOfMonth.Value.Date >= timeSlotRequestDto.SelectedDate.Date &&
+                            x.TrainGroupDate.RecurrenceDayOfMonth.Value.Date <= timeSlotRequestDto.SelectedDate.Date.AddDays(6)
+                        )
+                        ||
+                        (
+                            x.TrainGroupDate != null &&
+                            x.TrainGroupDate.RecurrenceDayOfWeek.HasValue
+                        )
+                    )
+                    .ToListAsync(true);
+
+            List<TimeSlotResponseDto>? timeSlotRequestDtos = trainGroupParticipants
+                .Select(x => x.TrainGroup)
+                .Distinct()
+                .Select(x => new TimeSlotResponseDto()
+                {
+                    Title = x.Title,
+                    Description = x.Description,
+                    Duration = x.Duration,
+                    StartOn = x.StartOn,
+                    TrainerId = x.TrainerId,
+                    TrainGroupId = x.Id,
+                    TrainGroupDateId = 0, /// TODO check if needed
+                    RecurrenceDates = x.TrainGroupDates
+                        .Where(y => y.RecurrenceDayOfMonth.HasValue || y.RecurrenceDayOfWeek.HasValue)
+                        .Select(y =>
+                            new TimeSlotRecurrenceDateDto()
+                            {
+                                TrainGroupDateId = y.Id,
+                                TrainGroupDateType = y.TrainGroupDateType,
+                                Date = y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
+                                    ? y.RecurrenceDayOfWeek!.Value
+                                    : y.RecurrenceDayOfMonth!.Value,
+                                IsUserJoined = true,
+                                TrainGroupParticipantId = y.TrainGroupParticipants.FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?.Id
+                            }
+                        )
+                        .Concat(
+                            x.TrainGroupDates
+                            .Where(y => y.FixedDay.HasValue)
+                            .Select(y =>
+                                 new TimeSlotRecurrenceDateDto()
+                                 {
+                                     TrainGroupDateId = y.Id,
+                                     TrainGroupDateType = y.TrainGroupDateType,
+                                     Date = y.FixedDay!.Value,
+                                     IsUserJoined = true,
+                                     TrainGroupParticipantId = y.TrainGroupParticipants.FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?.Id
+                                 }
+                            )
+                        )
+                        .Concat(
+                            x.TrainGroupParticipants
+                            .Where(y => y.SelectedDate.HasValue)
+                            .Select(y =>
+                                 new TimeSlotRecurrenceDateDto()
+                                 {
+                                     TrainGroupDateId = y.Id,
+                                     TrainGroupDateType = null,
+                                     Date = y.SelectedDate!.Value,
+                                     IsUserJoined = true,
+                                     TrainGroupParticipantId = y.Id
+                                 }
+                            )
+                        )
+                        .ToList(),
+                    SpotsLeft = 0 // Not needed here.
+                })
+                .ToList();
+
+            if (timeSlotRequestDtos == null)
+                return new ApiResponse<List<TimeSlotResponseDto>>().SetErrorResponse("error", $"Requested data not found!");
+
+            return new ApiResponse<List<TimeSlotResponseDto>>().SetSuccessResponse(timeSlotRequestDtos);
+        }
+
 
         // DELETE: api/Roles/5
         [HttpDelete("{id}")]

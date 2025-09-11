@@ -13,6 +13,7 @@ import ApiService from "../../../services/ApiService";
 import { LocalStorageService } from "../../../services/LocalStorageService";
 import { ThemeService } from "../../../services/ThemeService";
 import { TokenService } from "../../../services/TokenService";
+import { PrimeTheme } from "../../../model/PrimeTheme";
 
 function NavTop() {
   const { isUserAuthenticated, logout } = useAuth();
@@ -280,7 +281,17 @@ function NavTop() {
               className="flex bg-primary m-1 border-round"
             >
               <Button
-                onClick={() => ThemeService.setTheme(row)}
+                // onClick={() => ThemeService.setTheme(row)}
+                onClick={() => {
+                  const selectedTheme = new PrimeTheme(row.themeName);
+                  ThemeService.setTheme(selectedTheme, (palette) => {
+                    document.dispatchEvent(
+                      new CustomEvent("primeThemeChange", {
+                        detail: { palette },
+                      })
+                    );
+                  });
+                }}
                 className="cursor-pointer p-link"
               >
                 <Image
@@ -301,7 +312,17 @@ function NavTop() {
               className="flex bg-primary m-1 border-round"
             >
               <Button
-                onClick={() => ThemeService.setTheme(row)}
+                onClick={() => {
+                  const selectedTheme = new PrimeTheme(row.themeName);
+                  ThemeService.setTheme(selectedTheme, (palette) => {
+                    document.dispatchEvent(
+                      new CustomEvent("primeThemeChange", {
+                        detail: { palette },
+                      })
+                    );
+                  });
+                }}
+                // onClick={() => ThemeService.setTheme(row)}
                 className="cursor-pointer p-link"
               >
                 <Image

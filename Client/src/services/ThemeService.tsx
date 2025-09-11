@@ -21,12 +21,12 @@ export namespace ThemeService {
     }
   };
 
-  export const setTheme = (primeTheme: PrimeTheme) => {
-    if (HTMLRef.current) {
-      HTMLRef.current.href = primeTheme.themeURL;
-      LocalStorageService.setThemeName(primeTheme.themeName);
-    }
-  };
+  // export const setTheme = (primeTheme: PrimeTheme) => {
+  //   if (HTMLRef.current) {
+  //     HTMLRef.current.href = primeTheme.themeURL;
+  //     LocalStorageService.setThemeName(primeTheme.themeName);
+  //   }
+  // };
 
   export const getDarkThemes = (): PrimeTheme[] => {
     const themes: PrimeTheme[] = [];
@@ -64,5 +64,45 @@ export namespace ThemeService {
   export const setThemeScale = (size: number) => {
     document.documentElement.style.fontSize = `${size}px`;
     LocalStorageService.setThemeScale(size.toString());
+  };
+
+  /**
+   * Enhanced setTheme with optional callback (e.g., for FullCalendar updates after load).
+   * Callback receives the extracted color palette.
+   */
+  export const setTheme = (
+    primeTheme: PrimeTheme,
+    onThemeLoaded?: (palette: { [key: string]: string }) => void
+  ) => {
+    if (HTMLRef.current) {
+      HTMLRef.current.href = primeTheme.themeURL;
+      LocalStorageService.setThemeName(primeTheme.themeName);
+
+      // Wait for CSS to load, then extract palette and call callback
+      const checkLoaded = () => {
+        requestAnimationFrame(() => {
+          const palette = primeTheme.getColorPalette();
+          if (onThemeLoaded) {
+            onThemeLoaded(palette);
+          }
+        });
+      };
+      // Trigger after a short delay to ensure CSS applies
+      setTimeout(checkLoaded, 50);
+    }
+  };
+
+  /**
+   * Gets the current theme name and dynamically extracts its color palette.
+   * Use this in components (e.g., FullCalendar) to get live vars without hardcoding.
+   * Returns { primaryColor: '#3f82f6', surfaceCard: '#ffffff', ... }
+   */
+  export const getCurrentThemeColors = (): { [key: string]: string } => {
+    const currentThemeName = LocalStorageService.getThemeName();
+    if (!currentThemeName) {
+      return {}; // Fallback empty
+    }
+    const currentTheme = new PrimeTheme(currentThemeName);
+    return currentTheme.getColorPalette();
   };
 }
