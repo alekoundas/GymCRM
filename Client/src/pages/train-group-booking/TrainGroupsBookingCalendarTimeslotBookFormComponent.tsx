@@ -24,18 +24,14 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
             <>
               {/* <h4>{"datatable.select_booking_options"}</h4> */}
               {selectedTimeSlot.recurrenceDates.some(
-                (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
+                (x) => x.trainGroupDateType === undefined
               ) && (
                 <div className="field">
                   <p>
                     <strong>{"Current Date"}:</strong>
                   </p>
                   {selectedTimeSlot.recurrenceDates
-                    .filter(
-                      (x) =>
-                        x.trainGroupDateType ===
-                        TrainGroupDateTypeEnum.FIXED_DAY
-                    )
+                    .filter((x) => x.trainGroupDateType === undefined)
                     .map((x) => (
                       <div
                         key={x.trainGroupDateId}
@@ -43,11 +39,9 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                       >
                         <Checkbox
                           inputId={`recurrence-${x.trainGroupDateId}`}
-                          checked={
-                            trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                              (y) => y.trainGroupDateId == x.trainGroupDateId
-                            ).length === 1
-                          }
+                          checked={trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.some(
+                            (y) => y.trainGroupDateId === undefined
+                          )}
                           onChange={(e) => {
                             updateTrainGroupDateParticipantUpdateDto({
                               trainGroupParticipantDtos: e.checked
@@ -55,15 +49,15 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                     ...trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos,
                                     {
                                       id: 0,
+                                      selectedDate:
+                                        timeSlotRequestDto.selectedDate,
                                       trainGroupId:
                                         selectedTimeSlot.trainGroupId,
-                                      trainGroupDateId:
-                                        selectedTimeSlot.trainGroupDateId,
                                       userId: TokenService.getUserId(),
                                     } as TrainGroupParticipantDto,
                                   ]
                                 : trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                                    (y) => y.selectedDate === null
+                                    (y) => y.trainGroupDateId !== undefined
                                   ),
                             });
                           }}
@@ -101,7 +95,11 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                     <strong>{"Current Date"}:</strong>
                   </p>
                   {selectedTimeSlot.recurrenceDates
-                    .filter((x) => x.trainGroupDateType === undefined)
+                    .filter(
+                      (x) =>
+                        x.trainGroupDateType ===
+                        TrainGroupDateTypeEnum.FIXED_DAY
+                    )
                     .map((x) => (
                       <div
                         key={x.trainGroupDateId}
@@ -111,7 +109,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                           inputId={`recurrence-${x.trainGroupDateId}`}
                           checked={
                             trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                              (y) => y.trainGroupDateId == x.trainGroupDateId
+                              (y) => y.trainGroupDateId === x.trainGroupDateId
                             ).length === 1
                           }
                           onChange={(e) => {
@@ -121,16 +119,15 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                     ...trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos,
                                     {
                                       id: 0,
-                                      selectedDate:
-                                        timeSlotRequestDto.selectedDate,
                                       trainGroupId:
                                         selectedTimeSlot.trainGroupId,
-                                      trainGroupDateId: undefined,
+                                      trainGroupDateId: x.trainGroupDateId,
                                       userId: TokenService.getUserId(),
                                     } as TrainGroupParticipantDto,
                                   ]
                                 : trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                                    (y) => y.selectedDate === null
+                                    (y) =>
+                                      y.trainGroupDateId !== x.trainGroupDateId
                                   ),
                             });
                           }}
@@ -160,7 +157,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                 </div>
               )}
 
-              <h4>{"Reccuring Dates:"}</h4>
+              {/* <h4>{"Reccuring Dates:"}</h4> */}
               {selectedTimeSlot.recurrenceDates.filter(
                 (x) =>
                   x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK
@@ -194,7 +191,6 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                     ...trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos,
                                     {
                                       id: 0,
-                                      selectedDate: undefined,
                                       trainGroupId:
                                         selectedTimeSlot.trainGroupId,
                                       trainGroupDateId: x.trainGroupDateId,
