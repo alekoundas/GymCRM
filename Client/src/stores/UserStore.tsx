@@ -9,12 +9,7 @@ interface UserStoreState {
 }
 
 export const useUserStore = create<UserStoreState>((set) => ({
-  userDto: {
-    id: "",
-    userName: "",
-    email: "",
-    roleId: "",
-  },
+  userDto: new UserDto(),
   setUserDto: (data) => set({ userDto: data }),
 
   updateUserDto: (updates) =>
@@ -24,12 +19,7 @@ export const useUserStore = create<UserStoreState>((set) => ({
 
   resetUserDto: () => {
     set({
-      userDto: {
-        id: "",
-        userName: "",
-        email: "",
-        roleId: "",
-      },
+      userDto: new UserDto(),
     });
   },
 }));

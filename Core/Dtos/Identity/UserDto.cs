@@ -4,7 +4,7 @@ namespace Core.Dtos.Identity
 {
     public class UserDto
     {
-        public Guid? Id { get; set; }
+        public string? Id { get; set; }
 
         [Required(ErrorMessage = "UserName is required")]
         [StringLength(100, ErrorMessage = "UserName cannot exceed 100 characters")]
@@ -23,6 +23,7 @@ namespace Core.Dtos.Identity
         [StringLength(50, ErrorMessage = "LastName cannot exceed 50 characters")]
         public string LastName { get; set; } = "";
 
+        public byte[]? ProfileImage { get; set; }
 
         public string? RoleId { get; set; }
 

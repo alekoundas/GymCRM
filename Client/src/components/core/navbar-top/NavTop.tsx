@@ -14,6 +14,7 @@ import { LocalStorageService } from "../../../services/LocalStorageService";
 import { ThemeService } from "../../../services/ThemeService";
 import { TokenService } from "../../../services/TokenService";
 import { PrimeTheme } from "../../../model/PrimeTheme";
+import { useUserStore } from "../../../stores/UserStore";
 
 function NavTop() {
   const { isUserAuthenticated, logout } = useAuth();
