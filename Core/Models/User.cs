@@ -8,6 +8,9 @@ namespace Core.Models
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
 
+        public byte[]? ProfileImage { get; set; }
+
+
         public virtual ICollection<PhoneNumber> PhoneNumbers { get; set; } = new Collection<PhoneNumber>();
 
         // TrainGroup.

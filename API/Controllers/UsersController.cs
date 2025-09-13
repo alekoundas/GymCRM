@@ -46,47 +46,59 @@ namespace API.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ApiResponse<User>> Get(string? id)
+        public async Task<ApiResponse<UserDto>> Get(string? id)
         {
             if (id == null)
-                return new ApiResponse<User>().SetErrorResponse("error", "User ID not set!");
+                return new ApiResponse<UserDto>().SetErrorResponse("error", "User ID not set!");
 
             User? user = await _dataService.Users.FirstOrDefaultAsync(x => x.Id == new Guid(id));
-            if (user == null)
-                return new ApiResponse<User>().SetErrorResponse("error", "User not found!");
 
-            return new ApiResponse<User>().SetSuccessResponse(user);
+
+            if (user == null)
+                return new ApiResponse<UserDto>().SetErrorResponse("error", "User not found!");
+
+            UserDto userDto = _mapper.Map<UserDto>(user);
+
+            IList<string> userRoles = await _userManager.GetRolesAsync(user);
+            if (userRoles.Count() == 1)
+                userDto.RoleId = userRoles.First();
+
+            return new ApiResponse<UserDto>().SetSuccessResponse(userDto);
         }
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
 
-        public async Task<ApiResponse<bool>> Update(Guid id, UserUpdateRequestDto request)
+        public async Task<ApiResponse<UserDto>> Update(string id, UserDto request)
         {
             if (id != request.Id)
-                return new ApiResponse<bool>().SetErrorResponse("error", "ID mismatch");
+                return new ApiResponse<UserDto>().SetErrorResponse("error", "ID mismatch");
 
 
-            User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == request.Id);
+            User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == new Guid(request.Id));
             if (user == null)
-                return new ApiResponse<bool>().SetErrorResponse("error", "User not found");
+                return new ApiResponse<UserDto>().SetErrorResponse("error", "User not found");
 
 
-            IdentityRole<Guid>? role = await _dataService.Roles.FirstOrDefaultAsync(x => x.Id.ToString() == request.RoleId);
-            if (role?.Name == null)
-                return new ApiResponse<bool>().SetErrorResponse("error", "User not found");
+            //IdentityRole<Guid>? role = await _dataService.Roles.FirstOrDefaultAsync(x => x.Id.ToString() == request.RoleId);
+            //if (role?.Name == null)
+            //    return new ApiResponse<bool>().SetErrorResponse("error", "User not found");
 
 
             // Update user properties
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
-            user.Email = request.Email;
+            //user.Email = request.Email; Shouldnt update email
             user.UserName = request.UserName;
+            user.ProfileImage = request.ProfileImage;
 
-            await _userService.AssignSingleRoleAsync(user, role.Name);
-            await _userManager.UpdateAsync(user);
-
-            return new ApiResponse<bool>().SetSuccessResponse(true, "success", "User updated successfully");
+            UserDto userDto = _mapper.Map<UserDto>(user);
+            //await _userService.AssignSingleRoleAsync(user, role.Name);
+            IdentityResult response = await _userManager.UpdateAsync(user);
+            if (response.Succeeded)
+                return new ApiResponse<UserDto>().SetSuccessResponse(userDto, "success", "User updated successfully");
+            else
+                return new ApiResponse<UserDto>().SetErrorResponse("error", "User update error");
         }
 
         // POST: api/Users/lookup
