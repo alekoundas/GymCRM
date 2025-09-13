@@ -1,22 +1,38 @@
 // src/components/UserProfile.tsx
 import { FileUpload, FileUploadHandlerEvent } from "primereact/fileupload";
+import { Dialog } from "primereact/dialog";
+import { Password } from "primereact/password";
+import { Button } from "primereact/button";
+import { Toast } from "primereact/toast";
 import { UserDto } from "../../model/entities/user/UserDto";
 import ApiService from "../../services/ApiService";
 import { TokenService } from "../../services/TokenService";
 import { Card } from "primereact/card";
 import { Avatar } from "primereact/avatar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUserStore } from "../../stores/UserStore";
 import UserProfileFormComponent from "./UserProfileFormComponent";
 import PhoneNumberGridComponent from "../phone-number/PhoneNumberGridComponent";
 import UserProfileTimeslotsComponent from "./UserProfileTimeslotsComponent";
+import { UserPasswordChangeDto } from "../../model/entities/user/UserPasswordChangeDto";
+import UserProfilePasswordChangeFormComponent from "./UserProfilePasswordChangeFormComponent";
 
 export default function UserProfilePage() {
-  const { userDto, updateUserDto, setUserDto, resetUserDto } = useUserStore();
+  const {
+    userDto,
+    updateUserDto,
+    setUserDto,
+    resetUserDto,
+    userPasswordChangeDto,
+  } = useUserStore();
 
   const [loading, setLoading] = useState(true);
   const [isImageHovered, setIsImageHovered] = useState(false);
   const [isImageUploadSelected, setIsImageUploadSelected] = useState(false);
+
+  // Change Password Dialog State
+  const [showChangePasswordDialog, setShowChangePasswordDialog] =
+    useState(false);
 
   // Load initial data.
   useEffect(() => {
@@ -34,18 +50,16 @@ export default function UserProfilePage() {
     loadUser();
   }, []);
 
-  // Handle image upload
+  // Handle image upload (unchanged)
   const handleImageUpload = async (event: FileUploadHandlerEvent) => {
     const file = event.files[0];
     if (!file) return;
 
     try {
-      // Convert file to Base64 for backend
       const reader = new FileReader();
       reader.onload = async () => {
         const base64Image = reader.result as string;
 
-        // Update user with new image
         userDto.profileImage = base64Image;
         const response = await ApiService.update<UserDto>(
           "Users",
@@ -59,14 +73,22 @@ export default function UserProfilePage() {
       reader.readAsDataURL(file);
     } catch (error) {
       console.error("Image upload failed:", error);
-      // Handle error (e.g., show toast)
     }
 
     setIsImageUploadSelected(false);
   };
 
+  // Handle Change Password Dialog
+  const handleChangePassword = async () => {
+    userPasswordChangeDto.userId = TokenService.getUserId() ?? "";
+    const response = await ApiService.changePassword(userPasswordChangeDto);
+    if (response) {
+      setShowChangePasswordDialog(false);
+    }
+  };
+
   const renderProfileImage = () => {
-    if (userDto?.id) {
+    if (userDto.id) {
       const initials = `${userDto.firstName.charAt(0)}${userDto.lastName.charAt(
         0
       )}`.toUpperCase();
@@ -119,23 +141,30 @@ export default function UserProfilePage() {
   };
 
   return (
-    // <div className="flex align-items-center justify-content-center">
     <div className="grid">
-      <div className="col-12 md:col-5 ">
+      <div className="col-12 md:col-5">
         <Card
-          className="p-4 "
+          className="p-4"
           style={{
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
           }}
           header={
-            <div className="flex align-items-center mb-5">
-              <div className="mr-5">{renderProfileImage()}</div>
-              <div>
-                <h2 className="m-0">
-                  {userDto.firstName} {userDto.lastName}
-                </h2>
-                <p className="text-color-secondary m-0">{userDto.email}</p>
+            <div className="flex align-items-center justify-content-between mb-5">
+              <div className="flex align-items-center">
+                <div className="mr-5">{renderProfileImage()}</div>
+                <div>
+                  <h2 className="m-0">
+                    {userDto.firstName} {userDto.lastName}
+                  </h2>
+                  <p className="text-color-secondary m-0">{userDto.email}</p>
+                </div>
               </div>
+              <Button
+                label="Change Password"
+                icon="pi pi-key"
+                className="p-button-outlined"
+                onClick={() => setShowChangePasswordDialog(true)}
+              />
             </div>
           }
         >
@@ -143,9 +172,9 @@ export default function UserProfilePage() {
         </Card>
       </div>
 
-      <div className=" col-12 md:col-7">
+      <div className="col-12 md:col-7">
         <Card
-          className="p-4 "
+          className="p-4"
           title="Phone Numbers"
           style={{
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
@@ -157,7 +186,7 @@ export default function UserProfilePage() {
 
       <div className="col-12">
         <Card
-          className="p-4 "
+          className="p-4"
           title="Upcoming Train Groups"
           style={{
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
@@ -166,6 +195,37 @@ export default function UserProfilePage() {
           <UserProfileTimeslotsComponent />
         </Card>
       </div>
+
+      {/* Change Password Dialog */}
+      <Dialog
+        header="Change Password"
+        visible={showChangePasswordDialog}
+        onHide={() => setShowChangePasswordDialog(false)}
+        style={{ width: "30rem" }}
+        footer={
+          <div className="flex justify-content-end gap-2">
+            <Button
+              label="Cancel"
+              icon="pi pi-times"
+              className="p-button-text"
+              onClick={() => setShowChangePasswordDialog(false)}
+            />
+            <Button
+              label="Change Password"
+              icon="pi pi-check"
+              className="p-button-primary"
+              onClick={handleChangePassword}
+              disabled={
+                !userPasswordChangeDto.newPassword ||
+                userPasswordChangeDto.newPassword !==
+                  userPasswordChangeDto.confirmNewPassword
+              }
+            />
+          </div>
+        }
+      >
+        <UserProfilePasswordChangeFormComponent />
+      </Dialog>
     </div>
   );
 }

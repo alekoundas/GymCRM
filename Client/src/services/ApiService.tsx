@@ -1,5 +1,6 @@
 import { ApiResponse } from "../model/ApiResponse";
 import { DataTableDto } from "../model/datatable/DataTableDto";
+import { UserPasswordChangeDto } from "../model/entities/user/UserPasswordChangeDto";
 import { UserLoginRequestDto } from "../model/entities/user/UserLoginRequestDto";
 import { UserRefreshTokenDto } from "../model/entities/user/UserRefreshTokenDto";
 import { UserRegisterDto } from "../model/entities/user/UserRegisterDto";
@@ -294,6 +295,19 @@ export default class ApiService {
       TrainGroupParticipantUpdateDto,
       TrainGroupParticipantUpdateDto
     >(url, "POST", data);
+  }
+
+  public static async changePassword(
+    data: UserPasswordChangeDto
+  ): Promise<boolean> {
+    const url = this.buildUrl("users", "ChangePassword");
+    const result = await this.apiRequest<UserPasswordChangeDto, boolean>(
+      url,
+      "POST",
+      data
+    );
+
+    return result ?? false;
   }
 
   public static async login(
