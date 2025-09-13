@@ -326,6 +326,11 @@ namespace API.Controllers
                     .Include(x => x.TrainGroup)
                     .Include(x => x.TrainGroupDate)
                     .Where(x => x.UserId == new Guid(timeSlotRequestDto.UserId))
+                    .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y => 
+                        y.TrainGroupParticipantId == x.Id &&
+                        y.UnavailableDate >= timeSlotRequestDto.SelectedDate &&
+                        y.UnavailableDate <= timeSlotRequestDto.SelectedDate.AddDays(6)
+                    ))
                     .Where(x =>
                         (
                             x.SelectedDate.HasValue &&

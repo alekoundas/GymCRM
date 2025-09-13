@@ -2,6 +2,7 @@
 using Core.Models;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 
@@ -33,6 +34,20 @@ namespace Business.Repository
             return this;
         }
 
+
+        public GenericRepository<TEntity> ThenInclude<TPrevious, TProperty>(Expression<Func<TPrevious, TProperty>> navigationProperty)
+        {
+            if (_query == null)
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+
+            if (_query is IIncludableQueryable<TEntity, IEnumerable<TPrevious>> collectionIncludable)
+                _query = collectionIncludable.ThenInclude(navigationProperty);
+
+            else if (_query is IIncludableQueryable<TEntity, TPrevious> referenceIncludable)
+                _query = referenceIncludable.ThenInclude(navigationProperty);
+
+            return this;
+        }
 
         //TODO: Find a way to combine Select methods.
         public GenericRepository<User> Select<TResult>(Expression<Func<TEntity, User>> selector)

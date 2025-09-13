@@ -1,4 +1,6 @@
-﻿namespace Core.Models
+﻿using System.Collections.ObjectModel;
+
+namespace Core.Models
 {
     public class 
         TrainGroupParticipant : BaseModel
@@ -13,6 +15,9 @@
 
 
         public Guid UserId { get; set; } 
-        public User User { get; set; } = null!; 
+        public User User { get; set; } = null!;
+
+        public virtual ICollection<TrainGroupParticipantUnavailableDate> TrainGroupParticipantUnavailableDates { get; set; } = new Collection<TrainGroupParticipantUnavailableDate>();
+
     }
 }

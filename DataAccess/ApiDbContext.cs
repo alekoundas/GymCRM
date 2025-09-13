@@ -47,6 +47,7 @@ namespace DataAccess
             builder.ApplyConfiguration(new TrainGroupDateConfiguration());
             builder.ApplyConfiguration(new TrainGroupParticipantConfiguration());
             builder.ApplyConfiguration(new TrainGroupDateCancellationSubscriberConfiguration());
+            builder.ApplyConfiguration(new TrainGroupParticipantUnavailableDateConfiguration());
         }
 
         public void RunMigrations()
