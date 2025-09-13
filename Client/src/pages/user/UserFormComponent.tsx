@@ -7,7 +7,7 @@ import { DialogChildProps } from "../../components/core/dialog/GenericDialogComp
 
 interface IField extends DialogChildProps {}
 
-export default function UserForm({ formMode }: IField) {
+export default function UserFormComponent({ formMode }: IField) {
   const { userDto, updateUserDto } = useUserStore();
 
   return (

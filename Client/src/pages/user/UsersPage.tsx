@@ -3,7 +3,7 @@ import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { FormMode } from "../../enum/FormMode";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
-import UserForm from "./UserForm";
+import UserFormComponent from "./UserFormComponent";
 import { Card } from "primereact/card";
 import DataTableComponent from "../../components/core/datatable/DataTableComponent";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
@@ -161,7 +161,7 @@ export default function UsersPage() {
       </Card>
 
       {/*                                      */}
-      {/*           View Train Group           */}
+      {/*               View User              */}
       {/*                                      */}
 
       <GenericDialogComponent
@@ -170,12 +170,12 @@ export default function UsersPage() {
         formMode={FormMode.VIEW}
       >
         <div className="w-full">
-          <UserForm />
+          <UserFormComponent />
         </div>
       </GenericDialogComponent>
 
       {/*                                     */}
-      {/*           Add Train Group           */}
+      {/*               Add User              */}
       {/*                                     */}
 
       <GenericDialogComponent
@@ -185,12 +185,12 @@ export default function UsersPage() {
         formMode={FormMode.ADD}
       >
         <div className="w-full">
-          <UserForm />
+          <UserFormComponent />
         </div>
       </GenericDialogComponent>
 
       {/*                                     */}
-      {/*          Edit Train Group           */}
+      {/*              Edit User              */}
       {/*                                     */}
       <GenericDialogComponent
         visible={isEditDialogVisible}
@@ -199,12 +199,12 @@ export default function UsersPage() {
         formMode={FormMode.EDIT}
       >
         <div className="w-full">
-          <UserForm />
+          <UserFormComponent />
         </div>
       </GenericDialogComponent>
 
       {/*                                       */}
-      {/*          Delete Train Group           */}
+      {/*              Delete User              */}
       {/*                                       */}
       <GenericDialogComponent
         visible={isDeleteDialogVisible}

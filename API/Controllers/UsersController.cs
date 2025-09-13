@@ -195,6 +195,40 @@ namespace API.Controllers
 
         }
 
+        // POST: api/Users/ChangePassword
+        [HttpPost("ChangePassword")]
+        [Authorize] // Requires authentication
+        public async Task<ApiResponse<bool>> ChangePassword([FromBody] UserChangePasswordDto request)
+        {
+            if (!ModelState.IsValid)
+                return new ApiResponse<bool>().SetErrorResponse("error", "Invalid model state.");
+
+            // Get current user from claims
+            User? user = await _userManager.FindByIdAsync(request.UserId);
+            if (user == null)
+                return new ApiResponse<bool>().SetErrorResponse("error", "User not found.");
+
+            // Validate old password
+            var oldPasswordValid = await _userManager.CheckPasswordAsync(user, request.OldPassword);
+            if (!oldPasswordValid)
+                return new ApiResponse<bool>().SetErrorResponse("error", "Old password is incorrect.");
+
+            // Validate new password fields are equal
+            if (request.NewPassword != request.ConfirmNewPassword)
+                return new ApiResponse<bool>().SetErrorResponse("error", "Passwords dont match.");
+
+            // Validate new password length (Identity default is 6 chars, but customizable)
+            //if (request.newPassword.Length < 6)
+            //    return new ApiResponse<bool>().SetErrorResponse("error", "New password must be at least 6 characters");
+
+            // Change password
+            var result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
+            if (result.Succeeded)
+                return new ApiResponse<bool>().SetSuccessResponse(true, "success", "Password changed successfully.");
+            else
+                return new ApiResponse<bool>().SetErrorResponse("error", string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+
         // POST: api/Users/Register
         [HttpPost("Register")]
         public async Task<ApiResponse<bool>> Register(UserRegisterRequestDto request)
