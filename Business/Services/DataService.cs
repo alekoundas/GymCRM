@@ -18,6 +18,7 @@ namespace Business.Services
         public IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
         public IGenericRepository<TrainGroupParticipant> TrainGroupParticipants { get; }
         public IGenericRepository<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; }
+        public IGenericRepository<TrainGroupParticipantUnavailableDate> TrainGroupParticipantUnavailableDates { get; }
 
         // Identity.
         public IGenericRepository<IdentityRole<Guid>> Roles { get; }
@@ -30,10 +31,11 @@ namespace Business.Services
             IDbContextFactory<ApiDbContext> dbContextFactory,
             IGenericRepository<User> userRepository,
             IGenericRepository<TrainGroup> trainGroupRepository,
-            IGenericRepository<TrainGroupDate> trainGroupDateRepository,
             IGenericRepository<PhoneNumber> phoneNumberRepository,
+            IGenericRepository<TrainGroupDate> trainGroupDateRepository,
             IGenericRepository<TrainGroupParticipant> trainGroupParticipantRepository,
             IGenericRepository<TrainGroupDateCancellationSubscriber> trainGroupCancellationSubscriberRepository,
+            IGenericRepository<TrainGroupParticipantUnavailableDate> trainGroupParticipantUnavailableDateRepository,
             IGenericRepository<IdentityRole<Guid>> roleRepository,
             IGenericRepository<IdentityRoleClaim<Guid>> roleClaimRepository,
             IGenericRepository<IdentityUserRole<Guid>> userRoleRepository)
@@ -46,6 +48,7 @@ namespace Business.Services
             TrainGroupDates = trainGroupDateRepository;
             TrainGroupParticipants = trainGroupParticipantRepository;
             TrainGroupCancellationSubscribers = trainGroupCancellationSubscriberRepository;
+            TrainGroupParticipantUnavailableDates = trainGroupParticipantUnavailableDateRepository;
             PhoneNumbers = phoneNumberRepository;
 
 
@@ -69,6 +72,8 @@ namespace Business.Services
                 return (IGenericRepository<TEntity>)TrainGroupParticipants;
             if (typeof(TEntity) == typeof(TrainGroupDateCancellationSubscriber))
                 return (IGenericRepository<TEntity>)TrainGroupCancellationSubscribers;
+            if (typeof(TEntity) == typeof(TrainGroupParticipantUnavailableDate))
+                return (IGenericRepository<TEntity>)TrainGroupParticipantUnavailableDates;
             if (typeof(TEntity) == typeof(IdentityRole<Guid>))
                 return (IGenericRepository<TEntity>)Roles;
             if (typeof(TEntity) == typeof(IdentityUserRole<Guid>))

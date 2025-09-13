@@ -42,6 +42,7 @@ namespace API.Controllers
             List<TrainGroupDate>? trainGroupDates = await _dataService.TrainGroupDates
                     .Include(x => x.TrainGroup.TrainGroupDates)
                     .Include(x => x.TrainGroup.TrainGroupParticipants)
+                    .ThenInclude<TrainGroupParticipant, IEnumerable<TrainGroupParticipantUnavailableDate>>(x => x.TrainGroupParticipantUnavailableDates)
                     .Include(x => x.TrainGroupParticipants)
                     .Where(x =>
                         x.FixedDay == timeSlotRequestDto.SelectedDate
@@ -50,7 +51,7 @@ namespace API.Controllers
                     .ToListAsync(true);
 
             List<TimeSlotResponseDto>? timeSlotRequestDtos = trainGroupDates
-                .GroupBy(x=> x.TrainGroup)
+                .GroupBy(x => x.TrainGroup)
                 .Select(x => new TimeSlotResponseDto()
                 {
                     Title = x.Key.Title,
@@ -115,6 +116,7 @@ namespace API.Controllers
                         x.Key.MaxParticipants -
                         (
                             x.Key.TrainGroupParticipants
+                                .Where(y => !y.TrainGroupParticipantUnavailableDates.Any(z => z.TrainGroupParticipantId == y.Id && z.UnavailableDate == timeSlotRequestDto.SelectedDate))
                                 .Where(y =>
                                     y.SelectedDate == timeSlotRequestDto.SelectedDate
                                     || y.TrainGroupDate?.FixedDay == timeSlotRequestDto.SelectedDate

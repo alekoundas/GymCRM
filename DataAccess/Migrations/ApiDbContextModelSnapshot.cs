@@ -227,6 +227,36 @@ namespace DataAccess.Migrations
                     b.ToTable("TrainGroupParticipants");
                 });
 
+            modelBuilder.Entity("Core.Models.TrainGroupParticipantUnavailableDate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TrainGroupParticipantId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UnavailableDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrainGroupParticipantId");
+
+                    b.ToTable("TrainGroupParticipantUnavailableDate");
+                });
+
             modelBuilder.Entity("Core.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -532,6 +562,17 @@ namespace DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Core.Models.TrainGroupParticipantUnavailableDate", b =>
+                {
+                    b.HasOne("Core.Models.TrainGroupParticipant", "TrainGroupParticipant")
+                        .WithMany("TrainGroupParticipantUnavailableDates")
+                        .HasForeignKey("TrainGroupParticipantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TrainGroupParticipant");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -595,6 +636,11 @@ namespace DataAccess.Migrations
                     b.Navigation("TrainGroupDateCancellationSubscribers");
 
                     b.Navigation("TrainGroupParticipants");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
+                {
+                    b.Navigation("TrainGroupParticipantUnavailableDates");
                 });
 
             modelBuilder.Entity("Core.Models.User", b =>

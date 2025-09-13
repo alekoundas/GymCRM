@@ -157,7 +157,7 @@ namespace API.Controllers
                         .Include(x => x.TrainGroup)
                         .Where(x => x.TrainGroupId == updateDto.TrainGroupId)
                         .ToList()
-                        .Where(x => incomingParticipant.SelectedDate.HasValue
+                        .Where(x => incomingParticipant.SelectedDate.HasValue  // If incoming participant is TrainGroupParticipants, count TrainGroupParticipants and TrainGroupDatePatricipants
                             ?
                                 incomingParticipant.SelectedDate == x.SelectedDate
                                 || incomingParticipant.SelectedDate == x.TrainGroupDate?.FixedDay
@@ -165,11 +165,15 @@ namespace API.Controllers
                                 || incomingParticipant.SelectedDate.Value.DayOfWeek == x.TrainGroupDate?.RecurrenceDayOfWeek?.DayOfWeek
                             : true
                         )
-                        .Where(x => incomingParticipant.TrainGroupDateId != null
+                        //.Where(x => incomingParticipant.TrainGroupDateId != null  // Else count TrainGroupDatePatricipants only!
+                        //    ? incomingParticipant.TrainGroupDateId == x.TrainGroupDateId
+                        //        || existingEntity.TrainGroupDates.First(y => y.Id == incomingParticipant.TrainGroupDateId).RecurrenceDayOfMonth?.Day == x.SelectedDate?.Day
+                        //        || existingEntity.TrainGroupDates.First(y => y.Id == incomingParticipant.TrainGroupDateId).RecurrenceDayOfWeek?.DayOfWeek == x.SelectedDate?.DayOfWeek
+                        //        || existingEntity.TrainGroupDates.First(y => y.Id == incomingParticipant.TrainGroupDateId).FixedDay == x.SelectedDate
+                        //    : true
+                        //)
+                        .Where(x => incomingParticipant.TrainGroupDateId.HasValue  // Else count TrainGroupDatePatricipants only!
                             ? incomingParticipant.TrainGroupDateId == x.TrainGroupDateId
-                                || existingEntity.TrainGroupDates.First(y => y.Id == incomingParticipant.TrainGroupDateId).RecurrenceDayOfMonth?.Day == x.SelectedDate?.Day
-                                || existingEntity.TrainGroupDates.First(y => y.Id == incomingParticipant.TrainGroupDateId).RecurrenceDayOfWeek?.DayOfWeek == x.SelectedDate?.DayOfWeek
-                                || existingEntity.TrainGroupDates.First(y => y.Id == incomingParticipant.TrainGroupDateId).FixedDay == x.SelectedDate
                             : true
                         )
                         .ToList();
@@ -182,64 +186,62 @@ namespace API.Controllers
 
             }
 
-            List<TrainGroupParticipant> futureUnavailableDates = new List<TrainGroupParticipant>();
 
             // Add TrainGroup Participants
             foreach (TrainGroupParticipant incomingParticipant in incomingParticipants)
             {
 
+
                 // Add new Participant
                 incomingParticipant.Id = 0;
-                dbContext.Add(incomingParticipant);
 
 
                 // Check which future dates user cant book.
-                if (incomingParticipant.SelectedDate == null)
+                // Only applies to DAY_OF_MONTH and DAY_OF_WEEK
+                if (incomingParticipant.TrainGroupDateId != null)
                 {
-                    futureUnavailableDates =
+                    List<TrainGroupParticipantUnavailableDate> futureUnavailableDates =
                     dbContext.Set<TrainGroupParticipant>()
-                        .Include(x => x.TrainGroupDate)
-                        .Include(x => x.TrainGroup)
                         .Where(x => x.TrainGroupId == updateDto.TrainGroupId)
                         .Where(x => x.SelectedDate != null)
                         .Where(x => x.SelectedDate >= DateTime.UtcNow)
-                        .ToList()
                         .Where(x =>
                             x.TrainGroup.MaxParticipants -
                             (
-                                x.TrainGroup.TrainGroupDates
+                                x.TrainGroup.TrainGroupParticipants
+
                                     .Where(y =>
-                                       (y.RecurrenceDayOfMonth?.Day == x.SelectedDate!.Value.Day) ||
-                                       (y.RecurrenceDayOfWeek?.DayOfWeek == x.SelectedDate!.Value.DayOfWeek)
+                                        y.TrainGroupDate!.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
+                                        || y.TrainGroupDate!.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH
+                                        || y.SelectedDate != null
                                     )
-                                    .SelectMany(y =>
-                                    y.TrainGroupParticipants
+                                    .Where(y =>
+                                        (y.TrainGroupDate!.RecurrenceDayOfMonth.HasValue && y.TrainGroupDate!.RecurrenceDayOfMonth.Value.Day == x.SelectedDate!.Value.Day)
+                                        || (y.TrainGroupDate!.RecurrenceDayOfWeek.HasValue && y.TrainGroupDate!.RecurrenceDayOfWeek.Value.DayOfWeek == x.SelectedDate!.Value.DayOfWeek)
+                                        || (y.SelectedDate!.Value== x.SelectedDate!.Value)
                                     )
                                     .Count()
-                                +
-                                x.TrainGroup.TrainGroupParticipants
-                                   .Where(y =>
-                                       y.TrainGroupDate?.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
-                                       || y.TrainGroupDate?.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH
-                                   )
-                                   .Where(y =>
-                                       (y.TrainGroupDate?.RecurrenceDayOfMonth?.Day == x.SelectedDate!.Value.Day) ||
-                                       (y.TrainGroupDate?.RecurrenceDayOfWeek?.DayOfWeek == x.SelectedDate!.Value.DayOfWeek)
-                                   )
-                                   .Count()
                                 )
                                 <= 0
                         )
+                        .ToList()
+                        .Select(x => new TrainGroupParticipantUnavailableDate() { UnavailableDate = x.SelectedDate!.Value })
                         .ToList();
+
+             
+
+                    incomingParticipant.TrainGroupParticipantUnavailableDates = futureUnavailableDates;
                 }
+
+                dbContext.Add(incomingParticipant);
             }
 
 
             await dbContext.SaveChangesAsync();
             dbContext.Dispose();
 
-            if (futureUnavailableDates.Count > 0)
-                return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity, "warning", "Future unavailable dates that cannot be booked: " + futureUnavailableDates.Select(x => x.SelectedDate?.ToUniversalTime().ToString()).ToList().ToString());
+            //if (futureUnavailableDates.Count > 0)
+            //    return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity, "warning", "Future unavailable dates that cannot be booked: " + futureUnavailableDates.Select(x => x.UnavailableDate.ToUniversalTime().ToString()).ToList().ToString());
 
             return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity);
         }
