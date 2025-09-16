@@ -18,15 +18,13 @@ export default function UserPasswordResetPage({}: IField) {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     setLoading(true);
 
-    try {
-      await ApiService.passwordReset(userPasswordResetDto);
-      setTimeout(() => navigate("/login"), 3000); // Redirect to login after 3s
-    } finally {
-      setLoading(false);
+    const response = await ApiService.passwordReset(userPasswordResetDto);
+    if (response) {
+      setTimeout(() => navigate("/users/login"), 3000); // Redirect to login after 3s
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -39,101 +37,103 @@ export default function UserPasswordResetPage({}: IField) {
         token: token,
       });
   }, []);
+
   return (
     <>
-      <div className="p-d-flex p-jc-center p-mt-5">
-        <div
-          className="p-card p-p-4"
-          style={{ maxWidth: "400px" }}
-        >
-          <h2>Reset Password</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="p-field p-mb-3">
-              <label
-                htmlFor="email"
-                className="p-d-block"
-              >
-                Email
-              </label>
-              <InputText
-                id="email"
-                value={userPasswordResetDto.email}
-                onChange={(e) =>
-                  setUserPasswordResetDto({
-                    ...userPasswordResetDto,
-                    email: e.target.value,
-                  })
-                }
-                className="p-d-block p-inputtext-lg"
-                required
-                type="email"
-                disabled={!!searchParams.get("email")} // Disable if from URL
-              />
+      <div className="flex align-items-center justify-content-center">
+        <div className="surface-card p-4 shadow-2 border-round w-full lg:w-6">
+          <div className="text-center mb-5">
+            <div className="text-900 text-3xl font-medium mb-3">
+              Reset Password
             </div>
+          </div>
 
-            <div className="p-field p-mb-3">
-              <label
-                htmlFor="newPassword"
-                className="p-d-block"
-              >
-                New Password
-              </label>
-              <Password
-                id="newPassword"
-                value={userPasswordResetDto.newPassword}
-                onChange={(e) =>
-                  setUserPasswordResetDto({
-                    ...userPasswordResetDto,
-                    newPassword: e.target.value,
-                  })
-                }
-                className="p-d-block"
-                toggleMask
-                feedback={true}
-                required
-              />
-            </div>
+          <label
+            htmlFor="email"
+            className="p-d-block"
+          >
+            Email
+          </label>
+          <InputText
+            id="email"
+            name="email"
+            type="email"
+            placeholder="Email"
+            value={userPasswordResetDto.email}
+            onChange={(e) =>
+              setUserPasswordResetDto({
+                ...userPasswordResetDto,
+                email: e.target.value,
+              })
+            }
+            className="w-full mb-3"
+            disabled={!!searchParams.get("email")}
+          />
 
-            <div className="p-field p-mb-3">
-              <label
-                htmlFor="confirmNewPassword"
-                className="p-d-block"
-              >
-                New Password
-              </label>
-              <Password
-                id="confirmNewPassword"
-                value={userPasswordResetDto.confirmNewPassword}
-                onChange={(e) =>
-                  setUserPasswordResetDto({
-                    ...userPasswordResetDto,
-                    confirmNewPassword: e.target.value,
-                  })
-                }
-                className="p-d-block"
-                toggleMask
-                feedback={true}
-                required
-              />
-            </div>
-            <Button
-              label="Reset Password"
-              type="submit"
-              className="p-button-primary p-d-block"
-              disabled={
-                loading ||
-                !userPasswordResetDto.email ||
-                !userPasswordResetDto.token ||
-                !userPasswordResetDto.newPassword ||
-                !userPasswordResetDto.confirmNewPassword
+          <label
+            htmlFor="newPassword"
+            className="p-d-block"
+          >
+            New Password
+          </label>
+          <Password
+            id="newPassword"
+            name="newPassword"
+            placeholder="Password"
+            value={userPasswordResetDto.newPassword}
+            onChange={(e) =>
+              setUserPasswordResetDto({
+                ...userPasswordResetDto,
+                newPassword: e.target.value,
+              })
+            }
+            className="w-full mb-3"
+            toggleMask
+            feedback={true}
+            required
+          />
+
+          <div className="p-field p-mb-3">
+            <label
+              htmlFor="confirmNewPassword"
+              className="p-d-block"
+            >
+              New Password
+            </label>
+            <Password
+              id="confirmNewPassword"
+              name="confirmNewPassword"
+              placeholder="Password"
+              value={userPasswordResetDto.confirmNewPassword}
+              onChange={(e) =>
+                setUserPasswordResetDto({
+                  ...userPasswordResetDto,
+                  confirmNewPassword: e.target.value,
+                })
               }
-              loading={loading}
+              className="w-full mb-3"
+              toggleMask
+              feedback={true}
+              required
             />
-          </form>
+          </div>
+          <Button
+            label="Reset Password"
+            className="p-button-primary p-d-block"
+            disabled={
+              loading ||
+              !userPasswordResetDto.email ||
+              !userPasswordResetDto.token ||
+              !userPasswordResetDto.newPassword ||
+              !userPasswordResetDto.confirmNewPassword
+            }
+            loading={loading}
+            onClick={handleSubmit}
+          />
           <Button
             label="Back to Login"
             className="p-button-text p-mt-2"
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/users/login")}
           />
         </div>
       </div>
