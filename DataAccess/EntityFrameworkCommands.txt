@@ -100,3 +100,10 @@ rclone ls gdrive:/DB_Backups/Damianakos/
 rclone config show
 rclone version
 
+
+
+
+// GMAIL
+
+https://myaccount.google.com/apppasswords
+https://myaccount.google.com/security
