@@ -1,8 +1,14 @@
-﻿using MailKit.Net.Smtp;
-using MailKit.Security;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.Gmail.v1;
+using Google.Apis.Gmail.v1.Data;
+using Google.Apis.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MimeKit;
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Business.Services.Email
 {
@@ -19,52 +25,76 @@ namespace Business.Services.Email
 
         public async Task SendEmailAsync(string to, string subject, string plainTextBody, string htmlBody)
         {
-            var smtpHost = _configuration["Gmail:SmtpHost"];
-            var smtpPort = int.Parse(_configuration["Gmail:SmtpPort"] ?? "587");
+            var clientId = _configuration["Gmail:ClientId"];
+            var clientSecret = _configuration["Gmail:ClientSecret"];
+            var refreshToken = _configuration["Gmail:RefreshToken"];
             var username = _configuration["Gmail:Email"];
-            var appPassword = _configuration["Gmail:EmailAppPassword"];
             var fromEmail = _configuration["Gmail:Email"];
             var fromName = _configuration["Gmail:FromName"];
 
-            if (string.IsNullOrWhiteSpace(smtpHost) || string.IsNullOrWhiteSpace(username) ||
-                string.IsNullOrWhiteSpace(appPassword) || string.IsNullOrWhiteSpace(fromEmail))
+            if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret) ||
+                string.IsNullOrWhiteSpace(refreshToken) || string.IsNullOrWhiteSpace(username) ||
+                string.IsNullOrWhiteSpace(fromEmail))
             {
-                _logger.LogError("Gmail configuration is incomplete: SmtpHost={SmtpHost}, Username={Username}, AppPassword={AppPassword}, FromEmail={FromEmail}",
-                    smtpHost, username, appPassword != null ? "[REDACTED]" : null, fromEmail);
-                throw new InvalidOperationException("Gmail configuration is incomplete.");
+                _logger.LogError("Gmail API configuration is incomplete: ClientId={ClientId}, ClientSecret={ClientSecret}, RefreshToken={RefreshToken}, Username={Username}, FromEmail={FromEmail}",
+                    clientId, clientSecret, refreshToken != null ? "[REDACTED]" : null, username, fromEmail);
+                throw new InvalidOperationException("Gmail API configuration is incomplete.");
             }
 
             try
             {
-                var message = new MimeMessage();
-                message.From.Add(new MailboxAddress(fromName, fromEmail));
-                message.To.Add(new MailboxAddress(to, to));
-                message.Subject = subject;
+                // Replace this block:
+                /*
+                var credential = new GoogleCredential(new ClientSecrets
+                {
+                    ClientId = clientId,
+                    ClientSecret = clientSecret
+                }, new[] { GmailService.Scope.GmailSend }, refreshToken);
+                */
 
+                // With the following code:
+                var credential = GoogleCredential
+                    .FromJson($@"{{
+                        ""client_id"": ""{clientId}"",
+                        ""client_secret"": ""{clientSecret}"",
+                        ""refresh_token"": ""{refreshToken}"",
+                        ""type"": ""authorized_user""
+                    }}")
+                    .CreateScoped(GmailService.Scope.GmailSend);
+
+                // Initialize Gmail service
+                var service = new GmailService(new BaseClientService.Initializer
+                {
+                    HttpClientInitializer = credential,
+                    ApplicationName = "GymCRM"
+                });
+
+                // Create email
+                var mimeMessage = new MimeMessage();
+                mimeMessage.From.Add(new MailboxAddress(fromName, fromEmail));
+                mimeMessage.To.Add(new MailboxAddress(to, to));
+                mimeMessage.Subject = subject;
                 var bodyBuilder = new BodyBuilder
                 {
                     TextBody = plainTextBody,
                     HtmlBody = htmlBody
                 };
-                message.Body = bodyBuilder.ToMessageBody();
+                mimeMessage.Body = bodyBuilder.ToMessageBody();
 
-                using var client = new SmtpClient();
-                _logger.LogInformation("Connecting to SMTP server {SmtpHost}:{SmtpPort}", smtpHost, smtpPort);
-                await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
+                // Convert to raw base64
+                using var stream = new MemoryStream();
+                await mimeMessage.WriteToAsync(stream);
+                var rawMessage = Convert.ToBase64String(stream.ToArray())
+                    .Replace('+', '-')
+                    .Replace('/', '_')
+                    .Replace("=", "");
 
-                _logger.LogInformation("Authenticating with username {Username}", username);
-                await client.AuthenticateAsync(username, appPassword);
-
-                _logger.LogInformation("Sending email to {To}", to);
-                await client.SendAsync(message);
-                await client.DisconnectAsync(true);
+                // Send email
+                var message = new Message { Raw = rawMessage };
+                var request = service.Users.Messages.Send(message, username);
+                await request.ExecuteAsync();
 
                 _logger.LogInformation("Email sent successfully to {To}", to);
-            }
-            catch (SmtpCommandException ex)
-            {
-                _logger.LogError(ex, "SMTP command error while sending email to {To}. ErrorCode: {ErrorCode}, StatusCode: {StatusCode}", to, ex.ErrorCode, ex.StatusCode);
-                throw new InvalidOperationException($"Failed to send email: {ex.Message}", ex);
             }
             catch (Exception ex)
             {
