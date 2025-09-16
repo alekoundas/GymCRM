@@ -16,5 +16,5 @@ export class UserRegisterDto {
   firstName: string = "";
   lastName: string = "";
   password: string = "";
-  phoneNumbers: PhoneNumberDto[];
+  phoneNumbers: PhoneNumberDto[] = [];
 }
