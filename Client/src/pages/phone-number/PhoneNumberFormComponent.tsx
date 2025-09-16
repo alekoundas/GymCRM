@@ -30,21 +30,23 @@ export default function PhoneNumberFormComponent({ formMode }: IField) {
         />
       </div>
 
-      <div className="field ">
-        <label
-          htmlFor="isPrimary"
-          className="block text-900 font-medium mb-2"
-        >
-          Primary
-        </label>
-        <InputSwitch
-          id="isPrimary"
-          name="Primary"
-          checked={phoneNumberDto.isPrimary}
-          onChange={(x) => updatePhoneNumberDto({ isPrimary: x.value })}
-          disabled={formMode === FormMode.VIEW}
-        />
-      </div>
+      {formMode !== FormMode.ADD && (
+        <div className="field ">
+          <label
+            htmlFor="isPrimary"
+            className="block text-900 font-medium mb-2"
+          >
+            Primary
+          </label>
+          <InputSwitch
+            id="isPrimary"
+            name="Primary"
+            checked={phoneNumberDto.isPrimary}
+            onChange={(x) => updatePhoneNumberDto({ isPrimary: x.value })}
+            disabled={formMode === FormMode.VIEW}
+          />
+        </div>
+      )}
     </div>
   );
 }
