@@ -58,7 +58,7 @@ namespace API.Controllers
             foreach (var entityDto in entityDtos)
                 if (CustomValidatePOST(entityDto, out string[] errors))
                     return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", errors));
- 
+
             List<TEntity> entities = _mapper.Map<List<TEntity>>(entityDtos);
 
             int result = await _dataService.GetGenericRepository<TEntity>().AddRangeAsync(entities);
@@ -151,7 +151,10 @@ namespace API.Controllers
             // Handle Filtering of DataTable.
             foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.equals))
             {
-                query.FilterEqualsByColumn(filter.FieldName, filter.Value == "null"?null: filter.Value);
+                if (filter.FieldName == "UserId" && filter.Value != "null")
+                    query.FilterEqualsByColumn(filter.FieldName, new Guid(filter.Value));
+                else
+                    query.FilterEqualsByColumn(filter.FieldName, filter.Value == "null" ? null : filter.Value);
             }
             foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.contains))
             {

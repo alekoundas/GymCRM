@@ -14,6 +14,7 @@ import { PhoneNumberDto } from "../../model/entities/phone-number/PhoneNumberDto
 import PhoneNumberFormComponent from "./PhoneNumberFormComponent";
 import { usePhoneNumberStore } from "../../stores/PhoneNumberStore";
 import { InputSwitch } from "primereact/inputswitch";
+import { TokenService } from "../../services/TokenService";
 
 export default function PhoneNumberGridComponent() {
   const { phoneNumberDto, setPhoneNumberDto, resetPhoneNumberDto } =
@@ -52,7 +53,13 @@ export default function PhoneNumberGridComponent() {
     rows: 10,
     page: 1,
     pageCount: 0,
-    filters: [],
+    filters: [
+      {
+        fieldName: "UserId",
+        value: TokenService.getUserId(),
+        filterType: "equals",
+      },
+    ],
     dataTableSorts: [],
   });
 
