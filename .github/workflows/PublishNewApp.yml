@@ -54,9 +54,12 @@ jobs:
             fi
 
             echo "[INFO]: Replace placeholders in appsettings.json with secrets."
-            sed -i "s/JWT_TOKEN_SECRET_KEY_PLACEHOLDER/${{ secrets.JWT_TOKEN_SECRET_KEY_PLACEHOLDER }}/g" API/appsettings.json
-            sed -i "s/GMAIL_EMAIL_PLACEHOLDER/${{ secrets.GMAIL_EMAIL_PLACEHOLDER }}/g" API/appsettings.json
-            sed -i "s/GMAIL_EMAIL_APP_PASSWORD_PLACEHOLDER/${{ secrets.GMAIL_EMAIL_APP_PASSWORD_PLACEHOLDER }}/g" API/appsettings.json
+            sed -i "s|JWT_TOKEN_SECRET_KEY_PLACEHOLDER|${{ secrets.JWT_TOKEN_SECRET_KEY_PLACEHOLDER }}|g" API/appsettings.json
+            sed -i "s|GMAIL_EMAIL_PLACEHOLDER|${{ secrets.GMAIL_EMAIL_PLACEHOLDER }}|g" API/appsettings.json
+            sed -i "s|GMAIL_CLIENT_ID_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_ID_PLACEHOLDER }}|g" API/appsettings.json
+            sed -i "s|GMAIL_CLIENT_SECRET_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_SECRET_PLACEHOLDER }}|g" API/appsettings.json
+            sed -i "s|GMAIL_REFRESH_TOKEN_PLACEHOLDER|${{ secrets.GMAIL_REFRESH_TOKEN_PLACEHOLDER }}|g" API/appsettings.json
+
 
             # Close already running containers
             echo "[INFO]: Close already running containers"
