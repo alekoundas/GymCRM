@@ -15,6 +15,8 @@ import PhoneNumberFormComponent from "./PhoneNumberFormComponent";
 import { usePhoneNumberStore } from "../../stores/PhoneNumberStore";
 import { InputSwitch } from "primereact/inputswitch";
 import { TokenService } from "../../services/TokenService";
+import { ColumnBodyOptions } from "primereact/column";
+import { Tag } from "primereact/tag";
 
 export default function PhoneNumberGridComponent() {
   const { phoneNumberDto, setPhoneNumberDto, resetPhoneNumberDto } =
@@ -79,11 +81,16 @@ export default function PhoneNumberGridComponent() {
       filter: false,
       filterPlaceholder: "Search",
       style: { width: "20%" },
-      body: (x) => {
-        <InputSwitch
-          checked={x.isPrimary}
-          disabled
-        />;
+      body: (rowData: PhoneNumberDto, options: ColumnBodyOptions) => {
+        if (rowData.isPrimary)
+          return (
+            <Tag
+              className="p-2"
+              severity={"secondary"}
+            >
+              Primary
+            </Tag>
+          );
       },
     },
   ];
