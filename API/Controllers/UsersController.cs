@@ -5,6 +5,7 @@ using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.Identity;
 using Core.Dtos.Lookup;
+using Core.Dtos.PhoneNumber;
 using Core.Dtos.TrainGroupDate;
 using Core.Dtos.User;
 using Core.Enums;
@@ -295,10 +296,14 @@ namespace API.Controllers
         [HttpPost("Register")]
         public async Task<ApiResponse<bool>> Register(UserRegisterRequestDto request)
         {
+            List<PhoneNumber> phoneNumbers = _mapper.Map<List<PhoneNumber>>(request.PhoneNumbers);
             User user = new User()
             {
                 UserName = request.UserName,
                 Email = request.Email,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                PhoneNumbers = phoneNumbers,
             };
 
             // Create user.

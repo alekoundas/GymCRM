@@ -21,6 +21,9 @@ export default function RegisterPage() {
   };
 
   const onSave = () => {
+    userRegisterDto.phoneNumbers.forEach(
+      (x) => (x.userId = "00000000-0000-0000-0000-000000000000")
+    );
     ApiService.register(userRegisterDto, login).then((isSuccessful) => {
       if (isSuccessful) {
         navigate("/");
