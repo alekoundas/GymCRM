@@ -81,7 +81,7 @@ export default function UserProfilePage() {
   // Handle Change Password Dialog
   const handleChangePassword = async () => {
     userPasswordChangeDto.userId = TokenService.getUserId() ?? "";
-    const response = await ApiService.changePassword(userPasswordChangeDto);
+    const response = await ApiService.passwordChange(userPasswordChangeDto);
     if (response) {
       setShowChangePasswordDialog(false);
     }

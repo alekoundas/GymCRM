@@ -91,7 +91,10 @@ export default function LoginPage() {
                 /> */}
                 {/* <label htmlFor="rememberme">Remember me</label> */}
               </div>
-              <a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">
+              <a
+                className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
+                onClick={() => navigate("/users/forgot-password")}
+              >
                 Forgot your password?
               </a>
             </div>

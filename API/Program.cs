@@ -3,6 +3,7 @@ using API.Filters;
 using API.JsonConverter;
 using Business.Repository;
 using Business.Services;
+using Business.Services.Email;
 using Core.Dtos;
 using Core.Models;
 using Core.System;
@@ -13,7 +14,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
@@ -164,6 +164,7 @@ builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddSingleton(appSettings); // appsettings.json
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailService, GmailEmailService>();
 
 
 
@@ -192,14 +193,24 @@ builder.Services.AddIdentityCore<User>(options =>
     .AddRoleManager<RoleManager<IdentityRole<Guid>>>()
     .AddSignInManager()
     .AddEntityFrameworkStores<ApiDbContext>()
-    .AddTokenProvider<DataProtectorTokenProvider<User>>("REFRESHTOKENPROVIDER");
+    .AddTokenProvider<DataProtectorTokenProvider<User>>("REFRESHTOKENPROVIDER")
+    .AddTokenProvider<DataProtectorTokenProvider<User>>("Default"); // Added for password reset tokens
 
 
 
-// Configure JWT Bearer token and refresh token.
+
+
+// Configure JWT Bearer token and refresh token and password refresh token.
+// Configure token providers
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
 {
-    options.TokenLifespan = TimeSpan.FromSeconds(appSettings.RefreshTokenExpireSeconds);
+    options.Name = "Default"; // For password reset tokens
+    options.TokenLifespan = TimeSpan.FromHours(24); // Reset tokens valid for 24 hours
+});
+builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+{
+    opt.Name = "REFRESHTOKENPROVIDER";
+    opt.TokenLifespan = TimeSpan.FromSeconds(appSettings.RefreshTokenExpireSeconds);
 });
 
 builder.Services.AddAuthentication(options =>

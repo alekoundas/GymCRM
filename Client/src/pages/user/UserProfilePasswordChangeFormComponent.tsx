@@ -1,8 +1,6 @@
 import { useUserStore } from "../../stores/UserStore";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { Password } from "primereact/password";
-import { UserPasswordChangeDto } from "../../model/entities/user/UserPasswordChangeDto";
-import { useState } from "react";
 
 interface IField extends DialogChildProps {}
 

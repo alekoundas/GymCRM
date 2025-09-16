@@ -11,6 +11,8 @@ import { TrainGroupParticipantUpdateDto } from "../model/TrainGroupParticipantUp
 import { LocalStorageService } from "./LocalStorageService";
 import { ToastService } from "./ToastService";
 import { TokenService } from "./TokenService";
+import { UserPasswordResetDto } from "../model/entities/user/UserPasswordResetDto";
+import { UserPasswordForgotDto } from "../model/entities/user/UserPasswordForgotDto";
 
 export default class ApiService {
   private static readonly BASE_URL = "/api/";
@@ -297,10 +299,36 @@ export default class ApiService {
     >(url, "POST", data);
   }
 
-  public static async changePassword(
+  public static async passwordForgot(
+    data: UserPasswordForgotDto
+  ): Promise<boolean> {
+    const url = this.buildUrl("users", "PasswordForgot");
+    const result = await this.apiRequest<UserPasswordForgotDto, boolean>(
+      url,
+      "POST",
+      data
+    );
+
+    return result ?? false;
+  }
+
+  public static async passwordReset(
+    data: UserPasswordResetDto
+  ): Promise<boolean> {
+    const url = this.buildUrl("users", "PasswordReset");
+    const result = await this.apiRequest<UserPasswordResetDto, boolean>(
+      url,
+      "POST",
+      data
+    );
+
+    return result ?? false;
+  }
+
+  public static async passwordChange(
     data: UserPasswordChangeDto
   ): Promise<boolean> {
-    const url = this.buildUrl("users", "ChangePassword");
+    const url = this.buildUrl("users", "PasswordChange");
     const result = await this.apiRequest<UserPasswordChangeDto, boolean>(
       url,
       "POST",

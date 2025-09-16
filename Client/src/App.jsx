@@ -17,6 +17,8 @@ import RegisterPage from "./pages/user/RegisterPage.tsx";
 import TrainGroupsBookingCalendarPage from "./pages/train-group-booking/TrainGroupsBookingCalendarPage.tsx";
 import TrainGroupAdminFormPage from "./pages/train-group-admin/TrainGroupAdminFormPage.tsx";
 import UserProfilePage from "./pages/user/UserProfilePage.tsx";
+import UserPasswordForgotPage from "./pages/user/UserPasswordForgotPage.tsx";
+import UserPasswordResetPage from "./pages/user/UserPasswordResetPage.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -78,7 +80,6 @@ export default function App() {
                   path="train-groups"
                   element={<TrainGroupAdminPage />}
                 />
-
                 <Route
                   path="train-groups/add"
                   element={<TrainGroupAdminFormPage />}
@@ -115,6 +116,14 @@ export default function App() {
               <Route
                 path="/users/profile"
                 element={<UserProfilePage />}
+              />
+              <Route
+                path="/users/forgot-password"
+                element={<UserPasswordForgotPage />}
+              />
+              <Route
+                path="/users/reset-password"
+                element={<UserPasswordResetPage />}
               />
             </Routes>
           </ScrollPanel>

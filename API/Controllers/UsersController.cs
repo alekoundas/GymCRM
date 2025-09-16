@@ -1,18 +1,22 @@
 ﻿using AutoMapper;
 using Business.Services;
+using Business.Services.Email;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.Identity;
 using Core.Dtos.Lookup;
 using Core.Dtos.TrainGroupDate;
+using Core.Dtos.User;
 using Core.Enums;
 using Core.Models;
+using Core.System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace API.Controllers
 {
@@ -26,6 +30,8 @@ namespace API.Controllers
         private readonly IUserService _userService;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly UserManager<User> _userManager;
+        private readonly IEmailService _emailService;
+        private readonly TokenSettings _tokenSettings;
 
         public UsersController(
             IDataService dataService,
@@ -33,7 +39,9 @@ namespace API.Controllers
             ILogger<UsersController> logger,
             IUserService userService,
             UserManager<User> userManager,
-            RoleManager<IdentityRole<Guid>> roleManager)
+            RoleManager<IdentityRole<Guid>> roleManager,
+            IEmailService emailService,
+            TokenSettings tokenSettings)
         {
             _dataService = dataService;
             _logger = logger;
@@ -41,6 +49,8 @@ namespace API.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
             _mapper = mapper;
+            _emailService = emailService;
+            _tokenSettings = tokenSettings;
         }
 
 
@@ -195,10 +205,62 @@ namespace API.Controllers
 
         }
 
+        // POST: api/Users/ForgotPassword
+        [HttpPost("PasswordForgot")]
+        public async Task<ApiResponse<bool>> PasswordForgot([FromBody] UserPasswordForgotDto dto)
+        {
+            User? user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
+            {
+                // Don't reveal if email doesn't exist for security
+                return new ApiResponse<bool>().SetErrorResponse("error", "Password reset email didnt sent!");
+            }
+
+
+            string? token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            // URL-encode email and token to handle special characters
+            string encodedEmail = Uri.EscapeDataString(dto.Email);
+            string encodedToken = Uri.EscapeDataString(token);
+            string baseUrl = _tokenSettings.Issuer; // Adjust base URL based on environment (e.g., prod: https://alexps.gr, dev: http://localhost:5173)
+            string resetLink = $"{baseUrl}/users/reset-password?email={encodedEmail}&token={encodedToken}";
+
+            string emailBody = $@"<h2>Password Reset Request</h2>
+                              <p>Please click the link below to reset your password:</p>
+                              <p><a href=""{resetLink}"">Reset Password</a></p>
+                              <p>This link expires in 24 hours.</p>";
+
+            await _emailService.SendEmailAsync(
+                dto.Email,
+                "Reset Your Password",
+                emailBody,
+                emailBody // HTML version
+            );
+
+            return new ApiResponse<bool>().SetSuccessResponse(true, "success", "Password reset email sent.");
+        }
+
+        // POST: api/Users/ResetPassword
+        [HttpPost("PasswordReset")]
+        public async Task<ApiResponse<bool>> PasswordReset([FromBody] UserPasswordResetDto request)
+        {
+            User? user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+                return new ApiResponse<bool>().SetErrorResponse("error", "Invalid email or token.");
+
+            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return new ApiResponse<bool>().SetErrorResponse("error", $"Password reset failed: {errors}");
+            }
+            return new ApiResponse<bool>().SetSuccessResponse(true, "success", "Password changed successfully.");
+
+        }
+
         // POST: api/Users/ChangePassword
-        [HttpPost("ChangePassword")]
+        [HttpPost("PasswordChange")]
         [Authorize] // Requires authentication
-        public async Task<ApiResponse<bool>> ChangePassword([FromBody] UserChangePasswordDto request)
+        public async Task<ApiResponse<bool>> PasswordChange([FromBody] UserPasswordChangeDto request)
         {
             if (!ModelState.IsValid)
                 return new ApiResponse<bool>().SetErrorResponse("error", "Invalid model state.");
@@ -326,7 +388,7 @@ namespace API.Controllers
                     .Include(x => x.TrainGroup)
                     .Include(x => x.TrainGroupDate)
                     .Where(x => x.UserId == new Guid(timeSlotRequestDto.UserId))
-                    .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y => 
+                    .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y =>
                         y.TrainGroupParticipantId == x.Id &&
                         y.UnavailableDate >= timeSlotRequestDto.SelectedDate &&
                         y.UnavailableDate <= timeSlotRequestDto.SelectedDate.AddDays(6)
