@@ -34,6 +34,7 @@ export default function TrainGroupDateParticipantGridComponent({
     setTrainGroupParticipant,
     deleteTrainGroupDateParticipant,
     resetTrainGroupParticipant,
+    updateTrainGroupDto,
   } = useTrainGroupStore();
 
   const [isViewDialogVisible, setViewDialogVisible] = useState(false); // Dialog visibility
@@ -78,6 +79,11 @@ export default function TrainGroupDateParticipantGridComponent({
 
         filterType: "equals",
       },
+      {
+        fieldName: "SelectedDate",
+        // value: "Null",
+        filterType: "equals",
+      },
     ],
   });
 
@@ -101,9 +107,9 @@ export default function TrainGroupDateParticipantGridComponent({
 
       if (formMode === FormMode.ADD) {
         const participants =
-          trainGroupDto.trainGroupDates.find(
-            (x) => x.id === selectedTrainGroupDate.id
-          )?.trainGroupParticipants ?? [];
+          trainGroupDto.trainGroupDates
+            .find((x) => x.id === selectedTrainGroupDate.id)
+            ?.trainGroupParticipants.filter((x) => !x.selectedDate) ?? [];
         newData = participants;
         newPageCount = participants.length;
       }
@@ -199,11 +205,12 @@ export default function TrainGroupDateParticipantGridComponent({
   const OnSaveAdd = async (): Promise<void> => {
     if (selectedTrainGroupDate?.id) {
       if (formMode === FormMode.ADD) {
-        const id =
-          (trainGroupDto.trainGroupDates
+        const participantCount: number =
+          trainGroupDto.trainGroupDates
             .find((x) => x.id === selectedTrainGroupDate.id)
-            ?.trainGroupParticipants.filter((x) => x.id < 0).length ?? 0 + 1) *
-          -1;
+            ?.trainGroupParticipants.filter((x) => x.id < 0).length ?? 0;
+
+        const id = (participantCount + 1) * -1;
 
         addTrainGroupDateParticipant({
           id,
@@ -250,17 +257,24 @@ export default function TrainGroupDateParticipantGridComponent({
   const OnSaveEdit = async (): Promise<void> => {
     if (selectedTrainGroupDate) {
       if (formMode === FormMode.ADD) {
-        const trainGroupParticipants = trainGroupDto.trainGroupDates
-          .filter((x) => x.id == selectedTrainGroupDate.id)[0]
-          .trainGroupParticipants.filter(
-            (x) => x.id != trainGroupParticipant.id
-          );
-
-        trainGroupParticipant.trainGroupId = trainGroupDto.id;
-        trainGroupParticipant.trainGroupDateId = selectedTrainGroupDate.id;
-        trainGroupParticipants.push(trainGroupParticipant);
-
         editTrainGroupDateParticipant(trainGroupParticipant);
+
+        // Force DTO refresh to pick up new participant
+        const participants =
+          trainGroupDto.trainGroupDates
+            .find((x) => x.id === selectedTrainGroupDate.id)
+            ?.trainGroupParticipants.filter(
+              (x) =>
+                x.selectedDate === undefined &&
+                x.id !== trainGroupParticipant.id
+            ) ?? [];
+
+        setDatatableDto((prev) => ({
+          ...prev,
+          data: [...participants, trainGroupParticipant],
+          pageCount: [...participants, trainGroupParticipant].length,
+        }));
+
         resetTrainGroupParticipant();
         dialogControlEdit.hideDialog();
       } else {
@@ -287,26 +301,26 @@ export default function TrainGroupDateParticipantGridComponent({
   const onDelete = async (): Promise<void> => {
     if (selectedTrainGroupDate) {
       if (formMode === FormMode.ADD) {
-        const id =
-          (trainGroupDto.trainGroupDates
-            .find((x) => x.id === selectedTrainGroupDate.id)
-            ?.trainGroupParticipants.filter((x) => x.id < 0).length ?? 0 + 1) *
-          -1;
-
         deleteTrainGroupDateParticipant(trainGroupParticipant);
-        resetTrainGroupParticipant();
-        dialogControlDelete.hideDialog();
+
+        const participants =
+          trainGroupDto.trainGroupDates
+            .find((x) => x.id === selectedTrainGroupDate.id)
+            ?.trainGroupParticipants.filter(
+              (x) =>
+                x.selectedDate !== undefined &&
+                x.id !== trainGroupParticipant.id
+            ) ?? [];
 
         // Force DTO refresh to pick up new participant
-        const participants =
-          trainGroupDto.trainGroupDates.find(
-            (x) => x.id === selectedTrainGroupDate.id
-          )?.trainGroupParticipants ?? [];
         setDatatableDto((prev) => ({
           ...prev,
           data: participants,
           pageCount: participants.length,
         }));
+
+        resetTrainGroupParticipant();
+        dialogControlDelete.hideDialog();
       } else {
         const response = await ApiService.delete(
           "trainGroupParticipants",

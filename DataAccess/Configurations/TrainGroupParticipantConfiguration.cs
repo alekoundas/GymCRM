@@ -13,16 +13,18 @@ namespace DataAccess.Configurations
 
             
 
-            // Relationship with TrainGroupDate (zero-to-many)
+            // Relationship with TrainGroupDate (one-to-many)
             builder.HasOne(x => x.TrainGroupDate)
                 .WithMany(x => x.TrainGroupParticipants)
                 .HasForeignKey(x => x.TrainGroupDateId)
+                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade); // Delete if parent TrainGroupDate is deleted
 
-            // Relationship with TrainGroup (zero-to-many)
+            // Relationship with TrainGroup (one-to-many)
             builder.HasOne(x => x.TrainGroup)
                 .WithMany(x => x.TrainGroupParticipants)
                 .HasForeignKey(x => x.TrainGroupId)
+                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade); // Delete if parent TrainGroup is deleted
 
             // Relationship with User (one-to-many)

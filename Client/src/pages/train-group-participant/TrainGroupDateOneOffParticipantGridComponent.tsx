@@ -1,0 +1,461 @@
+import { useState, useEffect, useRef } from "react";
+import DataTableComponent from "../../components/core/datatable/DataTableComponent";
+import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
+import { FormMode } from "../../enum/FormMode";
+import { DataTableColumns } from "../../model/datatable/DataTableColumns";
+import { useTrainGroupStore } from "../../stores/TrainGroupStore";
+import { DataTableDto } from "../../model/datatable/DataTableDto";
+import { TrainGroupParticipantDto } from "../../model/TrainGroupParticipantDto";
+import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
+import GenericDialogComponent, {
+  DialogControl,
+} from "../../components/core/dialog/GenericDialogComponent";
+import ApiService from "../../services/ApiService";
+import { useParams } from "react-router-dom";
+import TrainGroupDateParticipantFormComponent from "./TrainGroupDateParticipantFormComponent";
+import { DataTableFilterDto } from "../../model/datatable/DataTableFilterDto";
+import TrainGroupDateOneOffParticipantFormComponent from "./TrainGroupDateOneOffParticipantFormComponent";
+
+interface IField {
+  formMode: FormMode;
+}
+
+export default function TrainGroupDateOneOffParticipantGridComponent({
+  formMode,
+}: IField) {
+  const params = useParams();
+
+  const {
+    trainGroupDto,
+    trainGroupParticipant,
+    selectedTrainGroupDate,
+    addTrainGroupDateParticipant,
+    editTrainGroupDateParticipant,
+    resetTrainGroupDateParticipant,
+    setTrainGroupParticipant,
+    deleteTrainGroupDateParticipant,
+    resetTrainGroupParticipant,
+    updateTrainGroupDto,
+  } = useTrainGroupStore();
+
+  const [isViewDialogVisible, setViewDialogVisible] = useState(false); // Dialog visibility
+  const [isAddDialogVisible, setAddDialogVisible] = useState(false); // Dialog visibility
+  const [isEditDialogVisible, setEditDialogVisible] = useState(false); // Dialog visibility
+  const [isDeleteDialogVisible, setDeleteDialogVisible] = useState(false); // Dialog visibility
+  const triggerRefreshDataTable = useRef<
+    ((dto: DataTableDto<TrainGroupParticipantDto>) => void) | undefined
+  >(undefined);
+
+  const dialogControlAdd: DialogControl = {
+    showDialog: () => setAddDialogVisible(true),
+    hideDialog: () => setAddDialogVisible(false),
+  };
+  const dialogControlView: DialogControl = {
+    showDialog: () => setViewDialogVisible(true),
+    hideDialog: () => setViewDialogVisible(false),
+  };
+  const dialogControlEdit: DialogControl = {
+    showDialog: () => setEditDialogVisible(true),
+    hideDialog: () => setEditDialogVisible(false),
+  };
+  const dialogControlDelete: DialogControl = {
+    showDialog: () => setDeleteDialogVisible(true),
+    hideDialog: () => setDeleteDialogVisible(false),
+  };
+
+  const [datatableDto, setDatatableDto] = useState<
+    DataTableDto<TrainGroupParticipantDto>
+  >({
+    data: [],
+    first: 0,
+    rows: 10,
+    page: 1,
+    pageCount: 0,
+    dataTableSorts: [],
+    filters: [
+      {
+        fieldName: "TrainGroupId",
+        value:
+          trainGroupDto.id > 0 ? trainGroupDto.id.toString() : params["id"],
+
+        filterType: "equals",
+      },
+      {
+        fieldName: "SelectedDate",
+        // value: "null",
+        filterType: "notEquals",
+      },
+    ],
+  });
+
+  // Update datatableDto when trainGroupDto.trainGroupDates changes
+  useEffect(() => {
+    if (!datatableDto.filters) return;
+
+    let newFilters: DataTableFilterDto[] = datatableDto.filters.filter(
+      (x) => x.fieldName !== "TrainGroupDateId"
+    );
+
+    let newData = datatableDto.data;
+    let newPageCount = datatableDto.pageCount;
+
+    if (selectedTrainGroupDate?.id) {
+      newFilters.push({
+        fieldName: "TrainGroupDateId",
+        value: selectedTrainGroupDate.id.toString(),
+        filterType: "equals",
+      });
+
+      if (formMode === FormMode.ADD) {
+        const participants =
+          trainGroupDto.trainGroupDates
+            .find((x) => x.id === selectedTrainGroupDate.id)
+            ?.trainGroupParticipants.filter((x) => x.selectedDate) ?? [];
+        newData = participants;
+        newPageCount = participants.length;
+      }
+    } else {
+      newFilters.push({
+        fieldName: "TrainGroupDateId",
+        value: "0",
+        filterType: "equals",
+      });
+
+      if (formMode === FormMode.ADD) {
+        newData = [];
+        newPageCount = 0;
+      }
+    }
+
+    const newDto: DataTableDto<TrainGroupParticipantDto> = {
+      ...datatableDto,
+      filters: newFilters,
+      data: newData,
+      pageCount: newPageCount,
+    };
+
+    setDatatableDto(newDto);
+
+    if (formMode !== FormMode.ADD && triggerRefreshDataTable.current) {
+      triggerRefreshDataTable.current(newDto);
+    }
+  }, [selectedTrainGroupDate]);
+
+  const dataTableColumns: DataTableColumns<TrainGroupParticipantDto>[] = [
+    {
+      field: "selectedDate",
+      header: "Selected Date",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "30%" },
+      body: (rowData: TrainGroupParticipantDto) => {
+        if (rowData.selectedDate) {
+          const date = new Date(rowData.selectedDate);
+          return (
+            date.getDate() +
+            "/" +
+            (date.getMonth() + 1) +
+            "/" +
+            date.getFullYear()
+          );
+        }
+      },
+    },
+    {
+      field: "trainGroupId",
+      header: "TrainGroupId",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "10%" },
+    },
+    {
+      field: "trainGroupDateId",
+      header: "TrainGroupDateId",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "10%" },
+    },
+    {
+      field: "userId",
+      header: "Participant",
+      sortable: true,
+      filter: true,
+      filterPlaceholder: "Search",
+      style: { width: "10%" },
+    },
+  ];
+
+  const onAfterDataLoaded = (
+    data: DataTableDto<TrainGroupParticipantDto> | null
+  ) => {
+    if (
+      data &&
+      trainGroupDto.trainGroupDates.length > 0 &&
+      selectedTrainGroupDate
+    ) {
+      resetTrainGroupDateParticipant(selectedTrainGroupDate.id);
+      data.data.forEach((x) => addTrainGroupDateParticipant(x));
+      // data.data = [];
+    }
+    return data;
+  };
+
+  const OnSaveAdd = async (): Promise<void> => {
+    if (selectedTrainGroupDate?.id) {
+      if (formMode === FormMode.ADD) {
+        const participantCount: number =
+          trainGroupDto.trainGroupDates
+            .find((x) => x.id === selectedTrainGroupDate.id)
+            ?.trainGroupParticipants.filter((x) => x.id < 0).length ?? 0;
+
+        const id = (participantCount + 1) * -1;
+
+        addTrainGroupDateParticipant({
+          id,
+          trainGroupId: trainGroupDto.id,
+          trainGroupDateId: selectedTrainGroupDate.id,
+          userId: trainGroupParticipant.userId, // Use from store (form selection)
+          selectedDate: trainGroupParticipant.selectedDate,
+        });
+        resetTrainGroupParticipant();
+        dialogControlAdd.hideDialog();
+
+        const participants =
+          trainGroupDto.trainGroupDates.find(
+            (x) => x.id === selectedTrainGroupDate.id
+          )?.trainGroupParticipants ?? [];
+        // Force DTO refresh to pick up new participant
+        setDatatableDto((prev) => ({
+          ...prev,
+          data: participants,
+          pageCount: participants.length,
+        }));
+      } else {
+        trainGroupParticipant.trainGroupId = trainGroupDto.id;
+        trainGroupParticipant.trainGroupDateId = selectedTrainGroupDate.id;
+        const response = await ApiService.create(
+          "trainGroupParticipants",
+          trainGroupParticipant
+        );
+        if (response) {
+          dialogControlAdd.hideDialog();
+          resetTrainGroupParticipant();
+          datatableDto.filters.push({
+            fieldName: "TrainGroupDateId",
+            value: selectedTrainGroupDate.id.toString(),
+            filterType: "equals",
+          });
+          if (triggerRefreshDataTable.current)
+            triggerRefreshDataTable.current(datatableDto);
+        }
+      }
+    }
+  };
+
+  const OnSaveEdit = async (): Promise<void> => {
+    if (selectedTrainGroupDate) {
+      if (formMode === FormMode.ADD) {
+        editTrainGroupDateParticipant(trainGroupParticipant);
+        // updateTrainGroupDto(trainGroupDto);
+
+        const participants =
+          trainGroupDto.trainGroupDates
+            .find((x) => x.id === selectedTrainGroupDate.id)
+            ?.trainGroupParticipants.filter(
+              (x) =>
+                x.selectedDate !== undefined &&
+                x.id !== trainGroupParticipant.id
+            ) ?? [];
+
+        // Force DTO refresh to pick up new participant
+        setDatatableDto((prev) => ({
+          ...prev,
+          data: [...participants, trainGroupParticipant],
+          pageCount: [...participants, trainGroupParticipant].length,
+        }));
+
+        resetTrainGroupParticipant();
+        dialogControlEdit.hideDialog();
+      } else {
+        const response = await ApiService.update(
+          "TrainGroupParticipants",
+          trainGroupParticipant,
+          trainGroupParticipant.id
+        );
+        if (response) {
+          dialogControlEdit.hideDialog();
+          resetTrainGroupParticipant();
+          datatableDto.filters.push({
+            fieldName: "TrainGroupDateId",
+            value: selectedTrainGroupDate.id.toString(),
+            filterType: "equals",
+          });
+          if (triggerRefreshDataTable.current)
+            triggerRefreshDataTable.current(datatableDto);
+        }
+      }
+    }
+  };
+
+  const onDelete = async (): Promise<void> => {
+    if (selectedTrainGroupDate) {
+      if (formMode === FormMode.ADD) {
+        deleteTrainGroupDateParticipant(trainGroupParticipant);
+
+        const participants =
+          trainGroupDto.trainGroupDates
+            .find((x) => x.id === selectedTrainGroupDate.id)
+            ?.trainGroupParticipants.filter(
+              (x) =>
+                x.selectedDate !== undefined &&
+                x.id !== trainGroupParticipant.id
+            ) ?? [];
+
+        // Force DTO refresh to pick up new participant
+        setDatatableDto((prev) => ({
+          ...prev,
+          data: participants,
+          pageCount: participants.length,
+        }));
+
+        resetTrainGroupParticipant();
+        dialogControlDelete.hideDialog();
+      } else {
+        const response = await ApiService.delete(
+          "trainGroupParticipants",
+          trainGroupParticipant.id
+        );
+
+        dialogControlDelete.hideDialog();
+        resetTrainGroupParticipant();
+
+        datatableDto.filters.push({
+          fieldName: "TrainGroupDateId",
+          value: selectedTrainGroupDate.id.toString(),
+          filterType: "equals",
+        });
+        if (triggerRefreshDataTable.current)
+          triggerRefreshDataTable.current(datatableDto);
+      }
+    }
+  };
+
+  const onDataTableClick = (
+    buttonType: ButtonTypeEnum,
+    rowData?: TrainGroupParticipantDto
+  ) => {
+    switch (buttonType) {
+      case ButtonTypeEnum.VIEW:
+        if (rowData) {
+          setTrainGroupParticipant(rowData);
+          setViewDialogVisible(true);
+        }
+        break;
+      case ButtonTypeEnum.ADD:
+        setAddDialogVisible(true);
+        const participant = new TrainGroupParticipantDto();
+        participant.selectedDate = new Date(
+          new Date().getFullYear(),
+          new Date().getMonth(),
+          new Date().getDate(),
+          0,
+          0,
+          0
+        ).toISOString();
+        setTrainGroupParticipant(participant);
+        break;
+      case ButtonTypeEnum.EDIT:
+        if (rowData) {
+          setTrainGroupParticipant(rowData);
+          setEditDialogVisible(true);
+        }
+        break;
+      case ButtonTypeEnum.DELETE:
+        if (rowData) {
+          setTrainGroupParticipant(rowData);
+          setDeleteDialogVisible(true);
+        }
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  return (
+    <>
+      <DataTableComponent
+        controller="TrainGroupParticipants"
+        formMode={formMode}
+        dataTableDto={datatableDto}
+        setDataTableDto={setDatatableDto}
+        dataTableColumns={dataTableColumns}
+        filterDisplay={DataTableFilterDisplayEnum.ROW}
+        enableAddAction={
+          formMode !== FormMode.VIEW && selectedTrainGroupDate?.id !== undefined
+        }
+        enableGridRowActions={formMode !== FormMode.VIEW}
+        onButtonClick={onDataTableClick}
+        onAfterDataLoaded={onAfterDataLoaded}
+        triggerRefreshData={triggerRefreshDataTable}
+        authorize={true}
+        loadDataOnInit={false}
+      />
+
+      {/*                                      */}
+      {/*           View Participant           */}
+      {/*                                      */}
+
+      <GenericDialogComponent
+        formMode={FormMode.VIEW}
+        visible={isViewDialogVisible}
+        control={dialogControlView}
+      >
+        <TrainGroupDateOneOffParticipantFormComponent />
+      </GenericDialogComponent>
+
+      {/*                                      */}
+      {/*            Add Participant           */}
+      {/*                                      */}
+
+      <GenericDialogComponent
+        formMode={FormMode.ADD}
+        visible={isAddDialogVisible}
+        control={dialogControlAdd}
+        onSave={OnSaveAdd}
+      >
+        <TrainGroupDateOneOffParticipantFormComponent />
+      </GenericDialogComponent>
+
+      {/*                                      */}
+      {/*           Edit Participant           */}
+      {/*                                      */}
+
+      <GenericDialogComponent
+        formMode={FormMode.EDIT}
+        visible={isEditDialogVisible}
+        control={dialogControlEdit}
+        onSave={OnSaveEdit}
+      >
+        <TrainGroupDateOneOffParticipantFormComponent />
+      </GenericDialogComponent>
+
+      {/*                                       */}
+      {/*          Delete Participant           */}
+      {/*                                       */}
+      <GenericDialogComponent
+        visible={isDeleteDialogVisible}
+        control={dialogControlDelete}
+        onDelete={onDelete}
+        formMode={FormMode.DELETE}
+      >
+        <div className="flex justify-content-center">
+          <p>Are you sure?</p>
+        </div>
+      </GenericDialogComponent>
+    </>
+  );
+}

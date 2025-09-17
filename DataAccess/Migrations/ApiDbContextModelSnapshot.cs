@@ -204,7 +204,7 @@ namespace DataAccess.Migrations
                     b.Property<DateTime?>("SelectedDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("TrainGroupDateId")
+                    b.Property<int>("TrainGroupDateId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("TrainGroupId")
@@ -251,6 +251,9 @@ namespace DataAccess.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.HasIndex("TrainGroupParticipantId");
 
@@ -541,7 +544,8 @@ namespace DataAccess.Migrations
                     b.HasOne("Core.Models.TrainGroupDate", "TrainGroupDate")
                         .WithMany("TrainGroupParticipants")
                         .HasForeignKey("TrainGroupDateId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Core.Models.TrainGroup", "TrainGroup")
                         .WithMany("TrainGroupParticipants")

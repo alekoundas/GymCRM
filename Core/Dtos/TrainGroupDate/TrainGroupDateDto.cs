@@ -1,9 +1,11 @@
-﻿using Core.Enums;
+﻿using Core.CustomValidationAttributes;
+using Core.Enums;
 using Core.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Core.Dtos.TrainGroupDate
 {
+    [TrainGroupDateTypeValidation]
     public class TrainGroupDateDto
     {
         [Required(ErrorMessage = "Id is required")]

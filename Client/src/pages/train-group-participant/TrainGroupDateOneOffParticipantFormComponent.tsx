@@ -6,7 +6,7 @@ import { DialogChildProps } from "../../components/core/dialog/GenericDialogComp
 
 interface IField extends DialogChildProps {}
 
-export default function TrainGroupParticipantFormComponent({
+export default function TrainGroupDateOneOffParticipantFormComponent({
   formMode,
 }: IField) {
   const { trainGroupParticipant, setTrainGroupParticipant } =
