@@ -1,37 +1,37 @@
-﻿    using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
 
-    namespace Business
+namespace Business
+{
+    public static class ExtentionMethods
     {
-        public static class ExtentionMethods
-    {
-            public static IOrderedQueryable<T> OrderByColumn<T>(this IQueryable<T> source, string columnPath)
-            => source.OrderByColumnUsing(columnPath, "OrderBy");
+        public static IOrderedQueryable<T> OrderByColumn<T>(this IQueryable<T> source, string columnPath)
+        => source.OrderByColumnUsing(columnPath, "OrderBy");
 
-            public static IOrderedQueryable<T> OrderByColumnDescending<T>(this IQueryable<T> source, string columnPath)
-                => source.OrderByColumnUsing(columnPath, "OrderByDescending");
+        public static IOrderedQueryable<T> OrderByColumnDescending<T>(this IQueryable<T> source, string columnPath)
+            => source.OrderByColumnUsing(columnPath, "OrderByDescending");
 
-            public static IOrderedQueryable<T> ThenByColumn<T>(this IOrderedQueryable<T> source, string columnPath)
-                => source.OrderByColumnUsing(columnPath, "ThenBy");
+        public static IOrderedQueryable<T> ThenByColumn<T>(this IOrderedQueryable<T> source, string columnPath)
+            => source.OrderByColumnUsing(columnPath, "ThenBy");
 
-            public static IOrderedQueryable<T> ThenByColumnDescending<T>(this IOrderedQueryable<T> source, string columnPath)
-                => source.OrderByColumnUsing(columnPath, "ThenByDescending");
+        public static IOrderedQueryable<T> ThenByColumnDescending<T>(this IOrderedQueryable<T> source, string columnPath)
+            => source.OrderByColumnUsing(columnPath, "ThenByDescending");
 
-            private static IOrderedQueryable<T> OrderByColumnUsing<T>(this IQueryable<T> source, string columnPath, string method)
-            {
-                ParameterExpression parameter = Expression.Parameter(typeof(T), "item");
-                Expression member = columnPath
-                    .Split('.')
-                    .Aggregate((Expression)parameter, Expression.PropertyOrField);
+        private static IOrderedQueryable<T> OrderByColumnUsing<T>(this IQueryable<T> source, string columnPath, string method)
+        {
+            ParameterExpression parameter = Expression.Parameter(typeof(T), "item");
+            Expression member = columnPath
+                .Split('.')
+                .Aggregate((Expression)parameter, Expression.PropertyOrField);
 
-                System.Linq.Expressions.LambdaExpression keySelector = Expression.Lambda(member, parameter);
+            System.Linq.Expressions.LambdaExpression keySelector = Expression.Lambda(member, parameter);
 
-                MethodCallExpression methodCall = Expression.Call(typeof(Queryable), method, new[]
-                        { parameter.Type, member.Type },
-                    source.Expression, Expression.Quote(keySelector));
+            MethodCallExpression methodCall = Expression.Call(typeof(Queryable), method, new[]
+                    { parameter.Type, member.Type },
+                source.Expression, Expression.Quote(keySelector));
 
-                return (IOrderedQueryable<T>)source.Provider.CreateQuery(methodCall);
-            }
+            return (IOrderedQueryable<T>)source.Provider.CreateQuery(methodCall);
+        }
 
 
 
@@ -72,7 +72,7 @@ using System.Reflection;
         //    // Execute the query
         //    return source.Provider.CreateQuery<T>(methodCall);
         //}
-        public static IQueryable<T> FilterEqualsByColumn<T>(this IQueryable<T> source, string columnPath, object value)
+        public static IQueryable<T> FilterByColumnEquality<T>(this IQueryable<T> source, string columnPath, object? value,bool isEqual)
         {
             // Guard clauses
             if (source == null) throw new ArgumentNullException(nameof(source));
@@ -88,36 +88,36 @@ using System.Reflection;
 
             // Get the target type
             Type memberType = member.Type;
-            object convertedValue;
+            object? convertedValue;
 
             // Handle nullable types
-            if (Nullable.GetUnderlyingType(memberType) != null)
+            Type? underlyingType = Nullable.GetUnderlyingType(memberType);
+            if (underlyingType != null)
             {
-                Type underlyingType = Nullable.GetUnderlyingType(memberType);
                 if (value == null)
-                {
-                    convertedValue = null; // Nullable field can accept null
-                }
+                    // Nullable field can accept null
+                    convertedValue = null;
+
                 else if (value is string stringValue && underlyingType == typeof(int))
-                {
                     // Parse string to int for int? fields
                     convertedValue = string.IsNullOrEmpty(stringValue) ? null : int.Parse(stringValue);
-                }
+
                 else
-                {
                     // Convert to the underlying type
                     convertedValue = Convert.ChangeType(value, underlyingType);
-                }
             }
+            // Non-nullable type
             else
-            {
-                // Non-nullable type
                 convertedValue = Convert.ChangeType(value, memberType);
-            }
 
             // Create equality expression (e.g., 'item.Property == value')
             Expression constant = Expression.Constant(convertedValue, memberType);
-            Expression equality = Expression.Equal(member, constant);
+            Expression equality;
+            if(isEqual)
+                equality = Expression.Equal(member, constant);
+            else
+                equality = Expression.NotEqual(member, constant);
+
 
             // Create lambda expression (e.g., 'item => item.Property == value')
             LambdaExpression lambda = Expression.Lambda(equality, parameter);

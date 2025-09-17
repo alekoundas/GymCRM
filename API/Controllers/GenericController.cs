@@ -151,15 +151,20 @@ namespace API.Controllers
             // Handle Filtering of DataTable.
             foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.equals))
             {
-                if (filter.FieldName == "UserId" && filter.Value != "null")
-                    query.FilterEqualsByColumn(filter.FieldName, new Guid(filter.Value));
+                if (filter.FieldName == "UserId" && filter.Value != null)
+                    query.FilterByColumnEquals(filter.FieldName, new Guid(filter.Value));
                 else
-                    query.FilterEqualsByColumn(filter.FieldName, filter.Value == "null" ? null : filter.Value);
+                    query.FilterByColumnEquals(filter.FieldName, filter.Value);
             }
+
             foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.contains))
-            {
-                query.FilterByColumnContains(filter.FieldName, filter.Value);
-            }
+                if (filter.Value != null)
+                    query.FilterByColumnContains(filter.FieldName, filter.Value);
+
+            foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.notEquals))
+                query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
+
+
 
             // Handle Pagging of DataTable.
             int skip = (dataTable.Page - 1) * dataTable.Rows;

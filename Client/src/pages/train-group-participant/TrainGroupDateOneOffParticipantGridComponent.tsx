@@ -14,12 +14,13 @@ import ApiService from "../../services/ApiService";
 import { useParams } from "react-router-dom";
 import TrainGroupDateParticipantFormComponent from "./TrainGroupDateParticipantFormComponent";
 import { DataTableFilterDto } from "../../model/datatable/DataTableFilterDto";
+import TrainGroupDateOneOffParticipantFormComponent from "./TrainGroupDateOneOffParticipantFormComponent";
 
 interface IField {
   formMode: FormMode;
 }
 
-export default function TrainGroupDateParticipantGridComponent({
+export default function TrainGroupDateOneOffParticipantGridComponent({
   formMode,
 }: IField) {
   const params = useParams();
@@ -81,8 +82,8 @@ export default function TrainGroupDateParticipantGridComponent({
       },
       {
         fieldName: "SelectedDate",
-        // value: "Null",
-        filterType: "equals",
+        // value: "null",
+        filterType: "notEquals",
       },
     ],
   });
@@ -109,7 +110,7 @@ export default function TrainGroupDateParticipantGridComponent({
         const participants =
           trainGroupDto.trainGroupDates
             .find((x) => x.id === selectedTrainGroupDate.id)
-            ?.trainGroupParticipants.filter((x) => !x.selectedDate) ?? [];
+            ?.trainGroupParticipants.filter((x) => x.selectedDate) ?? [];
         newData = participants;
         newPageCount = participants.length;
       }
@@ -217,16 +218,16 @@ export default function TrainGroupDateParticipantGridComponent({
           trainGroupId: trainGroupDto.id,
           trainGroupDateId: selectedTrainGroupDate.id,
           userId: trainGroupParticipant.userId, // Use from store (form selection)
-          selectedDate: undefined,
+          selectedDate: trainGroupParticipant.selectedDate,
         });
         resetTrainGroupParticipant();
         dialogControlAdd.hideDialog();
 
-        // Force DTO refresh to pick up new participant
         const participants =
           trainGroupDto.trainGroupDates.find(
             (x) => x.id === selectedTrainGroupDate.id
           )?.trainGroupParticipants ?? [];
+        // Force DTO refresh to pick up new participant
         setDatatableDto((prev) => ({
           ...prev,
           data: participants,
@@ -258,17 +259,18 @@ export default function TrainGroupDateParticipantGridComponent({
     if (selectedTrainGroupDate) {
       if (formMode === FormMode.ADD) {
         editTrainGroupDateParticipant(trainGroupParticipant);
+        // updateTrainGroupDto(trainGroupDto);
 
-        // Force DTO refresh to pick up new participant
         const participants =
           trainGroupDto.trainGroupDates
             .find((x) => x.id === selectedTrainGroupDate.id)
             ?.trainGroupParticipants.filter(
               (x) =>
-                x.selectedDate === undefined &&
+                x.selectedDate !== undefined &&
                 x.id !== trainGroupParticipant.id
             ) ?? [];
 
+        // Force DTO refresh to pick up new participant
         setDatatableDto((prev) => ({
           ...prev,
           data: [...participants, trainGroupParticipant],
@@ -354,6 +356,16 @@ export default function TrainGroupDateParticipantGridComponent({
         break;
       case ButtonTypeEnum.ADD:
         setAddDialogVisible(true);
+        const participant = new TrainGroupParticipantDto();
+        participant.selectedDate = new Date(
+          new Date().getFullYear(),
+          new Date().getMonth(),
+          new Date().getDate(),
+          0,
+          0,
+          0
+        ).toISOString();
+        setTrainGroupParticipant(participant);
         break;
       case ButtonTypeEnum.EDIT:
         if (rowData) {
@@ -402,7 +414,7 @@ export default function TrainGroupDateParticipantGridComponent({
         visible={isViewDialogVisible}
         control={dialogControlView}
       >
-        <TrainGroupDateParticipantFormComponent />
+        <TrainGroupDateOneOffParticipantFormComponent />
       </GenericDialogComponent>
 
       {/*                                      */}
@@ -415,7 +427,7 @@ export default function TrainGroupDateParticipantGridComponent({
         control={dialogControlAdd}
         onSave={OnSaveAdd}
       >
-        <TrainGroupDateParticipantFormComponent />
+        <TrainGroupDateOneOffParticipantFormComponent />
       </GenericDialogComponent>
 
       {/*                                      */}
@@ -428,7 +440,7 @@ export default function TrainGroupDateParticipantGridComponent({
         control={dialogControlEdit}
         onSave={OnSaveEdit}
       >
-        <TrainGroupDateParticipantFormComponent />
+        <TrainGroupDateOneOffParticipantFormComponent />
       </GenericDialogComponent>
 
       {/*                                       */}

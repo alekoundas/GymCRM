@@ -19,6 +19,7 @@ import GenericDialogComponent, {
 } from "../../components/core/dialog/GenericDialogComponent";
 import TrainGroupDateFormComponent from "./TrainGroupDateFormComponent";
 import ApiService from "../../services/ApiService";
+import { Dialog } from "primereact/dialog";
 
 interface IField extends DialogChildProps {}
 
@@ -38,6 +39,7 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
     resetSelectedTrainGroupDate,
   } = useTrainGroupStore();
 
+  const [isInfoDialogVisible, setInfoDialogVisible] = useState(false); // Dialog visibility
   const [isViewDialogVisible, setViewDialogVisible] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisible] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisible] = useState(false); // Dialog visibility

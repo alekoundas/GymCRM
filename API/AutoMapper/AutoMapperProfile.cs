@@ -23,10 +23,8 @@ namespace API.AutoMapper
                 .AfterMap((src, dest) =>
                 {
                     // Set TrainGroupId for all TrainGroupParticipants
-                    foreach (var date in dest.TrainGroupDates)
-                        foreach (var participant in date.TrainGroupParticipants)
-                            //participant.TrainGroupId = src.Id; // Set TrainGroupId
-                            participant.TrainGroup = dest; //Set navigation property
+                    foreach (TrainGroupParticipant participant in dest.TrainGroupDates.SelectMany(x => x.TrainGroupParticipants))
+                        participant.TrainGroup = dest; //Set navigation property
                 });
 
             // TrainGroupDateDto

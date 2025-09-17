@@ -1,5 +1,5 @@
 import { Card } from "primereact/card";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FormMode } from "../../enum/FormMode";
 import ApiService from "../../services/ApiService";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
@@ -11,6 +11,8 @@ import { Button } from "primereact/button";
 import TrainGroupDateParticipantGridComponent from "../train-group-participant/TrainGroupDateParticipantGridComponent";
 import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
 import { TrainGroupDto } from "../../model/TrainGroupDto";
+import TrainGroupDateOneOffParticipantGridComponent from "../train-group-participant/TrainGroupDateOneOffParticipantGridComponent";
+import { Dialog } from "primereact/dialog";
 
 interface IField {
   formMode: FormMode;
@@ -21,6 +23,9 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
   const navigate = useNavigate();
 
   const { trainGroupDto, resetTrainGroupDto } = useTrainGroupStore();
+  const [isInfoDateDialogVisible, setInfoDateDialogVisible] = useState(false); // Dialog visibility
+  const [isInfoParticipantDialogVisible, setInfoParticipantDialogVisible] =
+    useState(false); // Dialog visibility
 
   // Load Initial data
   useEffect(() => {
@@ -90,7 +95,24 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
           </Card>
         </div>
         <div className=" col-12  lg:col-6 xl:col-6">
-          <Card title="Train Group Dates">
+          <Card
+            header={
+              <div className="flex justify-content-between align-items-center p-3">
+                <div className="flex flex-column gap-1">
+                  <h2 className="m-0">Train Group Dates</h2>
+                  <p className="m-0 text-gray-600">
+                    Select a date to view Participants
+                  </p>
+                </div>
+                <Button
+                  label=""
+                  icon="pi pi-info-circle"
+                  onClick={() => setInfoDateDialogVisible(true)}
+                  className="p-button-text"
+                />
+              </div>
+            }
+          >
             <div className="card">
               <TrainGroupDateGridComponent formMode={formMode} />
             </div>
@@ -98,20 +120,97 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
         </div>
 
         <div className=" col-12  lg:col-6 xl:col-6">
-          <Card title="Train Group Participants">
+          <Card
+            header={
+              <div className="flex justify-content-between align-items-center p-3">
+                <h2 className="m-0">Train Group Date Participants (One Off)</h2>
+                <Button
+                  label=""
+                  icon="pi pi-info-circle"
+                  onClick={() => setInfoParticipantDialogVisible(true)}
+                  className="p-button-text"
+                />
+              </div>
+            }
+          >
             <div className="card">
-              <TrainGroupParticipantGridComponent formMode={formMode} />
+              <TrainGroupDateOneOffParticipantGridComponent
+                formMode={formMode}
+              />
             </div>
           </Card>
         </div>
         <div className=" col-12  lg:col-6 xl:col-6">
-          <Card title="Train Group Date Participants">
+          <Card
+            header={
+              <div className="flex justify-content-between align-items-center p-3">
+                <h2 className="m-0">Train Group Date Participants </h2>
+                <Button
+                  label=""
+                  icon="pi pi-info-circle"
+                  onClick={() => setInfoParticipantDialogVisible(true)}
+                  className="p-button-text"
+                />
+              </div>
+            }
+          >
             <div className="card">
               <TrainGroupDateParticipantGridComponent formMode={formMode} />
             </div>
           </Card>
         </div>
       </div>
+
+      {/*                                       */}
+      {/*             Info Dialog               */}
+      {/*                                       */}
+      <Dialog
+        header="Train group dates"
+        visible={isInfoDateDialogVisible}
+        style={{ width: "50vw" }}
+        onHide={() => {
+          if (!isInfoDateDialogVisible) return;
+          setInfoDateDialogVisible(false);
+        }}
+      >
+        <p>Handle the date or dates when this Training Group occurs.</p>
+        <p>Training Group Dates must follow these rules:</p>
+        <ul>
+          <li>Cannot mix day-of-week dates with day-of-month dates.</li>
+          <li>Fixed dates cannot overlap with an existing day-of-week row.</li>
+          <li>Fixed dates cannot overlap with an existing day-of-month row.</li>
+          <li>Duplicate dates are not allowed.</li>
+        </ul>
+      </Dialog>
+
+      <Dialog
+        header="Train group participants"
+        visible={isInfoParticipantDialogVisible}
+        style={{ width: "50vw" }}
+        onHide={() => {
+          if (!isInfoParticipantDialogVisible) return;
+          setInfoParticipantDialogVisible(false);
+        }}
+      >
+        <p>
+          Handle the participants of the selected train group date. If "Selected
+          Date" is set, then this is an one-off participant and will only join
+          the specific train group date once.
+        </p>
+        <p>Training Group Date Participants must follow these rules:</p>
+        <ul>
+          <li>
+            If selected date is set (one-off), then it should match at least one
+            train group date.
+          </li>
+
+          <li>
+            "Selected Date" cannot be set to a Fixed Date. Fixed date is already
+            a single date and cant have one-off participants.
+          </li>
+          <li>Duplicate participants are not allowed.</li>
+        </ul>
+      </Dialog>
     </>
   );
 }

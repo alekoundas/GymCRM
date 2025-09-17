@@ -200,8 +200,8 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
     }),
 
   editTrainGroupDateParticipant: (row: TrainGroupParticipantDto) =>
-    set((state) => ({
-      trainGroupDto: {
+    set((state) => {
+      const traingroup = {
         ...state.trainGroupDto,
         trainGroupDates: [
           ...state.trainGroupDto.trainGroupDates.filter(
@@ -219,12 +219,18 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
             ],
           },
         ],
-      },
-    })),
+      };
+      return {
+        trainGroupDto: traingroup,
+        selectedTrainGroupDate: traingroup.trainGroupDates.find(
+          (x) => x.id === row.trainGroupDateId
+        ),
+      };
+    }),
 
   deleteTrainGroupDateParticipant: (row: TrainGroupParticipantDto) =>
-    set((state) => ({
-      trainGroupDto: {
+    set((state) => {
+      const traingroup = {
         ...state.trainGroupDto,
         trainGroupDates: [
           ...state.trainGroupDto.trainGroupDates.filter(
@@ -241,8 +247,14 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
             ],
           },
         ],
-      },
-    })),
+      };
+      return {
+        trainGroupDto: traingroup,
+        selectedTrainGroupDate: traingroup.trainGroupDates.find(
+          (x) => x.id === row.trainGroupDateId
+        ),
+      };
+    }),
 
   resetTrainGroupDateParticipant: (id: number) =>
     set((state) => ({
