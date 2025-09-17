@@ -1,4 +1,5 @@
-﻿using Core.Dtos.Identity;
+﻿using Core.CustomValidationAttributes;
+using Core.Dtos.Identity;
 using Core.Dtos.TrainGroupDate;
 using Core.Models;
 using System.Collections.ObjectModel;
@@ -31,7 +32,7 @@ namespace Core.Dtos.TrainGroup
         [Required(ErrorMessage = "TrainerId is required")]
         public string? TrainerId { get; set; }
 
-
+        [MinListCount(1,ErrorMessage ="At least 1 Train Group Date is required!")]
         public ICollection<TrainGroupDateAddDto> TrainGroupDates { get; set; } = new Collection<TrainGroupDateAddDto>();
         public ICollection<TrainGroupParticipantAddDto> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipantAddDto>();
     }

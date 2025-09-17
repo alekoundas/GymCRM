@@ -200,6 +200,7 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
 
       updateTrainGroupDto({ trainGroupDates: trainGroupDateDtos });
       resetTrainGroupDateDto();
+      console.log("hideDialog");
       dialogControlEdit.hideDialog();
     } else {
       const response = await ApiService.update(

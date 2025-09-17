@@ -63,7 +63,6 @@ export default function UserPasswordForgotPage({}: IField) {
           <Divider />
           <Button
             label="Send Reset Link"
-            type="submit"
             className="w-full"
             disabled={loading}
             loading={loading}

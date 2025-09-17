@@ -49,7 +49,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
             className="w-full"
             checkmark={true}
             highlightOnSelect={true}
-            disabled={formMode !== FormMode.EDIT}
+            disabled={formMode === FormMode.VIEW}
           />
         </div>
 
@@ -78,7 +78,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
               minDate={new Date(new Date().setHours(0, 0, 0, 0))} // Prevent selecting past dates
               className="w-full"
               dateFormat="dd/mm/yy"
-              disabled={formMode !== FormMode.EDIT}
+              disabled={formMode === FormMode.VIEW}
             />
           </div>
         )}
@@ -116,7 +116,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
               }}
               min={0}
               max={31}
-              disabled={formMode !== FormMode.EDIT}
+              disabled={formMode === FormMode.VIEW}
             />
           </div>
         )}
@@ -153,7 +153,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
               className="w-full"
               checkmark={true}
               highlightOnSelect={true}
-              disabled={formMode !== FormMode.EDIT}
+              disabled={formMode === FormMode.VIEW}
             />
           </div>
         )}
