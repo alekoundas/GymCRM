@@ -196,7 +196,7 @@ export default function TrainGroupAdminPage() {
       {/*                                      */}
       {/*           View Train Group           */}
       {/*                                      */}
-
+      {/* 
       <GenericDialogComponent
         formMode={FormMode.VIEW}
         visible={isViewDialogVisible}
@@ -206,13 +206,13 @@ export default function TrainGroupAdminPage() {
           <TrainGroupFormComponent />
           <TrainGroupDateGridComponent />
         </div>
-      </GenericDialogComponent>
+      </GenericDialogComponent> */}
 
       {/*                                     */}
       {/*           Add Train Group           */}
       {/*                                     */}
 
-      <GenericDialogComponent
+      {/* <GenericDialogComponent
         formMode={FormMode.ADD}
         visible={isAddDialogVisible}
         control={dialogControlAdd}
@@ -222,12 +222,12 @@ export default function TrainGroupAdminPage() {
           <TrainGroupFormComponent />
           <TrainGroupDateGridComponent />
         </div>
-      </GenericDialogComponent>
+      </GenericDialogComponent> */}
 
       {/*                                     */}
       {/*          Edit Train Group           */}
       {/*                                     */}
-      <GenericDialogComponent
+      {/* <GenericDialogComponent
         formMode={FormMode.EDIT}
         visible={isEditDialogVisible}
         control={dialogControlEdit}
@@ -237,7 +237,7 @@ export default function TrainGroupAdminPage() {
           <TrainGroupFormComponent />
           <TrainGroupDateGridComponent />
         </div>
-      </GenericDialogComponent>
+      </GenericDialogComponent> */}
 
       {/*                                       */}
       {/*          Delete Train Group           */}

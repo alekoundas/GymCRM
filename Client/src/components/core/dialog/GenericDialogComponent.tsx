@@ -26,7 +26,7 @@ interface DialogComponentProps {
   control: DialogControl;
   children: ReactNode;
   onSave?: () => Promise<void>;
-  onDelete?: () => void;
+  onDelete?: () => Promise<void>;
 }
 
 const DialogComponent: React.FC<DialogComponentProps> = ({
@@ -41,9 +41,27 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
   const [isSaveEnabled, setIsSaveEnabled] = useState<boolean>(true);
 
   const handleSave = () => {
-    setIsSaveEnabled(false);
-    if (onSave) {
-      onSave().finally(() => setIsSaveEnabled(true));
+    // Need this check because save btn is enabled while dialog is closing. (disallow double-clicks)
+    if (visible) {
+      setIsSaveEnabled(false);
+      if (onSave) {
+        onSave().finally(() => {
+          console.log("finaly");
+          setIsSaveEnabled(true);
+        });
+      }
+    }
+  };
+
+  const handleDelete = () => {
+    // Need this check because save btn is enabled while dialog is closing. (disallow double-clicks)
+    if (visible) {
+      setIsSaveEnabled(false);
+      if (onDelete) {
+        onDelete().finally(() => {
+          setIsSaveEnabled(true);
+        });
+      }
     }
   };
 
@@ -95,8 +113,8 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
               label="Delete"
               icon="pi pi-danger"
               severity="danger"
-              onClick={onDelete}
-              // disabled={!isSaveEnabled}
+              onClick={handleDelete}
+              disabled={!isSaveEnabled}
               autoFocus
             />
           )}
