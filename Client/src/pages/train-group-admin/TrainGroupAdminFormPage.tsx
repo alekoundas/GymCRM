@@ -123,7 +123,12 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
           <Card
             header={
               <div className="flex justify-content-between align-items-center p-3">
-                <h2 className="m-0">Train Group Date Participants (One Off)</h2>
+                <div className="flex flex-column gap-1">
+                  <h2 className="m-0">
+                    Train Group Date Participants (One Off)
+                  </h2>
+                  <p className="m-0 text-gray-600">One-off participants</p>
+                </div>
                 <Button
                   label=""
                   icon="pi pi-info-circle"
@@ -144,7 +149,10 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
           <Card
             header={
               <div className="flex justify-content-between align-items-center p-3">
-                <h2 className="m-0">Train Group Date Participants </h2>
+                <div className="flex flex-column gap-1">
+                  <h2 className="m-0">Train Group Date Participants </h2>
+                  <p className="m-0 text-gray-600">Recurring participants</p>
+                </div>
                 <Button
                   label=""
                   icon="pi pi-info-circle"

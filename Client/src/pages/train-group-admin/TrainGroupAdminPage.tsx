@@ -193,52 +193,6 @@ export default function TrainGroupAdminPage() {
         </div>
       </Card>
 
-      {/*                                      */}
-      {/*           View Train Group           */}
-      {/*                                      */}
-      {/* 
-      <GenericDialogComponent
-        formMode={FormMode.VIEW}
-        visible={isViewDialogVisible}
-        control={dialogControlView}
-      >
-        <div className="w-full">
-          <TrainGroupFormComponent />
-          <TrainGroupDateGridComponent />
-        </div>
-      </GenericDialogComponent> */}
-
-      {/*                                     */}
-      {/*           Add Train Group           */}
-      {/*                                     */}
-
-      {/* <GenericDialogComponent
-        formMode={FormMode.ADD}
-        visible={isAddDialogVisible}
-        control={dialogControlAdd}
-        onSave={OnSaveAdd}
-      >
-        <div className="w-full">
-          <TrainGroupFormComponent />
-          <TrainGroupDateGridComponent />
-        </div>
-      </GenericDialogComponent> */}
-
-      {/*                                     */}
-      {/*          Edit Train Group           */}
-      {/*                                     */}
-      {/* <GenericDialogComponent
-        formMode={FormMode.EDIT}
-        visible={isEditDialogVisible}
-        control={dialogControlEdit}
-        onSave={OnSaveEdit}
-      >
-        <div className="w-full">
-          <TrainGroupFormComponent />
-          <TrainGroupDateGridComponent />
-        </div>
-      </GenericDialogComponent> */}
-
       {/*                                       */}
       {/*          Delete Train Group           */}
       {/*                                       */}
