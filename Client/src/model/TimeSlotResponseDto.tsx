@@ -6,20 +6,20 @@ export interface TimeSlotResponseDto {
   trainerId: string;
   trainGroupId: number;
   trainGroupDateId: number;
-  duration: Date;
-  startOn: Date;
+  duration: string;
+  startOn: string;
   spotsLeft: number;
   recurrenceDates: TimeSlotRecurrenceDateDto[];
 }
 
 export class TimeSlotResponseDto {
-  title: string;
-  description: string;
-  trainerId: string;
-  trainGroupId: number;
-  trainGroupDateId: number;
-  duration: Date;
-  startOn: Date;
-  spotsLeft: number;
-  recurrenceDates: TimeSlotRecurrenceDateDto[];
+  title: string = "";
+  description: string = "";
+  trainerId: string = "";
+  trainGroupId: number = -1;
+  trainGroupDateId: number = -1;
+  duration: string = "";
+  startOn: string = "";
+  spotsLeft: number = -1;
+  recurrenceDates: TimeSlotRecurrenceDateDto[] = [];
 }

@@ -15,14 +15,15 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
     trainGroupDateParticipantUpdateDto,
     updateTrainGroupDateParticipantUpdateDto,
   } = useTrainGroupBookingStore();
-
   return (
     <>
       {selectedTimeSlot && (
         <div className="p-fluid">
           {selectedTimeSlot.recurrenceDates.length > 0 && (
             <>
-              {/* <h4>{"datatable.select_booking_options"}</h4> */}
+              {/*                      */}
+              {/*     Current Date     */}
+              {/*                      */}
               {selectedTimeSlot.recurrenceDates.some(
                 (x) => x.trainGroupDateType === undefined
               ) && (
@@ -33,14 +34,13 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                   {selectedTimeSlot.recurrenceDates
                     .filter((x) => x.trainGroupDateType === undefined)
                     .map((x) => (
-                      <div
-                        key={x.trainGroupDateId}
-                        className="field-checkbox"
-                      >
+                      <div className="field-checkbox">
                         <Checkbox
-                          inputId={`recurrence-${x.trainGroupDateId}`}
+                          inputId={`recurrence-${x.trainGroupDateId}-current`}
                           checked={trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.some(
-                            (y) => y.trainGroupDateId === undefined
+                            (y) =>
+                              y.selectedDate !== undefined &&
+                              y.trainGroupDateId === x.trainGroupDateId
                           )}
                           onChange={(e) => {
                             updateTrainGroupDateParticipantUpdateDto({
@@ -53,18 +53,18 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                         timeSlotRequestDto.selectedDate,
                                       trainGroupId:
                                         selectedTimeSlot.trainGroupId,
+                                      trainGroupDateId: x.trainGroupDateId,
                                       userId: TokenService.getUserId(),
                                     } as TrainGroupParticipantDto,
                                   ]
                                 : trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                                    (y) => y.trainGroupDateId !== undefined
+                                    (y) => y.selectedDate === undefined
                                   ),
                             });
                           }}
-                          // disabled={selectedTimeSlot.spotsLeft <= 0}
                         />
                         <label
-                          htmlFor={`recurrence-${x.trainGroupDateId}`}
+                          htmlFor={`recurrence-${x.trainGroupDateId}-current`}
                           className="ml-2"
                         >
                           {timeSlotRequestDto.selectedDate
@@ -87,12 +87,15 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                 </div>
               )}
 
-              {!selectedTimeSlot.recurrenceDates.some(
+              {/*                      */}
+              {/*       FIXED_DAY      */}
+              {/*                      */}
+              {selectedTimeSlot.recurrenceDates.some(
                 (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
               ) && (
                 <div className="field">
                   <p>
-                    <strong>{"Current Date"}:</strong>
+                    <strong>{"Fixed Date"}:</strong>
                   </p>
                   {selectedTimeSlot.recurrenceDates
                     .filter(
@@ -109,7 +112,9 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                           inputId={`recurrence-${x.trainGroupDateId}`}
                           checked={
                             trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                              (y) => y.trainGroupDateId === x.trainGroupDateId
+                              (y) =>
+                                y.selectedDate === undefined &&
+                                y.trainGroupDateId === x.trainGroupDateId
                             ).length === 1
                           }
                           onChange={(e) => {
@@ -119,6 +124,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                     ...trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos,
                                     {
                                       id: 0,
+                                      selectedDate: undefined,
                                       trainGroupId:
                                         selectedTimeSlot.trainGroupId,
                                       trainGroupDateId: x.trainGroupDateId,
@@ -127,29 +133,24 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                   ]
                                 : trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
                                     (y) =>
-                                      y.trainGroupDateId !== x.trainGroupDateId
+                                      y.selectedDate !== undefined ||
+                                      (y.selectedDate === undefined &&
+                                        y.trainGroupDateId !==
+                                          x.trainGroupDateId)
                                   ),
                             });
                           }}
-                          // disabled={selectedTimeSlot.spotsLeft <= 0}
                         />
                         <label
                           htmlFor={`recurrence-${x.trainGroupDateId}`}
                           className="ml-2"
                         >
                           {timeSlotRequestDto.selectedDate
-                            ? new Date(
-                                timeSlotRequestDto.selectedDate
-                              ).getDate() +
+                            ? new Date(x.date).getDate() +
                               "/" +
-                              (new Date(
-                                timeSlotRequestDto.selectedDate
-                              ).getMonth() +
-                                1) +
+                              (new Date(x.date).getMonth() + 1) +
                               "/" +
-                              new Date(
-                                timeSlotRequestDto.selectedDate
-                              ).getFullYear()
+                              new Date(x.date).getFullYear()
                             : ""}
                         </label>
                       </div>
@@ -157,15 +158,18 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                 </div>
               )}
 
-              {/* <h4>{"Reccuring Dates:"}</h4> */}
-              {selectedTimeSlot.recurrenceDates.filter(
+              {/*                        */}
+              {/*       DAY_OF_WEEK      */}
+              {/*                        */}
+              {selectedTimeSlot.recurrenceDates.some(
                 (x) =>
                   x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK
-              ).length > 0 && (
+              ) && (
                 <div className="field">
                   <p>
-                    <strong>{"Days of Week"}:</strong>
+                    <strong>Days of Week:</strong>
                   </p>
+
                   {selectedTimeSlot.recurrenceDates
                     .filter(
                       (x) =>
@@ -181,7 +185,9 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                           inputId={`recurrence-${x.trainGroupDateId}`}
                           checked={
                             trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                              (y) => y.trainGroupDateId == x.trainGroupDateId
+                              (y) =>
+                                y.selectedDate === undefined &&
+                                y.trainGroupDateId == x.trainGroupDateId
                             ).length === 1
                           }
                           onChange={(e) => {
@@ -191,6 +197,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                     ...trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos,
                                     {
                                       id: 0,
+                                      selectedDate: undefined,
                                       trainGroupId:
                                         selectedTimeSlot.trainGroupId,
                                       trainGroupDateId: x.trainGroupDateId,
@@ -199,11 +206,13 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                   ]
                                 : trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
                                     (y) =>
-                                      y.trainGroupDateId !== x.trainGroupDateId
+                                      y.selectedDate !== undefined ||
+                                      (y.selectedDate === undefined &&
+                                        y.trainGroupDateId !==
+                                          x.trainGroupDateId)
                                   ),
                             });
                           }}
-                          // disabled={selectedTimeSlot.spotsLeft <= 0}
                         />
                         <label
                           htmlFor={`recurrence-${x.trainGroupDateId}`}
@@ -216,10 +225,13 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                 </div>
               )}
 
-              {selectedTimeSlot.recurrenceDates.filter(
+              {/*                        */}
+              {/*       DAY_OF_MONTH     */}
+              {/*                        */}
+              {selectedTimeSlot.recurrenceDates.some(
                 (x) =>
                   x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH
-              ).length > 0 && (
+              ) && (
                 <div className="field">
                   <p>
                     <strong>{"Days of Month"}:</strong>
@@ -239,7 +251,9 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                           inputId={`recurrence-${x.trainGroupDateId}`}
                           checked={
                             trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
-                              (y) => y.trainGroupDateId == x.trainGroupDateId
+                              (y) =>
+                                y.selectedDate === undefined &&
+                                y.trainGroupDateId == x.trainGroupDateId
                             ).length === 1
                           }
                           onChange={(e) => {
@@ -258,11 +272,13 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                                   ]
                                 : trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.filter(
                                     (y) =>
-                                      y.trainGroupDateId !== x.trainGroupDateId
+                                      y.selectedDate !== undefined ||
+                                      (y.selectedDate === undefined &&
+                                        y.trainGroupDateId !==
+                                          x.trainGroupDateId)
                                   ),
                             });
                           }}
-                          // disabled={selectedTimeSlot.spotsLeft <= 0}
                         />
                         <label
                           htmlFor={`recurrence-${x.trainGroupDateId}`}

@@ -60,7 +60,7 @@ export default function TrainGroupsBookingCalendarPage() {
         (x) =>
           ({
             id: x.trainGroupParticipantId,
-            selectedDate: x.trainGroupDateId ? undefined : x.date,
+            selectedDate: x.trainGroupDateType ? undefined : x.date,
             trainGroupDateId: x.trainGroupDateId,
             userId: TokenService.getUserId(),
             trainGroupId: selectedTimeSlot.trainGroupId,

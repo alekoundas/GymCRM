@@ -58,8 +58,7 @@ namespace API.Controllers
                     StartOn = x.Key.StartOn,
                     TrainerId = x.Key.TrainerId,
                     TrainGroupId = x.Key.Id,
-                    //TrainGroupDateId = x.Id,
-                    RecurrenceDates = x
+                    RecurrenceDates = x.Key.TrainGroupDates
                         .Where(y => y.RecurrenceDayOfMonth.HasValue || y.RecurrenceDayOfWeek.HasValue)
                         .Select(y =>
                             new TimeSlotRecurrenceDateDto()
@@ -69,12 +68,13 @@ namespace API.Controllers
                                 Date = y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
                                     ? y.RecurrenceDayOfWeek!.Value
                                     : y.RecurrenceDayOfMonth!.Value,
-                                IsUserJoined = y.TrainGroupParticipants.Any(z => z.UserId == new Guid(timeSlotRequestDto.UserId)),
+                                //IsOneOff = false,
+                                IsUserJoined = y.TrainGroupParticipants.Where(z=>z.SelectedDate==null).Any(z => z.UserId == new Guid(timeSlotRequestDto.UserId)),
                                 TrainGroupParticipantId = y.TrainGroupParticipants.FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?.Id
                             }
                         )
                         .Concat(
-                            x
+                            x.Key.TrainGroupDates
                             .Where(y => y.FixedDay.HasValue)
                             .Select(y =>
                                 new TimeSlotRecurrenceDateDto()
@@ -82,31 +82,40 @@ namespace API.Controllers
                                     TrainGroupDateId = y.Id,
                                     TrainGroupDateType = y.TrainGroupDateType,
                                     Date = y.FixedDay!.Value,
+                                    //IsOneOff = false,
                                     IsUserJoined = y.TrainGroupParticipants.Any(z => z.UserId == new Guid(timeSlotRequestDto.UserId)),
                                     TrainGroupParticipantId = y.TrainGroupParticipants.FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?.Id
                                 }
                             )
                         )
                         .Concat(
-                            new List<TimeSlotRecurrenceDateDto>()
-                            {
-                                new TimeSlotRecurrenceDateDto()
-                                {
-                                    TrainGroupDateId = null,
-                                    TrainGroupDateType = null,
-                                    Date = timeSlotRequestDto.SelectedDate,
-                                    IsUserJoined = x.Key.TrainGroupParticipants
-                                        .Where(y => y.UserId == new Guid(timeSlotRequestDto.UserId))
-                                        .Where(y => y.SelectedDate.HasValue)
-                                        .Where(y => y.SelectedDate!.Value == timeSlotRequestDto.SelectedDate)
-                                        .Any(),
-                                    TrainGroupParticipantId =x.Key.TrainGroupParticipants
-                                        .Where(y => y.UserId == new Guid(timeSlotRequestDto.UserId))
-                                        .Where(y => y.SelectedDate.HasValue)
-                                        .Where(y => y.SelectedDate!.Value == timeSlotRequestDto.SelectedDate)
-                                        .FirstOrDefault()?.Id,
-                                }
-                            }
+                                x.Key.TrainGroupDates.Any(y => y.FixedDay == timeSlotRequestDto.SelectedDate)
+                                ?
+                                    new List<TimeSlotRecurrenceDateDto>()
+                                :
+                                    new List<TimeSlotRecurrenceDateDto>()
+                                    {
+                                        new TimeSlotRecurrenceDateDto()
+                                        {
+                                            TrainGroupDateId = x.Key.TrainGroupDates.First(y =>
+                                                y.FixedDay == timeSlotRequestDto.SelectedDate
+                                                || y.RecurrenceDayOfMonth?.Day == timeSlotRequestDto.SelectedDate.Day
+                                                || y.RecurrenceDayOfWeek?.DayOfWeek == timeSlotRequestDto.SelectedDate.DayOfWeek).Id,
+                                            TrainGroupDateType = null,
+                                            Date = timeSlotRequestDto.SelectedDate,
+                                            //IsOneOff=true,
+                                            IsUserJoined = x.Key.TrainGroupParticipants
+                                                .Where(y => y.UserId == new Guid(timeSlotRequestDto.UserId))
+                                                .Where(y => y.SelectedDate.HasValue)
+                                                .Where(y => y.SelectedDate!.Value == timeSlotRequestDto.SelectedDate)
+                                                .Any(),
+                                            TrainGroupParticipantId =x.Key.TrainGroupParticipants
+                                                .Where(y => y.UserId == new Guid(timeSlotRequestDto.UserId))
+                                                .Where(y => y.SelectedDate.HasValue)
+                                                .Where(y => y.SelectedDate!.Value == timeSlotRequestDto.SelectedDate)
+                                                .FirstOrDefault()?.Id,
+                                        }
+                                    }
                         )
                         .ToList(),
                     SpotsLeft =
@@ -148,7 +157,7 @@ namespace API.Controllers
             return errors.Count() > 0;
         }
 
-        private string[] ValidateTrainGroupDate( TrainGroupDate dto, int? excludeId = null)
+        private string[] ValidateTrainGroupDate(TrainGroupDate dto, int? excludeId = null)
         {
             var errorList = new List<string>();
 
