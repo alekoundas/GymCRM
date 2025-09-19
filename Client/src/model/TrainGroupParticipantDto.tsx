@@ -7,9 +7,9 @@ export interface TrainGroupParticipantDto {
 }
 
 export class TrainGroupParticipantDto {
-  id: number;
+  id: number = -1;
   selectedDate: string | undefined; // ISO 8601 string or null
   trainGroupDateId: number | undefined;
-  trainGroupId: number;
-  userId: string; // GUID as string
+  trainGroupId: number = -1;
+  userId: string = ""; // GUID as string
 }

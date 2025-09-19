@@ -9,7 +9,7 @@ export interface TrainGroupParticipantUpdateDto {
 
 export class TrainGroupParticipantUpdateDto {
   userId: string | undefined;
-  trainGroupId: number;
-  selectedDate: string;
+  trainGroupId: number = -1;
+  selectedDate: string = "";
   trainGroupParticipantDtos: TrainGroupParticipantDto[] = [];
 }

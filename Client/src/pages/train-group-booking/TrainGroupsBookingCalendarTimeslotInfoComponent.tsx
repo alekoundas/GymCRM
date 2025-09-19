@@ -48,166 +48,194 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
 
           <h3 className="mt-6">Group is occurring on </h3>
 
-          <p>
-            <strong>Current Date:</strong>{" "}
-          </p>
+          {/*                      */}
+          {/*     Current Date     */}
+          {/*                      */}
+          <div>
+            {selectedTimeSlot.recurrenceDates.some(
+              (x) => x.trainGroupDateType === undefined
+            ) && (
+              <>
+                <p>
+                  <strong>Current Date:</strong>{" "}
+                </p>
+                {selectedTimeSlot.recurrenceDates
+                  .filter((x) => x.trainGroupDateType === undefined)
+                  .map((x) => {
+                    if (x.isUserJoined)
+                      return (
+                        <Tag
+                          className="p-2 m-1"
+                          key={x.trainGroupDateId}
+                          severity={"success"}
+                        >
+                          {new Date(x.date).getDate() +
+                            "/" +
+                            (new Date(x.date).getMonth() + 1) +
+                            "/" +
+                            new Date(x.date).getFullYear()}
+                          {"  "}
+                          <i className="pi pi-check"></i>
+                        </Tag>
+                      );
+                    else
+                      return (
+                        <Tag
+                          className="p-2 m-1"
+                          key={x.trainGroupDateId}
+                        >
+                          {new Date(x.date).getDate() +
+                            "/" +
+                            (new Date(x.date).getMonth() + 1) +
+                            "/" +
+                            new Date(x.date).getFullYear()}
+                        </Tag>
+                      );
+                  })}
+              </>
+            )}
+          </div>
 
+          {/*                      */}
+          {/*       FIXED_DAY      */}
+          {/*                      */}
           <div>
             {selectedTimeSlot.recurrenceDates.some(
               (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
-            ) &&
-              selectedTimeSlot.recurrenceDates
-                .filter(
-                  (x) =>
-                    x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
-                )
-                .map((x) => {
-                  if (x.isUserJoined)
-                    return (
-                      <Tag
-                        className="p-2 m-1"
-                        key={x.trainGroupDateId}
-                        severity={"success"}
-                      >
-                        {new Date(x.date).getDate() +
-                          "/" +
-                          (new Date(x.date).getMonth() + 1) +
-                          "/" +
-                          new Date(x.date).getFullYear()}
-                        {"  "}
-                        <i className="pi pi-check"></i>
-                      </Tag>
-                    );
-                  else
-                    return (
-                      <Tag
-                        className="p-2 m-1"
-                        key={x.trainGroupDateId}
-                      >
-                        {new Date(x.date).getDate() +
-                          "/" +
-                          (new Date(x.date).getMonth() + 1) +
-                          "/" +
-                          new Date(x.date).getFullYear()}
-                      </Tag>
-                    );
-                })}
+            ) && (
+              <>
+                <p>
+                  <strong>{"Fixed Date"}:</strong>
+                </p>
+                {selectedTimeSlot.recurrenceDates
+                  .filter(
+                    (x) =>
+                      x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
+                  )
+                  .map((x) => {
+                    if (x.isUserJoined)
+                      return (
+                        <Tag
+                          className="p-2 m-1"
+                          key={x.trainGroupDateId}
+                          severity={"success"}
+                        >
+                          {new Date(x.date).getDate() +
+                            "/" +
+                            (new Date(x.date).getMonth() + 1) +
+                            "/" +
+                            new Date(x.date).getFullYear()}
+                          {"  "}
+                          <i className="pi pi-check"></i>
+                        </Tag>
+                      );
+                    else
+                      return (
+                        <Tag
+                          className="p-2 m-1"
+                          key={x.trainGroupDateId}
+                        >
+                          {new Date(x.date).getDate() +
+                            "/" +
+                            (new Date(x.date).getMonth() + 1) +
+                            "/" +
+                            new Date(x.date).getFullYear()}
+                        </Tag>
+                      );
+                  })}
+              </>
+            )}
           </div>
 
+          {/*                        */}
+          {/*       DAY_OF_WEEK      */}
+          {/*                        */}
           <div>
-            {!selectedTimeSlot.recurrenceDates.some(
-              (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
-            ) &&
-              selectedTimeSlot.recurrenceDates
-                .filter((x) => x.trainGroupDateType === undefined)
-                .map((x) => {
-                  if (x.isUserJoined)
-                    return (
-                      <Tag
-                        className="p-2 m-1"
-                        key={x.trainGroupDateId}
-                        severity={"success"}
-                      >
-                        {new Date(x.date).getDate() +
-                          "/" +
-                          (new Date(x.date).getMonth() + 1) +
-                          "/" +
-                          new Date(x.date).getFullYear()}
-                        {"  "}
-                        <i className="pi pi-check"></i>
-                      </Tag>
-                    );
-                  else
-                    return (
-                      <Tag
-                        className="p-2 m-1"
-                        key={x.trainGroupDateId}
-                      >
-                        {new Date(x.date).getDate() +
-                          "/" +
-                          (new Date(x.date).getMonth() + 1) +
-                          "/" +
-                          new Date(x.date).getFullYear()}
-                      </Tag>
-                    );
-                })}
+            {selectedTimeSlot.recurrenceDates.some(
+              (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK
+            ) && (
+              <>
+                <p>
+                  <strong>Days of the week:</strong>
+                </p>
+
+                {selectedTimeSlot.recurrenceDates
+                  .filter(
+                    (x) =>
+                      x.trainGroupDateType ===
+                      TrainGroupDateTypeEnum.DAY_OF_WEEK
+                  )
+                  .map((x) => {
+                    if (x.isUserJoined)
+                      return (
+                        <Tag
+                          className="p-2 m-1"
+                          key={x.trainGroupDateId}
+                          severity={"success"}
+                        >
+                          {DateService.getDayOfWeekFromDate(new Date(x.date))}{" "}
+                          <i className="pi pi-check"></i>
+                        </Tag>
+                      );
+                    else
+                      return (
+                        <Tag
+                          className="p-2 m-1"
+                          key={x.trainGroupDateId}
+                        >
+                          {DateService.getDayOfWeekFromDate(new Date(x.date))}
+                        </Tag>
+                      );
+                  })}
+              </>
+            )}
           </div>
 
-          {selectedTimeSlot.recurrenceDates.filter(
-            (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK
-          ).length > 0 ? (
-            <p>
-              <strong>Days of the week:</strong>
-            </p>
-          ) : null}
-
+          {/*                        */}
+          {/*       DAY_OF_MONTH     */}
+          {/*                        */}
           <div>
-            {selectedTimeSlot.recurrenceDates
-              .filter(
-                (x) =>
-                  x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK
-              )
-              .map((x) => {
-                if (x.isUserJoined)
-                  return (
-                    <Tag
-                      className="p-2 m-1"
-                      key={x.trainGroupDateId}
-                      severity={"success"}
-                    >
-                      {DateService.getDayOfWeekFromDate(new Date(x.date))}{" "}
-                      <i className="pi pi-check"></i>
-                    </Tag>
-                  );
-                else
-                  return (
-                    <Tag
-                      className="p-2 m-1"
-                      key={x.trainGroupDateId}
-                    >
-                      {DateService.getDayOfWeekFromDate(new Date(x.date))}
-                    </Tag>
-                  );
-              })}
+            {selectedTimeSlot.recurrenceDates.some(
+              (x) =>
+                x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH
+            ) && (
+              <>
+                <p>
+                  <strong>Days of the month:</strong>
+                </p>
+
+                {selectedTimeSlot.recurrenceDates
+                  .filter(
+                    (x) =>
+                      x.trainGroupDateType ===
+                      TrainGroupDateTypeEnum.DAY_OF_MONTH
+                  )
+                  .map((x) => {
+                    if (x.isUserJoined)
+                      return (
+                        <Tag
+                          className="p-2 m-1"
+                          key={x.trainGroupDateId}
+                          severity={"success"}
+                        >
+                          {new Date(x.date).getDate()}{" "}
+                          <i className="pi pi-check"></i>
+                        </Tag>
+                      );
+                    else
+                      return (
+                        <Tag
+                          className="p-2 m-1"
+                          key={x.trainGroupDateId}
+                        >
+                          {new Date(x.date).getDate()}
+                        </Tag>
+                      );
+                  })}
+              </>
+            )}
           </div>
 
-          {selectedTimeSlot.recurrenceDates.filter(
-            (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH
-          ).length > 0 ? (
-            <p>
-              <strong>Days of the month:</strong>
-            </p>
-          ) : null}
-
-          <div>
-            {selectedTimeSlot.recurrenceDates
-              .filter(
-                (x) =>
-                  x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH
-              )
-              .map((x) => {
-                if (x.isUserJoined)
-                  return (
-                    <Tag
-                      className="p-2 m-1"
-                      key={x.trainGroupDateId}
-                      severity={"success"}
-                    >
-                      {new Date(x.date).getDate()}{" "}
-                      <i className="pi pi-check"></i>
-                    </Tag>
-                  );
-                else
-                  return (
-                    <Tag
-                      className="p-2 m-1"
-                      key={x.trainGroupDateId}
-                    >
-                      {new Date(x.date).getDate()}
-                    </Tag>
-                  );
-              })}
-          </div>
           <div className="flex justify-content-center">
             <Button
               label="Book Now"

@@ -75,7 +75,7 @@ namespace API.Controllers
 
             // Check for duplicate participants
             var duplicateParticipants = entityDto.TrainGroupParticipants
-               .GroupBy(x => new { x.SelectedDate, x.TrainGroupDateId}) // Group by composite key
+               .GroupBy(x => new { x.SelectedDate, x.TrainGroupDateId }) // Group by composite key
                .Where(g => g.Count() > 1)                               // Find groups with more than one item
                .ToList();
             if (duplicates.Count() > 0)
@@ -84,17 +84,20 @@ namespace API.Controllers
 
 
             // Check for TrainGroup participant selected date validity
-            bool isTrainGroupParticipantValid =
-                !entityDto.TrainGroupParticipants
-                    .Where(x => x.SelectedDate.HasValue)
-                    .Any(x =>
-                        entityDto.TrainGroupDates.Any(y =>
-                            x.SelectedDate == y.FixedDay
-                            || x.SelectedDate!.Value.Day == y.RecurrenceDayOfMonth?.Day
-                            || x.SelectedDate!.Value.DayOfWeek == y.RecurrenceDayOfWeek?.DayOfWeek)
-                    );
-            if (isTrainGroupParticipantValid)
-                errorList.Add("Participant selected date doesnt match any of the Train Group Dates!");
+            if (entityDto.TrainGroupParticipants.Count() > 0)
+            {
+                bool isTrainGroupParticipantValid =
+                    !entityDto.TrainGroupParticipants
+                        .Where(x => x.SelectedDate.HasValue)
+                        .Any(x =>
+                            entityDto.TrainGroupDates.Any(y =>
+                                x.SelectedDate == y.FixedDay
+                                || x.SelectedDate!.Value.Day == y.RecurrenceDayOfMonth?.Day
+                                || x.SelectedDate!.Value.DayOfWeek == y.RecurrenceDayOfWeek?.DayOfWeek)
+                        );
+                if (isTrainGroupParticipantValid)
+                    errorList.Add("Participant selected date doesnt match any of the Train Group Dates!");
+            }
 
             errors = errorList.ToArray();
             return errors.Length > 0;
