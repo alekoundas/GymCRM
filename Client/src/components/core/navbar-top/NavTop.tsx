@@ -169,7 +169,10 @@ function NavTop() {
       (items[0].items as MenuItem[])?.push({
         label: "Logout",
         icon: "pi pi-user",
-        command: () => ApiService.logout(logout),
+        command: () => {
+          ApiService.logout(logout);
+          navigate("/users/login");
+        },
       });
       (items[0].items as MenuItem[])?.push({
         label: "Profile",
