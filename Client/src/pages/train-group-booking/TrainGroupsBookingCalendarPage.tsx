@@ -68,6 +68,7 @@ export default function TrainGroupsBookingCalendarPage() {
       );
 
     updateTrainGroupDateParticipantUpdateDto({
+      userId: TokenService.getUserId(),
       trainGroupParticipantDtos: trainGroupParticipants,
     });
     setDialogVisibility(true);

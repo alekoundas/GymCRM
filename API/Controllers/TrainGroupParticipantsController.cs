@@ -141,6 +141,7 @@ namespace API.Controllers
             {
                 int numberOfParticipants = existingParticipants
                     .Where(x => incomingParticipant.TrainGroupDateId == x.TrainGroupDateId)
+                    .Where(x => incomingParticipant.SelectedDate == null ? x.SelectedDate == null : true) // If SelectedDate is not set, check only for non one-off participants
                     .Where(x => !incomingParticipant.TrainGroupParticipantUnavailableDates.Any(y =>
                         y.UnavailableDate == x.TrainGroupDate.FixedDay ||
                         y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth?.Day ||
@@ -246,7 +247,7 @@ namespace API.Controllers
                 .Where(x => excludeParticipantId == null || x.Id != excludeParticipantId) // Used in PUT
                 .Where(x => x.SelectedDate == null || x.SelectedDate.Value.Date >= DateTime.UtcNow.Date)
                 .Any(x => x.TrainGroupDateId == participantDto.TrainGroupDateId);
-           
+
 
             if (isAlreadyParticipant)
                 errorList.Add("Participant already joined!");
