@@ -1,24 +1,23 @@
-﻿using Google.Apis.Auth.OAuth2;
+﻿using Core.Models;
+using Google.Apis.Auth.OAuth2;
 using Google.Apis.Gmail.v1;
 using Google.Apis.Gmail.v1.Data;
 using Google.Apis.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MimeKit;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Business.Services.Email
 {
     public class GmailEmailService : IEmailService
     {
+        private readonly IDataService _dataService;
         private readonly IConfiguration _configuration;
         private readonly ILogger<GmailEmailService> _logger;
 
-        public GmailEmailService(IConfiguration configuration, ILogger<GmailEmailService> logger)
+        public GmailEmailService(IDataService dataService, IConfiguration configuration, ILogger<GmailEmailService> logger)
         {
+            _dataService = dataService;
             _configuration = configuration;
             _logger = logger;
         }
@@ -43,16 +42,6 @@ namespace Business.Services.Email
 
             try
             {
-                // Replace this block:
-                /*
-                var credential = new GoogleCredential(new ClientSecrets
-                {
-                    ClientId = clientId,
-                    ClientSecret = clientSecret
-                }, new[] { GmailService.Scope.GmailSend }, refreshToken);
-                */
-
-                // With the following code:
                 var credential = GoogleCredential
                     .FromJson($@"{{
                         ""client_id"": ""{clientId}"",
@@ -62,14 +51,14 @@ namespace Business.Services.Email
                     }}")
                     .CreateScoped(GmailService.Scope.GmailSend);
 
-                // Initialize Gmail service
+                // Initialize Gmail service.
                 var service = new GmailService(new BaseClientService.Initializer
                 {
                     HttpClientInitializer = credential,
                     ApplicationName = "GymCRM"
                 });
 
-                // Create email
+                // Create email.
                 var mimeMessage = new MimeMessage();
                 mimeMessage.From.Add(new MailboxAddress(fromName, fromEmail));
                 mimeMessage.To.Add(new MailboxAddress(to, to));
@@ -81,7 +70,7 @@ namespace Business.Services.Email
                 };
                 mimeMessage.Body = bodyBuilder.ToMessageBody();
 
-                // Convert to raw base64
+                // Convert to raw base64.
                 using var stream = new MemoryStream();
                 await mimeMessage.WriteToAsync(stream);
                 var rawMessage = Convert.ToBase64String(stream.ToArray())
@@ -89,10 +78,20 @@ namespace Business.Services.Email
                     .Replace('/', '_')
                     .Replace("=", "");
 
-                // Send email
+                // Send email.
                 var message = new Message { Raw = rawMessage };
                 var request = service.Users.Messages.Send(message, username);
                 await request.ExecuteAsync();
+
+                // Save mail to database.
+                User? user = await _dataService.Users.FirstOrDefaultAsync(x => x.Email == to);
+                if (user != null)
+                    _dataService.Mails.Add(new Mail
+                    {
+                        UserId = user.Id,
+                        Subject = subject,
+                        Body = htmlBody ?? plainTextBody,
+                    });
 
                 _logger.LogInformation("Email sent successfully to {To}", to);
             }

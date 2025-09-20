@@ -17,6 +17,44 @@ namespace DataAccess.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.19");
 
+            modelBuilder.Entity("Core.Models.Mail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Mails");
+                });
+
             modelBuilder.Entity("Core.Models.PhoneNumber", b =>
                 {
                     b.Property<int>("Id")
@@ -257,7 +295,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("TrainGroupParticipantId");
 
-                    b.ToTable("TrainGroupParticipantUnavailableDate");
+                    b.ToTable("TrainGroupParticipantUnavailableDates");
                 });
 
             modelBuilder.Entity("Core.Models.User", b =>
@@ -487,6 +525,17 @@ namespace DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Core.Models.Mail", b =>
+                {
+                    b.HasOne("Core.Models.User", "User")
+                        .WithMany("Mails")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Core.Models.PhoneNumber", b =>
                 {
                     b.HasOne("Core.Models.User", "User")
@@ -649,6 +698,8 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Core.Models.User", b =>
                 {
+                    b.Navigation("Mails");
+
                     b.Navigation("PhoneNumbers");
 
                     b.Navigation("TrainGroupDatesCancellationSubscriber");

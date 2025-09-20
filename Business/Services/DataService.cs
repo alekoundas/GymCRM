@@ -13,8 +13,11 @@ namespace Business.Services
 
         // Repositories.
         public IGenericRepository<User> Users { get; }
+        public IGenericRepository<Mail> Mails { get; }
         public IGenericRepository<TrainGroup> TrainGroups { get; }
         public IGenericRepository<PhoneNumber> PhoneNumbers { get; }
+
+
         public IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
         public IGenericRepository<TrainGroupParticipant> TrainGroupParticipants { get; }
         public IGenericRepository<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; }
@@ -30,26 +33,30 @@ namespace Business.Services
         public DataService(
             IDbContextFactory<ApiDbContext> dbContextFactory,
             IGenericRepository<User> userRepository,
+            IGenericRepository<Mail> mailRepository,
             IGenericRepository<TrainGroup> trainGroupRepository,
             IGenericRepository<PhoneNumber> phoneNumberRepository,
+            IGenericRepository<IdentityRole<Guid>> roleRepository,
             IGenericRepository<TrainGroupDate> trainGroupDateRepository,
+            IGenericRepository<IdentityUserRole<Guid>> userRoleRepository,
+            IGenericRepository<IdentityRoleClaim<Guid>> roleClaimRepository,
             IGenericRepository<TrainGroupParticipant> trainGroupParticipantRepository,
             IGenericRepository<TrainGroupDateCancellationSubscriber> trainGroupCancellationSubscriberRepository,
-            IGenericRepository<TrainGroupParticipantUnavailableDate> trainGroupParticipantUnavailableDateRepository,
-            IGenericRepository<IdentityRole<Guid>> roleRepository,
-            IGenericRepository<IdentityRoleClaim<Guid>> roleClaimRepository,
-            IGenericRepository<IdentityUserRole<Guid>> userRoleRepository)
+            IGenericRepository<TrainGroupParticipantUnavailableDate> trainGroupParticipantUnavailableDateRepository)
         {
             _dbContextFactory = dbContextFactory;
 
             // Repositories.
             Users = userRepository;
             TrainGroups = trainGroupRepository;
+            PhoneNumbers = phoneNumberRepository;
+            Mails = mailRepository;
+
+            // TrainGroup.
             TrainGroupDates = trainGroupDateRepository;
             TrainGroupParticipants = trainGroupParticipantRepository;
             TrainGroupCancellationSubscribers = trainGroupCancellationSubscriberRepository;
             TrainGroupParticipantUnavailableDates = trainGroupParticipantUnavailableDateRepository;
-            PhoneNumbers = phoneNumberRepository;
 
 
             // Identity.
@@ -66,6 +73,8 @@ namespace Business.Services
                 return (IGenericRepository<TEntity>)TrainGroups;
             if (typeof(TEntity) == typeof(PhoneNumber))
                 return (IGenericRepository<TEntity>)PhoneNumbers;
+            if (typeof(TEntity) == typeof(Mail))
+                return (IGenericRepository<TEntity>)Mails;
             if (typeof(TEntity) == typeof(TrainGroupDate))
                 return (IGenericRepository<TEntity>)TrainGroupDates;
             if (typeof(TEntity) == typeof(TrainGroupParticipant))
@@ -80,6 +89,7 @@ namespace Business.Services
                 return (IGenericRepository<TEntity>)UserRoles;
             if (typeof(TEntity) == typeof(IdentityRoleClaim<Guid>))
                 return (IGenericRepository<TEntity>)RoleClaims;
+
             throw new InvalidOperationException($"No repository found for type {typeof(TEntity).Name}");
         }
 

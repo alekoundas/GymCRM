@@ -18,13 +18,14 @@ namespace DataAccess
             _configuration = configuration;
         }
 
+        public DbSet<Mail> Mails { get; set; }
         public DbSet<TrainGroup> TrainGroups { get; set; }
         public DbSet<PhoneNumber> PhoneNumbers { get; set; }
         public DbSet<TrainGroupDate> TrainGroupDates { get; set; }
-        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
         public DbSet<TrainGroupParticipant> TrainGroupParticipants { get; set; }
         public DbSet<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; set; }
-
+        public DbSet<TrainGroupParticipantUnavailableDate> TrainGroupParticipantUnavailableDates { get; set; }
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -42,6 +43,7 @@ namespace DataAccess
             base.OnModelCreating(builder);
 
             builder.ApplyConfiguration(new UserConfiguration());
+            builder.ApplyConfiguration(new MailConfiguration());
             builder.ApplyConfiguration(new TrainGroupConfiguration());
             builder.ApplyConfiguration(new PhoneNumberConfiguration());
             builder.ApplyConfiguration(new TrainGroupDateConfiguration());

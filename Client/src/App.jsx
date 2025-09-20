@@ -19,6 +19,7 @@ import TrainGroupAdminFormPage from "./pages/train-group-admin/TrainGroupAdminFo
 import UserProfilePage from "./pages/user/UserProfilePage.tsx";
 import UserPasswordForgotPage from "./pages/user/UserPasswordForgotPage.tsx";
 import UserPasswordResetPage from "./pages/user/UserPasswordResetPage.tsx";
+import MailsPage from "./pages/mail/MailsPage.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -91,6 +92,11 @@ export default function App() {
                 <Route
                   path="train-groups/:id/view"
                   element={<TrainGroupAdminFormPage />}
+                />
+
+                <Route
+                  path="emails"
+                  element={<MailsPage />}
                 />
 
                 {/* Users */}
