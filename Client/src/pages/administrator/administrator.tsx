@@ -7,6 +7,7 @@ import RolesPage from "../role/RolesPage";
 import UsersPage from "../user/UsersPage";
 import TrainGroupAdminFormPage from "../train-group-admin/TrainGroupAdminFormPage";
 import { FormMode } from "../../enum/FormMode";
+import MailsPage from "../mail/MailsPage";
 
 export default function Administrator() {
   return (
@@ -41,6 +42,11 @@ export default function Administrator() {
               <Route
                 path="train-groups/:id/edit"
                 element={<TrainGroupAdminFormPage formMode={FormMode.EDIT} />}
+              />
+
+              <Route
+                path="emails"
+                element={<MailsPage />}
               />
 
               {/* Users */}

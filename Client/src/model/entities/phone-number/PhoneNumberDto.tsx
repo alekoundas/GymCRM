@@ -6,7 +6,7 @@ export interface PhoneNumberDto {
 }
 export class PhoneNumberDto {
   id?: number = 0; // Optional for new phone numbers
-  number: string;
-  isPrimary: boolean;
+  number: string = "";
+  isPrimary: boolean = false;
   userId?: string = "";
 }

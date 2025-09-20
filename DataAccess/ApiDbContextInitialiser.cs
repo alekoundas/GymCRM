@@ -73,18 +73,21 @@ namespace DataAccess
 
                 var claims = new List<Claim>
                 {
-                    new Claim("Permission", "ContactInformations_View"),
-                    new Claim("Permission", "ContactInformations_Add"),
-                    new Claim("Permission", "ContactInformations_Edit"),
-                    new Claim("Permission", "ContactInformations_Delete"),
                     new Claim("Permission", "Roles_View"),
                     new Claim("Permission", "Roles_Add"),
                     new Claim("Permission", "Roles_Edit"),
                     new Claim("Permission", "Roles_Delete"),
+
                     new Claim("Permission", "Users_View"),
                     new Claim("Permission", "Users_Add"),
                     new Claim("Permission", "Users_Edit"),
                     new Claim("Permission", "Users_Delete"),
+
+                    new Claim("Permission", "Mails_View"),
+                    new Claim("Permission", "Mails_Add"),
+                    new Claim("Permission", "Mails_Edit"),
+                    new Claim("Permission", "Mails_Delete"),
+
                     //new Claim("Permission", "Claims_View"),
                     //new Claim("Permission", "Claims_Add"),
                     //new Claim("Permission", "Claims_Edit"),
@@ -93,10 +96,12 @@ namespace DataAccess
                     new Claim("Permission", "TrainGroups_Add"),
                     new Claim("Permission", "TrainGroups_Edit"),
                     new Claim("Permission", "TrainGroups_Delete"),
+
                     new Claim("Permission", "TrainGroupDates_View"),
                     new Claim("Permission", "TrainGroupDates_Add"),
                     new Claim("Permission", "TrainGroupDates_Edit"),
                     new Claim("Permission", "TrainGroupDates_Delete"),
+
                     new Claim("Permission", "TrainGroupParticipants_View"),
                     new Claim("Permission", "TrainGroupParticipants_Add"),
                     new Claim("Permission", "TrainGroupParticipants_Edit"),
@@ -124,14 +129,21 @@ namespace DataAccess
 
                 var claims = new List<Claim>
                 {
+                    new Claim("Permission", "Mails_View"),
+                    new Claim("Permission", "Mails_Add"),
+                    new Claim("Permission", "Mails_Edit"),
+                    new Claim("Permission", "Mails_Delete"),
+
                     new Claim("Permission", "TrainGroups_View"),
                     new Claim("Permission", "TrainGroups_Add"),
                     new Claim("Permission", "TrainGroups_Edit"),
                     new Claim("Permission", "TrainGroups_Delete"),
+
                     new Claim("Permission", "TrainGroupDates_View"),
                     new Claim("Permission", "TrainGroupDates_Add"),
                     new Claim("Permission", "TrainGroupDates_Edit"),
                     new Claim("Permission", "TrainGroupDates_Delete"),
+
                     new Claim("Permission", "TrainGroupParticipants_View"),
                     new Claim("Permission", "TrainGroupParticipants_Add"),
                     new Claim("Permission", "TrainGroupParticipants_Edit"),

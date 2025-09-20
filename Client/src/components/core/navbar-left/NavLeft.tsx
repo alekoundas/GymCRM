@@ -56,6 +56,21 @@ export default function NavLeft() {
         },
       ],
     },
+
+    {
+      label: "Email",
+      visible: TokenService.isUserAllowed("Mails_View"),
+      items: [
+        {
+          label: "Emails",
+          icon: "pi pi-envelope",
+          visible: TokenService.isUserAllowed("Mails_View"),
+          command: () => {
+            navigate("/administrator/emails");
+          },
+        },
+      ],
+    },
     // {
     //   label: "Lookups",
     //   items: [

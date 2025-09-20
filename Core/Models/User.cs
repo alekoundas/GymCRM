@@ -11,12 +11,14 @@ namespace Core.Models
         public byte[]? ProfileImage { get; set; }
 
 
+        public virtual ICollection<Mail> Mails { get; set; } = new Collection<Mail>();
         public virtual ICollection<PhoneNumber> PhoneNumbers { get; set; } = new Collection<PhoneNumber>();
+
+
 
         // TrainGroup.
         public virtual ICollection<TrainGroup> TrainGroups { get; set; } = new Collection<TrainGroup>();
         public virtual ICollection<TrainGroupParticipant> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipant>();
         public virtual ICollection<TrainGroupDateCancellationSubscriber> TrainGroupDatesCancellationSubscriber { get; set; } = new Collection<TrainGroupDateCancellationSubscriber>();
-
     }
 }

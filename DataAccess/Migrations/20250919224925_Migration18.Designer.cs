@@ -3,6 +3,7 @@ using System;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,14 +11,16 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250919224925_Migration18")]
+    partial class Migration18
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.19");
 
-            modelBuilder.Entity("Core.Models.Mail", b =>
+            modelBuilder.Entity("Core.Models.EmailHistory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -52,7 +55,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Mails");
+                    b.ToTable("EmailHistory");
                 });
 
             modelBuilder.Entity("Core.Models.PhoneNumber", b =>
@@ -90,7 +93,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PhoneNumbers");
+                    b.ToTable("PhoneNumber");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroup", b =>
@@ -138,7 +141,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("TrainerId");
 
-                    b.ToTable("TrainGroups");
+                    b.ToTable("TrainGroup");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroupDate", b =>
@@ -181,7 +184,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("TrainGroupId");
 
-                    b.ToTable("TrainGroupDates");
+                    b.ToTable("TrainGroupDate");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroupDateCancellationSubscriber", b =>
@@ -219,7 +222,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TrainGroupCancellationSubscribers");
+                    b.ToTable("TrainGroupDateCancellationSubscriber");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
@@ -262,7 +265,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TrainGroupParticipants");
+                    b.ToTable("TrainGroupParticipant");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroupParticipantUnavailableDate", b =>
@@ -295,7 +298,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("TrainGroupParticipantId");
 
-                    b.ToTable("TrainGroupParticipantUnavailableDates");
+                    b.ToTable("TrainGroupParticipantUnavailableDate");
                 });
 
             modelBuilder.Entity("Core.Models.User", b =>
@@ -525,10 +528,10 @@ namespace DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Models.Mail", b =>
+            modelBuilder.Entity("Core.Models.EmailHistory", b =>
                 {
                     b.HasOne("Core.Models.User", "User")
-                        .WithMany("Mails")
+                        .WithMany("EmailHistories")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -698,7 +701,7 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Core.Models.User", b =>
                 {
-                    b.Navigation("Mails");
+                    b.Navigation("EmailHistories");
 
                     b.Navigation("PhoneNumbers");
 

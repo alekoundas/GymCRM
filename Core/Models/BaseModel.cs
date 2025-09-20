@@ -8,6 +8,6 @@
 
         public string CreatedBy_FullName { get; set; } = string.Empty;
 
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
     }
 }
