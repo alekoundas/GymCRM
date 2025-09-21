@@ -34,6 +34,15 @@ export default function UserProfilePage() {
   const [showChangePasswordDialog, setShowChangePasswordDialog] =
     useState(false);
 
+  // Compute display image src (prefix plain base64 if needed)
+  const getDisplayImageSrc = (
+    profileImage: string | undefined
+  ): string | undefined => {
+    if (!profileImage) return undefined;
+    if (profileImage.startsWith("data:")) return profileImage;
+    return `data:image/png;base64,${profileImage}`;
+  };
+
   // Load initial data.
   useEffect(() => {
     resetUserDto();
@@ -41,6 +50,13 @@ export default function UserProfilePage() {
       const userId = TokenService.getUserId();
       if (userId) {
         const response = await ApiService.get<UserDto>("Users", userId);
+        // Prefix for display if it's plain base64 from API
+        if (
+          response?.profileImage &&
+          !response.profileImage.startsWith("data:")
+        ) {
+          response.profileImage = `data:image/png;base64,${response.profileImage}`;
+        }
         setUserDto(response as UserDto);
       }
 
@@ -50,7 +66,7 @@ export default function UserProfilePage() {
     loadUser();
   }, []);
 
-  // Handle image upload (unchanged)
+  // Handle image upload
   const handleImageUpload = async (event: FileUploadHandlerEvent) => {
     const file = event.files[0];
     if (!file) return;
@@ -58,15 +74,29 @@ export default function UserProfilePage() {
     try {
       const reader = new FileReader();
       reader.onload = async () => {
-        const base64Image = reader.result as string;
+        const fullDataUrl = reader.result as string;
+        // Keep full data URL in DTO for display
+        userDto.profileImage = fullDataUrl;
 
-        userDto.profileImage = base64Image;
+        // Extract plain base64 for API (split removes 'data:image/png;base64,' prefix)
+        const plainBase64 = fullDataUrl.split(",")[1];
+
+        // Create a copy for update with plain base64
+        const updateDto: UserDto = { ...userDto, profileImage: plainBase64 };
+
         const response = await ApiService.update<UserDto>(
           "Users",
-          userDto,
+          updateDto,
           userDto.id
         );
         if (response) {
+          // Prefix response for display (API returns plain base64)
+          if (
+            response.profileImage &&
+            !response.profileImage.startsWith("data:")
+          ) {
+            response.profileImage = `data:image/png;base64,${response.profileImage}`;
+          }
           updateUserDto(response);
         }
       };
@@ -92,6 +122,7 @@ export default function UserProfilePage() {
       const initials = `${userDto.firstName.charAt(0)}${userDto.lastName.charAt(
         0
       )}`.toUpperCase();
+      const imageSrc = getDisplayImageSrc(userDto.profileImage ?? "");
       return (
         <div
           style={{ position: "relative", display: "inline-block" }}
@@ -99,20 +130,20 @@ export default function UserProfilePage() {
           onMouseLeave={() => setIsImageHovered(false)}
         >
           <Avatar
-            image={userDto.profileImage ?? ""}
-            label={userDto.profileImage ? undefined : initials}
+            image={imageSrc ?? ""}
+            label={imageSrc ? undefined : initials}
             shape="circle"
             size="xlarge"
             style={{
               width: "80px",
               height: "80px",
-              backgroundColor: userDto.profileImage
+              backgroundColor: imageSrc
                 ? "transparent"
                 : "var(--primary-color)",
-              color: userDto.profileImage ? "transparent" : "var(--surface-a)",
+              color: imageSrc ? "transparent" : "var(--surface-a)",
               fontSize: "2rem",
               transition: "opacity 0.3s",
-              opacity: isImageHovered && userDto.profileImage ? 0.7 : 1,
+              opacity: isImageHovered && imageSrc ? 0.7 : 1,
             }}
           />
           {(isImageHovered || isImageUploadSelected) && (

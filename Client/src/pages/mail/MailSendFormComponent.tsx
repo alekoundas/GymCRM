@@ -27,41 +27,34 @@ export default function MailSendFormComponent({ formMode }: IField) {
     mailSendDto.users || []
   );
 
-  // Filter users for AutoComplete suggestions
-  // const searchUsers = (event: { query: string }) => {
-  //   const query = event.query.toLowerCase();
-  //   const filtered = allUsers.filter(
-  //     (user) =>
-  //       user.firstName.toLowerCase().includes(query) ||
-  //       user.lastName.toLowerCase().includes(query) ||
-  //       user.email.toLowerCase().includes(query)
-  //   );
-  //   setFilteredUsers(filtered);
-  // };
-
-  // Handle user selection
+  const getDisplayImageSrc = (
+    profileImage: string | undefined
+  ): string | undefined => {
+    if (!profileImage) return undefined;
+    if (profileImage.startsWith("data:")) return profileImage;
+    return `data:image/png;base64,${profileImage}`;
+  };
 
   // Custom suggestion template for AutoComplete
   const userTemplate = (user: UserDto) => {
+    const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
+      0
+    )}`.toUpperCase();
+    const imageSrc = getDisplayImageSrc(user.profileImage ?? "");
+
+    const avatar = (
+      <Avatar
+        image={imageSrc ?? ""}
+        label={imageSrc ? undefined : initials}
+        shape="circle"
+        size="normal"
+        className=" mr-2 "
+      />
+    );
+
     return (
-      <div className="flex align-items-center">
-        {user.profileImage ? (
-          <img
-            src={user.profileImage}
-            alt={`${user.firstName} ${user.lastName}`}
-            style={{
-              width: "24px",
-              height: "24px",
-              borderRadius: "50%",
-              marginRight: "8px",
-            }}
-          />
-        ) : (
-          <i
-            className="pi pi-user"
-            style={{ marginRight: "8px" }}
-          />
-        )}
+      <div className="flex">
+        {user.profileImage ? avatar : <i className="pi pi-user mr-2" />}
         <div>
           {user.firstName} {user.lastName} ({user.email})
         </div>
@@ -74,19 +67,15 @@ export default function MailSendFormComponent({ formMode }: IField) {
     const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
       0
     )}`.toUpperCase();
+    const imageSrc = getDisplayImageSrc(user.profileImage ?? "");
     return (
-      <p className="m-0 p-0">
+      <p className="flex m-0 p-0 align-items-center">
         <Avatar
-          image={user.profileImage ?? ""}
-          label={user.profileImage ? undefined : initials}
+          image={imageSrc ?? ""}
+          label={imageSrc ? undefined : initials}
           shape="circle"
           size="normal"
-          style={{
-            backgroundColor: user.profileImage
-              ? "transparent"
-              : "var(--primary-color)",
-            color: user.profileImage ? "transparent" : "var(--surface-a)",
-          }}
+          className=" mr-2 "
         />
         {" " +
           user.firstName[0].toUpperCase() +
