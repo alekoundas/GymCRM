@@ -10,9 +10,10 @@ import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import ApiService from "../../services/ApiService";
-import MailFormComponent from "./MailFormComponent";
+
 import { useMailStore } from "../../stores/MailStore";
-import { MailDto } from "../../model/entities/email-history/EmailHistoryDto";
+import MailFormComponent from "./MailFormComponent";
+import { MailDto } from "../../model/entities/mail/MailDto";
 
 export default function MailsPage() {
   const { mailDto, setMailDto, resetMailDto, updateMailDto } = useMailStore();
@@ -159,7 +160,7 @@ export default function MailsPage() {
             onButtonClick={onDataTableClick}
             enableGridRowActions={true}
             filterDisplay={DataTableFilterDisplayEnum.ROW}
-            enableAddAction={true}
+            enableAddAction={false}
             dataTableColumns={dataTableColumns}
             triggerRefreshData={triggerRefreshDataTable}
             authorize={true}

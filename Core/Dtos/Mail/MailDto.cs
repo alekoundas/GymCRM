@@ -7,7 +7,7 @@ namespace Core.Dtos.Mail
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Subject is required")]
-        [StringLength(200,ErrorMessage ="Subject length must be between 5 and 200 character long!",MinimumLength =5)]
+        [StringLength(200, ErrorMessage = "Subject length must be between 5 and 200 character long!", MinimumLength = 5)]
         public string Subject { get; set; } = string.Empty;
 
 
