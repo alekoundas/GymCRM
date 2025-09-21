@@ -43,7 +43,10 @@ export default function LoginPage() {
             <span className="text-600 font-medium line-height-3">
               Don't have an account?
             </span>
-            <a className="font-medium no-underline ml-2 text-blue-500 cursor-pointer">
+            <a
+              className="font-medium no-underline ml-2 text-blue-500 cursor-pointer"
+              onClick={() => navigate("/users/register")}
+            >
               Create today!
             </a>
           </div>

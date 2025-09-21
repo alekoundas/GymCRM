@@ -8,6 +8,7 @@ import UsersPage from "../user/UsersPage";
 import TrainGroupAdminFormPage from "../train-group-admin/TrainGroupAdminFormPage";
 import { FormMode } from "../../enum/FormMode";
 import MailsPage from "../mail/MailsPage";
+import MailSendPage from "../mail/MailSendPage";
 
 export default function Administrator() {
   return (
@@ -47,6 +48,10 @@ export default function Administrator() {
               <Route
                 path="emails"
                 element={<MailsPage />}
+              />
+              <Route
+                path="email-send"
+                element={<MailSendPage />}
               />
 
               {/* Users */}

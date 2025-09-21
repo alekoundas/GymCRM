@@ -164,7 +164,9 @@ namespace API.Controllers
             foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.notEquals))
                 query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
 
-
+            
+            // Retrieve record count (with filters, no paging).
+            dataTable.PageCount = await query.CountAsync();
 
             // Handle Pagging of DataTable.
             int skip = (dataTable.Page - 1) * dataTable.Rows;

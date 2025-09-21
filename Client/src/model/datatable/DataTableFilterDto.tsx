@@ -24,7 +24,7 @@ export interface DataTableFilterDto {
 }
 
 export class DataTableFilterDto {
-  fieldName: string;
+  fieldName: string = "";
   value?: string;
   filterType:
     | "startsWith"

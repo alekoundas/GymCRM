@@ -1,65 +1,45 @@
 import { FormMode } from "../../enum/FormMode";
 import { InputText } from "primereact/inputtext";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
-import { useMailStore } from "../../stores/MailStore";
-import { AutoComplete } from "primereact/autocomplete";
-import { useEffect, useState } from "react";
 import { UserDto } from "../../model/entities/user/UserDto";
-import { Chip } from "primereact/chip";
+import { Chip, ChipRemoveEvent } from "primereact/chip";
+import { InputTextarea } from "primereact/inputtextarea";
+import { MailSendDto } from "../../model/entities/mail/MailSendDto";
+import {
+  VirtualScrollerLazyEvent,
+  VirtualScrollerProps,
+} from "primereact/virtualscroller";
+import ApiService from "../../services/ApiService";
+import AutoCompleteComponent from "../../components/core/auto-complete/AutoCompleteComponent";
+import { useState } from "react";
+import { Avatar } from "primereact/avatar";
 
 interface IField extends DialogChildProps {}
 
 export default function MailSendFormComponent({ formMode }: IField) {
-  const { mailDto, updateMailDto } = useMailStore();
+  const [mailSendDto, setMailSendDto] = useState<MailSendDto>(
+    new MailSendDto()
+  );
   const [filteredUsers, setFilteredUsers] = useState<UserDto[]>([]);
+  const [loading, setLoading] = useState(false);
+
   const [selectedUsers, setSelectedUsers] = useState<UserDto[]>(
-    mailDto.users || []
+    mailSendDto.users || []
   );
 
-  // Mock user fetch (replace with your actual API or store call)
-  const allUsers: UserDto[] = [
-    // Example users; replace with your data source
-    {
-      id: "1",
-      userName: "johndoe",
-      email: "john.doe@example.com",
-      firstName: "John",
-      lastName: "Doe",
-      roleId: "user",
-      profileImage: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD...", // Example base64
-    },
-    {
-      id: "2",
-      userName: "janedoe",
-      email: "jane.doe@example.com",
-      firstName: "Jane",
-      lastName: "Doe",
-      roleId: "user",
-      profileImage: null,
-    },
-  ];
-
   // Filter users for AutoComplete suggestions
-  const searchUsers = (event: { query: string }) => {
-    const query = event.query.toLowerCase();
-    const filtered = allUsers.filter(
-      (user) =>
-        user.firstName.toLowerCase().includes(query) ||
-        user.lastName.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query)
-    );
-    setFilteredUsers(filtered);
-  };
+  // const searchUsers = (event: { query: string }) => {
+  //   const query = event.query.toLowerCase();
+  //   const filtered = allUsers.filter(
+  //     (user) =>
+  //       user.firstName.toLowerCase().includes(query) ||
+  //       user.lastName.toLowerCase().includes(query) ||
+  //       user.email.toLowerCase().includes(query)
+  //   );
+  //   setFilteredUsers(filtered);
+  // };
 
   // Handle user selection
-  const handleUserSelect = (e: { value: UserDto[] }) => {
-    const newUsers = e.value;
-    setSelectedUsers(newUsers);
-    updateMailDto({
-      userIds: newUsers.map((user) => user.id),
-      users: newUsers,
-    });
-  };
 
   // Custom suggestion template for AutoComplete
   const userTemplate = (user: UserDto) => {
@@ -91,58 +71,60 @@ export default function MailSendFormComponent({ formMode }: IField) {
 
   // Custom chip template for selected users
   const chipTemplate = (user: UserDto) => {
+    const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
+      0
+    )}`.toUpperCase();
     return (
-      <Chip
-        label={`${user.firstName} ${user.lastName}`}
-        image={user.profileImage || undefined}
-        removable
-        onRemove={() => {
-          const updatedUsers = selectedUsers.filter((u) => u.id !== user.id);
-          setSelectedUsers(updatedUsers);
-          updateMailDto({
-            userIds: updatedUsers.map((u) => u.id),
-            users: updatedUsers,
-          });
-        }}
-        className="mr-2"
-      />
+      <p className="m-0 p-0">
+        <Avatar
+          image={user.profileImage ?? ""}
+          label={user.profileImage ? undefined : initials}
+          shape="circle"
+          size="normal"
+          style={{
+            backgroundColor: user.profileImage
+              ? "transparent"
+              : "var(--primary-color)",
+            color: user.profileImage ? "transparent" : "var(--surface-a)",
+          }}
+        />
+        {" " +
+          user.firstName[0].toUpperCase() +
+          "." +
+          " " +
+          user.lastName[0].toUpperCase() +
+          user.lastName.slice(1, user.lastName.length) +
+          "(" +
+          user.email +
+          ")"}
+      </p>
     );
   };
 
-  // Sync selected users with mailDto on mount
-  useEffect(() => {
-    setSelectedUsers(mailDto.users || []);
-  }, [mailDto.users]);
-
   return (
     <div className="flex flex-column gap-3">
-      <div className="field">
+      <div className="field ">
         <label htmlFor="recipients">Recipients</label>
-        <AutoComplete
-          id="recipients"
-          multiple
-          value={selectedUsers}
-          suggestions={filteredUsers}
-          completeMethod={searchUsers}
-          field="email" // Display email in the input
+        <AutoCompleteComponent
+          controller="users"
+          isEnabled={true}
           itemTemplate={userTemplate}
-          onChange={handleUserSelect}
-          disabled={formMode !== FormMode.ADD}
-          className="w-full"
-          inputClassName="w-full"
+          selectedItemTemplate={chipTemplate}
+          onChange={(x) =>
+            setMailSendDto({ ...mailSendDto, usersIds: x.map((y) => y.id) })
+          }
         />
-        <div className="flex flex-wrap gap-2 mt-2">
-          {selectedUsers.map((user) => chipTemplate(user))}
-        </div>
       </div>
       <div className="field">
         <label htmlFor="subject">Subject</label>
         <InputText
           id="subject"
           name="subject"
-          value={mailDto.subject}
-          onChange={(e) => updateMailDto({ [e.target.name]: e.target.value })}
-          disabled={formMode !== FormMode.ADD}
+          value={mailSendDto.subject}
+          onChange={(e) =>
+            setMailSendDto({ ...mailSendDto, [e.target.name]: e.target.value })
+          }
+          disabled={formMode === FormMode.VIEW}
           className="w-full"
         />
       </div>
@@ -151,9 +133,11 @@ export default function MailSendFormComponent({ formMode }: IField) {
         <InputTextarea
           id="body"
           name="body"
-          value={mailDto.body}
-          onChange={(e) => updateMailDto({ [e.target.name]: e.target.value })}
-          disabled={formMode !== FormMode.ADD}
+          value={mailSendDto.body}
+          onChange={(e) =>
+            setMailSendDto({ ...mailSendDto, [e.target.name]: e.target.value })
+          }
+          disabled={formMode === FormMode.VIEW}
           rows={5}
           className="w-full"
         />

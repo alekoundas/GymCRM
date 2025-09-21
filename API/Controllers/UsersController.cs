@@ -2,9 +2,11 @@
 using Business.Services;
 using Business.Services.Email;
 using Core.Dtos;
+using Core.Dtos.AutoComplete;
 using Core.Dtos.DataTable;
 using Core.Dtos.Identity;
 using Core.Dtos.Lookup;
+using Core.Dtos.Mail;
 using Core.Dtos.PhoneNumber;
 using Core.Dtos.TrainGroupDate;
 using Core.Dtos.User;
@@ -173,6 +175,7 @@ namespace API.Controllers
 
 
 
+
             // Handle pagination.
             int skip = (dataTable.Page - 1) * dataTable.Rows;
             int take = dataTable.Rows;
@@ -194,16 +197,48 @@ namespace API.Controllers
                     resultDto[i].RoleId = role.Id.ToString();
             }
 
-
-
-            //TODDO add filter
-            int rows = await _dataService.Users.CountAsync();
-
             dataTable.Data = resultDto;
-            dataTable.PageCount = rows;
+            dataTable.PageCount = await query.CountAsync();
 
             return new ApiResponse<DataTableDto<UserDto>>().SetSuccessResponse(dataTable);
 
+        }
+
+        // POST: api/users/AutoComplete
+        [HttpPost("AutoComplete")]
+        public async Task<ApiResponse<AutoCompleteDto<UserDto>>> AutoComplete([FromBody] AutoCompleteDto<UserDto> autoCompleteDto)
+        {
+            var query = _dataService.GetGenericRepository<User>();
+
+            if (autoCompleteDto.SearchValue.Length > 0)
+                query.Where(x =>
+                x.FirstName.Contains(autoCompleteDto.SearchValue) ||
+                x.LastName.Contains(autoCompleteDto.SearchValue) ||
+                x.Email.Contains(autoCompleteDto.SearchValue) ||
+                x.PhoneNumbers.Any(y => y.Number.Contains(autoCompleteDto.SearchValue)) ||
+                x.FirstName.Contains(autoCompleteDto.SearchValue)
+            );
+
+            // Handle Pagging.
+            query.AddPagging(autoCompleteDto.Skip, autoCompleteDto.Take);
+
+            // Retrieve Data.
+            List<User> result = await query.ToListAsync();
+            List<UserDto> customerDto = _mapper.Map<List<UserDto>>(result);
+
+            if (autoCompleteDto.SearchValue.Length > 0)
+                query.Where(x =>
+                x.FirstName.Contains(autoCompleteDto.SearchValue) ||
+                x.LastName.Contains(autoCompleteDto.SearchValue) ||
+                x.Email.Contains(autoCompleteDto.SearchValue) ||
+                x.PhoneNumbers.Any(y => y.Number.Contains(autoCompleteDto.SearchValue)) ||
+                x.FirstName.Contains(autoCompleteDto.SearchValue)
+            );
+
+            autoCompleteDto.Suggestions = customerDto;
+            autoCompleteDto.TotalRecords = await query.CountAsync();
+
+            return new ApiResponse<AutoCompleteDto<UserDto>>().SetSuccessResponse(autoCompleteDto);
         }
 
         // POST: api/Users/ForgotPassword

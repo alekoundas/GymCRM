@@ -4,6 +4,6 @@ export interface DataTableSortDto {
 }
 
 export class DataTableSortDto {
-  fieldName: string;
+  fieldName: string = "";
   order: 1 | 0 | -1 | null | undefined;
 }

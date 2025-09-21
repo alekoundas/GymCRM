@@ -13,6 +13,7 @@ import { ToastService } from "./ToastService";
 import { TokenService } from "./TokenService";
 import { UserPasswordResetDto } from "../model/entities/user/UserPasswordResetDto";
 import { UserPasswordForgotDto } from "../model/entities/user/UserPasswordForgotDto";
+import { AutoCompleteDto } from "../model/core/auto-complete/AutoCompleteDto";
 
 export default class ApiService {
   private static readonly BASE_URL = "/api/";
@@ -230,6 +231,17 @@ export default class ApiService {
   ): Promise<LookupDto | null> {
     const url = this.buildUrl(controller, "Lookup");
     return this.apiRequest<LookupDto, LookupDto>(url, "POST", data);
+  }
+  public static async getDataAutoComplete<TEntity>(
+    controller: string,
+    data: AutoCompleteDto<TEntity>
+  ): Promise<AutoCompleteDto<TEntity> | null> {
+    const url = this.buildUrl(controller, "AutoComplete");
+    return this.apiRequest<AutoCompleteDto<TEntity>, AutoCompleteDto<TEntity>>(
+      url,
+      "POST",
+      data
+    );
   }
 
   public static async getDataGrid<TEntity>(
