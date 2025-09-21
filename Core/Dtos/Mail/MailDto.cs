@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Dtos.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Dtos.Mail
 {
@@ -17,6 +18,7 @@ namespace Core.Dtos.Mail
 
         [Required(ErrorMessage = "UserId is required")]
         public string UserId { get; set; } = "";
+        public UserDto User { get; set; } = null!;
 
         public string CreatedOn { get; set; } = "";
 

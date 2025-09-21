@@ -19,6 +19,9 @@ namespace DataAccess.Configurations
             builder.Property(u => u.LastName)
                 .IsRequired()
                 .HasMaxLength(100);
+
+            builder.Property(u => u.Email)
+              .IsRequired();
         }
     }
 }

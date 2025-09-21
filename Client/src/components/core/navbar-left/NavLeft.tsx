@@ -69,6 +69,14 @@ export default function NavLeft() {
             navigate("/administrator/emails");
           },
         },
+        {
+          label: "Send New Mail",
+          icon: "pi pi-envelope",
+          visible: TokenService.isUserAllowed("Mails_Add"),
+          command: () => {
+            navigate("/administrator/email-send");
+          },
+        },
       ],
     },
     // {

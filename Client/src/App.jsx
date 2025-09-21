@@ -20,6 +20,7 @@ import UserProfilePage from "./pages/user/UserProfilePage.tsx";
 import UserPasswordForgotPage from "./pages/user/UserPasswordForgotPage.tsx";
 import UserPasswordResetPage from "./pages/user/UserPasswordResetPage.tsx";
 import MailsPage from "./pages/mail/MailsPage.tsx";
+import MailSendPage from "./pages/mail/MailSendPage.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -70,7 +71,7 @@ export default function App() {
 
               {/* Administrator */}
               <Route
-                path="/administrator"
+                path="/administrator/*"
                 element={<Administrator />}
               >
                 <Route
@@ -97,6 +98,10 @@ export default function App() {
                 <Route
                   path="emails"
                   element={<MailsPage />}
+                />
+                <Route
+                  path="email-send"
+                  element={<MailSendPage />}
                 />
 
                 {/* Users */}
