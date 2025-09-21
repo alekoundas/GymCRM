@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { MailDto } from "../model/entities/email-history/EmailHistoryDto";
+import { MailDto } from "../model/entities/mail/MailDto";
 
 interface MailState {
   mailDto: MailDto;
