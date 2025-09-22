@@ -18,7 +18,7 @@ namespace Core.Dtos.Mail
 
         [Required(ErrorMessage = "UserId is required")]
         public string UserId { get; set; } = "";
-        public UserDto User { get; set; } = null!;
+        public UserDto? User { get; set; } = null; //optional
 
         public string CreatedOn { get; set; } = "";
 

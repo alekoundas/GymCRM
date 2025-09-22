@@ -2,29 +2,18 @@ import { FormMode } from "../../enum/FormMode";
 import { InputText } from "primereact/inputtext";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { UserDto } from "../../model/entities/user/UserDto";
-import { Chip, ChipRemoveEvent } from "primereact/chip";
 import { InputTextarea } from "primereact/inputtextarea";
 import { MailSendDto } from "../../model/entities/mail/MailSendDto";
-import {
-  VirtualScrollerLazyEvent,
-  VirtualScrollerProps,
-} from "primereact/virtualscroller";
-import ApiService from "../../services/ApiService";
 import AutoCompleteComponent from "../../components/core/auto-complete/AutoCompleteComponent";
 import { useState } from "react";
 import { Avatar } from "primereact/avatar";
+import RichTextAreaComponent from "../../components/core/text-area/RichTextAreaComponent";
 
 interface IField extends DialogChildProps {}
 
 export default function MailSendFormComponent({ formMode }: IField) {
   const [mailSendDto, setMailSendDto] = useState<MailSendDto>(
     new MailSendDto()
-  );
-  const [filteredUsers, setFilteredUsers] = useState<UserDto[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const [selectedUsers, setSelectedUsers] = useState<UserDto[]>(
-    mailSendDto.users || []
   );
 
   const getDisplayImageSrc = (
@@ -118,17 +107,11 @@ export default function MailSendFormComponent({ formMode }: IField) {
         />
       </div>
       <div className="field">
-        <label htmlFor="body">Body</label>
-        <InputTextarea
-          id="body"
-          name="body"
+        <RichTextAreaComponent
           value={mailSendDto.body}
-          onChange={(e) =>
-            setMailSendDto({ ...mailSendDto, [e.target.name]: e.target.value })
-          }
-          disabled={formMode === FormMode.VIEW}
-          rows={5}
-          className="w-full"
+          onChange={(e) => setMailSendDto({ ...mailSendDto, body: e })}
+          isEnabled={formMode !== FormMode.VIEW}
+          label="Body"
         />
       </div>
     </div>
