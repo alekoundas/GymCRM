@@ -18,6 +18,9 @@ dotnet ef database update --project DataAccess --startup-project API
 //		React		//
 //					//
 
+// Clear cache
+npm cache clean --force
+
 // Create vite react app
 npm create vite@latest my-react-app -- --template react
 

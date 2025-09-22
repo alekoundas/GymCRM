@@ -9,6 +9,7 @@ import TrainGroupAdminFormPage from "../train-group-admin/TrainGroupAdminFormPag
 import { FormMode } from "../../enum/FormMode";
 import MailsPage from "../mail/MailsPage";
 import MailSendPage from "../mail/MailSendPage";
+import ChartsComponent from "./ChartsComponent";
 
 export default function Administrator() {
   return (
@@ -23,6 +24,11 @@ export default function Administrator() {
             className="custombar2"
           >
             <Routes>
+              <Route
+                index
+                element={<ChartsComponent />}
+              />
+
               <Route
                 path="train-group-calendar"
                 element={<TrainGroupAdminCalendarPage />}

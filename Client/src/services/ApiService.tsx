@@ -15,6 +15,7 @@ import { UserPasswordResetDto } from "../model/entities/user/UserPasswordResetDt
 import { UserPasswordForgotDto } from "../model/entities/user/UserPasswordForgotDto";
 import { AutoCompleteDto } from "../model/core/auto-complete/AutoCompleteDto";
 import { MailSendDto } from "../model/entities/mail/MailSendDto";
+import { ChartData } from "../model/core/chart/ChartData";
 
 export default class ApiService {
   private static readonly BASE_URL = "/api/";
@@ -419,5 +420,10 @@ export default class ApiService {
     );
 
     return result ?? false;
+  }
+
+  public static async getChartData(): Promise<ChartData | null> {
+    const url = this.buildUrl("charts");
+    return this.apiRequest<null, ChartData>(url, "GET");
   }
 }
