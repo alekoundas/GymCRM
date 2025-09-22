@@ -22,7 +22,7 @@ namespace Business.Services.Email
             _logger = logger;
         }
 
-        public async Task SendEmailAsync(string to, string subject, string plainTextBody, string htmlBody)
+        public async Task SendEmailAsync(string to, string subject, string htmlBody)
         {
             var clientId = _configuration["Gmail:ClientId"];
             var clientSecret = _configuration["Gmail:ClientSecret"];
@@ -65,7 +65,7 @@ namespace Business.Services.Email
                 mimeMessage.Subject = subject;
                 var bodyBuilder = new BodyBuilder
                 {
-                    TextBody = plainTextBody,
+                    TextBody = htmlBody,
                     HtmlBody = htmlBody
                 };
                 mimeMessage.Body = bodyBuilder.ToMessageBody();
@@ -90,7 +90,7 @@ namespace Business.Services.Email
                     {
                         UserId = user.Id,
                         Subject = subject,
-                        Body = htmlBody ?? plainTextBody,
+                        Body = htmlBody,
                     });
 
                 _logger.LogInformation("Email sent successfully to {To}", to);

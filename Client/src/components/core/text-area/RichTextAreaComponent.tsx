@@ -224,7 +224,7 @@ export default function RichTextAreaComponent({
           id="input-quill"
           name="input-quill"
           value={textAreaHtmlValue}
-          onChange={(e) => handleChange(cleanHtml(e.target.value))}
+          onChange={(e) => handleChange(e.target.value)}
           disabled={!isEnabled}
           rows={10}
           className="w-full"

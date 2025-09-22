@@ -14,6 +14,7 @@ import { TokenService } from "./TokenService";
 import { UserPasswordResetDto } from "../model/entities/user/UserPasswordResetDto";
 import { UserPasswordForgotDto } from "../model/entities/user/UserPasswordForgotDto";
 import { AutoCompleteDto } from "../model/core/auto-complete/AutoCompleteDto";
+import { MailSendDto } from "../model/entities/mail/MailSendDto";
 
 export default class ApiService {
   private static readonly BASE_URL = "/api/";
@@ -407,5 +408,16 @@ export default class ApiService {
     // }
     TokenService.logout();
     authLogout();
+  }
+
+  public static async emailSend(data: MailSendDto): Promise<boolean> {
+    const url = this.buildUrl("mails", "Send");
+    const result = await this.apiRequest<MailSendDto, boolean>(
+      url,
+      "POST",
+      data
+    );
+
+    return result ?? false;
   }
 }

@@ -268,8 +268,7 @@ namespace API.Controllers
             await _emailService.SendEmailAsync(
                 dto.Email,
                 "Reset Your Password",
-                emailBody,
-                emailBody // HTML version
+                emailBody
             );
 
             return new ApiResponse<bool>().SetSuccessResponse(true, "success", "Password reset email sent.");
