@@ -12,8 +12,8 @@ import GenericDialogComponent, {
 import ApiService from "../../services/ApiService";
 
 import { useMailStore } from "../../stores/MailStore";
-import MailFormComponent from "./MailFormComponent";
 import { MailDto } from "../../model/entities/mail/MailDto";
+import MailFormComponent from "./MailFormComponent";
 
 export default function MailsPage() {
   const { mailDto, setMailDto, resetMailDto, updateMailDto } = useMailStore();

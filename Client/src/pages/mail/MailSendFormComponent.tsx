@@ -2,19 +2,15 @@ import { FormMode } from "../../enum/FormMode";
 import { InputText } from "primereact/inputtext";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { UserDto } from "../../model/entities/user/UserDto";
-import { InputTextarea } from "primereact/inputtextarea";
-import { MailSendDto } from "../../model/entities/mail/MailSendDto";
 import AutoCompleteComponent from "../../components/core/auto-complete/AutoCompleteComponent";
-import { useState } from "react";
 import { Avatar } from "primereact/avatar";
 import RichTextAreaComponent from "../../components/core/text-area/RichTextAreaComponent";
+import { useMailStore } from "../../stores/MailStore";
 
 interface IField extends DialogChildProps {}
 
 export default function MailSendFormComponent({ formMode }: IField) {
-  const [mailSendDto, setMailSendDto] = useState<MailSendDto>(
-    new MailSendDto()
-  );
+  const { mailSendDto, updateMailSendDto } = useMailStore();
 
   const getDisplayImageSrc = (
     profileImage: string | undefined
@@ -88,9 +84,7 @@ export default function MailSendFormComponent({ formMode }: IField) {
           isEnabled={true}
           itemTemplate={userTemplate}
           selectedItemTemplate={chipTemplate}
-          onChange={(x) =>
-            setMailSendDto({ ...mailSendDto, usersIds: x.map((y) => y.id) })
-          }
+          onChange={(x) => updateMailSendDto({ userIds: x.map((y) => y.id) })}
         />
       </div>
       <div className="field">
@@ -99,9 +93,7 @@ export default function MailSendFormComponent({ formMode }: IField) {
           id="subject"
           name="subject"
           value={mailSendDto.subject}
-          onChange={(e) =>
-            setMailSendDto({ ...mailSendDto, [e.target.name]: e.target.value })
-          }
+          onChange={(e) => updateMailSendDto({ subject: e.target.value })}
           disabled={formMode === FormMode.VIEW}
           className="w-full"
         />
@@ -109,7 +101,7 @@ export default function MailSendFormComponent({ formMode }: IField) {
       <div className="field">
         <RichTextAreaComponent
           value={mailSendDto.body}
-          onChange={(e) => setMailSendDto({ ...mailSendDto, body: e })}
+          onChange={(e) => updateMailSendDto({ body: e })}
           isEnabled={formMode !== FormMode.VIEW}
           label="Body"
         />
