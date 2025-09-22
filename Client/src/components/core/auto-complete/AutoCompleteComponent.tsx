@@ -123,7 +123,7 @@ export default function AutoCompleteComponent<TEntity>({
 
   return (
     <>
-      <div className="w-full">
+      <div className="p-fluid">
         <AutoComplete
           id="recipients"
           multiple
@@ -145,7 +145,8 @@ export default function AutoCompleteComponent<TEntity>({
           completeMethod={search}
           onChange={handleChange}
           disabled={!isEnabled}
-          inputClassName="w-full"
+          inputStyle={{ width: "100%" }}
+          style={{ width: "100%" }}
           className="w-full"
         />
       </div>
