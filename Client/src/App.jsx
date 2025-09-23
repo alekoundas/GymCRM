@@ -21,6 +21,7 @@ import UserPasswordForgotPage from "./pages/user/UserPasswordForgotPage.tsx";
 import UserPasswordResetPage from "./pages/user/UserPasswordResetPage.tsx";
 import MailsPage from "./pages/mail/MailsPage.tsx";
 import MailSendPage from "./pages/mail/MailSendPage.tsx";
+import { PrimeReactProvider, PrimeReactContext } from "primereact/api";
 
 export default function App() {
   // Set Toast messages here
@@ -36,110 +37,110 @@ export default function App() {
 
   return (
     <>
-      {/* Theme switching here. */}
-      <link
-        ref={theme}
-        rel="stylesheet"
-        type="text/css"
-      />
+      <PrimeReactProvider>
+        {/* Theme switching here. */}
+        <link
+          ref={theme}
+          rel="stylesheet"
+          type="text/css"
+        />
 
-      {/* Display messages */}
-      <Toast ref={toast} />
+        {/* Display messages */}
+        <Toast ref={toast} />
 
-      <div className="grid">
-        <div className="col-12 ">
-          <NavTop />
-        </div>
-        {/* <div className="col-2 ">
-          <NavLeft />
-        </div> */}
-        <div className="col-12">
-          <ScrollPanel
-            style={{ height: "100%", width: "100%" }}
-            className="custombar2"
-          >
-            <Routes>
-              <Route
-                path="/"
-                element={<Home />}
-              />
+        <div className="grid p-0 m-0">
+          <div className="col-12 p-1 pt-0 ">
+            <NavTop />
+          </div>
 
-              <Route
-                path="/appointment"
-                element={<TrainGroupsBookingCalendarPage />}
-              />
-
-              {/* Administrator */}
-              <Route
-                path="/administrator/*"
-                element={<Administrator />}
-              >
+          <div className="col-12 p-1 pb-0">
+            <ScrollPanel
+              style={{ height: "100%", width: "100%" }}
+              className="custombar1"
+            >
+              <Routes>
                 <Route
-                  path="train-group-calendar"
-                  element={<TrainGroupAdminCalendarPage />}
-                />
-                <Route
-                  path="train-groups"
-                  element={<TrainGroupAdminPage />}
-                />
-                <Route
-                  path="train-groups/add"
-                  element={<TrainGroupAdminFormPage />}
-                />
-                <Route
-                  path="train-groups/:id/edit"
-                  element={<TrainGroupAdminFormPage />}
-                />
-                <Route
-                  path="train-groups/:id/view"
-                  element={<TrainGroupAdminFormPage />}
+                  path="/"
+                  element={<Home />}
                 />
 
                 <Route
-                  path="emails"
-                  element={<MailsPage />}
+                  path="/appointment"
+                  element={<TrainGroupsBookingCalendarPage />}
                 />
+
+                {/* Administrator */}
                 <Route
-                  path="email-send"
-                  element={<MailSendPage />}
-                />
+                  path="/administrator/*"
+                  element={<Administrator />}
+                >
+                  <Route
+                    path="train-group-calendar"
+                    element={<TrainGroupAdminCalendarPage />}
+                  />
+                  <Route
+                    path="train-groups"
+                    element={<TrainGroupAdminPage />}
+                  />
+                  <Route
+                    path="train-groups/add"
+                    element={<TrainGroupAdminFormPage />}
+                  />
+                  <Route
+                    path="train-groups/:id/edit"
+                    element={<TrainGroupAdminFormPage />}
+                  />
+                  <Route
+                    path="train-groups/:id/view"
+                    element={<TrainGroupAdminFormPage />}
+                  />
+
+                  <Route
+                    path="emails"
+                    element={<MailsPage />}
+                  />
+                  <Route
+                    path="email-send"
+                    element={<MailSendPage />}
+                  />
+
+                  {/* Users */}
+                  <Route
+                    path="users"
+                    element={<UsersPage />}
+                  />
+                  <Route
+                    path="roles"
+                    element={<RolesPage />}
+                  />
+                </Route>
 
                 {/* Users */}
                 <Route
-                  path="users"
-                  element={<UsersPage />}
+                  path="/users/login"
+                  element={<LoginPage />}
                 />
                 <Route
-                  path="roles"
-                  element={<RolesPage />}
+                  path="/users/register"
+                  element={<RegisterPage />}
                 />
-              </Route>
-
-              {/* Users */}
-              <Route
-                path="/users/login"
-                element={<LoginPage />}
-              />
-              <Route
-                path="/users/register"
-                element={<RegisterPage />}
-              />
-              <Route
-                path="/users/profile"
-                element={<UserProfilePage />}
-              />
-              <Route
-                path="/users/forgot-password"
-                element={<UserPasswordForgotPage />}
-              />
-              <Route
-                path="/users/reset-password"
-                element={<UserPasswordResetPage />}
-              />
-            </Routes>
-          </ScrollPanel>
+                <Route
+                  path="/users/profile"
+                  element={<UserProfilePage />}
+                />
+                <Route
+                  path="/users/forgot-password"
+                  element={<UserPasswordForgotPage />}
+                />
+                <Route
+                  path="/users/reset-password"
+                  element={<UserPasswordResetPage />}
+                />
+              </Routes>
+            </ScrollPanel>
+          </div>
         </div>
-      </div>
+      </PrimeReactProvider>
     </>
   );
 }

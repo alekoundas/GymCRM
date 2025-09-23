@@ -134,9 +134,9 @@ namespace API.Controllers
                 // Create the first OrderBy().
                 DataTableSortDto? dataTableSort = dataTable.Sorts.First();
                 if (dataTableSort.Order > 0)
-                    query.OrderBy(dataTableSort.FieldName.Substring(0, 1).ToUpper() + dataTableSort.FieldName.Substring(1, dataTableSort.FieldName.Length), OrderDirectionEnum.ASCENDING);
+                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.ASCENDING);
                 else if (dataTableSort.Order < 0)
-                    query.OrderBy(dataTableSort.FieldName.Substring(0, 1).ToUpper() + dataTableSort.FieldName.Substring(1, dataTableSort.FieldName.Length), OrderDirectionEnum.DESCENDING);
+                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.DESCENDING);
 
                 // Create the rest OrderBy methods as ThenBy() if any.
                 foreach (var sortInfo in dataTable.Sorts.Skip(1))

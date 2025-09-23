@@ -18,6 +18,7 @@ import DataTableService from "../../../services/DataTableService";
 import { DataTableDto } from "../../../model/datatable/DataTableDto";
 import { TokenService } from "../../../services/TokenService";
 import { DataTableFilterDto } from "../../../model/datatable/DataTableFilterDto";
+import DataTableGridRowActionsComponent from "./DataTableGridRowActionsComponent";
 
 interface IField<TEntity> {
   controller: string;
@@ -174,39 +175,12 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   };
 
   const gridRowActions = (rowData: TEntity, _options: ColumnBodyOptions) => (
-    <React.Fragment>
-      <Button
-        icon="pi pi-eye"
-        rounded
-        outlined
-        className="mr-2"
-        visible={
-          authorize ? TokenService.isUserAllowed(controller + "_View") : true
-        }
-        severity="secondary"
-        onClick={() => onButtonClick(ButtonTypeEnum.VIEW, rowData)}
-      />
-      <Button
-        icon="pi pi-pencil"
-        rounded
-        outlined
-        className="mr-2"
-        visible={
-          authorize ? TokenService.isUserAllowed(controller + "_Edit") : true
-        }
-        onClick={() => onButtonClick(ButtonTypeEnum.EDIT, rowData)}
-      />
-      <Button
-        icon="pi pi-trash"
-        rounded
-        outlined
-        severity="danger"
-        visible={
-          authorize ? TokenService.isUserAllowed(controller + "_Delete") : true
-        }
-        onClick={() => onButtonClick(ButtonTypeEnum.DELETE, rowData)}
-      />
-    </React.Fragment>
+    <DataTableGridRowActionsComponent
+      rowData={rowData}
+      onButtonClick={onButtonClick}
+      authorize={authorize}
+      controller={controller}
+    />
   );
 
   const renderHeader = () => {
@@ -277,16 +251,6 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         }
         // Filter.
         filterDisplay={filterDisplay}
-        // filters={
-        //   dataTableDto.filters
-        //     ? dataTableDto.filters.map(
-        //         (x) =>
-        //           ({
-        //             x.fieldName: { value: x.value, matchMode: x.matchMode },
-        //           })
-        //       )
-        //     : ({} as DataTableFilterMeta)
-        // }
         filters={mapFiltersToDataTableFilterMeta(dataTableDto.filters)}
         onFilter={(x) => dataTableService.onFilter(dataTableDto, x)}
         // Sort.

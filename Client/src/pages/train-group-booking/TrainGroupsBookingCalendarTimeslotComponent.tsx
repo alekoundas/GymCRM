@@ -12,18 +12,20 @@ export default function TrainGroupsBookingCalendarTimeslotComponent() {
       {/*     Timeslots    */}
       {/*                  */}
       <Card
-        header={
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "1rem",
-            }}
-          >
-            <h2 style={{ margin: 0 }}>Available Time Slots</h2>
-          </div>
-        }
+        className="p-0"
+        title="Available Time Slots"
+        // header={
+        //   <div
+        //     style={{
+        //       display: "flex",
+        //       justifyContent: "space-between",
+        //       alignItems: "center",
+        //       padding: "1rem",
+        //     }}
+        //   >
+        //     <h2 style={{ margin: 0 }}>Available Time Slots</h2>
+        //   </div>
+        // }
       >
         {timeSlotResponseDto?.length === 0 ? (
           <p className="text-gray-500">
