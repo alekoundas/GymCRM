@@ -133,18 +133,21 @@ namespace API.Controllers
             {
                 // Create the first OrderBy().
                 DataTableSortDto? dataTableSort = dataTable.Sorts.First();
+                string fieldName = dataTableSort.FieldName.Substring(0, 1).ToUpper() + dataTableSort.FieldName.Substring(1, dataTableSort.FieldName.Length-1);
+
                 if (dataTableSort.Order > 0)
-                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.ASCENDING);
+                    query.OrderBy(fieldName, OrderDirectionEnum.ASCENDING);
                 else if (dataTableSort.Order < 0)
-                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.DESCENDING);
+                    query.OrderBy(fieldName, OrderDirectionEnum.DESCENDING);
 
                 // Create the rest OrderBy methods as ThenBy() if any.
                 foreach (var sortInfo in dataTable.Sorts.Skip(1))
                 {
+                    fieldName = sortInfo.FieldName.Substring(0, 1).ToUpper() + sortInfo.FieldName.Substring(1, sortInfo.FieldName.Length-1);
                     if (dataTableSort.Order > 0)
-                        query.ThenBy(sortInfo.FieldName.Substring(0, 1).ToUpper() + sortInfo.FieldName.Substring(1, sortInfo.FieldName.Length), OrderDirectionEnum.ASCENDING);
+                        query.ThenBy(fieldName, OrderDirectionEnum.ASCENDING);
                     else if (dataTableSort.Order < 0)
-                        query.ThenBy(sortInfo.FieldName.Substring(0, 1).ToUpper() + sortInfo.FieldName.Substring(1, sortInfo.FieldName.Length), OrderDirectionEnum.DESCENDING);
+                        query.ThenBy(fieldName, OrderDirectionEnum.DESCENDING);
                 }
             }
 
@@ -164,9 +167,6 @@ namespace API.Controllers
             foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.notEquals))
                 query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
 
-            
-            // Retrieve record count (with filters, no paging).
-            dataTable.PageCount = await query.CountAsync();
 
             // Handle Pagging of DataTable.
             int skip = (dataTable.Page - 1) * dataTable.Rows;

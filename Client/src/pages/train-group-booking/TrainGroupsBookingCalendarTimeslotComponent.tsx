@@ -12,7 +12,6 @@ export default function TrainGroupsBookingCalendarTimeslotComponent() {
       {/*     Timeslots    */}
       {/*                  */}
       <Card
-        className="p-0"
         title="Available Time Slots"
         // header={
         //   <div
