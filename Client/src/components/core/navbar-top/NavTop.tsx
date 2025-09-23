@@ -208,12 +208,14 @@ function NavTop() {
     setValue(value);
     ThemeService.setThemeScale(value + 5);
   };
+
   useEffect(() => {
     const localStorageThemeScale = LocalStorageService.getThemeScale();
     if (localStorageThemeScale) {
       setValue(+localStorageThemeScale);
     } else {
       setValue(14);
+      ThemeService.setThemeScale(14);
     }
   }, []);
 
@@ -241,7 +243,7 @@ function NavTop() {
 
   return (
     <>
-      <div className="card">
+      <div className="card p-0">
         <Menubar
           model={items}
           start={start}
