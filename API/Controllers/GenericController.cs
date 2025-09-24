@@ -133,7 +133,7 @@ namespace API.Controllers
             {
                 // Create the first OrderBy().
                 DataTableSortDto? dataTableSort = dataTable.Sorts.First();
-                string fieldName = dataTableSort.FieldName.Substring(0, 1).ToUpper() + dataTableSort.FieldName.Substring(1, dataTableSort.FieldName.Length-1);
+                string fieldName = dataTableSort.FieldName.Substring(0, 1).ToUpper() + dataTableSort.FieldName.Substring(1, dataTableSort.FieldName.Length - 1);
 
                 if (dataTableSort.Order > 0)
                     query.OrderBy(fieldName, OrderDirectionEnum.ASCENDING);
@@ -143,7 +143,7 @@ namespace API.Controllers
                 // Create the rest OrderBy methods as ThenBy() if any.
                 foreach (var sortInfo in dataTable.Sorts.Skip(1))
                 {
-                    fieldName = sortInfo.FieldName.Substring(0, 1).ToUpper() + sortInfo.FieldName.Substring(1, sortInfo.FieldName.Length-1);
+                    fieldName = sortInfo.FieldName.Substring(0, 1).ToUpper() + sortInfo.FieldName.Substring(1, sortInfo.FieldName.Length - 1);
                     if (dataTableSort.Order > 0)
                         query.ThenBy(fieldName, OrderDirectionEnum.ASCENDING);
                     else if (dataTableSort.Order < 0)
@@ -152,20 +152,34 @@ namespace API.Controllers
             }
 
             // Handle Filtering of DataTable.
-            foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.equals))
+            //foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.equals))
+            //{
+            //    if (filter.FieldName == "UserId" && filter.Value != null)
+            //        query.FilterByColumnEquals(filter.FieldName, new Guid(filter.Value));
+            //    else
+            //        //if (filter.Value != null)
+            //        query.FilterByColumnEquals(filter.FieldName, filter.Value);
+            //}
+
+            foreach (var filter in dataTable.Filters)//.Where(x => x.FilterType == DataTableFiltersEnum.contains))
             {
-                if (filter.FieldName == "UserId" && filter.Value != null)
-                    query.FilterByColumnEquals(filter.FieldName, new Guid(filter.Value));
-                else
+                string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
+
+                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.contains)
+                    query.FilterByColumnContains(filter.FieldName, filter.Value.ToLower());
+
+                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.equals)
                     query.FilterByColumnEquals(filter.FieldName, filter.Value);
+
+                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.notEquals)
+                    query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
+
+                if (filter.Values?.Count() > 0 && filter.FilterType == DataTableFiltersEnum.@in)
+                    query.FilterByColumnIn(filter.FieldName, filter.Values);
+
+                if (filter.Values?.Count() == 2 && filter.FilterType == DataTableFiltersEnum.between)
+                    query.FilterByColumnDateBetween(filter.FieldName, filter.Values[0], filter.Values[1]);
             }
-
-            foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.contains))
-                if (filter.Value != null)
-                    query.FilterByColumnContains(filter.FieldName, filter.Value);
-
-            foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.notEquals))
-                query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
 
 
             // Handle Pagging of DataTable.

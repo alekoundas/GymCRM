@@ -1,5 +1,6 @@
 import {
   DataTableFilterEvent,
+  DataTableFilterMetaData,
   DataTablePageEvent,
   DataTableRowEditCompleteEvent,
   DataTableSortEvent,
@@ -9,6 +10,7 @@ import ApiService from "./ApiService";
 import { ColumnEvent } from "primereact/column";
 import { FormMode } from "../enum/FormMode";
 import { DataTableDto } from "../model/datatable/DataTableDto";
+import { DataTableFilterDto } from "../model/datatable/DataTableFilterDto";
 
 export default class DataTableService<TEntity> {
   private controller: string;
@@ -75,17 +77,27 @@ export default class DataTableService<TEntity> {
     dataTableDto: DataTableDto<TEntity>,
     event: DataTableFilterEvent
   ) => {
+    // dataTableDto.dataTableFilters;
     dataTableDto.filters = [];
-    dataTableDto.dataTableFilters = event.filters;
 
-    // This doesnt work  [...event.filters]
-    Object.entries(event.filters).map(([value, index]) =>
-      dataTableDto.filters?.push({
+    Object.entries(event.filters).map(([value, index]) => {
+      const filterField = event.filters[value] as DataTableFilterMetaData;
+
+      const filter = {
         fieldName: value,
-        filterType: event.filters[value]["matchMode"],
-        value: event.filters[value]["value"],
-      })
-    );
+        filterType: filterField.matchMode,
+      } as DataTableFilterDto;
+
+      if (filterField.matchMode === "in") {
+        filter.values = filterField.value ?? [];
+      } else if (filterField.matchMode === "between") {
+        filter.values = filterField.value ?? [];
+      } else {
+        filter.value = filterField.value;
+      }
+
+      dataTableDto.filters?.push(filter);
+    });
 
     this.refreshData(dataTableDto);
   };

@@ -27,6 +27,8 @@ namespace Business.Repository
         GenericRepository<TEntity> FilterByColumnContains(string columnPath, string value);
         GenericRepository<TEntity> FilterByColumnEquals(string columnPath, object? value);
         GenericRepository<TEntity> FilterByColumnNotEquals(string columnPath, object? value);
+        GenericRepository<TEntity> FilterByColumnIn(string columnPath, System.Collections.IEnumerable value);
+        GenericRepository<TEntity> FilterByColumnDateBetween(string columnPath, object startValue, object endValue);
         GenericRepository<TEntity> Where(Expression<Func<TEntity, bool>> predicate);
         GenericRepository<TEntity> AddPagging(int skip = 10, int take = 1);
 

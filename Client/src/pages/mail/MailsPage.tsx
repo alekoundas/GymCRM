@@ -14,6 +14,8 @@ import ApiService from "../../services/ApiService";
 import { useMailStore } from "../../stores/MailStore";
 import { MailDto } from "../../model/entities/mail/MailDto";
 import MailFormComponent from "./MailFormComponent";
+import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
+import DataTableFilterDateComponent from "../../components/core/datatable/DataTableFilterDateComponent";
 
 export default function MailsPage() {
   const { mailDto, setMailDto, resetMailDto, updateMailDto } = useMailStore();
@@ -51,8 +53,10 @@ export default function MailsPage() {
     page: 1,
     pageCount: 0,
     filters: [
-      { fieldName: "Value", filterType: "contains" },
-      { fieldName: "Description", filterType: "contains" },
+      { fieldName: "id", filterType: "equals" },
+      { fieldName: "subject", filterType: "contains" },
+      { fieldName: "userId", filterType: "in" },
+      { fieldName: "createdOn", filterType: "between" },
     ],
     dataTableSorts: [],
   });
@@ -64,7 +68,7 @@ export default function MailsPage() {
       sortable: true,
       filter: true,
       filterPlaceholder: "Search",
-      style: { width: "10%" },
+      style: { width: "20%" },
     },
     {
       field: "subject",
@@ -80,7 +84,13 @@ export default function MailsPage() {
       sortable: true,
       filter: true,
       filterPlaceholder: "Search",
-      style: { width: "30%" },
+      filterTemplate: (options) => (
+        <DataTableFilterIdComponent
+          options={options}
+          controller="users"
+        />
+      ),
+      style: { width: "20%" },
     },
     {
       field: "createdOn",
@@ -88,6 +98,23 @@ export default function MailsPage() {
       sortable: true,
       filter: true,
       filterPlaceholder: "Search",
+      filterTemplate: (options) => (
+        <DataTableFilterDateComponent options={options} />
+      ),
+      body: (rowData, options) => (
+        <>
+          {new Date(rowData.createdOn).getDate() +
+            "/" +
+            (new Date(rowData.createdOn).getMonth() + 1) +
+            "/" +
+            new Date(rowData.createdOn).getFullYear() +
+            " " +
+            new Date(rowData.createdOn).getHours() +
+            ":" +
+            new Date(rowData.createdOn).getMinutes()}
+        </>
+      ),
+
       style: { width: "10%" },
     },
   ];
