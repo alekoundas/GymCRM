@@ -19,7 +19,7 @@
         dateBefore,
         dateAfter,
         custom,
-        //,in
+        @in // Use of @ prefix to escape the reserved keyword 'in'
 
     }
 }

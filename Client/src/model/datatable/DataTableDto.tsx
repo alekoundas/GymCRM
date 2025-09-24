@@ -11,7 +11,7 @@ export interface DataTableDto<TEntity> {
   sorts?: DataTableSortDto[];
   filters: DataTableFilterDto[];
   dataTableSorts: DataTableSortMeta[];
-  dataTableFilters?: DataTableFilterMeta;
+  // dataTableFilters?: DataTableFilterMeta;
 }
 
 export class DataTableDto<TEntity> {
@@ -23,5 +23,17 @@ export class DataTableDto<TEntity> {
   sorts?: DataTableSortDto[] = [];
   filters: DataTableFilterDto[] = [];
   dataTableSorts: DataTableSortMeta[] = [];
-  dataTableFilters?: DataTableFilterMeta = {};
+  // dataTableFilters?: DataTableFilterMeta = this.filters.reduce(
+  //   (accumulator, currentValue) => {
+  //     if (currentValue.fieldName && currentValue.filterType) {
+  //       console.log(currentValue.filterType);
+  //       accumulator[currentValue.fieldName] = {
+  //         value: currentValue.value,
+  //         matchMode: currentValue.filterType,
+  //       };
+  //     }
+  //     return accumulator;
+  //   },
+  //   {} as DataTableFilterMeta
+  // );
 }

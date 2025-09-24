@@ -20,7 +20,7 @@ namespace Core.Dtos.Mail
         public string UserId { get; set; } = "";
         public UserDto? User { get; set; } = null; //optional
 
-        public string CreatedOn { get; set; } = "";
+        public DateTime CreatedOn { get; set; }
 
     }
 }

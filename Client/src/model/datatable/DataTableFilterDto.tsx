@@ -1,6 +1,7 @@
 export interface DataTableFilterDto {
   fieldName: string;
-  value?: string;
+  value?: string | undefined;
+  values?: string[] | undefined;
   filterType:
     | "startsWith"
     | "contains"
@@ -25,7 +26,8 @@ export interface DataTableFilterDto {
 
 export class DataTableFilterDto {
   fieldName: string = "";
-  value?: string;
+  value?: string | undefined;
+  values?: string[] | undefined;
   filterType:
     | "startsWith"
     | "contains"

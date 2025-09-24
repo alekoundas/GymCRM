@@ -5,6 +5,7 @@ import { LookupOptionDto } from "./LookupOptionDto";
 export interface LookupDto {
   skip?: number;
   take?: number;
+  totalRecords?: number;
   filter: LookupFilterDto;
   data?: LookupOptionDto[];
 }
@@ -13,10 +14,7 @@ export interface LookupDto {
 export class LookupDto implements LookupDto {
   skip?: number = 0;
   take?: number = 0;
+  totalRecords?: number = 0;
   filter: LookupFilterDto = new LookupFilterDto();
   data?: LookupOptionDto[] = [];
-
-  constructor() {
-    this.data = [];
-  }
 }

@@ -118,18 +118,52 @@ namespace API.Controllers
         [HttpPost("Lookup")]
         public async Task<ApiResponse<LookupDto>> Lookup([FromBody] LookupDto lookupDto)
         {
-            List<User> users;
-            if (lookupDto.Filter?.Id != null && lookupDto.Filter?.Id.Length > 0)
-                users = await _dataService.Users
-                    .Where(x => lookupDto.Filter.Id.ToLower().Contains(x.Id.ToString().ToLower()))
-                    .ToListAsync();
-            else
-                users = await _dataService.Users.ToListAsync();
+
+            var query = _dataService.GetGenericRepository<User>();
+
+            if (lookupDto.Filter.Id.Length > 0)
+                query.Where(x => x.Id == new Guid(lookupDto.Filter.Id));
+
+            if (lookupDto.Filter.Value.Length > 0)
+                query.Where(x =>
+                x.FirstName.Contains(lookupDto.Filter.Value) ||
+                x.LastName.Contains(lookupDto.Filter.Value) ||
+                x.Email.Contains(lookupDto.Filter.Value) ||
+                x.PhoneNumbers.Any(y => y.Number.Contains(lookupDto.Filter.Value)) ||
+                x.UserName!.Contains(lookupDto.Filter.Value)
+            );
+
+            // Handle Pagging.
+            query.AddPagging(lookupDto.Skip, lookupDto.Take);
+
+            // Retrieve Data.
+            List<User> result = await query.ToListAsync();
+            lookupDto.Data = result
+              .Select(x =>
+                  new LookupOptionDto()
+                  {
+                      Id = x.Id.ToString(),
+                      Value = x.UserName,
+                      ProfileImage = x.ProfileImage
+                  })
+              .ToList();
 
 
-            lookupDto.Data = users
-                .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.UserName ?? "" })
-                .ToList();
+
+
+            if (lookupDto.Filter.Id.Length > 0)
+                query.Where(x => x.Id == new Guid(lookupDto.Filter.Id));
+
+            if (lookupDto.Filter.Value.Length > 0)
+                query.Where(x =>
+                x.FirstName.Contains(lookupDto.Filter.Value) ||
+                x.LastName.Contains(lookupDto.Filter.Value) ||
+                x.Email.Contains(lookupDto.Filter.Value) ||
+                x.PhoneNumbers.Any(y => y.Number.Contains(lookupDto.Filter.Value)) ||
+                x.UserName!.Contains(lookupDto.Filter.Value)
+            );
+            lookupDto.TotalRecords = await query.CountAsync();
+
 
             return new ApiResponse<LookupDto>().SetSuccessResponse(lookupDto);
         }
@@ -216,7 +250,7 @@ namespace API.Controllers
                 x.LastName.Contains(autoCompleteDto.SearchValue) ||
                 x.Email.Contains(autoCompleteDto.SearchValue) ||
                 x.PhoneNumbers.Any(y => y.Number.Contains(autoCompleteDto.SearchValue)) ||
-                x.FirstName.Contains(autoCompleteDto.SearchValue)
+                x.UserName!.Contains(autoCompleteDto.SearchValue)
             );
 
             // Handle Pagging.
@@ -232,7 +266,7 @@ namespace API.Controllers
                 x.LastName.Contains(autoCompleteDto.SearchValue) ||
                 x.Email.Contains(autoCompleteDto.SearchValue) ||
                 x.PhoneNumbers.Any(y => y.Number.Contains(autoCompleteDto.SearchValue)) ||
-                x.FirstName.Contains(autoCompleteDto.SearchValue)
+                x.UserName!.Contains(autoCompleteDto.SearchValue)
             );
 
             autoCompleteDto.Suggestions = customerDto;

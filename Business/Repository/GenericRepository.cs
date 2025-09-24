@@ -208,6 +208,23 @@ namespace Business.Repository
             return this;
         }
 
+        public GenericRepository<TEntity> FilterByColumnIn(string columnPath, System.Collections.IEnumerable values)
+        {
+            if (_query == null)
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+
+            _query = _query.FilterByColumnIn(columnPath, values);
+            return this;
+        }
+        public GenericRepository<TEntity> FilterByColumnDateBetween(string columnPath, object startValue, object endValue)
+        {
+            if (_query == null)
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+
+            _query = _query.FilterByColumnDateBetween(columnPath, startValue, endValue);
+            return this;
+        }
+
         public GenericRepository<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
         {
             if (_query == null)

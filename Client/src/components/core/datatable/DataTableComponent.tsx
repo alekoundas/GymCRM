@@ -78,10 +78,8 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     // if parent has set the onAfterDataLoaded, call parent
     if (onAfterDataLoaded) {
       var dataResponse = onAfterDataLoaded(data);
-      if (dataResponse) {
-        // setDataTableDto(dataResponse);
+      if (dataResponse)
         setDataTableDto({ ...dataTableDto, data: dataResponse.data });
-      }
     }
 
     // Else do default action
@@ -206,21 +204,25 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     );
   };
 
-  const mapFiltersToDataTableFilterMeta = (
-    filters: DataTableFilterDto[] | undefined
-  ): DataTableFilterMeta => {
-    if (!filters || filters.length === 0) return {};
-    const aaa = filters.reduce((acc, filter) => {
-      return {
-        ...acc,
-        [filter.fieldName]: {
-          value: filter.value,
-          matchMode: filter.filterType || "equals",
-        },
-      };
-    }, {} as DataTableFilterMeta);
+  const dataTableFilters = () => {
+    // In case of filter reset, assign empty array to values instead of null.
+    // dataTableDto.filters
+    //   .filter((x) => x.filterType === "in" && x.values === null)
+    //   .forEach((x) => (x.values = []));
 
-    return aaa;
+    const dataTableFilters: DataTableFilterMeta = dataTableDto.filters.reduce(
+      (accumulator, currentValue) => {
+        if (currentValue.fieldName && currentValue.filterType) {
+          accumulator[currentValue.fieldName] = {
+            value: currentValue.value ?? currentValue.values,
+            matchMode: currentValue.filterType,
+          };
+        }
+        return accumulator;
+      },
+      {} as DataTableFilterMeta
+    );
+    return dataTableFilters;
   };
 
   return (
@@ -251,7 +253,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         }
         // Filter.
         filterDisplay={filterDisplay}
-        filters={mapFiltersToDataTableFilterMeta(dataTableDto.filters)}
+        filters={dataTableFilters()}
         onFilter={(x) => dataTableService.onFilter(dataTableDto, x)}
         // Sort.
         removableSort
@@ -284,9 +286,16 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
             sortable={col.sortable}
             filter={col.filter}
             filterPlaceholder={col.filterPlaceholder}
+            filterElement={col.filterTemplate}
             style={col.style}
             body={col.body}
             showFilterMenu={false}
+            showClearButton={dataTableDto.filters.some(
+              (x) =>
+                x.fieldName == col.field &&
+                x.filterType !== "in" &&
+                x.filterType !== "custom"
+            )}
             editor={col.cellEditor}
             onCellEditComplete={
               col.onCellEditComplete
