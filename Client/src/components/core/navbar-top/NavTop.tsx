@@ -243,7 +243,7 @@ function NavTop() {
 
   return (
     <>
-      <div className="card p-0">
+      <div className="p-0 ">
         <Menubar
           model={items}
           start={start}

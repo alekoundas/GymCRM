@@ -22,6 +22,7 @@ import UserPasswordResetPage from "./pages/user/UserPasswordResetPage.tsx";
 import MailsPage from "./pages/mail/MailsPage.tsx";
 import MailSendPage from "./pages/mail/MailSendPage.tsx";
 import { PrimeReactProvider, PrimeReactContext } from "primereact/api";
+import { FormMode } from "./enum/FormMode.tsx";
 
 export default function App() {
   // Set Toast messages here
@@ -48,16 +49,14 @@ export default function App() {
         {/* Display messages */}
         <Toast ref={toast} />
 
-        <div className="grid p-0 m-0">
-          <div className="col-12 p-1 pt-0 ">
+        <div className="flex flex-column p-0 m-0 h-screen">
+          <div className="pt-0 pb-1">
             <NavTop />
           </div>
 
-          <div className="col-12 p-1 pb-0">
-            <ScrollPanel
-              style={{ height: "100%", width: "100%" }}
-              className="custombar1"
-            >
+          {/* ScrollPanel: fills remaining space */}
+          <div className="flex-1 p-1 pb-0 overflow-hidden">
+            <ScrollPanel className="custombar1 w-full h-full">
               <Routes>
                 <Route
                   path="/"
@@ -84,15 +83,21 @@ export default function App() {
                   />
                   <Route
                     path="train-groups/add"
-                    element={<TrainGroupAdminFormPage />}
+                    element={
+                      <TrainGroupAdminFormPage formMode={FormMode.ADD} />
+                    }
                   />
                   <Route
                     path="train-groups/:id/edit"
-                    element={<TrainGroupAdminFormPage />}
+                    element={
+                      <TrainGroupAdminFormPage formMode={FormMode.EDIT} />
+                    }
                   />
                   <Route
                     path="train-groups/:id/view"
-                    element={<TrainGroupAdminFormPage />}
+                    element={
+                      <TrainGroupAdminFormPage formMode={FormMode.VIEW} />
+                    }
                   />
 
                   <Route
