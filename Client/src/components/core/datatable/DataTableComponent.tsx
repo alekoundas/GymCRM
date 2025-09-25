@@ -134,7 +134,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
 
   React.useEffect(() => {
     // Log filters only if they have changed
-    console.log("data updated:", JSON.stringify(dataTableDto.data));
+    // console.log("data updated:", JSON.stringify(dataTableDto.data));
   }, [dataTableDto.data]);
 
   const getDataTableColumns = () => {
@@ -243,13 +243,22 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         // Pagging.
         paginator
         rows={dataTableDto.rows}
-        totalRecords={dataTableDto.pageCount}
+        totalRecords={dataTableDto.totalRecords}
         onPage={(x) => dataTableService.onPage(dataTableDto, x)}
         rowsPerPageOptions={[10, 25, 50, 100]}
         // paginatorLeft={paginatorLeft}
         paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
         currentPageReportTemplate={
-          "1 to " + dataTableDto.rows + " out of " + dataTableDto.pageCount
+          "Showing " +
+          (dataTableDto.first ?? 0 + 1) +
+          " to " +
+          Math.min(
+            dataTableDto.first ?? 0 + dataTableDto.rows,
+            dataTableDto.totalRecords ?? 0
+          ) +
+          " of " +
+          dataTableDto.totalRecords +
+          " entries"
         }
         // Filter.
         filterDisplay={filterDisplay}

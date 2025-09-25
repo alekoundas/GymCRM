@@ -231,8 +231,12 @@ namespace API.Controllers
                     resultDto[i].RoleId = role.Id.ToString();
             }
 
+            int rowCount = await query.CountAsync();
+            int totalRecords = rowCount;
+
             dataTable.Data = resultDto;
-            dataTable.PageCount = await query.CountAsync();
+            dataTable.TotalRecords = totalRecords;
+            dataTable.PageCount = (int)Math.Ceiling((double)totalRecords / dataTable.Rows);
 
             return new ApiResponse<DataTableDto<UserDto>>().SetSuccessResponse(dataTable);
 

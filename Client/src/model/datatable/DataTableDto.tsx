@@ -4,10 +4,11 @@ import { DataTableFilterDto } from "./DataTableFilterDto";
 
 export interface DataTableDto<TEntity> {
   data: TEntity[];
-  first: number;
+  first?: number;
   rows: number;
-  page: number;
-  pageCount: number;
+  page?: number;
+  pageCount?: number;
+  totalRecords?: number;
   sorts?: DataTableSortDto[];
   filters: DataTableFilterDto[];
   dataTableSorts: DataTableSortMeta[];
@@ -16,10 +17,11 @@ export interface DataTableDto<TEntity> {
 
 export class DataTableDto<TEntity> {
   data: TEntity[] = [];
-  first: number = 0;
+  first?: number = 0;
   rows: number = 0;
-  page: number = 0;
-  pageCount: number = 0;
+  page?: number = 0;
+  pageCount?: number = 0;
+  totalRecords?: number = 0;
   sorts?: DataTableSortDto[] = [];
   filters: DataTableFilterDto[] = [];
   dataTableSorts: DataTableSortMeta[] = [];

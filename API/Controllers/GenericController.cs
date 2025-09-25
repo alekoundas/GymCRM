@@ -161,7 +161,7 @@ namespace API.Controllers
             //        query.FilterByColumnEquals(filter.FieldName, filter.Value);
             //}
 
-            foreach (var filter in dataTable.Filters)//.Where(x => x.FilterType == DataTableFiltersEnum.contains))
+            foreach (var filter in dataTable.Filters)
             {
                 string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
 
@@ -193,14 +193,33 @@ namespace API.Controllers
             List<TEntity> result = await query.ToListAsync();
             List<TEntityDto> customerDto = _mapper.Map<List<TEntityDto>>(result);
 
-            //TODO add filter
-            int rows = await _dataService
-                .GetGenericRepository<TEntity>()
-                //.Where()
-                .CountAsync();
+            foreach (var filter in dataTable.Filters)
+            {
+                string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
+
+                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.contains)
+                    query.FilterByColumnContains(filter.FieldName, filter.Value.ToLower());
+
+                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.equals)
+                    query.FilterByColumnEquals(filter.FieldName, filter.Value);
+
+                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.notEquals)
+                    query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
+
+                if (filter.Values?.Count() > 0 && filter.FilterType == DataTableFiltersEnum.@in)
+                    query.FilterByColumnIn(filter.FieldName, filter.Values);
+
+                if (filter.Values?.Count() == 2 && filter.FilterType == DataTableFiltersEnum.between)
+                    query.FilterByColumnDateBetween(filter.FieldName, filter.Values[0], filter.Values[1]);
+            }
+
+
+            int rowCount = await query.CountAsync();
+            int totalRecords = rowCount;
 
             dataTable.Data = customerDto;
-            dataTable.PageCount = rows;
+            dataTable.TotalRecords = totalRecords;
+            dataTable.PageCount = (int)Math.Ceiling((double)totalRecords / dataTable.Rows);
 
             return new ApiResponse<DataTableDto<TEntityDto>>().SetSuccessResponse(dataTable);
         }
