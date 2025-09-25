@@ -19,58 +19,55 @@ export default function Administrator() {
           <NavLeft />
         </div>
         <div className="col-10">
-          <ScrollPanel
-            style={{ height: "100%", width: "100%" }}
-            className="custombar2"
-          >
-            <Routes>
-              <Route
-                index
-                element={<ChartsComponent />}
-              />
+          {/* <ScrollPanel className="custombar2 h-full w-full"> */}
+          <Routes>
+            <Route
+              index
+              element={<ChartsComponent />}
+            />
 
-              <Route
-                path="train-group-calendar"
-                element={<TrainGroupAdminCalendarPage />}
-              />
-              <Route
-                path="train-groups"
-                element={<TrainGroupAdminPage />}
-              />
+            <Route
+              path="train-group-calendar"
+              element={<TrainGroupAdminCalendarPage />}
+            />
+            <Route
+              path="train-groups"
+              element={<TrainGroupAdminPage />}
+            />
 
-              <Route
-                path="train-groups/:id/view"
-                element={<TrainGroupAdminFormPage formMode={FormMode.VIEW} />}
-              />
-              <Route
-                path="train-groups/add"
-                element={<TrainGroupAdminFormPage formMode={FormMode.ADD} />}
-              />
-              <Route
-                path="train-groups/:id/edit"
-                element={<TrainGroupAdminFormPage formMode={FormMode.EDIT} />}
-              />
+            <Route
+              path="train-groups/:id/view"
+              element={<TrainGroupAdminFormPage formMode={FormMode.VIEW} />}
+            />
+            <Route
+              path="train-groups/add"
+              element={<TrainGroupAdminFormPage formMode={FormMode.ADD} />}
+            />
+            <Route
+              path="train-groups/:id/edit"
+              element={<TrainGroupAdminFormPage formMode={FormMode.EDIT} />}
+            />
 
-              <Route
-                path="emails"
-                element={<MailsPage />}
-              />
-              <Route
-                path="email-send"
-                element={<MailSendPage />}
-              />
+            <Route
+              path="emails"
+              element={<MailsPage />}
+            />
+            <Route
+              path="email-send"
+              element={<MailSendPage />}
+            />
 
-              {/* Users */}
-              <Route
-                path="users"
-                element={<UsersPage />}
-              />
-              <Route
-                path="roles"
-                element={<RolesPage />}
-              />
-            </Routes>
-          </ScrollPanel>
+            {/* Users */}
+            <Route
+              path="users"
+              element={<UsersPage />}
+            />
+            <Route
+              path="roles"
+              element={<RolesPage />}
+            />
+          </Routes>
+          {/* </ScrollPanel> */}
         </div>
       </div>
     </>
