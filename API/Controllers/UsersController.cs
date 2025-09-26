@@ -31,7 +31,7 @@ namespace API.Controllers
         private readonly IMapper _mapper;
         private readonly ILogger<UsersController> _logger;
         private readonly IUserService _userService;
-        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
         private readonly TokenSettings _tokenSettings;
@@ -42,7 +42,7 @@ namespace API.Controllers
             ILogger<UsersController> logger,
             IUserService userService,
             UserManager<User> userManager,
-            RoleManager<IdentityRole<Guid>> roleManager,
+            RoleManager<Role> roleManager,
             IEmailService emailService,
             TokenSettings tokenSettings)
         {
@@ -174,7 +174,13 @@ namespace API.Controllers
         {
             List<Expression<Func<User, bool>>>? filterQuery = new List<Expression<Func<User, bool>>>();
 
-            var query = _dataService.Users;
+
+            //_dataService.GetDbContext().Users.Include(x=>x.UserRoles).ThenInclude(x=>x.Role)
+
+            var query = _dataService.Users
+                .Include(x => x.UserRoles);
+            var asdquery = _dataService.Users
+                .Include(x => x.UserRoles).ThenInclude<UserRole,Role>(x=>x.Role).ToList();
 
             // Handle Sorting of DataTable.
             if (dataTable.Sorts.Count() > 0)
@@ -200,11 +206,22 @@ namespace API.Controllers
             // Handle Filtering of DataTable.
             foreach (var filter in dataTable.Filters)
             {
-                if (filter.FieldName == "FirstName" && filter.Value.Length > 0)
-                    filterQuery.Add(x => x.FirstName.Contains(filter.Value));
+                string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
 
-                if (filter.FieldName == "LastName" && filter.Value.Length > 0)
-                    filterQuery.Add(x => x.LastName.Contains(filter.Value));
+                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.contains)
+                    query.FilterByColumnContains(filter.FieldName, filter.Value.ToLower());
+
+                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.equals)
+                    query.FilterByColumnEquals(filter.FieldName, filter.Value);
+
+                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.notEquals)
+                    query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
+
+                if (filter.Values?.Count() > 0 && filter.FilterType == DataTableFiltersEnum.@in)
+                    query.FilterByColumnIn(filter.FieldName, filter.Values);
+
+                if (filter.Values?.Count() == 2 && filter.FilterType == DataTableFiltersEnum.between)
+                    query.FilterByColumnDateBetween(filter.FieldName, filter.Values[0], filter.Values[1]);
             }
 
 
@@ -226,10 +243,33 @@ namespace API.Controllers
             for (int i = 0; i < result.Count(); i++)
             {
                 string? roleName = (await _userManager.GetRolesAsync(result[i])).FirstOrDefault();
-                IdentityRole<Guid>? role = _roleManager.Roles.FirstOrDefault(x => x.Name == roleName);
+                Role? role = _roleManager.Roles.FirstOrDefault(x => x.Name == roleName);
                 if (role != null)
                     resultDto[i].RoleId = role.Id.ToString();
             }
+
+
+
+            foreach (var filter in dataTable.Filters)
+            {
+                string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
+
+                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.contains)
+                    query.FilterByColumnContains(filter.FieldName, filter.Value.ToLower());
+
+                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.equals)
+                    query.FilterByColumnEquals(filter.FieldName, filter.Value);
+
+                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.notEquals)
+                    query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
+
+                if (filter.Values?.Count() > 0 && filter.FilterType == DataTableFiltersEnum.@in)
+                    query.FilterByColumnIn(filter.FieldName, filter.Values);
+
+                if (filter.Values?.Count() == 2 && filter.FilterType == DataTableFiltersEnum.between)
+                    query.FilterByColumnDateBetween(filter.FieldName, filter.Values[0], filter.Values[1]);
+            }
+
 
             int rowCount = await query.CountAsync();
             int totalRecords = rowCount;
@@ -384,7 +424,7 @@ namespace API.Controllers
                 return new ApiResponse<bool>().SetErrorResponse("error", result);
 
             // Check if SimpleUser role exists, if not create it.
-            var role = new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "SimpleUser", NormalizedName = "SIMPLEUSER" };
+            var role = new Role { Id = Guid.NewGuid(), Name = "SimpleUser", NormalizedName = "SIMPLEUSER" };
             if (!await _roleManager.RoleExistsAsync(role.Name))
                 await _roleManager.CreateAsync(role);
 

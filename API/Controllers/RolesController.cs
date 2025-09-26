@@ -5,6 +5,7 @@ using Core.Dtos.DataTable;
 using Core.Dtos.Identity;
 using Core.Dtos.Lookup;
 using Core.Enums;
+using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,13 +22,13 @@ namespace API.Controllers
         private readonly IDataService _dataService;
         private readonly ILogger<RolesController> _logger;
         private readonly IMapper _mapper;
-        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly RoleManager<Role> _roleManager;
 
         public RolesController(
             IDataService dataService,
             ILogger<RolesController> logger,
             IMapper mapper,
-            RoleManager<IdentityRole<Guid>> roleManager)
+            RoleManager<Role> roleManager)
         {
             _dataService = dataService;
             _logger = logger;
@@ -37,9 +38,9 @@ namespace API.Controllers
 
         // GET: api/Roles
         [HttpGet]
-        public async Task<IEnumerable<IdentityRole<Guid>>> GetAll()
+        public async Task<IEnumerable<Role>> GetAll()
         {
-            List<IdentityRole<Guid> > result = await _roleManager.Roles.ToListAsync();
+            List<Role > result = await _roleManager.Roles.ToListAsync();
             return result;
         }
 
@@ -50,7 +51,7 @@ namespace API.Controllers
             if (id == null)
                 return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role ID not set!");
 
-            IdentityRole<Guid>? role = await _roleManager.FindByIdAsync(id);
+            Role? role = await _roleManager.FindByIdAsync(id);
             if (role == null)
                 return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role not found!");
 
@@ -137,7 +138,7 @@ namespace API.Controllers
 
 
             // Retrieve Data.
-            List<IdentityRole<Guid>> result = await query.ToListAsync();
+            List<Role> result = await query.ToListAsync();
             List<IdentityRoleDto> customerDto = _mapper.Map<List<IdentityRoleDto>>(result);
 
             //TODDO add filter
@@ -164,7 +165,9 @@ namespace API.Controllers
             if (roleExists)
                 return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role already exists");
 
-            IdentityRole<Guid> identityRole = new IdentityRole<Guid>(identityRoleDto.Name);
+            Role identityRole = new Role();
+            identityRole.Name = identityRoleDto.Name;
+
             var result = await _roleManager.CreateAsync(identityRole);
             if (result.Succeeded)
             {
@@ -197,7 +200,7 @@ namespace API.Controllers
             if (id == null || id.Count() == 0)
                 return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role name not not set!");
 
-            IdentityRole<Guid>? identityRole = await _roleManager.FindByIdAsync(id);
+            Role? identityRole = await _roleManager.FindByIdAsync(id);
             if (identityRole == null)
                 return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role name not found!");
 

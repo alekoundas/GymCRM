@@ -12,11 +12,9 @@ namespace Business.Services
 
 
         // Repositories.
-        public IGenericRepository<User> Users { get; }
         public IGenericRepository<Mail> Mails { get; }
         public IGenericRepository<TrainGroup> TrainGroups { get; }
         public IGenericRepository<PhoneNumber> PhoneNumbers { get; }
-
 
         public IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
         public IGenericRepository<TrainGroupParticipant> TrainGroupParticipants { get; }
@@ -24,30 +22,30 @@ namespace Business.Services
         public IGenericRepository<TrainGroupParticipantUnavailableDate> TrainGroupParticipantUnavailableDates { get; }
 
         // Identity.
-        public IGenericRepository<IdentityRole<Guid>> Roles { get; }
-        public IGenericRepository<IdentityUserRole<Guid>> UserRoles { get; }
+        public IGenericRepository<User> Users { get; }
+        public IGenericRepository<Role> Roles { get; }
+        public IGenericRepository<UserRole> UserRoles { get; }
         public IGenericRepository<IdentityRoleClaim<Guid>> RoleClaims { get; }
 
 
 
         public DataService(
             IDbContextFactory<ApiDbContext> dbContextFactory,
-            IGenericRepository<User> userRepository,
             IGenericRepository<Mail> mailRepository,
             IGenericRepository<TrainGroup> trainGroupRepository,
             IGenericRepository<PhoneNumber> phoneNumberRepository,
-            IGenericRepository<IdentityRole<Guid>> roleRepository,
             IGenericRepository<TrainGroupDate> trainGroupDateRepository,
-            IGenericRepository<IdentityUserRole<Guid>> userRoleRepository,
-            IGenericRepository<IdentityRoleClaim<Guid>> roleClaimRepository,
             IGenericRepository<TrainGroupParticipant> trainGroupParticipantRepository,
             IGenericRepository<TrainGroupDateCancellationSubscriber> trainGroupCancellationSubscriberRepository,
-            IGenericRepository<TrainGroupParticipantUnavailableDate> trainGroupParticipantUnavailableDateRepository)
+            IGenericRepository<TrainGroupParticipantUnavailableDate> trainGroupParticipantUnavailableDateRepository,
+            IGenericRepository<User> userRepository,
+            IGenericRepository<Role> roleRepository,
+            IGenericRepository<UserRole> userRoleRepository,
+            IGenericRepository<IdentityRoleClaim<Guid>> roleClaimRepository)
         {
             _dbContextFactory = dbContextFactory;
 
             // Repositories.
-            Users = userRepository;
             TrainGroups = trainGroupRepository;
             PhoneNumbers = phoneNumberRepository;
             Mails = mailRepository;
@@ -60,6 +58,7 @@ namespace Business.Services
 
 
             // Identity.
+            Users = userRepository;
             Roles = roleRepository;
             RoleClaims = roleClaimRepository;
             UserRoles = userRoleRepository;
@@ -67,8 +66,6 @@ namespace Business.Services
 
         public IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : class
         {
-            if (typeof(TEntity) == typeof(User))
-                return (IGenericRepository<TEntity>)Users;
             if (typeof(TEntity) == typeof(TrainGroup))
                 return (IGenericRepository<TEntity>)TrainGroups;
             if (typeof(TEntity) == typeof(PhoneNumber))
@@ -83,9 +80,11 @@ namespace Business.Services
                 return (IGenericRepository<TEntity>)TrainGroupCancellationSubscribers;
             if (typeof(TEntity) == typeof(TrainGroupParticipantUnavailableDate))
                 return (IGenericRepository<TEntity>)TrainGroupParticipantUnavailableDates;
-            if (typeof(TEntity) == typeof(IdentityRole<Guid>))
+            if (typeof(TEntity) == typeof(User))
+                return (IGenericRepository<TEntity>)Users;
+            if (typeof(TEntity) == typeof(Role))
                 return (IGenericRepository<TEntity>)Roles;
-            if (typeof(TEntity) == typeof(IdentityUserRole<Guid>))
+            if (typeof(TEntity) == typeof(UserRole))
                 return (IGenericRepository<TEntity>)UserRoles;
             if (typeof(TEntity) == typeof(IdentityRoleClaim<Guid>))
                 return (IGenericRepository<TEntity>)RoleClaims;

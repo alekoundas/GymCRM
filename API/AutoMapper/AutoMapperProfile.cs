@@ -60,8 +60,8 @@ namespace API.AutoMapper
             CreateMap<MailAddDto, Mail>();
 
             // Identity mappings.
-            CreateMap<IdentityRole<Guid>, IdentityRoleDto>();
-            CreateMap<IdentityRoleDto, IdentityRole<Guid>>();
+            CreateMap<Role, IdentityRoleDto>();
+            CreateMap<IdentityRoleDto, Role>();
 
             CreateMap<User, UserDto>();
             CreateMap<UserDto, User>();

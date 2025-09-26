@@ -20,8 +20,8 @@ namespace Business.Services
         IGenericRepository<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; }
 
         // Identity.
-        IGenericRepository<IdentityRole<Guid>> Roles { get; }
-        IGenericRepository<IdentityUserRole<Guid>> UserRoles { get; }
+        IGenericRepository<Role> Roles { get; }
+        IGenericRepository<UserRole> UserRoles { get; }
         IGenericRepository<IdentityRoleClaim<Guid>> RoleClaims { get; }
         IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : class;
 

@@ -13,6 +13,7 @@ import GenericDialogComponent, {
 } from "../../components/core/dialog/GenericDialogComponent";
 import { useUserStore } from "../../stores/UserStore";
 import ApiService from "../../services/ApiService";
+import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 
 export default function UsersPage() {
   const { userDto, setUserDto, resetUserDto } = useUserStore();
@@ -43,7 +44,7 @@ export default function UsersPage() {
   const [datatableDto, setDatatableDto] = useState<DataTableDto<UserDto>>({
     ...new DataTableDto(),
     filters: [
-      { fieldName: "id", filterType: "equals" },
+      // { fieldName: "id", filterType: "equals" },
       { fieldName: "subject", filterType: "contains" },
       { fieldName: "userId", filterType: "in" },
       { fieldName: "createdOn", filterType: "between" },
@@ -55,7 +56,7 @@ export default function UsersPage() {
       field: "id",
       header: "Id",
       sortable: true,
-      filter: true,
+      filter: false,
       filterPlaceholder: "Search",
       style: { width: "20%" },
     },
@@ -81,6 +82,12 @@ export default function UsersPage() {
       sortable: false,
       filter: true,
       filterPlaceholder: "Search",
+      filterTemplate: (options) => (
+        <DataTableFilterIdComponent
+          options={options}
+          controller="roles"
+        />
+      ),
       style: { width: "20%" },
     },
   ];
