@@ -40,19 +40,14 @@ export default function UsersPage() {
     showDialog: () => setDeleteDialogVisibility(true),
     hideDialog: () => setDeleteDialogVisibility(false),
   };
-
   const [datatableDto, setDatatableDto] = useState<DataTableDto<UserDto>>({
-    data: [],
-    first: 0,
-    rows: 10,
-    page: 1,
-    pageCount: 0,
-    filters: [],
-    dataTableSorts: [],
-    // dataTableFilters: {
-    //   userName: { value: "", matchMode: "contains" },
-    //   email: { value: "", matchMode: "contains" },
-    // },
+    ...new DataTableDto(),
+    filters: [
+      { fieldName: "id", filterType: "equals" },
+      { fieldName: "subject", filterType: "contains" },
+      { fieldName: "userId", filterType: "in" },
+      { fieldName: "createdOn", filterType: "between" },
+    ],
   });
 
   const dataTableColumns: DataTableColumns<UserDto>[] = [
@@ -83,7 +78,7 @@ export default function UsersPage() {
     {
       field: "roleId",
       header: "Role Id",
-      sortable: true,
+      sortable: false,
       filter: true,
       filterPlaceholder: "Search",
       style: { width: "20%" },

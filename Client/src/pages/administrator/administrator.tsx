@@ -14,7 +14,7 @@ import ChartsComponent from "./ChartsComponent";
 export default function Administrator() {
   return (
     <>
-      <div className="grid">
+      <div className="grid h-full">
         <div className="col-2 ">
           <NavLeft />
         </div>

@@ -17,7 +17,6 @@ import { DataTableColumns } from "../../../model/datatable/DataTableColumns";
 import DataTableService from "../../../services/DataTableService";
 import { DataTableDto } from "../../../model/datatable/DataTableDto";
 import { TokenService } from "../../../services/TokenService";
-import { DataTableFilterDto } from "../../../model/datatable/DataTableFilterDto";
 import DataTableGridRowActionsComponent from "./DataTableGridRowActionsComponent";
 
 interface IField<TEntity> {
@@ -79,12 +78,28 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     if (onAfterDataLoaded) {
       var dataResponse = onAfterDataLoaded(data);
       if (dataResponse)
-        setDataTableDto({ ...dataTableDto, data: dataResponse.data });
+        setDataTableDto({
+          ...dataTableDto,
+          data: dataResponse.data,
+          totalRecords: dataResponse.totalRecords,
+          pageCount: dataResponse.pageCount,
+          page: dataResponse.page,
+          first: dataResponse.first,
+          rows: dataResponse.rows,
+        });
     }
 
     // Else do default action
     if (data) {
-      setDataTableDto({ ...dataTableDto, data: data.data });
+      setDataTableDto({
+        ...dataTableDto,
+        data: data.data,
+        totalRecords: data.totalRecords,
+        pageCount: data.pageCount,
+        page: data.page,
+        first: data.first,
+        rows: data.rows,
+      });
     }
     return data;
   };
@@ -120,20 +135,8 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     }
   }, [triggerRefreshData]);
 
-  // Sync dataTableDto with dataTable prop when it changes
-  // React.useEffect(() => {
-  //   setDataTableDto(dataTable);
-  // }, [dataTable]);
-
-  // React.useEffect(() => {
-  //   if (dataTableDto?.filters && dataTableDto?.filters.length > 0) {
-  //     // Log filters only if they have changed
-  //     console.log("Filters updated:", JSON.stringify(dataTableDto.filters));
-  //   }
-  // }, [dataTableDto.filters]);
-
+  // Log if they have changed
   React.useEffect(() => {
-    // Log filters only if they have changed
     // console.log("data updated:", JSON.stringify(dataTableDto.data));
   }, [dataTableDto.data]);
 
@@ -205,11 +208,6 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   };
 
   const dataTableFilters = () => {
-    // In case of filter reset, assign empty array to values instead of null.
-    // dataTableDto.filters
-    //   .filter((x) => x.filterType === "in" && x.values === null)
-    //   .forEach((x) => (x.values = []));
-
     const dataTableFilters: DataTableFilterMeta = dataTableDto.filters.reduce(
       (accumulator, currentValue) => {
         if (currentValue.fieldName && currentValue.filterType) {
@@ -242,24 +240,25 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         loading={loading}
         // Pagging.
         paginator
+        first={dataTableDto.first ?? 0} // Add this line
         rows={dataTableDto.rows}
         totalRecords={dataTableDto.totalRecords}
         onPage={(x) => dataTableService.onPage(dataTableDto, x)}
-        rowsPerPageOptions={[10, 25, 50, 100]}
+        rowsPerPageOptions={[5, 10, 25, 50, 100]}
         // paginatorLeft={paginatorLeft}
-        paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
-        currentPageReportTemplate={
-          "Showing " +
-          (dataTableDto.first ?? 0 + 1) +
-          " to " +
-          Math.min(
-            dataTableDto.first ?? 0 + dataTableDto.rows,
-            dataTableDto.totalRecords ?? 0
-          ) +
-          " of " +
-          dataTableDto.totalRecords +
-          " entries"
-        }
+        // paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+        // currentPageReportTemplate={
+        //   "Showing " +
+        //   (dataTableDto.first ?? 0 + 1) +
+        //   " to " +
+        //   Math.min(
+        //     dataTableDto.first ?? 0 + dataTableDto.rows,
+        //     dataTableDto.totalRecords ?? 0
+        //   ) +
+        //   " of " +
+        //   (dataTableDto.totalRecords ?? 0) +
+        //   " entries"
+        // }
         // Filter.
         filterDisplay={filterDisplay}
         filters={dataTableFilters()}
