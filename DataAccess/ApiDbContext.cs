@@ -1,14 +1,13 @@
 ﻿using Core.Models;
 using DataAccess.Configurations;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace DataAccess
 {
-    public class ApiDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>, IDataProtectionKeyContext
+    public class ApiDbContext : IdentityDbContext<User, Role, Guid>, IDataProtectionKeyContext
     {
         private readonly IConfiguration _configuration;
 
@@ -44,6 +43,8 @@ namespace DataAccess
 
             builder.ApplyConfiguration(new UserConfiguration());
             builder.ApplyConfiguration(new MailConfiguration());
+            builder.ApplyConfiguration(new UserRoleConfiguration());
+            //builder.ApplyConfiguration(new RoleConfiguration());
             builder.ApplyConfiguration(new TrainGroupConfiguration());
             builder.ApplyConfiguration(new PhoneNumberConfiguration());
             builder.ApplyConfiguration(new TrainGroupDateConfiguration());

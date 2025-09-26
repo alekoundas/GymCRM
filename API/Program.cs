@@ -189,8 +189,8 @@ builder.Services.AddIdentityCore<User>(options =>
         options.Lockout.MaxFailedAccessAttempts = 5;
         options.Lockout.AllowedForNewUsers = true;
     })
-    .AddRoles<IdentityRole<Guid>>()
-    .AddRoleManager<RoleManager<IdentityRole<Guid>>>()
+    .AddRoles<Role>()
+    .AddRoleManager<RoleManager<Role>>()
     .AddSignInManager()
     .AddEntityFrameworkStores<ApiDbContext>()
     .AddTokenProvider<DataProtectorTokenProvider<User>>("REFRESHTOKENPROVIDER")

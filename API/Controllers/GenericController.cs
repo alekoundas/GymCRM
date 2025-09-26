@@ -191,7 +191,7 @@ namespace API.Controllers
 
             // Retrieve Data.
             List<TEntity> result = await query.ToListAsync();
-            List<TEntityDto> customerDto = _mapper.Map<List<TEntityDto>>(result);
+            List<TEntityDto> resultDto = _mapper.Map<List<TEntityDto>>(result);
 
             foreach (var filter in dataTable.Filters)
             {
@@ -217,7 +217,7 @@ namespace API.Controllers
             int rowCount = await query.CountAsync();
             int totalRecords = rowCount;
 
-            dataTable.Data = customerDto;
+            dataTable.Data = resultDto;
             dataTable.TotalRecords = totalRecords;
             dataTable.PageCount = (int)Math.Ceiling((double)totalRecords / dataTable.Rows);
 

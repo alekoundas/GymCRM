@@ -22,7 +22,7 @@ namespace API.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly TokenSettings _tokenSettings;
         private readonly ClaimsIdentity _claimsIdentity;
 
@@ -32,7 +32,7 @@ namespace API.Controllers
             IMapper mapper,
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            RoleManager<IdentityRole<Guid>> roleManager,
+            RoleManager<Role> roleManager,
             ClaimsIdentity claimsIdentity,
             TokenSettings tokenSettings)
         {
@@ -63,7 +63,7 @@ namespace API.Controllers
             string? roleName = dataTable.Filters.First(x=>x.FieldName== "RoleName").Value;
             if (roleName != null && roleName.Count() > 0)
             {
-                IdentityRole<Guid>? identityRole = await _roleManager.FindByNameAsync(roleName);
+                Role? identityRole = await _roleManager.FindByNameAsync(roleName);
                 if (identityRole != null)
                 {
                     List<Claim> roleClaims = (await _roleManager.GetClaimsAsync(identityRole)).ToList();

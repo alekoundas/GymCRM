@@ -12,6 +12,10 @@ namespace DataAccess.Configurations
             builder.HasIndex(x => x.Email).IsUnique();
             builder.HasKey(x => x.Id);
 
+            builder.Property(u => u.UserName)
+                .IsRequired()
+                .HasMaxLength(256);
+
             builder.Property(u => u.FirstName)
                 .IsRequired()
                 .HasMaxLength(100);
@@ -22,6 +26,14 @@ namespace DataAccess.Configurations
 
             builder.Property(u => u.Email)
               .IsRequired();
+
+
+
+
+            //builder.HasMany(u => u.UserRoles)
+            //    .WithOne()
+            //    .HasForeignKey(ur => ur.UserId)
+            //    .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

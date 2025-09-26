@@ -43,7 +43,7 @@ namespace DataAccess
             {
                 using var scope = _serviceProvider.CreateScope();
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
 
                 await TrySeedAdminRolesAndClaimsAsync(roleManager);
                 await TrySeedTrainerRolesAndClaimsAsync(roleManager);
@@ -61,9 +61,9 @@ namespace DataAccess
             }
         }
 
-        private async Task TrySeedAdminRolesAndClaimsAsync(RoleManager<IdentityRole<Guid>> roleManager)
+        private async Task TrySeedAdminRolesAndClaimsAsync(RoleManager<Role> roleManager)
         {
-            var role = new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Administrator", NormalizedName = "ADMINISTRATOR" };
+            var role = new Role { Id = Guid.NewGuid(), Name = "Administrator", NormalizedName = "ADMINISTRATOR" };
 
             if (!await roleManager.RoleExistsAsync(role.Name))
             {
@@ -117,9 +117,9 @@ namespace DataAccess
             }
         }
 
-        private async Task TrySeedTrainerRolesAndClaimsAsync(RoleManager<IdentityRole<Guid>> roleManager)
+        private async Task TrySeedTrainerRolesAndClaimsAsync(RoleManager<Role> roleManager)
         {
-            var role = new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "Trainer", NormalizedName = "TRAINER" };
+            var role = new Role { Id = Guid.NewGuid(), Name = "Trainer", NormalizedName = "TRAINER" };
 
             if (!await roleManager.RoleExistsAsync(role.Name))
             {
@@ -159,9 +159,9 @@ namespace DataAccess
             }
         }
 
-        private async Task TrySeedSimpleUserRolesAndClaimsAsync(RoleManager<IdentityRole<Guid>> roleManager)
+        private async Task TrySeedSimpleUserRolesAndClaimsAsync(RoleManager<Role> roleManager)
         {
-            var role = new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = "SimpleUser", NormalizedName = "SIMPLEUSER" };
+            var role = new Role { Id = Guid.NewGuid(), Name = "SimpleUser", NormalizedName = "SIMPLEUSER" };
 
             if (!await roleManager.RoleExistsAsync(role.Name))
             {
@@ -182,7 +182,7 @@ namespace DataAccess
             }
         }
 
-        private async Task TrySeedAdminUserAsync(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+        private async Task TrySeedAdminUserAsync(UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             var user = new User
             {
@@ -213,7 +213,7 @@ namespace DataAccess
             }
         }
 
-        private async Task TrySeedTrainerUserAsync(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+        private async Task TrySeedTrainerUserAsync(UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             var user = new User
             {
@@ -244,7 +244,7 @@ namespace DataAccess
             }
         }
 
-        private async Task TrySeedSimpleUserUserAsync(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+        private async Task TrySeedSimpleUserUserAsync(UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             var user = new User
             {
