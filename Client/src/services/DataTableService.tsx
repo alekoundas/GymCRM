@@ -106,9 +106,9 @@ export default class DataTableService<TEntity> {
     dataTableDto: DataTableDto<TEntity>,
     event: DataTablePageEvent
   ) => {
-    if (event.page) dataTableDto.page = event.page;
-    if (event.rows) dataTableDto.rows = event.rows;
-    if (event.pageCount) dataTableDto.pageCount = event.pageCount;
+    dataTableDto.page = event.page;
+    dataTableDto.rows = event.rows;
+    dataTableDto.first = event.first;
 
     this.refreshData(dataTableDto);
   };
@@ -140,6 +140,7 @@ export default class DataTableService<TEntity> {
       return dataTableDto;
     } else {
       this.setLoading(true);
+      dataTableDto.data = [];
       return await ApiService.getDataGrid<TEntity>(
         this.controller,
         dataTableDto

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { TokenService } from "../../../services/TokenService";
 
 export default function NavLeft() {
-  const toast = useRef<Toast>(null);
+  // const toast = useRef<Toast>(null);
   const navigate = useNavigate();
 
   const items: MenuItem[] = [
@@ -103,10 +103,10 @@ export default function NavLeft() {
   return (
     <>
       <div
-        className="card "
-        style={{ height: "93vh" }}
+        className="card h-full"
+        // style={{ height: "100%" }}
       >
-        <Toast ref={toast} />
+        {/* <Toast ref={toast} /> */}
         <Menu
           model={items}
           className="h-full w-full"

@@ -211,7 +211,7 @@ namespace API.Controllers
 
 
             // Handle pagination.
-            int skip = (dataTable.Page - 1) * dataTable.Rows;
+            int skip = dataTable.Page * dataTable.Rows;
             int take = dataTable.Rows;
 
             query.AddPagging(skip, take);

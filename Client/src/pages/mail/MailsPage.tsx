@@ -47,18 +47,13 @@ export default function MailsPage() {
   };
 
   const [datatableDto, setDatatableDto] = useState<DataTableDto<MailDto>>({
-    data: [],
-    first: 0,
-    rows: 10,
-    page: 1,
-    pageCount: 0,
+    ...new DataTableDto(),
     filters: [
       { fieldName: "id", filterType: "equals" },
       { fieldName: "subject", filterType: "contains" },
       { fieldName: "userId", filterType: "in" },
       { fieldName: "createdOn", filterType: "between" },
     ],
-    dataTableSorts: [],
   });
 
   const dataTableColumns: DataTableColumns<MailDto>[] = [
@@ -178,7 +173,7 @@ export default function MailsPage() {
   return (
     <>
       <Card title="Email History">
-        <div className="card">
+        <div className="h-full">
           <DataTableComponent
             controller="mails"
             dataTableDto={datatableDto}

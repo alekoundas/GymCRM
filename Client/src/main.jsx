@@ -4,15 +4,20 @@ import "primeicons/primeicons.css";
 import "primeflex/primeflex.css";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext.js";
+import { PrimeReactProvider } from "primereact/api";
 
 createRoot(document.getElementById("root")).render(
   <>
     {/* <StrictMode> */}
-    <BrowserRouter>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </BrowserRouter>
+    <div className="h-screen">
+      <BrowserRouter>
+        <AuthProvider>
+          <PrimeReactProvider>
+            <App />
+          </PrimeReactProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </div>
     {/* </StrictMode> */}
   </>
 );
