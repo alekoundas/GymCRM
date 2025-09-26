@@ -179,6 +179,8 @@ namespace API.Controllers
 
                 if (filter.Values?.Count() == 2 && filter.FilterType == DataTableFiltersEnum.between)
                     query.FilterByColumnDateBetween(filter.FieldName, filter.Values[0], filter.Values[1]);
+
+                //if (filter.FilterType == DataTableFiltersEnum.custom)
             }
 
 
@@ -236,6 +238,12 @@ namespace API.Controllers
             errors = Array.Empty<string>();
             return false;
         }
+
+        //protected virtual bool DatTableCustomFilterPOST(TEntityAddDto entity, out string[] errors)
+        //{
+        //    errors = Array.Empty<string>();
+        //    return false;
+        //}
 
         protected virtual bool IsUserAuthorized(string action)
         {

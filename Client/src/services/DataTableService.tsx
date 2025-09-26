@@ -88,9 +88,7 @@ export default class DataTableService<TEntity> {
         filterType: filterField.matchMode,
       } as DataTableFilterDto;
 
-      if (filterField.matchMode === "in") {
-        filter.values = filterField.value ?? [];
-      } else if (filterField.matchMode === "between") {
+      if (Array.isArray(filterField.value)) {
         filter.values = filterField.value ?? [];
       } else {
         filter.value = filterField.value;

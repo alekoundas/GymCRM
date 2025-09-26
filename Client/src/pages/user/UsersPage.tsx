@@ -47,6 +47,7 @@ export default function UsersPage() {
       // { fieldName: "id", filterType: "equals" },
       { fieldName: "subject", filterType: "contains" },
       { fieldName: "userId", filterType: "in" },
+      { fieldName: "roleId", filterType: "custom" },
       { fieldName: "createdOn", filterType: "between" },
     ],
   });

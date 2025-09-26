@@ -12,19 +12,19 @@ namespace DataAccess.Configurations
             //builder.HasKey(ur => new { ur.UserId, ur.RoleId });
 
             // Indexes (optional for performance)
-            builder.HasIndex(ur => ur.UserId);
-            builder.HasIndex(ur => ur.RoleId);
+            builder.HasIndex(x => x.UserId);
+            builder.HasIndex(x => x.RoleId);
 
             // Relationship with User (one-to-many)
             builder.HasOne(x => x.User)
-                .WithMany(r => r.UserRoles)
-                .HasForeignKey(ur => ur.UserId)
+                .WithMany(x => x.UserRoles)
+                .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);// Delete if parent User is deleted
 
             // Relationship with Role (one-to-many)
             builder.HasOne(x => x.Role)
-                .WithMany(u => u.UserRoles)
-                .HasForeignKey(ur => ur.RoleId)
+                .WithMany(x => x.UserRoles)
+                .HasForeignKey(x => x.RoleId)
                 .OnDelete(DeleteBehavior.Cascade); // Delete if parent Role is deleted
 
         }

@@ -174,13 +174,9 @@ namespace API.Controllers
         {
             List<Expression<Func<User, bool>>>? filterQuery = new List<Expression<Func<User, bool>>>();
 
-
-            //_dataService.GetDbContext().Users.Include(x=>x.UserRoles).ThenInclude(x=>x.Role)
-
             var query = _dataService.Users
-                .Include(x => x.UserRoles);
-            var asdquery = _dataService.Users
-                .Include(x => x.UserRoles).ThenInclude<UserRole,Role>(x=>x.Role).ToList();
+                .Include(x => x.UserRoles)
+                .ThenInclude<UserRole, Role>(x => x.Role);
 
             // Handle Sorting of DataTable.
             if (dataTable.Sorts.Count() > 0)
@@ -204,7 +200,7 @@ namespace API.Controllers
 
 
             // Handle Filtering of DataTable.
-            foreach (var filter in dataTable.Filters)
+            foreach (DataTableFilterDto filter in dataTable.Filters)
             {
                 string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
 
@@ -222,6 +218,11 @@ namespace API.Controllers
 
                 if (filter.Values?.Count() == 2 && filter.FilterType == DataTableFiltersEnum.between)
                     query.FilterByColumnDateBetween(filter.FieldName, filter.Values[0], filter.Values[1]);
+
+                if (filter.FilterType == DataTableFiltersEnum.custom)
+                    if (fieldName == "RoleId" && filter.Values.Count() > 0)
+                        query.Where(x => x.UserRoles.Any(y => filter.Values.Any(z => z == y.RoleId.ToString())));
+
             }
 
 
@@ -268,6 +269,10 @@ namespace API.Controllers
 
                 if (filter.Values?.Count() == 2 && filter.FilterType == DataTableFiltersEnum.between)
                     query.FilterByColumnDateBetween(filter.FieldName, filter.Values[0], filter.Values[1]);
+
+                if (filter.FilterType == DataTableFiltersEnum.custom)
+                    if (fieldName == "RoleId" && filter.Values.Count() > 0)
+                        query.Where(x => x.UserRoles.Any(y => filter.Values.Any(z => z == y.RoleId.ToString())));
             }
 
 
