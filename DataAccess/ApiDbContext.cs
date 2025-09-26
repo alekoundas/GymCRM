@@ -1,13 +1,23 @@
 ﻿using Core.Models;
 using DataAccess.Configurations;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace DataAccess
 {
-    public class ApiDbContext : IdentityDbContext<User, Role, Guid>, IDataProtectionKeyContext
+    public class ApiDbContext : IdentityDbContext<
+        User,                          // User type
+        Role,                          // Role type
+        Guid,                          // Key type
+        IdentityUserClaim<Guid>,       // User claim type (default)
+        UserRole,                      // Custom user-role type
+        IdentityUserLogin<Guid>,       // User login type (default)
+        IdentityRoleClaim<Guid>,       // Role claim type (default)
+        IdentityUserToken<Guid>        // User token type (default)
+    >, IDataProtectionKeyContext
     {
         private readonly IConfiguration _configuration;
 
@@ -41,8 +51,8 @@ namespace DataAccess
         {
             base.OnModelCreating(builder);
 
-            builder.ApplyConfiguration(new UserConfiguration());
             builder.ApplyConfiguration(new MailConfiguration());
+            builder.ApplyConfiguration(new UserConfiguration());
             builder.ApplyConfiguration(new UserRoleConfiguration());
             //builder.ApplyConfiguration(new RoleConfiguration());
             builder.ApplyConfiguration(new TrainGroupConfiguration());

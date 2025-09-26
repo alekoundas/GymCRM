@@ -26,14 +26,6 @@ namespace DataAccess.Configurations
 
             builder.Property(u => u.Email)
               .IsRequired();
-
-
-
-
-            //builder.HasMany(u => u.UserRoles)
-            //    .WithOne()
-            //    .HasForeignKey(ur => ur.UserId)
-            //    .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
