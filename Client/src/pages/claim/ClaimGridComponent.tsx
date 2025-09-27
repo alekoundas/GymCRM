@@ -14,7 +14,7 @@ import { RoleDto } from "../../model/entities/role/RoleDto";
 
 interface IField extends DialogChildProps {}
 
-export default function RoleGridComponent({
+export default function ClaimGridComponent({
   formMode,
   toggleDialogSave,
 }: IField) {
@@ -22,6 +22,9 @@ export default function RoleGridComponent({
 
   const [datatableDto, setDatatableDto] = useState<DataTableDto<ClaimDto>>({
     ...new DataTableDto(),
+    filters: [
+      { fieldName: "RoleName", filterType: "contains", value: roleDto.name },
+    ],
   });
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {

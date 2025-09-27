@@ -13,7 +13,7 @@ import GenericDialogComponent, {
 } from "../../components/core/dialog/GenericDialogComponent";
 import ApiService from "../../services/ApiService";
 import RoleFormComponent from "./RoleFormComponent";
-import RoleGridComponent from "./RoleGridComponent";
+import ClaimGridComponent from "../claim/ClaimGridComponent";
 
 export default function RolesPage() {
   const { roleDto, setRoleDto, resetRoleDto } = useRoleStore();
@@ -161,7 +161,7 @@ export default function RolesPage() {
       >
         <div className="w-full">
           <RoleFormComponent />
-          <RoleGridComponent />
+          <ClaimGridComponent />
         </div>
       </GenericDialogComponent>
 
@@ -177,7 +177,7 @@ export default function RolesPage() {
       >
         <div className="w-full">
           <RoleFormComponent />
-          <RoleGridComponent />
+          <ClaimGridComponent />
         </div>
       </GenericDialogComponent>
 
@@ -192,7 +192,7 @@ export default function RolesPage() {
       >
         <div className="w-full">
           <RoleFormComponent />
-          <RoleGridComponent />
+          <ClaimGridComponent />
         </div>
       </GenericDialogComponent>
 

@@ -52,7 +52,9 @@ namespace API.Controllers
                 .ToList();
 
 
-            string? roleName = dataTable.Filters.First(x=>x.FieldName== "RoleName").Value;
+            string? roleName = dataTable.Filters.FirstOrDefault(x=>x.FieldName== "RoleName")?.Value;
+
+            // View/Edit mode.
             if (roleName != null && roleName.Count() > 0)
             {
                 Role? identityRole = await _roleManager.FindByNameAsync(roleName);
@@ -71,6 +73,7 @@ namespace API.Controllers
                         });
                 }
             }
+            // Add mode.
             else
                 foreach (var controller in controllerNames)
                     identityClaimsDto.Add(new IdentityClaimDto()
