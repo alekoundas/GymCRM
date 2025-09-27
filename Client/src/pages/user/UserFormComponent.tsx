@@ -4,6 +4,8 @@ import { InputText } from "primereact/inputtext";
 import LookupComponent from "../../components/core/dropdown/LookupComponent";
 import { useUserStore } from "../../stores/UserStore";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
+import { UserRoleDto } from "../../model/entities/user-role/UserRoleDto";
+import { RoleDto } from "../../model/entities/role/RoleDto";
 
 interface IField extends DialogChildProps {}
 
@@ -25,7 +27,7 @@ export default function UserFormComponent({ formMode }: IField) {
             name="userName"
             value={userDto.userName}
             onChange={(x) => updateUserDto({ [x.target.name]: x.target.value })}
-            disabled
+            disabled={formMode !== FormMode.EDIT}
           />
         </div>
 
@@ -41,7 +43,7 @@ export default function UserFormComponent({ formMode }: IField) {
             name="email"
             value={userDto.email}
             onChange={(x) => updateUserDto({ [x.target.name]: x.target.value })}
-            disabled
+            disabled={formMode !== FormMode.EDIT}
           />
         </div>
 
@@ -54,12 +56,24 @@ export default function UserFormComponent({ formMode }: IField) {
           </label>
           <LookupComponent
             controller="roles"
-            idValue={userDto.roleId}
-            isEditable={true}
+            selectedEntityId={userDto.userRoles[0]?.role?.id ?? ""}
             isEnabled={formMode === FormMode.EDIT}
-            allowCustom={false}
-            // onCustomChange={isCustomChange}
-            onChange={(x) => updateUserDto({ roleId: x })}
+            onChange={(x) =>
+              updateUserDto({
+                userRoles: x
+                  ? [
+                      {
+                        ...new UserRoleDto(),
+                        role: {
+                          ...new RoleDto(),
+                          id: x.id ?? "",
+                          name: x.value ?? "",
+                        },
+                      },
+                    ]
+                  : [],
+              })
+            }
           />
         </div>
       </div>

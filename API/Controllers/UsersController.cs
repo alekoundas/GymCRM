@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using Business.Services;
 using Core.Dtos;
 using Core.Dtos.AutoComplete;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace API.Controllers
 {
@@ -24,16 +26,19 @@ namespace API.Controllers
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly ILogger<UsersController> _logger;
+        private readonly IUserService _userService;
         private readonly UserManager<User> _userManager;
 
         public UsersController(
             IDataService dataService,
             IMapper mapper,
             ILogger<UsersController> logger,
+            IUserService userService,
             UserManager<User> userManager)
         {
             _dataService = dataService;
             _logger = logger;
+            _userService = userService;
             _userManager = userManager;
             _mapper = mapper;
         }
@@ -47,8 +52,8 @@ namespace API.Controllers
                 return new ApiResponse<UserDto>().SetErrorResponse("error", "User ID not set!");
 
             User? user = await _dataService.Users
-                .Include(x=>x.UserRoles)
-                .ThenInclude<UserRole,Role>(x=>x.Role)
+                .Include(x => x.UserRoles)
+                .ThenInclude<UserRole, Role>(x => x.Role)
                 .FirstOrDefaultAsync(x => x.Id == new Guid(id));
 
 
@@ -67,16 +72,26 @@ namespace API.Controllers
             if (id != request.Id)
                 return new ApiResponse<UserDto>().SetErrorResponse("error", "ID mismatch");
 
+            if (request.UserRoles.Count() == 0)
+                return new ApiResponse<UserDto>().SetErrorResponse("error", "Role is required!");
 
             User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == new Guid(request.Id));
             if (user == null)
                 return new ApiResponse<UserDto>().SetErrorResponse("error", "User not found");
 
+            string? roleName = request.UserRoles[0].Role.Name;
+            bool roleExists = await _dataService.Roles.AnyAsync(x => x.Name == roleName);
+            if (!roleExists)
+                return new ApiResponse<UserDto>().SetErrorResponse("error", "Role doesnt exist!");
 
-            // Update user properties
+            // Update user role.
+            await _userService.AssignSingleRoleAsync(user, roleName!);
+
+            // Update user properties.
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
-            //user.Email = request.Email; Shouldnt update email
+            user.UserName = request.UserName;
+            user.Email = request.Email; // Only admin can update email.
             user.UserName = request.UserName;
             user.ProfileImage = request.ProfileImage;
 
@@ -86,7 +101,7 @@ namespace API.Controllers
             if (response.Succeeded)
                 return new ApiResponse<UserDto>().SetSuccessResponse(userDto, "success", "User updated successfully");
             else
-                return new ApiResponse<UserDto>().SetErrorResponse("error", "User update error");
+                return new ApiResponse<UserDto>().SetErrorResponse("error", response.Errors.First().Description);
         }
 
 
@@ -102,11 +117,11 @@ namespace API.Controllers
                 return new ApiResponse<IdentityUser>().SetErrorResponse("error", "User not found!");
 
 
-            var result = await _userManager.DeleteAsync(user);
-            if (result.Succeeded)
+            var response = await _userManager.DeleteAsync(user);
+            if (response.Succeeded)
                 return new ApiResponse<IdentityUser>().SetSuccessResponse("success", $"User {user.Email} deleted successfully");
+            return new ApiResponse<IdentityUser>().SetErrorResponse("error", response.Errors.First().Description);
 
-            return new ApiResponse<IdentityUser>().SetErrorResponse("error", result.Errors.ToString() ?? "");
         }
 
         // POST: api/Users/GetDataTable
@@ -167,7 +182,7 @@ namespace API.Controllers
 
 
             // Handle pagination.
-            int skip = (dataTable.Page-1) * dataTable.Rows;
+            int skip = (dataTable.Page - 1) * dataTable.Rows;
             int take = dataTable.Rows;
             query.AddPagging(skip, take);
 

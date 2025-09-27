@@ -90,7 +90,7 @@ export default function UsersPage() {
         />
       ),
       body: (rowData, options) => {
-        return rowData.userRoles[0].role.name;
+        return rowData.userRoles[0]?.role?.name;
       },
       style: { width: "20%" },
     },

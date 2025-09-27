@@ -67,16 +67,6 @@ namespace Business.Services
             if (userRoles.Count() > 0)
                 await _userManager.RemoveFromRolesAsync(user, userRoles);
 
-
-            // create role if it does not exist
-            //if (!await _roleManager.RoleExistsAsync(roleName))
-            //{
-            //    var role = new IdentityRole<Guid> { Id = Guid.NewGuid(), Name = roleName, NormalizedName = roleName.ToUpper() };
-            //    var result = await _roleManager.CreateAsync(role);
-            //    if (!result.Succeeded)
-            //        throw new InvalidOperationException($"Failed to create role: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-            //}
-
             // Assign the single role
             IdentityResult addResult = await _userManager.AddToRoleAsync(user, roleName);
             if (!addResult.Succeeded)

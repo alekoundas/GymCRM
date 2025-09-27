@@ -8,7 +8,6 @@ export interface UserDto {
   email: string;
   firstName: string;
   lastName: string;
-  roleId: string;
   profileImage?: string | null; // Base64-encoded image (e.g., "data:image/jpeg;base64,...") or null
   userRoles: UserRoleDto[];
 }
@@ -19,7 +18,6 @@ export class UserDto {
   email: string = "";
   firstName: string = "";
   lastName: string = "";
-  roleId: string = "";
   profileImage?: string | null; // Base64-encoded image (e.g., "data:image/jpeg;base64,...") or null
   userRoles: UserRoleDto[] = [];
 }
