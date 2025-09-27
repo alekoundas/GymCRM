@@ -55,8 +55,8 @@ namespace Business.Repository
         Task<int> RemoveRangeAsync(IEnumerable<TEntity> entities);
 
 
-        TEntity? Find(int id);
-        Task<TEntity?> FindAsync(int id);
+        TEntity? Find(object? id);
+        Task<TEntity?> FindAsync(object? id);
 
         Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> filter);
         TEntity? FirstOrDefault(Expression<Func<TEntity, bool>>? predicate);

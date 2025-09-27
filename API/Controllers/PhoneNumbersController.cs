@@ -25,7 +25,7 @@ namespace API.Controllers
 
         // PUT: api/controller/5
         [HttpPut("{id}")]
-        public override async Task<ActionResult<ApiResponse<PhoneNumber>>> Put(int id, [FromBody] PhoneNumberDto entityDto)
+        public override async Task<ActionResult<ApiResponse<PhoneNumber>>> Put(string? id, [FromBody] PhoneNumberDto entityDto)
         {
             if (!IsUserAuthorized("Edit"))
                 return new ApiResponse<PhoneNumber>().SetErrorResponse("error", "User is not authorized to perform this action.");

@@ -385,14 +385,14 @@ namespace Business.Repository
         }
 
 
-        public TEntity? Find(int id)
+        public TEntity? Find(object? id)
         {
             TEntity? result = _contextFactory.CreateDbContext().Set<TEntity>().Find(id);
 
             Dispose();
             return result;
         }
-        public async Task<TEntity?> FindAsync(int id)
+        public async Task<TEntity?> FindAsync(object? id)
         {
             TEntity? result = await _contextFactory.CreateDbContext().Set<TEntity>().FindAsync(id);
 
