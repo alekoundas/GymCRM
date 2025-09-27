@@ -87,6 +87,22 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
     ],
   });
 
+  const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
+    let availableButtons: ButtonTypeEnum[] = [];
+
+    if (formMode !== FormMode.VIEW)
+      availableButtons = [
+        ButtonTypeEnum.VIEW,
+        ButtonTypeEnum.EDIT,
+        ButtonTypeEnum.DELETE,
+      ];
+
+    if (formMode !== FormMode.VIEW && selectedTrainGroupDate?.id !== undefined)
+      availableButtons.push(ButtonTypeEnum.ADD);
+
+    return availableButtons;
+  };
+
   // Custom chip template for selected users
   const chipTemplate = (user: UserDto | undefined) => {
     if (user) {
@@ -420,15 +436,12 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
         setDataTableDto={setDatatableDto}
         dataTableColumns={dataTableColumns}
         filterDisplay={DataTableFilterDisplayEnum.ROW}
-        enableAddAction={
-          formMode !== FormMode.VIEW && selectedTrainGroupDate?.id !== undefined
-        }
-        enableGridRowActions={formMode !== FormMode.VIEW}
         onButtonClick={onDataTableClick}
         onAfterDataLoaded={onAfterDataLoaded}
         triggerRefreshData={triggerRefreshDataTable}
         authorize={true}
         loadDataOnInit={false}
+        availableGridRowButtons={availableGridRowButtons()}
       />
 
       {/*                                      */}

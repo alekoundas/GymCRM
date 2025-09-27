@@ -82,6 +82,18 @@ export default function TrainGroupParticipantGridComponent({
     ],
   });
 
+  const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
+    if (formMode !== FormMode.VIEW)
+      return [
+        ButtonTypeEnum.VIEW,
+        ButtonTypeEnum.ADD,
+        ButtonTypeEnum.EDIT,
+        ButtonTypeEnum.DELETE,
+      ];
+
+    return [];
+  };
+
   // Update datatableDto when trainGroupDto.trainGroupDates changes
   useEffect(() => {
     setDatatableDto((prev) => ({
@@ -265,12 +277,11 @@ export default function TrainGroupParticipantGridComponent({
         formMode={formMode}
         dataTableColumns={dataTableColumns}
         filterDisplay={DataTableFilterDisplayEnum.ROW}
-        enableAddAction={formMode !== FormMode.VIEW}
-        enableGridRowActions={formMode !== FormMode.VIEW}
         onButtonClick={onDataTableClick}
         onAfterDataLoaded={onAfterDataLoaded}
         triggerRefreshData={triggerRefreshDataTable}
         authorize={true}
+        availableGridRowButtons={availableGridRowButtons()}
       />
 
       {/*                                      */}

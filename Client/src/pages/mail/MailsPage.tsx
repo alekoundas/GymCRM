@@ -19,9 +19,17 @@ import DataTableFilterDateComponent from "../../components/core/datatable/DataTa
 import DataTableFilterNumberComponent from "../../components/core/datatable/DataTableFilterNumberComponent";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
+import MailSendFormComponent from "./MailSendFormComponent";
 
 export default function MailsPage() {
-  const { mailDto, setMailDto, resetMailDto } = useMailStore();
+  const {
+    mailDto,
+    setMailDto,
+    resetMailDto,
+    mailSendDto,
+    setMailSendDto,
+    resetMailSendDto,
+  } = useMailStore();
 
   const triggerRefreshDataTable = useRef<
     ((dto: DataTableDto<MailDto>) => void) | undefined
@@ -58,6 +66,10 @@ export default function MailsPage() {
       { fieldName: "createdOn", filterType: "between" },
     ],
   });
+
+  const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
+    return [ButtonTypeEnum.VIEW, ButtonTypeEnum.CLONE, ButtonTypeEnum.DELETE];
+  };
 
   // Custom chip template for selected users
   const chipTemplate = (user: UserDto | undefined) => {
@@ -147,7 +159,7 @@ export default function MailsPage() {
     },
   ];
 
-  const onDataTableClick = (buttonType: ButtonTypeEnum, rowData?: any) => {
+  const onDataTableClick = (buttonType: ButtonTypeEnum, rowData?: MailDto) => {
     if (rowData) setMailDto({ ...rowData });
     switch (buttonType) {
       case ButtonTypeEnum.VIEW:
@@ -159,6 +171,10 @@ export default function MailsPage() {
         break;
       case ButtonTypeEnum.EDIT:
         setEditDialogVisibility(true);
+        break;
+      case ButtonTypeEnum.CLONE:
+        if (rowData) setMailSendDto(rowData);
+        setAddDialogVisibility(true);
         break;
       case ButtonTypeEnum.DELETE:
         setDeleteDialogVisibility(true);
@@ -213,12 +229,11 @@ export default function MailsPage() {
             setDataTableDto={setDatatableDto}
             formMode={FormMode.EDIT}
             onButtonClick={onDataTableClick}
-            enableGridRowActions={true}
             filterDisplay={DataTableFilterDisplayEnum.ROW}
-            enableAddAction={false}
             dataTableColumns={dataTableColumns}
             triggerRefreshData={triggerRefreshDataTable}
             authorize={true}
+            availableGridRowButtons={availableGridRowButtons()}
           />
         </div>
       </Card>
@@ -248,7 +263,7 @@ export default function MailsPage() {
         formMode={FormMode.ADD}
       >
         <div className="w-full">
-          <MailFormComponent />
+          <MailSendFormComponent />
         </div>
       </GenericDialogComponent>
 

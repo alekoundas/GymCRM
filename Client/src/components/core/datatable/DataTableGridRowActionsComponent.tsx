@@ -1,15 +1,15 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { ButtonTypeEnum } from "../../../enum/ButtonTypeEnum";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
 import { TokenService } from "../../../services/TokenService";
 import { Button } from "primereact/button";
-import { useClickOutside } from "primereact/hooks";
 interface IField<TEntity> {
   rowData: TEntity;
-  onButtonClick: (type: ButtonTypeEnum, data: TEntity) => void;
+  onButtonClick: (buttonType: ButtonTypeEnum, rowData?: TEntity) => void;
   authorize: boolean;
   controller: string;
+  availableGridRowButtons: ButtonTypeEnum[];
 }
 
 export default function DataTableGridRowActionsComponent<TEntity>({
@@ -17,71 +17,56 @@ export default function DataTableGridRowActionsComponent<TEntity>({
   onButtonClick,
   authorize,
   controller,
+  availableGridRowButtons,
 }: IField<TEntity>) {
   const menuRef = useRef<Menu>(null);
 
-  // useEffect(() => {
-  //   const handleClickOutside = (event: MouseEvent) => {
-  //     const menuTarget = menuRef.current?.getElement();
-  //     if (menuTarget) {
-  //       let isMenuClick = false;
+  const getMenuItems: () => MenuItem[] = () => {
+    const menuItems: MenuItem[] = [];
 
-  //       menuTarget?.childNodes.forEach((ul) => {
-  //         ul.childNodes.forEach((li) => {
-  //           li.childNodes.forEach((div) => {
-  //             div.childNodes.forEach((a) => {
-  //               if (a === event.target) isMenuClick = true;
-  //             });
-  //           });
-  //         });
-  //       });
+    if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.VIEW))
+      menuItems.push({
+        label: "View",
+        icon: "pi pi-eye",
+        command: () => onButtonClick(ButtonTypeEnum.VIEW, rowData),
+        visible: authorize
+          ? TokenService.isUserAllowed(controller + "_View")
+          : true,
+      });
 
-  //       if (!isMenuClick) menuTarget.hidden = true;
-  //     }
-  //   };
+    if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.EDIT))
+      menuItems.push({
+        label: "Edit",
+        icon: "pi pi-pencil",
+        command: () => onButtonClick(ButtonTypeEnum.EDIT, rowData),
+        visible: authorize
+          ? TokenService.isUserAllowed(controller + "_Edit")
+          : true,
+      });
 
-  //   // Attach listener after a short delay to avoid initial open interference
-  //   const timeoutId = setTimeout(() => {
-  //     document.addEventListener("mousedown", handleClickOutside);
-  //   }, 0);
+    if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.CLONE))
+      menuItems.push({
+        label: "Clone",
+        icon: "pi pi-copy",
+        command: () => onButtonClick(ButtonTypeEnum.CLONE, rowData),
+        visible: authorize
+          ? TokenService.isUserAllowed(controller + "_Add")
+          : true,
+      });
 
-  //   return () => {
-  //     clearTimeout(timeoutId);
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []); // Runs once per component instance
+    if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.DELETE))
+      menuItems.push({
+        label: "Delete",
+        icon: "pi pi-trash",
+        command: () => onButtonClick(ButtonTypeEnum.DELETE, rowData),
+        visible: authorize
+          ? TokenService.isUserAllowed(controller + "_Delete")
+          : true,
+        style: { color: "red" }, // Optional: Red text for delete (Menu doesn't have built-in severity)
+      });
 
-  const actionMenuItems: MenuItem[] = [
-    {
-      label: "View",
-      icon: "pi pi-eye",
-      command: () => onButtonClick(ButtonTypeEnum.VIEW, rowData),
-      visible: authorize
-        ? TokenService.isUserAllowed(controller + "_View")
-        : true,
-    },
-    {
-      label: "Edit",
-      icon: "pi pi-pencil",
-      command: () => onButtonClick(ButtonTypeEnum.EDIT, rowData),
-      visible: authorize
-        ? TokenService.isUserAllowed(controller + "_Edit")
-        : true,
-    },
-    {
-      label: "Delete",
-      icon: "pi pi-trash",
-      command: () => onButtonClick(ButtonTypeEnum.DELETE, rowData),
-      visible: authorize
-        ? TokenService.isUserAllowed(controller + "_Delete")
-        : true,
-      style: { color: "red" }, // Optional: Red text for delete (Menu doesn't have built-in severity)
-    },
-  ];
-
-  // const handleToggle = (e: React.MouseEvent) => {
-  //   menuRef.current?.toggle(e);
-  // };
+    return menuItems;
+  };
 
   return (
     <div>
@@ -94,7 +79,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
       <Menu
         ref={menuRef}
         closeOnEscape
-        model={actionMenuItems}
+        model={getMenuItems()}
         popup
         appendTo={document.body}
       />

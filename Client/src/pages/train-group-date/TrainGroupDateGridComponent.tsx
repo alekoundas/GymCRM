@@ -64,7 +64,6 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
     hideDialog: () => setDeleteDialogVisibility(false),
   };
 
-  useEffect(() => {}, []);
   const [datatableDto, setDatatableDto] = useState<
     DataTableDto<TrainGroupDateDto>
   >({
@@ -80,6 +79,18 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       },
     ],
   });
+
+  const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
+    if (formMode !== FormMode.VIEW)
+      return [
+        ButtonTypeEnum.VIEW,
+        ButtonTypeEnum.ADD,
+        ButtonTypeEnum.EDIT,
+        ButtonTypeEnum.DELETE,
+      ];
+
+    return [];
+  };
 
   // Update datatableDto when trainGroupDto.trainGroupDates changes
   useEffect(() => {
@@ -288,14 +299,13 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
         setDataTableDto={setDatatableDto}
         dataTableColumns={dataTableColumns}
         filterDisplay={DataTableFilterDisplayEnum.ROW}
-        enableAddAction={formMode !== FormMode.VIEW}
-        enableGridRowActions={formMode !== FormMode.VIEW}
         onButtonClick={onDataTableClick}
         onAfterDataLoaded={onAfterDataLoaded}
         selectedObject={selectedTrainGroupDate}
         onSelect={onSelect}
         triggerRefreshData={triggerRefreshDataTable}
         authorize={true}
+        availableGridRowButtons={availableGridRowButtons()}
       />
 
       {/*                                      */}
