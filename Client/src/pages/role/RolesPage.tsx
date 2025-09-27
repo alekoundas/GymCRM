@@ -43,14 +43,10 @@ export default function RolesPage() {
   };
 
   const [datatableDto, setDatatableDto] = useState<DataTableDto<RoleDto>>({
-    data: [],
-    first: 0,
-    rows: 10,
-    page: 1,
-    pageCount: 0,
+    ...new DataTableDto(),
     filters: [
-      { fieldName: "Value", filterType: "contains" },
-      { fieldName: "Description", filterType: "contains" },
+      { fieldName: "name", filterType: "contains" },
+      { fieldName: "normalizedName", filterType: "contains" },
     ],
     dataTableSorts: [],
   });
