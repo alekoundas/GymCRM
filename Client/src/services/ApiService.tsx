@@ -155,11 +155,6 @@ export default class ApiService {
     }
     console.warn("Token refresh failed.");
     return null;
-    // }
-    console.warn(
-      "Received 401 but tokens are not expired. Possible server-side issue."
-    );
-    return null;
   }
 
   private static async refreshUserToken(): Promise<boolean> {
@@ -170,7 +165,7 @@ export default class ApiService {
 
     this.refreshPromise = (async () => {
       try {
-        const url = this.buildUrl("users", "refreshToken");
+        const url = this.buildUrl("Auth", "refreshToken");
         const refreshTokenDto = TokenService.getUserRefreshTokenDto();
         const token = refreshTokenDto.accessToken;
         const refreshToken = refreshTokenDto.refreshToken;
@@ -316,7 +311,7 @@ export default class ApiService {
   public static async passwordForgot(
     data: UserPasswordForgotDto
   ): Promise<boolean> {
-    const url = this.buildUrl("users", "PasswordForgot");
+    const url = this.buildUrl("Auth", "PasswordForgot");
     const result = await this.apiRequest<UserPasswordForgotDto, boolean>(
       url,
       "POST",
@@ -329,7 +324,7 @@ export default class ApiService {
   public static async passwordReset(
     data: UserPasswordResetDto
   ): Promise<boolean> {
-    const url = this.buildUrl("users", "PasswordReset");
+    const url = this.buildUrl("Auth", "PasswordReset");
     const result = await this.apiRequest<UserPasswordResetDto, boolean>(
       url,
       "POST",
@@ -342,7 +337,7 @@ export default class ApiService {
   public static async passwordChange(
     data: UserPasswordChangeDto
   ): Promise<boolean> {
-    const url = this.buildUrl("users", "PasswordChange");
+    const url = this.buildUrl("Auth", "PasswordChange");
     const result = await this.apiRequest<UserPasswordChangeDto, boolean>(
       url,
       "POST",
@@ -356,7 +351,7 @@ export default class ApiService {
     data: UserLoginRequestDto,
     authLogin: () => void
   ): Promise<boolean> {
-    const url = this.buildUrl("users", "login");
+    const url = this.buildUrl("Auth", "login");
     const result = await this.apiRequest<
       UserLoginRequestDto,
       UserLoginRequestDto
@@ -384,7 +379,7 @@ export default class ApiService {
     data: UserRegisterDto,
     authLogin: () => void
   ): Promise<boolean> {
-    const url = this.buildUrl("users", "register");
+    const url = this.buildUrl("Auth", "register");
     const result = await this.apiRequest(url, "POST", data);
     if (!result) return false;
 
@@ -396,7 +391,7 @@ export default class ApiService {
   }
 
   public static async logout(authLogout: () => void): Promise<void> {
-    const url = this.buildUrl("users", "logout");
+    const url = this.buildUrl("Auth", "logout");
     const result = await this.apiRequest<
       ApiResponse<boolean>,
       ApiResponse<boolean>
