@@ -59,134 +59,44 @@ namespace API.Controllers
             return new ApiResponse<RoleDto>().SetSuccessResponse(identityRoleDto);
         }
 
-
-        //[HttpGet("{roleName}/claims")]
-        //public async Task<IActionResult> GetRoleClaims(string roleName)
-        //{
-        //    var role = await _roleManager.FindByNameAsync(roleName);
-        //    if (role == null)
-        //        return NotFound("Role not found");
-
-        //    var claims = await _roleManager.GetClaimsAsync(role);
-        //    return Ok(claims);
-        //}
-
-        // POST: api/controller/lookup
-        [HttpPost("Lookup")]
-        public async Task<ApiResponse<LookupDto>> Lookup([FromBody] LookupDto lookupDto)
-        {
-            var query = _dataService.GetGenericRepository<Role>();
-
-            if (lookupDto.Filter?.Id != null && lookupDto.Filter?.Id.Length > 0)
-                query = query.Where(x => lookupDto.Filter.Id.ToLower().Contains(x.Id.ToString().ToLower()));
-            else if (lookupDto.Filter?.Value != null && lookupDto.Filter?.Value.Length > 0)
-                query = query.Where(x => x.Name.ToLower().Contains(lookupDto.Filter.Value.ToLower()));
-
-
-            // Handle Pagging.
-            query.AddPagging(lookupDto.Skip, lookupDto.Take);
-
-            // Retrieve Data.
-            List<Role> result = await query.ToListAsync();
-            lookupDto.Data = result
-              .Select(x =>
-                  new LookupOptionDto()
-                  {
-                      Id = x.Id.ToString(),
-                      Value = x.Name,
-                  })
-              .ToList();
-
-            return new ApiResponse<LookupDto>().SetSuccessResponse(lookupDto);
-        }
-
-        // POST: api/IdentityRoles/GetDataTable
-        [HttpPost("GetDataTable")]
-        public async Task<ApiResponse<DataTableDto<RoleDto>>> GetDataTable([FromBody] DataTableDto<RoleDto> dataTable)
-        {
-            var query = _dataService.Roles;
-
-            // Handle Sorting of DataTable.
-            if (dataTable.Sorts.Count() > 0)
-            {
-                // Create the first OrderBy().
-                DataTableSortDto? dataTableSort = dataTable.Sorts.First();
-                if (dataTableSort.Order > 0)
-                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.ASCENDING);
-                else if (dataTableSort.Order < 0)
-                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.DESCENDING);
-
-                // Create the rest OrderBy methods as ThenBy() if any.
-                foreach (var sortInfo in dataTable.Sorts.Skip(1))
-                {
-                    if (dataTableSort.Order > 0)
-                        query.ThenBy(sortInfo.FieldName, OrderDirectionEnum.ASCENDING);
-                    else if (dataTableSort.Order < 0)
-                        query.ThenBy(sortInfo.FieldName, OrderDirectionEnum.DESCENDING);
-                }
-            }
-
-
-            // Handle pagination.
-            int skip = (dataTable.Page - 1) * dataTable.Rows;
-            int take = dataTable.Rows;
-
-            query.AddPagging(skip, take);
-
-
-            // Retrieve Data.
-            List<Role> result = await query.ToListAsync();
-            List<RoleDto> customerDto = _mapper.Map<List<RoleDto>>(result);
-
-            //TODDO add filter
-            int rows = await _dataService.Users.CountAsync();
-
-            dataTable.Data = customerDto;
-            dataTable.PageCount = rows;
-
-            return new ApiResponse<DataTableDto<RoleDto>>().SetSuccessResponse(dataTable);
-
-        }
-
         // POST: api/Roles
         [HttpPost]
-        public async Task<ApiResponse<RoleDto>> CreateRole([FromBody] RoleDto identityRoleDto)
+        public async Task<ApiResponse<List<RoleDto>>> CreateRole([FromBody] List<RoleDto> roleDto)
         {
 
-
-            if (string.IsNullOrWhiteSpace(identityRoleDto.Name))
-                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role name is required");
-
-
-            var roleExists = await _roleManager.RoleExistsAsync(identityRoleDto.Name);
-            if (roleExists)
-                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role already exists");
-
-            Role identityRole = new Role();
-            identityRole.Name = identityRoleDto.Name;
-
-            var result = await _roleManager.CreateAsync(identityRole);
-            if (result.Succeeded)
+            foreach (var role in roleDto)
             {
-                foreach (var item in identityRoleDto.Claims)
-                {
-                    if (item.View)
-                        await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, item.Controller + "_View"));
+                if (string.IsNullOrWhiteSpace(role.Name))
+                    return new ApiResponse<List<RoleDto>>().SetErrorResponse("error", "Role name is required");
 
-                    if (item.Add)
-                        await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, item.Controller + "_Add"));
+                bool roleExists = await _dataService.Roles.AnyAsync(x => x.Name == role.Name);
+                if (roleExists)
+                    return new ApiResponse<List<RoleDto>>().SetErrorResponse("error", "Role already exists");
 
-                    if (item.Edit)
-                        await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, item.Controller + "_Edit"));
+                Role identityRole = new Role();
+                identityRole.Name = role.Name;
 
-                    if (item.Delete)
-                        await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, item.Controller + "_Delete"));
-                }
-                return new ApiResponse<RoleDto>().SetSuccessResponse(identityRoleDto);
+                var response = await _roleManager.CreateAsync(identityRole);
+                if (response.Succeeded)
+                    foreach (var claim in role.Claims)
+                    {
+                        if (claim.View)
+                            await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, claim.Controller + "_View"));
+
+                        if (claim.Add)
+                            await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, claim.Controller + "_Add"));
+
+                        if (claim.Edit)
+                            await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, claim.Controller + "_Edit"));
+
+                        if (claim.Delete)
+                            await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, claim.Controller + "_Delete"));
+                    }
+                else
+                    return new ApiResponse<List<RoleDto>>().SetErrorResponse("errors", response.Errors.ToString() ?? "");
             }
 
-
-            return new ApiResponse<RoleDto>().SetErrorResponse("errors", result.Errors.ToString() ?? "");
+            return new ApiResponse<List<RoleDto>>().SetSuccessResponse(roleDto);
         }
 
         // PUT: api/Roles
@@ -252,6 +162,87 @@ namespace API.Controllers
                 return new ApiResponse<RoleDto>().SetSuccessResponse("success", $"Role {role.Name} deleted successfully");
 
             return new ApiResponse<RoleDto>().SetErrorResponse("error", result.Errors.ToString() ?? "");
+        }
+
+
+
+
+
+        // POST: api/IdentityRoles/GetDataTable
+        [HttpPost("GetDataTable")]
+        public async Task<ApiResponse<DataTableDto<RoleDto>>> GetDataTable([FromBody] DataTableDto<RoleDto> dataTable)
+        {
+            var query = _dataService.Roles;
+
+            // Handle Sorting of DataTable.
+            if (dataTable.Sorts.Count() > 0)
+            {
+                // Create the first OrderBy().
+                DataTableSortDto? dataTableSort = dataTable.Sorts.First();
+                if (dataTableSort.Order > 0)
+                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.ASCENDING);
+                else if (dataTableSort.Order < 0)
+                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.DESCENDING);
+
+                // Create the rest OrderBy methods as ThenBy() if any.
+                foreach (var sortInfo in dataTable.Sorts.Skip(1))
+                {
+                    if (dataTableSort.Order > 0)
+                        query.ThenBy(sortInfo.FieldName, OrderDirectionEnum.ASCENDING);
+                    else if (dataTableSort.Order < 0)
+                        query.ThenBy(sortInfo.FieldName, OrderDirectionEnum.DESCENDING);
+                }
+            }
+
+
+            // Handle pagination.
+            int skip = (dataTable.Page - 1) * dataTable.Rows;
+            int take = dataTable.Rows;
+
+            query.AddPagging(skip, take);
+
+
+            // Retrieve Data.
+            List<Role> result = await query.ToListAsync();
+            List<RoleDto> customerDto = _mapper.Map<List<RoleDto>>(result);
+
+            //TODDO add filter
+            int rows = await _dataService.Users.CountAsync();
+
+            dataTable.Data = customerDto;
+            dataTable.PageCount = rows;
+
+            return new ApiResponse<DataTableDto<RoleDto>>().SetSuccessResponse(dataTable);
+
+        }
+
+        // POST: api/controller/lookup
+        [HttpPost("Lookup")]
+        public async Task<ApiResponse<LookupDto>> Lookup([FromBody] LookupDto lookupDto)
+        {
+            var query = _dataService.GetGenericRepository<Role>();
+
+            if (lookupDto.Filter?.Id != null && lookupDto.Filter?.Id.Length > 0)
+                query = query.Where(x => lookupDto.Filter.Id.ToLower().Contains(x.Id.ToString().ToLower()));
+            else if (lookupDto.Filter?.Value != null && lookupDto.Filter?.Value.Length > 0)
+                query = query.Where(x => x.Name.ToLower().Contains(lookupDto.Filter.Value.ToLower()));
+
+
+            // Handle Pagging.
+            query.AddPagging(lookupDto.Skip, lookupDto.Take);
+
+            // Retrieve Data.
+            List<Role> result = await query.ToListAsync();
+            lookupDto.Data = result
+              .Select(x =>
+                  new LookupOptionDto()
+                  {
+                      Id = x.Id.ToString(),
+                      Value = x.Name,
+                  })
+              .ToList();
+
+            return new ApiResponse<LookupDto>().SetSuccessResponse(lookupDto);
         }
     }
 }
