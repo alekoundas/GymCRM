@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Business.Services;
-using Business.Services.Email;
 using Core.Dtos;
 using Core.Dtos.AutoComplete;
 using Core.Dtos.DataTable;
@@ -9,7 +8,6 @@ using Core.Dtos.Lookup;
 using Core.Dtos.TrainGroupDate;
 using Core.Enums;
 using Core.Models;
-using Core.System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -26,23 +24,17 @@ namespace API.Controllers
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly ILogger<UsersController> _logger;
-        private readonly RoleManager<Role> _roleManager;
         private readonly UserManager<User> _userManager;
 
         public UsersController(
             IDataService dataService,
             IMapper mapper,
             ILogger<UsersController> logger,
-            IUserService userService,
-            UserManager<User> userManager,
-            RoleManager<Role> roleManager,
-            IEmailService emailService,
-            TokenSettings tokenSettings)
+            UserManager<User> userManager)
         {
             _dataService = dataService;
             _logger = logger;
             _userManager = userManager;
-            _roleManager = roleManager;
             _mapper = mapper;
         }
 
@@ -54,18 +46,16 @@ namespace API.Controllers
             if (id == null)
                 return new ApiResponse<UserDto>().SetErrorResponse("error", "User ID not set!");
 
-            User? user = await _dataService.Users.FirstOrDefaultAsync(x => x.Id == new Guid(id));
+            User? user = await _dataService.Users
+                .Include(x=>x.UserRoles)
+                .ThenInclude<UserRole,Role>(x=>x.Role)
+                .FirstOrDefaultAsync(x => x.Id == new Guid(id));
 
 
             if (user == null)
                 return new ApiResponse<UserDto>().SetErrorResponse("error", "User not found!");
 
             UserDto userDto = _mapper.Map<UserDto>(user);
-
-            IList<string> userRoles = await _userManager.GetRolesAsync(user);
-            if (userRoles.Count() == 1)
-                userDto.RoleId = userRoles.First();
-
             return new ApiResponse<UserDto>().SetSuccessResponse(userDto);
         }
 
@@ -83,11 +73,6 @@ namespace API.Controllers
                 return new ApiResponse<UserDto>().SetErrorResponse("error", "User not found");
 
 
-            //IdentityRole<Guid>? role = await _dataService.Roles.FirstOrDefaultAsync(x => x.Id.ToString() == request.RoleId);
-            //if (role?.Name == null)
-            //    return new ApiResponse<bool>().SetErrorResponse("error", "User not found");
-
-
             // Update user properties
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
@@ -96,70 +81,16 @@ namespace API.Controllers
             user.ProfileImage = request.ProfileImage;
 
             UserDto userDto = _mapper.Map<UserDto>(user);
-            //await _userService.AssignSingleRoleAsync(user, role.Name);
             IdentityResult response = await _userManager.UpdateAsync(user);
+
             if (response.Succeeded)
                 return new ApiResponse<UserDto>().SetSuccessResponse(userDto, "success", "User updated successfully");
             else
                 return new ApiResponse<UserDto>().SetErrorResponse("error", "User update error");
         }
 
-        // POST: api/Users/lookup
-        [HttpPost("Lookup")]
-        public async Task<ApiResponse<LookupDto>> Lookup([FromBody] LookupDto lookupDto)
-        {
 
-            var query = _dataService.GetGenericRepository<User>();
-
-            if (lookupDto.Filter.Id.Length > 0)
-                query.Where(x => x.Id == new Guid(lookupDto.Filter.Id));
-
-            if (lookupDto.Filter.Value.Length > 0)
-                query.Where(x =>
-                x.FirstName.Contains(lookupDto.Filter.Value) ||
-                x.LastName.Contains(lookupDto.Filter.Value) ||
-                x.Email.Contains(lookupDto.Filter.Value) ||
-                x.PhoneNumbers.Any(y => y.Number.Contains(lookupDto.Filter.Value)) ||
-                x.UserName!.Contains(lookupDto.Filter.Value)
-            );
-
-            // Handle Pagging.
-            query.AddPagging(lookupDto.Skip, lookupDto.Take);
-
-            // Retrieve Data.
-            List<User> result = await query.ToListAsync();
-            lookupDto.Data = result
-              .Select(x =>
-                  new LookupOptionDto()
-                  {
-                      Id = x.Id.ToString(),
-                      Value = x.UserName,
-                      ProfileImage = x.ProfileImage
-                  })
-              .ToList();
-
-
-
-
-            if (lookupDto.Filter.Id.Length > 0)
-                query.Where(x => x.Id == new Guid(lookupDto.Filter.Id));
-
-            if (lookupDto.Filter.Value.Length > 0)
-                query.Where(x =>
-                x.FirstName.Contains(lookupDto.Filter.Value) ||
-                x.LastName.Contains(lookupDto.Filter.Value) ||
-                x.Email.Contains(lookupDto.Filter.Value) ||
-                x.PhoneNumbers.Any(y => y.Number.Contains(lookupDto.Filter.Value)) ||
-                x.UserName!.Contains(lookupDto.Filter.Value)
-            );
-            lookupDto.TotalRecords = await query.CountAsync();
-
-
-            return new ApiResponse<LookupDto>().SetSuccessResponse(lookupDto);
-        }
-
-
-        // DELETE: api/Roles/5
+        // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<ApiResponse<IdentityUser>> Delete(string? id)
         {
@@ -232,16 +163,12 @@ namespace API.Controllers
                 if (filter.FilterType == DataTableFiltersEnum.custom)
                     if (fieldName == "RoleId" && filter.Values.Count() > 0)
                         query.Where(x => x.UserRoles.Any(y => filter.Values.Any(z => z == y.RoleId.ToString())));
-
             }
-
-
 
 
             // Handle pagination.
             int skip = (dataTable.Page-1) * dataTable.Rows;
             int take = dataTable.Rows;
-
             query.AddPagging(skip, take);
 
 
@@ -251,13 +178,13 @@ namespace API.Controllers
 
 
             // Assign Id to RoleId
-            for (int i = 0; i < result.Count(); i++)
-            {
-                string? roleName = (await _userManager.GetRolesAsync(result[i])).FirstOrDefault();
-                Role? role = _roleManager.Roles.FirstOrDefault(x => x.Name == roleName);
-                if (role != null)
-                    resultDto[i].RoleId = role.Id.ToString();
-            }
+            //for (int i = 0; i < result.Count(); i++)
+            //{
+            //    string? roleName = (await _userManager.GetRolesAsync(result[i])).FirstOrDefault();
+            //    Role? role = _roleManager.Roles.FirstOrDefault(x => x.Name == roleName);
+            //    if (role != null)
+            //        resultDto[i].RoleId = role.Id.ToString();
+            //}
 
 
 
@@ -297,19 +224,74 @@ namespace API.Controllers
 
         }
 
+        // POST: api/Users/lookup
+        [HttpPost("Lookup")]
+        public async Task<ApiResponse<LookupDto>> Lookup([FromBody] LookupDto lookupDto)
+        {
+
+            var query = _dataService.GetGenericRepository<User>();
+
+            if (lookupDto.Filter.Id.Length > 0)
+                query.Where(x => x.Id == new Guid(lookupDto.Filter.Id));
+
+            if (lookupDto.Filter.Value.Length > 0)
+                query.Where(x =>
+                x.FirstName.ToLower().Contains(lookupDto.Filter.Value.ToLower()) ||
+                x.LastName.ToLower().Contains(lookupDto.Filter.Value.ToLower()) ||
+                x.Email.ToLower().Contains(lookupDto.Filter.Value.ToLower()) ||
+                x.PhoneNumbers.Any(y => y.Number.Contains(lookupDto.Filter.Value.ToLower())) ||
+                x.UserName!.ToLower().Contains(lookupDto.Filter.Value.ToLower())
+            );
+
+            // Handle Pagging.
+            query.AddPagging(lookupDto.Skip, lookupDto.Take);
+
+            // Retrieve Data.
+            List<User> result = await query.ToListAsync();
+            lookupDto.Data = result
+              .Select(x =>
+                  new LookupOptionDto()
+                  {
+                      Id = x.Id.ToString(),
+                      Value = x.UserName,
+                      ProfileImage = x.ProfileImage
+                  })
+              .ToList();
+
+
+
+
+            if (lookupDto.Filter.Id.Length > 0)
+                query.Where(x => x.Id == new Guid(lookupDto.Filter.Id));
+
+            if (lookupDto.Filter.Value.Length > 0)
+                query.Where(x =>
+                x.FirstName.ToLower().Contains(lookupDto.Filter.Value.ToLower()) ||
+                x.LastName.ToLower().Contains(lookupDto.Filter.Value.ToLower()) ||
+                x.Email.ToLower().Contains(lookupDto.Filter.Value.ToLower()) ||
+                x.PhoneNumbers.Any(y => y.Number.Contains(lookupDto.Filter.Value.ToLower())) ||
+                x.UserName!.ToLower().Contains(lookupDto.Filter.Value.ToLower())
+            );
+            lookupDto.TotalRecords = await query.CountAsync();
+
+
+            return new ApiResponse<LookupDto>().SetSuccessResponse(lookupDto);
+        }
+
+
         // POST: api/users/AutoComplete
         [HttpPost("AutoComplete")]
         public async Task<ApiResponse<AutoCompleteDto<UserDto>>> AutoComplete([FromBody] AutoCompleteDto<UserDto> autoCompleteDto)
         {
             var query = _dataService.GetGenericRepository<User>();
-
+            string searchValue = autoCompleteDto.SearchValue.ToLower();
             if (autoCompleteDto.SearchValue.Length > 0)
                 query.Where(x =>
-                x.FirstName.Contains(autoCompleteDto.SearchValue) ||
-                x.LastName.Contains(autoCompleteDto.SearchValue) ||
-                x.Email.Contains(autoCompleteDto.SearchValue) ||
-                x.PhoneNumbers.Any(y => y.Number.Contains(autoCompleteDto.SearchValue)) ||
-                x.UserName!.Contains(autoCompleteDto.SearchValue)
+                x.FirstName.ToLower().Contains(searchValue) ||
+                x.LastName.ToLower().Contains(searchValue) ||
+                x.Email.ToLower().Contains(searchValue) ||
+                x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
+                x.UserName!.ToLower().Contains(searchValue)
             );
 
             // Handle Pagging.
@@ -321,11 +303,11 @@ namespace API.Controllers
 
             if (autoCompleteDto.SearchValue.Length > 0)
                 query.Where(x =>
-                x.FirstName.Contains(autoCompleteDto.SearchValue) ||
-                x.LastName.Contains(autoCompleteDto.SearchValue) ||
-                x.Email.Contains(autoCompleteDto.SearchValue) ||
-                x.PhoneNumbers.Any(y => y.Number.Contains(autoCompleteDto.SearchValue)) ||
-                x.UserName!.Contains(autoCompleteDto.SearchValue)
+                x.FirstName.ToLower().Contains(searchValue) ||
+                x.LastName.ToLower().Contains(searchValue) ||
+                x.Email.ToLower().Contains(searchValue) ||
+                x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
+                x.UserName!.ToLower().Contains(searchValue)
             );
 
             autoCompleteDto.Suggestions = customerDto;

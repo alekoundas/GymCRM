@@ -89,6 +89,9 @@ export default function UsersPage() {
           controller="roles"
         />
       ),
+      body: (rowData, options) => {
+        return rowData.userRoles[0].role.name;
+      },
       style: { width: "20%" },
     },
   ];

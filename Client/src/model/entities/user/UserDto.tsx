@@ -1,3 +1,5 @@
+import { UserRoleDto } from "../user-role/UserRoleDto";
+
 export interface UserDto {
   [key: string]: any;
 
@@ -8,6 +10,7 @@ export interface UserDto {
   lastName: string;
   roleId: string;
   profileImage?: string | null; // Base64-encoded image (e.g., "data:image/jpeg;base64,...") or null
+  userRoles: UserRoleDto[];
 }
 
 export class UserDto {
@@ -18,4 +21,5 @@ export class UserDto {
   lastName: string = "";
   roleId: string = "";
   profileImage?: string | null; // Base64-encoded image (e.g., "data:image/jpeg;base64,...") or null
+  userRoles: UserRoleDto[] = [];
 }
