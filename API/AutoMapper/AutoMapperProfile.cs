@@ -5,6 +5,7 @@ using Core.Dtos.Mail;
 using Core.Dtos.PhoneNumber;
 using Core.Dtos.TrainGroup;
 using Core.Dtos.TrainGroupDate;
+using Core.Dtos.UserRole;
 using Core.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -60,11 +61,15 @@ namespace API.AutoMapper
             CreateMap<MailAddDto, Mail>();
 
             // Identity mappings.
-            CreateMap<Role, IdentityRoleDto>();
-            CreateMap<IdentityRoleDto, Role>();
-
             CreateMap<User, UserDto>();
             CreateMap<UserDto, User>();
+
+            CreateMap<UserRole, UserRoleDto>();
+            CreateMap<UserRoleDto, UserRole>();
+
+            CreateMap<Role, RoleDto>();
+            CreateMap<RoleDto, Role>();
+
         }
     }
 }

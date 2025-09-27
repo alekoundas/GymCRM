@@ -40,23 +40,23 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IEnumerable<Role>> GetAll()
         {
-            List<Role > result = await _roleManager.Roles.ToListAsync();
+            List<Role> result = await _roleManager.Roles.ToListAsync();
             return result;
         }
 
         // GET: api/Roles/5
         [HttpGet("{id}")]
-        public async Task<ApiResponse<IdentityRoleDto>> Get(string? id)
+        public async Task<ApiResponse<RoleDto>> Get(string? id)
         {
             if (id == null)
-                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role ID not set!");
+                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role ID not set!");
 
             Role? role = await _roleManager.FindByIdAsync(id);
             if (role == null)
-                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role not found!");
+                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role not found!");
 
-            IdentityRoleDto identityRoleDto = _mapper.Map<IdentityRoleDto>(role);
-            return new ApiResponse<IdentityRoleDto>().SetSuccessResponse(identityRoleDto);
+            RoleDto identityRoleDto = _mapper.Map<RoleDto>(role);
+            return new ApiResponse<RoleDto>().SetSuccessResponse(identityRoleDto);
         }
 
 
@@ -75,37 +75,34 @@ namespace API.Controllers
         [HttpPost("Lookup")]
         public async Task<ApiResponse<LookupDto>> Lookup([FromBody] LookupDto lookupDto)
         {
-            List<LookupOptionDto> lookupOptions;
-            if (lookupDto.Filter?.Id != null && lookupDto.Filter?.Id.Length>0)
-            {
-                lookupOptions = await _roleManager.Roles
-                    .Where(x => lookupDto.Filter.Id.ToLower().Contains(x.Id.ToString().ToLower()))
-                    .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.Name ?? "" })
-                    .ToListAsync();
-            }
+            var query = _dataService.GetGenericRepository<Role>();
+
+            if (lookupDto.Filter?.Id != null && lookupDto.Filter?.Id.Length > 0)
+                query = query.Where(x => lookupDto.Filter.Id.ToLower().Contains(x.Id.ToString().ToLower()));
             else if (lookupDto.Filter?.Value != null && lookupDto.Filter?.Value.Length > 0)
-            {
-                lookupOptions = await _roleManager.Roles
-                    .Where(x => x.Name.Contains(lookupDto.Filter.Value))
-                    .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.Name ?? "" })
-                    .ToListAsync();
-            }
-            else
-            {
+                query = query.Where(x => x.Name.ToLower().Contains(lookupDto.Filter.Value.ToLower()));
 
-                lookupOptions = await _roleManager.Roles
-                    .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.Name ?? "" })
-                    .ToListAsync();
-            }
 
-            lookupDto.Data = lookupOptions;
+            // Handle Pagging.
+            query.AddPagging(lookupDto.Skip, lookupDto.Take);
+
+            // Retrieve Data.
+            List<Role> result = await query.ToListAsync();
+            lookupDto.Data = result
+              .Select(x =>
+                  new LookupOptionDto()
+                  {
+                      Id = x.Id.ToString(),
+                      Value = x.Name,
+                  })
+              .ToList();
 
             return new ApiResponse<LookupDto>().SetSuccessResponse(lookupDto);
         }
 
         // POST: api/IdentityRoles/GetDataTable
         [HttpPost("GetDataTable")]
-        public async Task<ApiResponse<DataTableDto<IdentityRoleDto>>> GetDataTable([FromBody] DataTableDto<IdentityRoleDto> dataTable)
+        public async Task<ApiResponse<DataTableDto<RoleDto>>> GetDataTable([FromBody] DataTableDto<RoleDto> dataTable)
         {
             var query = _dataService.Roles;
 
@@ -139,7 +136,7 @@ namespace API.Controllers
 
             // Retrieve Data.
             List<Role> result = await query.ToListAsync();
-            List<IdentityRoleDto> customerDto = _mapper.Map<List<IdentityRoleDto>>(result);
+            List<RoleDto> customerDto = _mapper.Map<List<RoleDto>>(result);
 
             //TODDO add filter
             int rows = await _dataService.Users.CountAsync();
@@ -147,23 +144,23 @@ namespace API.Controllers
             dataTable.Data = customerDto;
             dataTable.PageCount = rows;
 
-            return new ApiResponse<DataTableDto<IdentityRoleDto>>().SetSuccessResponse(dataTable);
+            return new ApiResponse<DataTableDto<RoleDto>>().SetSuccessResponse(dataTable);
 
         }
 
         // POST: api/Roles
         [HttpPost]
-        public async Task<ApiResponse<IdentityRoleDto>> CreateRole([FromBody] IdentityRoleDto identityRoleDto)
+        public async Task<ApiResponse<RoleDto>> CreateRole([FromBody] RoleDto identityRoleDto)
         {
 
 
             if (string.IsNullOrWhiteSpace(identityRoleDto.Name))
-                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role name is required");
+                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role name is required");
 
 
             var roleExists = await _roleManager.RoleExistsAsync(identityRoleDto.Name);
             if (roleExists)
-                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role already exists");
+                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role already exists");
 
             Role identityRole = new Role();
             identityRole.Name = identityRoleDto.Name;
@@ -185,24 +182,24 @@ namespace API.Controllers
                     if (item.Delete)
                         await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, item.Controller + "_Delete"));
                 }
-                return new ApiResponse<IdentityRoleDto>().SetSuccessResponse(identityRoleDto);
+                return new ApiResponse<RoleDto>().SetSuccessResponse(identityRoleDto);
             }
 
 
-            return new ApiResponse<IdentityRoleDto>().SetErrorResponse("errors", result.Errors.ToString() ?? "");
+            return new ApiResponse<RoleDto>().SetErrorResponse("errors", result.Errors.ToString() ?? "");
         }
 
         // PUT: api/Roles
         [HttpPut("{id}")]
-        public async Task<ApiResponse<IdentityRoleDto>> Update(string? id, [FromBody] IdentityRoleDto identityRoleDto)
+        public async Task<ApiResponse<RoleDto>> Update(string? id, [FromBody] RoleDto identityRoleDto)
         {
             // Checks.
             if (id == null || id.Count() == 0)
-                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role name not not set!");
+                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role name not not set!");
 
             Role? identityRole = await _roleManager.FindByIdAsync(id);
             if (identityRole == null)
-                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role name not found!");
+                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role name not found!");
 
 
             // Get claims from role.
@@ -234,27 +231,27 @@ namespace API.Controllers
             addClaims.ForEach(async claim => await _roleManager.AddClaimAsync(identityRole, claim));
 
 
-            return new ApiResponse<IdentityRoleDto>().SetSuccessResponse(identityRoleDto);
+            return new ApiResponse<RoleDto>().SetSuccessResponse(identityRoleDto);
         }
 
 
         // DELETE: api/Roles/5
         [HttpDelete("{id}")]
-        public async Task<ApiResponse<IdentityRoleDto>> DeleteRole(string? id)
+        public async Task<ApiResponse<RoleDto>> DeleteRole(string? id)
         {
             if (id == null || id.Count() == 0)
-                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role name not not set!");
+                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role name not not set!");
 
             var role = await _roleManager.FindByIdAsync(id);
             if (role == null)
-                return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", "Role not found!");
+                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role not found!");
 
 
             var result = await _roleManager.DeleteAsync(role);
             if (result.Succeeded)
-                return new ApiResponse<IdentityRoleDto>().SetSuccessResponse("success", $"Role {role.Name} deleted successfully");
+                return new ApiResponse<RoleDto>().SetSuccessResponse("success", $"Role {role.Name} deleted successfully");
 
-            return new ApiResponse<IdentityRoleDto>().SetErrorResponse("error", result.Errors.ToString() ?? "");
+            return new ApiResponse<RoleDto>().SetErrorResponse("error", result.Errors.ToString() ?? "");
         }
     }
 }

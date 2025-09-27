@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Dtos.UserRole;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Dtos.Identity
 {
@@ -28,6 +29,8 @@ namespace Core.Dtos.Identity
 
 
         public byte[]? ProfileImage { get; set; }
-        public string? RoleId { get; set; }
+
+        public List<UserRoleDto> UserRoles { get; set; } = new List<UserRoleDto>();
+        //public string? RoleId { get; set; }
     }
 }
