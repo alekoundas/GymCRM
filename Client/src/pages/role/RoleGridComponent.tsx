@@ -24,6 +24,10 @@ export default function RoleGridComponent({
     ...new DataTableDto(),
   });
 
+  const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
+    return [];
+  };
+
   const cellBody = (value: boolean) => {
     return (
       <InputSwitch
@@ -152,12 +156,12 @@ export default function RoleGridComponent({
         formMode={formMode === FormMode.VIEW ? formMode : FormMode.EDIT}
         dataTableColumns={dataTableColumns}
         // filterDisplay={}
-        enableGridRowActions={false}
         editMode={
           formMode !== FormMode.VIEW ? DataTableEditModeEnum.CELL : undefined
         }
         onAfterDataLoaded={onAfterDataLoaded}
         onButtonClick={onDataTableClick}
+        availableGridRowButtons={availableGridRowButtons()}
       />
     </>
   );

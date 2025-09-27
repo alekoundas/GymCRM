@@ -65,6 +65,13 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
     ],
   });
 
+  const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
+    if (formMode !== FormMode.VIEW)
+      return [ButtonTypeEnum.VIEW, ButtonTypeEnum.EDIT, ButtonTypeEnum.DELETE];
+
+    return [];
+  };
+
   // Update datatableDto when trainGroupDto.trainGroupDates changes
   useEffect(() => {
     setDatatableDto((prev) => ({
@@ -371,7 +378,6 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
         formMode={formMode ?? FormMode.VIEW}
         dataTableColumns={dataTableColumns}
         filterDisplay={DataTableFilterDisplayEnum.ROW}
-        enableAddAction={formMode !== FormMode.VIEW}
         editMode={
           formMode !== FormMode.VIEW ? DataTableEditModeEnum.ROW : undefined
         }
@@ -381,6 +387,7 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
         onRowEditCancel={onRowEditCancel}
         onAfterDataLoaded={onAfterDataLoaded}
         authorize={true}
+        availableGridRowButtons={availableGridRowButtons()}
       />
     </>
   );

@@ -51,6 +51,15 @@ export default function RolesPage() {
     dataTableSorts: [],
   });
 
+  const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
+    return [
+      ButtonTypeEnum.VIEW,
+      ButtonTypeEnum.ADD,
+      ButtonTypeEnum.EDIT,
+      ButtonTypeEnum.DELETE,
+    ];
+  };
+
   const dataTableColumns: DataTableColumns<RoleDto>[] = [
     {
       field: "name",
@@ -132,12 +141,11 @@ export default function RolesPage() {
             setDataTableDto={setDatatableDto}
             formMode={FormMode.EDIT}
             onButtonClick={onDataTableClick}
-            enableGridRowActions={true}
             filterDisplay={DataTableFilterDisplayEnum.ROW}
-            enableAddAction={true}
             dataTableColumns={dataTableColumns}
             triggerRefreshData={triggerRefreshDataTable}
             authorize={true}
+            availableGridRowButtons={availableGridRowButtons()}
           />
         </div>
       </Card>

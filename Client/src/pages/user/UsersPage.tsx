@@ -52,6 +52,10 @@ export default function UsersPage() {
     ],
   });
 
+  const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
+    return [ButtonTypeEnum.VIEW, ButtonTypeEnum.EDIT, ButtonTypeEnum.DELETE];
+  };
+
   const dataTableColumns: DataTableColumns<UserDto>[] = [
     {
       field: "id",
@@ -158,11 +162,10 @@ export default function UsersPage() {
           setDataTableDto={setDatatableDto}
           formMode={FormMode.EDIT}
           onButtonClick={onDataTableClick}
-          enableGridRowActions={true}
-          enableAddAction={false}
           filterDisplay={DataTableFilterDisplayEnum.ROW}
           dataTableColumns={dataTableColumns}
           triggerRefreshData={triggerRefreshDataTable}
+          availableGridRowButtons={availableGridRowButtons()}
         />
       </Card>
 

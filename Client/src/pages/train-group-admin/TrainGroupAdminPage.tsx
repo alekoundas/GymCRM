@@ -78,6 +78,14 @@ export default function TrainGroupAdminPage() {
       );
     }
   };
+  const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
+    return [
+      ButtonTypeEnum.VIEW,
+      ButtonTypeEnum.ADD,
+      ButtonTypeEnum.EDIT,
+      ButtonTypeEnum.DELETE,
+    ];
+  };
 
   const dataTableColumns: DataTableColumns<TrainGroupDto>[] = [
     {
@@ -218,11 +226,10 @@ export default function TrainGroupAdminPage() {
             formMode={FormMode.EDIT}
             onButtonClick={onDataTableClick}
             controller="TrainGroups"
-            enableGridRowActions={true}
             filterDisplay={DataTableFilterDisplayEnum.ROW}
-            enableAddAction={true}
             dataTableColumns={dataTableColumns}
             triggerRefreshData={triggerRefreshDataTable}
+            availableGridRowButtons={availableGridRowButtons()}
           />
         </div>
       </Card>

@@ -25,12 +25,11 @@ interface IField<TEntity> {
   setDataTableDto: (dataTableDto: DataTableDto<TEntity>) => void;
   dataTableColumns: DataTableColumns<TEntity>[];
   formMode: FormMode;
-  enableGridRowActions?: boolean;
-  enableAddAction?: boolean;
   editMode?: DataTableEditModeEnum;
   filterDisplay?: DataTableFilterDisplayEnum;
   authorize?: boolean;
   loadDataOnInit?: boolean;
+  availableGridRowButtons?: ButtonTypeEnum[];
   onRowEditInit?: (e: any) => void;
   onRowEditComplete?: (e: DataTableRowEditCompleteEvent) => void;
   onRowEditCancel?: (e: any) => void;
@@ -54,12 +53,11 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   setDataTableDto,
   dataTableColumns,
   formMode,
-  enableGridRowActions = false,
-  enableAddAction = false,
   editMode,
   filterDisplay,
   authorize = false,
   loadDataOnInit = true,
+  availableGridRowButtons = [],
   onRowEditInit,
   onRowEditComplete,
   onRowEditCancel,
@@ -74,34 +72,25 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   const afterDataLoaded = (
     data: DataTableDto<TEntity> | null
   ): DataTableDto<TEntity> | null => {
+    let updateData: DataTableDto<TEntity> | null = data;
+
     // if parent has set the onAfterDataLoaded, call parent
     if (onAfterDataLoaded) {
-      var dataResponse = onAfterDataLoaded(data);
-      if (dataResponse)
-        setDataTableDto({
-          ...dataTableDto,
-          data: dataResponse.data,
-          totalRecords: dataResponse.totalRecords,
-          pageCount: dataResponse.pageCount,
-          page: dataResponse.page,
-          first: dataResponse.first,
-          rows: dataResponse.rows,
-        });
+      updateData = onAfterDataLoaded(data);
     }
 
-    // Else do default action
-    if (data) {
+    if (updateData)
       setDataTableDto({
         ...dataTableDto,
-        data: data.data,
-        totalRecords: data.totalRecords,
-        pageCount: data.pageCount,
-        page: data.page,
-        first: data.first,
-        rows: data.rows,
+        data: updateData.data,
+        totalRecords: updateData.totalRecords,
+        pageCount: updateData.pageCount,
+        page: updateData.page,
+        first: updateData.first,
+        rows: updateData.rows,
       });
-    }
-    return data;
+
+    return updateData;
   };
 
   const dataTableService = new DataTableService(
@@ -141,12 +130,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   }, [dataTableDto.data]);
 
   const getDataTableColumns = () => {
-    const columns = [...dataTableColumns];
-
-    // In case Actions column already exists dont add it
-    if (columns.filter((x) => x.header === "Actions")[0]) {
-      return columns;
-    }
+    const columns = dataTableColumns;
 
     // In case editMode is set, add Edit inline button
     if (editMode === DataTableEditModeEnum.ROW)
@@ -162,14 +146,14 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
       });
 
     // In case editMode is NOT set, add View,Edit,Delete buttons
-    if (enableGridRowActions)
+    if (availableGridRowButtons.length > 0)
       columns.push({
         field: "",
         header: "Actions",
         sortable: false,
         filter: false,
         filterPlaceholder: "",
-        style: { width: "20%" },
+        style: { width: "10%" },
         body: gridRowActions,
       });
     return columns;
@@ -181,10 +165,20 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
       onButtonClick={onButtonClick}
       authorize={authorize}
       controller={controller}
+      availableGridRowButtons={availableGridRowButtons}
     />
   );
 
   const renderHeader = () => {
+    let isVisible: boolean = availableGridRowButtons.some(
+      (x) => x === ButtonTypeEnum.ADD
+    );
+
+    if (authorize)
+      isVisible = isVisible && TokenService.isUserAllowed(controller + "_Add");
+
+    if (!isVisible) return;
+
     return (
       <div className="flex justify-content-between">
         <div></div>
@@ -193,12 +187,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
           icon="pi pi-plus"
           label="Add"
           outlined
-          visible={
-            authorize
-              ? TokenService.isUserAllowed(controller + "_Add") &&
-                enableAddAction
-              : enableAddAction
-          }
+          visible={isVisible}
           onClick={() => {
             onButtonClick(ButtonTypeEnum.ADD);
           }}
@@ -240,25 +229,11 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         loading={loading}
         // Pagging.
         paginator
-        first={dataTableDto.first ?? 0} // Add this line
+        first={dataTableDto.first ?? 0}
         rows={dataTableDto.rows}
         totalRecords={dataTableDto.totalRecords}
         onPage={(x) => dataTableService.onPage(dataTableDto, x)}
         rowsPerPageOptions={[5, 10, 25, 50, 100]}
-        // paginatorLeft={paginatorLeft}
-        // paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
-        // currentPageReportTemplate={
-        //   "Showing " +
-        //   (dataTableDto.first ?? 0 + 1) +
-        //   " to " +
-        //   Math.min(
-        //     dataTableDto.first ?? 0 + dataTableDto.rows,
-        //     dataTableDto.totalRecords ?? 0
-        //   ) +
-        //   " of " +
-        //   (dataTableDto.totalRecords ?? 0) +
-        //   " entries"
-        // }
         // Filter.
         filterDisplay={filterDisplay}
         filters={dataTableFilters()}
@@ -268,7 +243,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         sortMode="multiple"
         onSort={(x) => dataTableService.onSort(dataTableDto, x)}
         multiSortMeta={dataTableDto.dataTableSorts}
-        header={enableAddAction ? renderHeader() : null}
+        header={renderHeader()}
         // Edit row/column.
         editMode={editMode}
         onRowEditInit={onRowEditInit}

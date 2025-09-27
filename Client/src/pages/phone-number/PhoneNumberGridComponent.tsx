@@ -65,6 +65,15 @@ export default function PhoneNumberGridComponent() {
     dataTableSorts: [],
   });
 
+  const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
+    return [
+      ButtonTypeEnum.VIEW,
+      ButtonTypeEnum.ADD,
+      ButtonTypeEnum.EDIT,
+      ButtonTypeEnum.DELETE,
+    ];
+  };
+
   const dataTableColumns: DataTableColumns<PhoneNumberDto>[] = [
     {
       field: "number",
@@ -179,11 +188,10 @@ export default function PhoneNumberGridComponent() {
         formMode={FormMode.EDIT}
         onButtonClick={onDataTableClick}
         controller="PhoneNumbers"
-        enableGridRowActions={true}
         filterDisplay={DataTableFilterDisplayEnum.ROW}
-        enableAddAction={true}
         dataTableColumns={dataTableColumns}
         triggerRefreshData={triggerRefreshDataTable}
+        availableGridRowButtons={availableGridRowButtons()}
       />
 
       {/*                                      */}
