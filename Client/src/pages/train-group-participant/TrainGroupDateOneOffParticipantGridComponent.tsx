@@ -66,12 +66,7 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
   const [datatableDto, setDatatableDto] = useState<
     DataTableDto<TrainGroupParticipantDto>
   >({
-    data: [],
-    first: 0,
-    rows: 10,
-    page: 1,
-    pageCount: 0,
-    dataTableSorts: [],
+    ...new DataTableDto(),
     filters: [
       {
         fieldName: "TrainGroupId",
@@ -87,6 +82,45 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
       },
     ],
   });
+
+  const dataTableColumns: DataTableColumns<TrainGroupParticipantDto>[] = [
+    {
+      field: "selectedDate",
+      header: "Selected Date",
+      sortable: formMode !== FormMode.ADD,
+      filter: formMode !== FormMode.ADD,
+      filterPlaceholder: "Search",
+      style: { width: "30%" },
+      body: (rowData: TrainGroupParticipantDto) => {
+        if (rowData.selectedDate) {
+          const date = new Date(rowData.selectedDate);
+          return (
+            date.getDate() +
+            "/" +
+            (date.getMonth() + 1) +
+            "/" +
+            date.getFullYear()
+          );
+        }
+      },
+    },
+    {
+      field: "trainGroupDateId",
+      header: "TrainGroupDateId",
+      sortable: formMode !== FormMode.ADD,
+      filter: formMode !== FormMode.ADD,
+      filterPlaceholder: "Search",
+      style: { width: "10%" },
+    },
+    {
+      field: "userId",
+      header: "Participant",
+      sortable: formMode !== FormMode.ADD,
+      filter: formMode !== FormMode.ADD,
+      filterPlaceholder: "Search",
+      style: { width: "10%" },
+    },
+  ];
 
   // Update datatableDto when trainGroupDto.trainGroupDates changes
   useEffect(() => {
@@ -140,53 +174,6 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
       triggerRefreshDataTable.current(newDto);
     }
   }, [selectedTrainGroupDate]);
-
-  const dataTableColumns: DataTableColumns<TrainGroupParticipantDto>[] = [
-    {
-      field: "selectedDate",
-      header: "Selected Date",
-      sortable: true,
-      filter: true,
-      filterPlaceholder: "Search",
-      style: { width: "30%" },
-      body: (rowData: TrainGroupParticipantDto) => {
-        if (rowData.selectedDate) {
-          const date = new Date(rowData.selectedDate);
-          return (
-            date.getDate() +
-            "/" +
-            (date.getMonth() + 1) +
-            "/" +
-            date.getFullYear()
-          );
-        }
-      },
-    },
-    {
-      field: "trainGroupId",
-      header: "TrainGroupId",
-      sortable: true,
-      filter: true,
-      filterPlaceholder: "Search",
-      style: { width: "10%" },
-    },
-    {
-      field: "trainGroupDateId",
-      header: "TrainGroupDateId",
-      sortable: true,
-      filter: true,
-      filterPlaceholder: "Search",
-      style: { width: "10%" },
-    },
-    {
-      field: "userId",
-      header: "Participant",
-      sortable: true,
-      filter: true,
-      filterPlaceholder: "Search",
-      style: { width: "10%" },
-    },
-  ];
 
   const onAfterDataLoaded = (
     data: DataTableDto<TrainGroupParticipantDto> | null

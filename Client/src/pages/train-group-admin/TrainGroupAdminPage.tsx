@@ -15,6 +15,11 @@ import { DataTableDto } from "../../model/datatable/DataTableDto";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { useNavigate } from "react-router-dom";
+import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
+import DataTableFilterDateComponent from "../../components/core/datatable/DataTableFilterDateComponent";
+import DataTableFilterTimeComponent from "../../components/core/datatable/DataTableFilterTimeComponent";
+import { InputNumber } from "primereact/inputnumber";
+import DataTableFilterNumberComponent from "../../components/core/datatable/DataTableFilterNumberComponent";
 
 export default function TrainGroupAdminPage() {
   const navigate = useNavigate();
@@ -52,13 +57,14 @@ export default function TrainGroupAdminPage() {
   };
   const [datatableDto, setDatatableDto] = useState<DataTableDto<TrainGroupDto>>(
     {
-      data: [],
-      first: 0,
-      rows: 10,
-      page: 1,
-      pageCount: 0,
-      filters: [],
-      dataTableSorts: [],
+      ...new DataTableDto(),
+      filters: [
+        { fieldName: "title", filterType: "contains" },
+        { fieldName: "startOn", filterType: "between" },
+        { fieldName: "duration", filterType: "between" },
+        { fieldName: "maxParticipants", filterType: "equals" },
+        { fieldName: "trainerId", filterType: "in" },
+      ],
     }
   );
 
@@ -76,8 +82,24 @@ export default function TrainGroupAdminPage() {
       header: "Start On",
       sortable: true,
       filter: true,
+      filterTemplate: (options) => (
+        <DataTableFilterDateComponent options={options} />
+      ),
+      body: (rowData: TrainGroupDto) => {
+        if (rowData.startOn) {
+          const date = new Date(rowData.startOn);
+          return (
+            date.getDate() +
+            "/" +
+            (date.getMonth() + 1) +
+            "/" +
+            date.getFullYear()
+          );
+        }
+      },
       filterPlaceholder: "Search",
-      style: { width: "10%" },
+
+      style: { width: "20%" },
     },
     {
       field: "duration",
@@ -85,7 +107,24 @@ export default function TrainGroupAdminPage() {
       sortable: true,
       filter: true,
       filterPlaceholder: "Search",
-      style: { width: "10%" },
+      filterTemplate: (options) => (
+        <DataTableFilterTimeComponent options={options} />
+      ),
+      body: (rowData: TrainGroupDto) => {
+        if (rowData.duration) {
+          const date = new Date(rowData.duration);
+          return (
+            (date.getHours().toLocaleString().length == 2
+              ? date.getHours().toLocaleString()
+              : "0" + date.getHours().toLocaleString()) +
+            ":" +
+            (date.getMinutes().toLocaleString().length == 2
+              ? date.getMinutes().toLocaleString()
+              : "0" + date.getMinutes().toLocaleString())
+          );
+        }
+      },
+      style: { width: "20%" },
     },
     {
       field: "maxParticipants",
@@ -93,6 +132,9 @@ export default function TrainGroupAdminPage() {
       sortable: true,
       filter: true,
       filterPlaceholder: "Search",
+      filterTemplate: (options) => (
+        <DataTableFilterNumberComponent options={options} />
+      ),
       style: { width: "10%" },
     },
     {
@@ -101,6 +143,12 @@ export default function TrainGroupAdminPage() {
       sortable: true,
       filter: true,
       filterPlaceholder: "Search",
+      filterTemplate: (options) => (
+        <DataTableFilterIdComponent
+          options={options}
+          controller="users"
+        />
+      ),
       style: { width: "20%" },
     },
   ];
