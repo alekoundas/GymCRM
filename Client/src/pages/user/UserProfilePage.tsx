@@ -50,13 +50,6 @@ export default function UserProfilePage() {
       const userId = TokenService.getUserId();
       if (userId) {
         const response = await ApiService.get<UserDto>("Users", userId);
-        // Prefix for display if it's plain base64 from API
-        if (
-          response?.profileImage &&
-          !response.profileImage.startsWith("data:")
-        ) {
-          response.profileImage = `data:image/png;base64,${response.profileImage}`;
-        }
         setUserDto(response as UserDto);
       }
 
