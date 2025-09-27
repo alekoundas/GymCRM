@@ -17,9 +17,11 @@ import MailFormComponent from "./MailFormComponent";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 import DataTableFilterDateComponent from "../../components/core/datatable/DataTableFilterDateComponent";
 import DataTableFilterNumberComponent from "../../components/core/datatable/DataTableFilterNumberComponent";
+import { UserDto } from "../../model/entities/user/UserDto";
+import { Avatar } from "primereact/avatar";
 
 export default function MailsPage() {
-  const { mailDto, setMailDto, resetMailDto, updateMailDto } = useMailStore();
+  const { mailDto, setMailDto, resetMailDto } = useMailStore();
 
   const triggerRefreshDataTable = useRef<
     ((dto: DataTableDto<MailDto>) => void) | undefined
@@ -57,6 +59,32 @@ export default function MailsPage() {
     ],
   });
 
+  // Custom chip template for selected users
+  const chipTemplate = (user: UserDto | undefined) => {
+    if (user) {
+      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
+        0
+      )}`.toUpperCase();
+      const imageSrc = "data:image/png;base64," + user.profileImage;
+      return (
+        <div className="flex m-0 p-0 align-items-center">
+          <Avatar
+            image={user.profileImage ? imageSrc : ""}
+            label={user.profileImage ? undefined : initials}
+            shape="circle"
+            size="normal"
+            className=" mr-2 "
+          />
+          {" " +
+            user.firstName[0].toUpperCase() +
+            user.firstName.slice(1, user.firstName.length) +
+            " " +
+            user.lastName[0].toUpperCase() +
+            user.lastName.slice(1, user.lastName.length)}
+        </div>
+      );
+    }
+  };
   const dataTableColumns: DataTableColumns<MailDto>[] = [
     {
       field: "id",
@@ -89,6 +117,7 @@ export default function MailsPage() {
           controller="users"
         />
       ),
+      body: (rowData, options) => chipTemplate(rowData.user),
       style: { width: "20%" },
     },
     {

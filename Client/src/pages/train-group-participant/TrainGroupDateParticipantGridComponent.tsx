@@ -15,6 +15,8 @@ import { useParams } from "react-router-dom";
 import TrainGroupDateParticipantFormComponent from "./TrainGroupDateParticipantFormComponent";
 import { DataTableFilterDto } from "../../model/datatable/DataTableFilterDto";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
+import { UserDto } from "../../model/entities/user/UserDto";
+import { Avatar } from "primereact/avatar";
 
 interface IField {
   formMode: FormMode;
@@ -77,12 +79,39 @@ export default function TrainGroupDateParticipantGridComponent({
       },
       {
         fieldName: "SelectedDate",
-        // value: "Null",
+        value: "null",
         filterType: "equals",
       },
       { fieldName: "userId", filterType: "in" },
     ],
   });
+
+  // Custom chip template for selected users
+  const chipTemplate = (user: UserDto | undefined) => {
+    if (user) {
+      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
+        0
+      )}`.toUpperCase();
+      const imageSrc = "data:image/png;base64," + user.profileImage;
+      return (
+        <div className="flex m-0 p-0 align-items-center">
+          <Avatar
+            image={user.profileImage ? imageSrc : ""}
+            label={user.profileImage ? undefined : initials}
+            shape="circle"
+            size="normal"
+            className=" mr-2 "
+          />
+          {" " +
+            user.firstName[0].toUpperCase() +
+            user.firstName.slice(1, user.firstName.length) +
+            " " +
+            user.lastName[0].toUpperCase() +
+            user.lastName.slice(1, user.lastName.length)}
+        </div>
+      );
+    }
+  };
 
   const dataTableColumns: DataTableColumns<TrainGroupParticipantDto>[] = [
     {
@@ -117,7 +146,8 @@ export default function TrainGroupDateParticipantGridComponent({
       field: "userId",
       header: "Participant",
       sortable: formMode !== FormMode.ADD,
-      filter: formMode !== FormMode.ADD,
+      // filter: formMode !== FormMode.ADD,
+      filter: false,
       filterPlaceholder: "Search",
       filterTemplate: (options) => (
         <DataTableFilterIdComponent
@@ -125,6 +155,7 @@ export default function TrainGroupDateParticipantGridComponent({
           controller="users"
         />
       ),
+      body: (rowData, options) => chipTemplate(rowData.user),
       style: { width: "10%" },
     },
   ];

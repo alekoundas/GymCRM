@@ -6,8 +6,6 @@ import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
-import TrainGroupFormComponent from "./TrainGroupFormComponent";
-import TrainGroupDateGridComponent from "../train-group-date/TrainGroupDateGridComponent";
 import { TrainGroupDto } from "../../model/TrainGroupDto";
 import DataTableComponent from "../../components/core/datatable/DataTableComponent";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
@@ -18,8 +16,9 @@ import { useNavigate } from "react-router-dom";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 import DataTableFilterDateComponent from "../../components/core/datatable/DataTableFilterDateComponent";
 import DataTableFilterTimeComponent from "../../components/core/datatable/DataTableFilterTimeComponent";
-import { InputNumber } from "primereact/inputnumber";
 import DataTableFilterNumberComponent from "../../components/core/datatable/DataTableFilterNumberComponent";
+import { UserDto } from "../../model/entities/user/UserDto";
+import { Avatar } from "primereact/avatar";
 
 export default function TrainGroupAdminPage() {
   const navigate = useNavigate();
@@ -34,23 +33,8 @@ export default function TrainGroupAdminPage() {
     ((dto: DataTableDto<TrainGroupDto>) => void) | undefined
   >(undefined);
 
-  const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
-  const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
-  const [isEditDialogVisible, setEditDialogVisibility] = useState(false); // Dialog visibility
   const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
 
-  const dialogControlView: DialogControl = {
-    showDialog: () => setViewDialogVisibility(true),
-    hideDialog: () => setViewDialogVisibility(false),
-  };
-  const dialogControlAdd: DialogControl = {
-    showDialog: () => setAddDialogVisibility(true),
-    hideDialog: () => setAddDialogVisibility(false),
-  };
-  const dialogControlEdit: DialogControl = {
-    showDialog: () => setEditDialogVisibility(true),
-    hideDialog: () => setEditDialogVisibility(false),
-  };
   const dialogControlDelete: DialogControl = {
     showDialog: () => setDeleteDialogVisibility(true),
     hideDialog: () => setDeleteDialogVisibility(false),
@@ -67,6 +51,33 @@ export default function TrainGroupAdminPage() {
       ],
     }
   );
+
+  // Custom chip template for selected users
+  const chipTemplate = (user: UserDto | undefined) => {
+    if (user) {
+      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
+        0
+      )}`.toUpperCase();
+      const imageSrc = "data:image/png;base64," + user.profileImage;
+      return (
+        <div className="flex m-0 p-0 align-items-center">
+          <Avatar
+            image={user.profileImage ? imageSrc : ""}
+            label={user.profileImage ? undefined : initials}
+            shape="circle"
+            size="normal"
+            className=" mr-2 "
+          />
+          {" " +
+            user.firstName[0].toUpperCase() +
+            user.firstName.slice(1, user.firstName.length) +
+            " " +
+            user.lastName[0].toUpperCase() +
+            user.lastName.slice(1, user.lastName.length)}
+        </div>
+      );
+    }
+  };
 
   const dataTableColumns: DataTableColumns<TrainGroupDto>[] = [
     {
@@ -143,6 +154,7 @@ export default function TrainGroupAdminPage() {
       sortable: true,
       filter: true,
       filterPlaceholder: "Search",
+      body: (rowData, options) => chipTemplate(rowData.trainer),
       filterTemplate: (options) => (
         <DataTableFilterIdComponent
           options={options}
@@ -152,32 +164,6 @@ export default function TrainGroupAdminPage() {
       style: { width: "20%" },
     },
   ];
-
-  const OnSaveAdd = async (): Promise<void> => {
-    const response = await ApiService.create("trainGroups", trainGroupDto);
-
-    if (response) {
-      dialogControlAdd.hideDialog();
-      resetTrainGroupDto();
-      if (triggerRefreshDataTable.current)
-        triggerRefreshDataTable.current(datatableDto);
-    }
-  };
-
-  const OnSaveEdit = async (): Promise<void> => {
-    const response = await ApiService.update(
-      "trainGroups",
-      trainGroupDto,
-      trainGroupDto.id
-    );
-
-    if (response) {
-      dialogControlEdit.hideDialog();
-      resetTrainGroupDto();
-      if (triggerRefreshDataTable.current)
-        triggerRefreshDataTable.current(datatableDto);
-    }
-  };
 
   const onDelete = async (): Promise<void> => {
     const response = await ApiService.delete("trainGroups", trainGroupDto.id);

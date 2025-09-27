@@ -1,4 +1,5 @@
-﻿using Core.Dtos.TrainGroupDate;
+﻿using Core.Dtos.Identity;
+using Core.Dtos.TrainGroupDate;
 using Core.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
@@ -31,6 +32,7 @@ namespace Core.Dtos.TrainGroup
 
         [Required(ErrorMessage = "TrainerId is required")]
         public string? TrainerId { get; set; }
+        public UserDto? Trainer { get; set; }
 
         public ICollection<TrainGroupDateDto> TrainGroupDates { get; set; } = new Collection<TrainGroupDateDto>();
         public ICollection<TrainGroupParticipantDto> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipantDto>();

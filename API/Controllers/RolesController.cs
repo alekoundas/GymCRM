@@ -129,7 +129,7 @@ namespace API.Controllers
 
         // DELETE: api/Roles/5
         [HttpDelete("{id}")]
-        public override async Task<ActionResult<ApiResponse<Role>>> Delete(object? id)
+        public override async Task<ActionResult<ApiResponse<Role>>> Delete(string? id)
         {
             if (id == null)
                 return new ApiResponse<Role>().SetErrorResponse("error", "Role name not not set!");

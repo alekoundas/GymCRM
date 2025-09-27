@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.Repository;
 using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
@@ -28,13 +29,13 @@ namespace API.Controllers
 
         // GET: api/controller/5
         [HttpGet("{id}")]
-        public virtual async Task<ActionResult<ApiResponse<TEntityDto>>> Get(object? id)
+        public virtual async Task<ActionResult<ApiResponse<TEntityDto>>> Get(string? id)
         {
             if (!IsUserAuthorized("View"))
                 return new ApiResponse<TEntityDto>().SetErrorResponse("error", "User is not authorized to perform this action.");
 
 
-            TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FindAsync(id);
+            TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
             TEntityDto entityDto = _mapper.Map<TEntityDto>(entity);
             if (entityDto == null)
             {
@@ -84,7 +85,7 @@ namespace API.Controllers
             TEntity entity = _mapper.Map<TEntity>(entityDto);
 
 
-            TEntity? existingEntity = await _dataService.GetGenericRepository<TEntity>().FindAsync(id);
+            TEntity? existingEntity = await _dataService.GetGenericRepository<TEntity>().FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
             if (existingEntity == null)
             {
                 string className = typeof(TEntity).Name;
@@ -97,13 +98,13 @@ namespace API.Controllers
 
         // DELETE: api/controller/5
         [HttpDelete("{id}")]
-        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Delete(object? id)
+        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Delete(string? id)
         {
             if (!IsUserAuthorized("Delete"))
                 return new ApiResponse<TEntity>().SetErrorResponse("error", "You dont have the permitions to request this information.");
 
 
-            TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FindAsync(id);
+            TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
             if (entity == null)
             {
                 string className = typeof(TEntity).Name;
@@ -127,6 +128,8 @@ namespace API.Controllers
         public async Task<ApiResponse<DataTableDto<TEntityDto>>> GetDataTable([FromBody] DataTableDto<TEntityDto> dataTable)
         {
             var query = _dataService.GetGenericRepository<TEntity>();
+            DataTableQueryUpdate(query);
+
 
             // Handle Sorting of DataTable.
             if (dataTable.Sorts.Count() > 0)
@@ -172,10 +175,10 @@ namespace API.Controllers
                     if (filter.FieldName == "UserId")
                         query.FilterByColumnEquals(filter.FieldName, new Guid(filter.Value));
                     else
-                        query.FilterByColumnEquals(filter.FieldName, filter.Value);
+                        query.FilterByColumnEquals(filter.FieldName, filter.Value != "null" ? filter.Value : null);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.notEquals)
-                    query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
+                    query.FilterByColumnNotEquals(filter.FieldName, filter.Value != "null" ? filter.Value : null);
 
                 if (filter.Values?.Count() > 0 && filter.FilterType == DataTableFiltersEnum.@in)
                     query.FilterByColumnIn(filter.FieldName, filter.Values);
@@ -209,10 +212,10 @@ namespace API.Controllers
                     if (filter.FieldName == "UserId")
                         query.FilterByColumnEquals(filter.FieldName, new Guid(filter.Value));
                     else
-                        query.FilterByColumnEquals(filter.FieldName, filter.Value);
+                        query.FilterByColumnEquals(filter.FieldName, filter.Value != "null" ? filter.Value : null);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.notEquals)
-                    query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
+                        query.FilterByColumnNotEquals(filter.FieldName, filter.Value != "null" ? filter.Value : null);
 
                 if (filter.Values?.Count() > 0 && filter.FilterType == DataTableFiltersEnum.@in)
                     query.FilterByColumnIn(filter.FieldName, filter.Values);
@@ -245,11 +248,16 @@ namespace API.Controllers
             return false;
         }
 
-        //protected virtual bool DatTableCustomFilterPOST(TEntityAddDto entity, out string[] errors)
+        //protected virtual bool DataTableCustomFilterPOST(TEntityAddDto entity, out string[] errors)
         //{
         //    errors = Array.Empty<string>();
         //    return false;
         //}
+
+        protected virtual void DataTableQueryUpdate(IGenericRepository<TEntity> query)
+        {
+        }
+
 
         protected virtual bool IsUserAuthorized(string action)
         {

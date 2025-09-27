@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.Repository;
 using Business.Services;
 using Business.Services.Email;
 using Core.Dtos;
@@ -43,6 +44,12 @@ namespace API.Controllers
                 );
 
             return new ApiResponse<bool>().SetSuccessResponse(true, "success", "Password reset email sent.");
+        }
+
+
+        protected override void DataTableQueryUpdate(IGenericRepository<Mail> query)
+        {
+            query = query.Include(x => x.User);
         }
 
     }

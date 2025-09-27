@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.Repository;
 using Business.Services;
 using Core.Dtos.TrainGroup;
 using Core.Enums;
@@ -103,5 +104,10 @@ namespace API.Controllers
             return errors.Length > 0;
         }
 
+
+        protected override void DataTableQueryUpdate(IGenericRepository<TrainGroup> query)
+        {
+            query = query.Include(x => x.Trainer);
+        }
     }
 }
