@@ -169,7 +169,10 @@ namespace API.Controllers
                     query.FilterByColumnContains(filter.FieldName, filter.Value.ToLower());
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.equals)
-                    query.FilterByColumnEquals(filter.FieldName, filter.Value);
+                    if (filter.FieldName == "UserId")
+                        query.FilterByColumnEquals(filter.FieldName, new Guid(filter.Value));
+                    else
+                        query.FilterByColumnEquals(filter.FieldName, filter.Value);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.notEquals)
                     query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
@@ -185,7 +188,7 @@ namespace API.Controllers
 
 
             // Handle Pagging of DataTable.
-            int skip = (dataTable.Page-1) * dataTable.Rows;
+            int skip = (dataTable.Page - 1) * dataTable.Rows;
             int take = dataTable.Rows;
             query.AddPagging(skip, take);
 
@@ -203,7 +206,10 @@ namespace API.Controllers
                     query.FilterByColumnContains(filter.FieldName, filter.Value.ToLower());
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.equals)
-                    query.FilterByColumnEquals(filter.FieldName, filter.Value);
+                    if (filter.FieldName == "UserId")
+                        query.FilterByColumnEquals(filter.FieldName, new Guid(filter.Value));
+                    else
+                        query.FilterByColumnEquals(filter.FieldName, filter.Value);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.notEquals)
                     query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
