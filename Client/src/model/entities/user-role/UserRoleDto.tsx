@@ -3,11 +3,11 @@ import { UserDto } from "../user/UserDto";
 
 export interface UserRoleDto {
   [key: string]: any;
-  user: UserDto;
-  role: RoleDto;
+  user?: UserDto | undefined;
+  role?: RoleDto | undefined;
 }
 
 export class UserRoleDto {
-  user: UserDto = new UserDto();
-  role: RoleDto = new RoleDto();
+  user?: UserDto | undefined;
+  role?: RoleDto | undefined;
 }

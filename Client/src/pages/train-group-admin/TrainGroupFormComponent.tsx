@@ -148,13 +148,11 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
         </label>
         <LookupComponent
           controller="users"
-          idValue={trainGroupDto.trainerId}
-          isEditable={true}
+          selectedEntityId={trainGroupDto.trainerId}
           isEnabled={
             formMode !== FormMode.VIEW &&
             TokenService.getRoleName() === "Administrator"
           }
-          allowCustom={true}
           onChange={(x) =>
             handleChange({
               target: {

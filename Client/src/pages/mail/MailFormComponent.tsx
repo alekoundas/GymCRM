@@ -24,10 +24,8 @@ export default function MailFormComponent({ formMode }: IField) {
         </label>
         <LookupComponent
           controller="users"
-          idValue={mailDto.userId ?? ""}
-          isEditable={true}
+          selectedEntityId={mailDto.userId ?? ""}
           isEnabled={formMode !== FormMode.VIEW}
-          allowCustom={true}
           onChange={(e) => updateMailDto({ userId: e })}
         />
       </div>

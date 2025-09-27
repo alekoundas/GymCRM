@@ -12,8 +12,8 @@ namespace DataAccess.Configurations
             //builder.HasKey(ur => new { ur.UserId, ur.RoleId });
 
             // Indexes (optional for performance)
-            builder.HasIndex(x => x.UserId);
-            builder.HasIndex(x => x.RoleId);
+            //builder.HasIndex(x => x.UserId);
+            //builder.HasIndex(x => x.RoleId);
 
             // Relationship with User (one-to-many)
             builder.HasOne(x => x.User)

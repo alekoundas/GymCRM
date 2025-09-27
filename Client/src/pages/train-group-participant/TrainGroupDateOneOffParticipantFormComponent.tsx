@@ -62,10 +62,8 @@ export default function TrainGroupDateOneOffParticipantFormComponent({
           </label>
           <LookupComponent
             controller="users"
-            idValue={trainGroupParticipant.userId}
-            isEditable={true}
+            selectedEntityId={trainGroupParticipant.userId}
             isEnabled={formMode !== FormMode.VIEW}
-            allowCustom={true}
             onChange={(x) =>
               setTrainGroupParticipant({
                 ...trainGroupParticipant,
