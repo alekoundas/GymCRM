@@ -26,7 +26,7 @@ export default function MailFormComponent({ formMode }: IField) {
           controller="users"
           selectedEntityId={mailDto.userId ?? ""}
           isEnabled={formMode !== FormMode.VIEW}
-          onChange={(e) => updateMailDto({ userId: e })}
+          onChange={(e) => updateMailDto({ userId: e?.id })}
         />
       </div>
       <div className="field">

@@ -157,7 +157,7 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
             handleChange({
               target: {
                 name: "trainerId",
-                value: x,
+                value: x?.id,
               },
             })
           }

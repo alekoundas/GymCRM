@@ -10,9 +10,9 @@ import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnu
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
-import TrainGroupParticipantFormComponent from "./TrainGroupParticipantFormComponent";
 import ApiService from "../../services/ApiService";
 import { useParams } from "react-router-dom";
+import TrainGroupDateParticipantFormComponent from "./TrainGroupDateParticipantFormComponent";
 
 interface IField {
   formMode: FormMode;
@@ -96,7 +96,7 @@ export default function TrainGroupParticipantGridComponent({
       field: "selectedDate",
       header: "Selected Date",
       sortable: true,
-      filter: true,
+      filter: false,
       filterPlaceholder: "Search",
       style: { width: "30%" },
       body: (rowData: TrainGroupParticipantDto) => {
@@ -116,7 +116,7 @@ export default function TrainGroupParticipantGridComponent({
       field: "trainGroupId",
       header: "TrainGroupId",
       sortable: true,
-      filter: true,
+      filter: false,
       filterPlaceholder: "Search",
       style: { width: "10%" },
     },
@@ -124,7 +124,7 @@ export default function TrainGroupParticipantGridComponent({
       field: "trainGroupDateId",
       header: "TrainGroupDateId",
       sortable: true,
-      filter: true,
+      filter: false,
       filterPlaceholder: "Search",
       style: { width: "10%" },
     },
@@ -132,7 +132,7 @@ export default function TrainGroupParticipantGridComponent({
       field: "userId",
       header: "Participant",
       sortable: true,
-      filter: true,
+      filter: false,
       filterPlaceholder: "Search",
       style: { width: "10%" },
     },
@@ -282,7 +282,7 @@ export default function TrainGroupParticipantGridComponent({
         visible={isViewDialogVisible}
         control={dialogControlView}
       >
-        <TrainGroupParticipantFormComponent />
+        <TrainGroupDateParticipantFormComponent />
       </GenericDialogComponent>
 
       {/*                                      */}
@@ -295,7 +295,7 @@ export default function TrainGroupParticipantGridComponent({
         control={dialogControlAdd}
         onSave={OnSaveAdd}
       >
-        <TrainGroupParticipantFormComponent />
+        <TrainGroupDateParticipantFormComponent />
       </GenericDialogComponent>
 
       {/*                                      */}
@@ -308,7 +308,7 @@ export default function TrainGroupParticipantGridComponent({
         control={dialogControlEdit}
         onSave={OnSaveEdit}
       >
-        <TrainGroupParticipantFormComponent />
+        <TrainGroupDateParticipantFormComponent />
       </GenericDialogComponent>
 
       {/*                                       */}

@@ -67,7 +67,7 @@ export default function TrainGroupDateOneOffParticipantFormComponent({
             onChange={(x) =>
               setTrainGroupParticipant({
                 ...trainGroupParticipant,
-                userId: x,
+                userId: x?.id ?? "",
               })
             }
           />

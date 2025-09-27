@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Dtos.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Models
 {
@@ -17,5 +18,6 @@ namespace Core.Models
 
         [Required(ErrorMessage = "UserId is required")]
         public string UserId { get; set; } = "";
+        public UserDto? User { get; set; }
     }
 }

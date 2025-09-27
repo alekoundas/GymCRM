@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.Repository;
 using Business.Services;
 using Core.Dtos;
 using Core.Enums;
@@ -253,6 +254,12 @@ namespace API.Controllers
                 errorList.Add("Participant already joined!");
 
             return errorList.ToArray();
+        }
+
+
+        protected override void DataTableQueryUpdate(IGenericRepository<TrainGroupParticipant> query)
+        {
+            query = query.Include(x => x.User);
         }
     }
 }
