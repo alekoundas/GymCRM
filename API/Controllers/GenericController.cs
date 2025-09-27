@@ -103,13 +103,16 @@ namespace API.Controllers
             if (!IsUserAuthorized("Delete"))
                 return new ApiResponse<TEntity>().SetErrorResponse("error", "You dont have the permitions to request this information.");
 
-
             TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
             if (entity == null)
             {
                 string className = typeof(TEntity).Name;
                 return new ApiResponse<TEntity>().SetErrorResponse("error", $"Requested {className} not found!");
             }
+
+            if (CustomValidateDELETE(entity, out string[] errors))
+                return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", errors));
+
 
             int result = await _dataService.GetGenericRepository<TEntity>().RemoveAsync(entity);
             if (result != 1)
@@ -247,6 +250,12 @@ namespace API.Controllers
             errors = Array.Empty<string>();
             return false;
         }
+        protected virtual bool CustomValidateDELETE(TEntity entity, out string[] errors)
+        {
+            errors = Array.Empty<string>();
+            return false;
+        }
+
 
         //protected virtual bool DataTableCustomFilterPOST(TEntityAddDto entity, out string[] errors)
         //{
