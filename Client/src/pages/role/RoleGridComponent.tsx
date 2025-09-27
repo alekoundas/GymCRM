@@ -21,15 +21,7 @@ export default function RoleGridComponent({
   const { roleDto, setRoleDto } = useRoleStore();
 
   const [datatableDto, setDatatableDto] = useState<DataTableDto<ClaimDto>>({
-    data: roleDto.claims,
-    first: 0,
-    rows: 10,
-    page: 1,
-    pageCount: 0,
-    filters: [
-      { fieldName: "RoleName", filterType: "contains", value: roleDto.name },
-    ],
-    dataTableSorts: [],
+    ...new DataTableDto(),
   });
 
   const cellBody = (value: boolean) => {
