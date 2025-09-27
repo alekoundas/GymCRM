@@ -65,6 +65,19 @@ namespace API.Controllers
             return new ApiResponse<PhoneNumber>().SetSuccessResponse(entity);
         }
 
+        protected override bool CustomValidateDELETE(PhoneNumber entity, out string[] errors)
+        {
+            if(entity.IsPrimary)
+            {
+                errors = new string[] { "Primary phone number cannot be deleted! Please set another phone number as primary first." };
+                return true;
+            }
+
+            errors = Array.Empty<string>();
+            return false;
+        }
+
+
         protected override bool IsUserAuthorized(string action)
         {
             return true;
