@@ -28,7 +28,7 @@ namespace API.Controllers
 
         // GET: api/controller/5
         [HttpGet("{id}")]
-        public virtual async Task<ActionResult<ApiResponse<TEntityDto>>> Get(int id)
+        public virtual async Task<ActionResult<ApiResponse<TEntityDto>>> Get(object? id)
         {
             if (!IsUserAuthorized("View"))
                 return new ApiResponse<TEntityDto>().SetErrorResponse("error", "User is not authorized to perform this action.");
@@ -70,7 +70,7 @@ namespace API.Controllers
 
         // PUT: api/controller/5
         [HttpPut("{id}")]
-        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Put(int id, [FromBody] TEntityDto entityDto)
+        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Put(string? id, [FromBody] TEntityDto entityDto)
         {
             if (!IsUserAuthorized("Edit"))
                 return new ApiResponse<TEntity>().SetErrorResponse("error", "User is not authorized to perform this action.");
@@ -97,7 +97,7 @@ namespace API.Controllers
 
         // DELETE: api/controller/5
         [HttpDelete("{id}")]
-        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Delete(int id)
+        public virtual async Task<ActionResult<ApiResponse<TEntity>>> Delete(object? id)
         {
             if (!IsUserAuthorized("Delete"))
                 return new ApiResponse<TEntity>().SetErrorResponse("error", "You dont have the permitions to request this information.");

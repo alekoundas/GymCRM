@@ -20,11 +20,7 @@ namespace API.Controllers
         private readonly IDataService _dataService;
         private readonly ILogger<ClaimsController> _logger;
         private readonly IMapper _mapper;
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<Role> _roleManager;
-        private readonly TokenSettings _tokenSettings;
-        private readonly ClaimsIdentity _claimsIdentity;
 
         public ClaimsController(
             IDataService dataService,
@@ -39,11 +35,7 @@ namespace API.Controllers
             _dataService = dataService;
             _logger = logger;
             _mapper = mapper;
-            _userManager = userManager;
-            _signInManager = signInManager;
             _roleManager = roleManager;
-            _claimsIdentity = claimsIdentity;
-            _tokenSettings = tokenSettings;
         }
 
 

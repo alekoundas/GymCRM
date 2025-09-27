@@ -17,7 +17,7 @@ namespace API.Controllers
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
-    public class RolesController : ControllerBase
+    public class RolesController : GenericController<Role, RoleDto, RoleDto>
     {
         private readonly IDataService _dataService;
         private readonly ILogger<RolesController> _logger;
@@ -28,7 +28,8 @@ namespace API.Controllers
             IDataService dataService,
             ILogger<RolesController> logger,
             IMapper mapper,
-            RoleManager<Role> roleManager)
+            RoleManager<Role> roleManager
+            ) : base(dataService, mapper)
         {
             _dataService = dataService;
             _logger = logger;
@@ -36,42 +37,21 @@ namespace API.Controllers
             _roleManager = roleManager;
         }
 
-        // GET: api/Roles
-        [HttpGet]
-        public async Task<IEnumerable<Role>> GetAll()
-        {
-            List<Role> result = await _roleManager.Roles.ToListAsync();
-            return result;
-        }
 
-        // GET: api/Roles/5
-        [HttpGet("{id}")]
-        public async Task<ApiResponse<RoleDto>> Get(string? id)
-        {
-            if (id == null)
-                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role ID not set!");
-
-            Role? role = await _roleManager.FindByIdAsync(id);
-            if (role == null)
-                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role not found!");
-
-            RoleDto identityRoleDto = _mapper.Map<RoleDto>(role);
-            return new ApiResponse<RoleDto>().SetSuccessResponse(identityRoleDto);
-        }
 
         // POST: api/Roles
         [HttpPost]
-        public async Task<ApiResponse<List<RoleDto>>> CreateRole([FromBody] List<RoleDto> roleDto)
+        public override async Task<ActionResult<ApiResponse<List<Role>>>> Post([FromBody] List<RoleDto> roleDto)
         {
 
             foreach (var role in roleDto)
             {
                 if (string.IsNullOrWhiteSpace(role.Name))
-                    return new ApiResponse<List<RoleDto>>().SetErrorResponse("error", "Role name is required");
+                    return new ApiResponse<List<Role>>().SetErrorResponse("error", "Role name is required");
 
                 bool roleExists = await _dataService.Roles.AnyAsync(x => x.Name == role.Name);
                 if (roleExists)
-                    return new ApiResponse<List<RoleDto>>().SetErrorResponse("error", "Role already exists");
+                    return new ApiResponse<List<Role>>().SetErrorResponse("error", "Role already exists");
 
                 Role identityRole = new Role();
                 identityRole.Name = role.Name;
@@ -93,23 +73,24 @@ namespace API.Controllers
                             await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, claim.Controller + "_Delete"));
                     }
                 else
-                    return new ApiResponse<List<RoleDto>>().SetErrorResponse("errors", response.Errors.ToString() ?? "");
+                    return new ApiResponse<List<Role>>().SetErrorResponse("errors", response.Errors.ToString() ?? "");
             }
 
-            return new ApiResponse<List<RoleDto>>().SetSuccessResponse(roleDto);
+            List<Role> roles = _mapper.Map<List<Role>>(roleDto);
+            return new ApiResponse<List<Role>>().SetSuccessResponse(roles);
         }
 
         // PUT: api/Roles
         [HttpPut("{id}")]
-        public async Task<ApiResponse<RoleDto>> Update(string? id, [FromBody] RoleDto identityRoleDto)
+        public override async Task<ActionResult<ApiResponse<Role>>> Put(string? id, [FromBody] RoleDto identityRoleDto)
         {
             // Checks.
-            if (id == null || id.Count() == 0)
-                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role name not not set!");
+            if (id == null)
+                return new ApiResponse<Role>().SetErrorResponse("error", "Role name not not set!");
 
-            Role? identityRole = await _roleManager.FindByIdAsync(id);
+            Role? identityRole = await _dataService.Roles.FindAsync(id);
             if (identityRole == null)
-                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role name not found!");
+                return new ApiResponse<Role>().SetErrorResponse("error", "Role name not found!");
 
 
             // Get claims from role.
@@ -141,80 +122,30 @@ namespace API.Controllers
             addClaims.ForEach(async claim => await _roleManager.AddClaimAsync(identityRole, claim));
 
 
-            return new ApiResponse<RoleDto>().SetSuccessResponse(identityRoleDto);
+            Role updatedRole = _mapper.Map<Role>(identityRoleDto);
+            return new ApiResponse<Role>().SetSuccessResponse(updatedRole);
         }
 
 
         // DELETE: api/Roles/5
         [HttpDelete("{id}")]
-        public async Task<ApiResponse<RoleDto>> DeleteRole(string? id)
+        public override async Task<ActionResult<ApiResponse<Role>>> Delete(object? id)
         {
-            if (id == null || id.Count() == 0)
-                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role name not not set!");
+            if (id == null)
+                return new ApiResponse<Role>().SetErrorResponse("error", "Role name not not set!");
 
-            var role = await _roleManager.FindByIdAsync(id);
+            var role = await _dataService.Roles.FindAsync(id);
             if (role == null)
-                return new ApiResponse<RoleDto>().SetErrorResponse("error", "Role not found!");
+                return new ApiResponse<Role>().SetErrorResponse("error", "Role not found!");
 
 
             var result = await _roleManager.DeleteAsync(role);
             if (result.Succeeded)
-                return new ApiResponse<RoleDto>().SetSuccessResponse("success", $"Role {role.Name} deleted successfully");
+                return new ApiResponse<Role>().SetSuccessResponse("success", $"Role {role.Name} deleted successfully");
 
-            return new ApiResponse<RoleDto>().SetErrorResponse("error", result.Errors.ToString() ?? "");
+            return new ApiResponse<Role>().SetErrorResponse("error", result.Errors.ToString() ?? "");
         }
 
-
-
-
-
-        // POST: api/IdentityRoles/GetDataTable
-        [HttpPost("GetDataTable")]
-        public async Task<ApiResponse<DataTableDto<RoleDto>>> GetDataTable([FromBody] DataTableDto<RoleDto> dataTable)
-        {
-            var query = _dataService.Roles;
-
-            // Handle Sorting of DataTable.
-            if (dataTable.Sorts.Count() > 0)
-            {
-                // Create the first OrderBy().
-                DataTableSortDto? dataTableSort = dataTable.Sorts.First();
-                if (dataTableSort.Order > 0)
-                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.ASCENDING);
-                else if (dataTableSort.Order < 0)
-                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.DESCENDING);
-
-                // Create the rest OrderBy methods as ThenBy() if any.
-                foreach (var sortInfo in dataTable.Sorts.Skip(1))
-                {
-                    if (dataTableSort.Order > 0)
-                        query.ThenBy(sortInfo.FieldName, OrderDirectionEnum.ASCENDING);
-                    else if (dataTableSort.Order < 0)
-                        query.ThenBy(sortInfo.FieldName, OrderDirectionEnum.DESCENDING);
-                }
-            }
-
-
-            // Handle pagination.
-            int skip = (dataTable.Page - 1) * dataTable.Rows;
-            int take = dataTable.Rows;
-
-            query.AddPagging(skip, take);
-
-
-            // Retrieve Data.
-            List<Role> result = await query.ToListAsync();
-            List<RoleDto> customerDto = _mapper.Map<List<RoleDto>>(result);
-
-            //TODDO add filter
-            int rows = await _dataService.Users.CountAsync();
-
-            dataTable.Data = customerDto;
-            dataTable.PageCount = rows;
-
-            return new ApiResponse<DataTableDto<RoleDto>>().SetSuccessResponse(dataTable);
-
-        }
 
         // POST: api/controller/lookup
         [HttpPost("Lookup")]
