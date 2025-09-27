@@ -15,6 +15,7 @@ import { useParams } from "react-router-dom";
 import TrainGroupDateParticipantFormComponent from "./TrainGroupDateParticipantFormComponent";
 import { DataTableFilterDto } from "../../model/datatable/DataTableFilterDto";
 import TrainGroupDateOneOffParticipantFormComponent from "./TrainGroupDateOneOffParticipantFormComponent";
+import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 
 interface IField {
   formMode: FormMode;
@@ -80,6 +81,7 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
         // value: "null",
         filterType: "notEquals",
       },
+      { fieldName: "userId", filterType: "in" },
     ],
   });
 
@@ -106,9 +108,9 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
     },
     {
       field: "trainGroupDateId",
-      header: "TrainGroupDateId",
-      sortable: formMode !== FormMode.ADD,
-      filter: formMode !== FormMode.ADD,
+      header: "Train Group Date Id",
+      sortable: false,
+      filter: false,
       filterPlaceholder: "Search",
       style: { width: "10%" },
     },
@@ -118,6 +120,12 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
       sortable: formMode !== FormMode.ADD,
       filter: formMode !== FormMode.ADD,
       filterPlaceholder: "Search",
+      filterTemplate: (options) => (
+        <DataTableFilterIdComponent
+          options={options}
+          controller="users"
+        />
+      ),
       style: { width: "10%" },
     },
   ];
