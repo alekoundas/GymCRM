@@ -1,7 +1,7 @@
 import { ColumnFilterElementTemplateOptions } from "primereact/column";
 import { Calendar } from "primereact/calendar";
 import { FormEvent } from "primereact/ts-helpers";
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 
 interface IField {
   options: ColumnFilterElementTemplateOptions;
@@ -10,18 +10,15 @@ interface IField {
 export default function DataTableFilterDateComponent({ options }: IField) {
   const [dates, setDates] = useState<Date[]>([]);
 
-  const onChange = (
-    e: FormEvent<(Date | null)[], SyntheticEvent<Element, Event>>
-  ) => {
-    if (e.value?.length) {
-      setDates(e.value as []);
-    }
-  };
+  // Clear filter value where user presses clear.
+  useEffect(() => {
+    if (options.value === null) setDates([]);
+  }, [options.value]);
 
   const onHide = () => {
     const result: string[] = [];
 
-    if (dates.length === 2) {
+    if (dates.every((x) => x !== null) && dates.length === 2) {
       let dateCleaned = new Date(
         dates[0].getFullYear(),
         dates[0].getMonth(),
@@ -45,13 +42,16 @@ export default function DataTableFilterDateComponent({ options }: IField) {
 
       result.push(dateCleaned.toISOString());
       options.filterApplyCallback(result);
+    } else {
+      setDates([]);
     }
   };
 
   return (
     <Calendar
       value={dates}
-      onChange={onChange}
+      onChange={(e) => setDates(e.value as [])}
+      placeholder="Search"
       selectionMode="range"
       readOnlyInput
       hideOnRangeSelection

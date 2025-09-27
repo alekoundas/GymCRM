@@ -19,7 +19,6 @@ import GenericDialogComponent, {
 } from "../../components/core/dialog/GenericDialogComponent";
 import TrainGroupDateFormComponent from "./TrainGroupDateFormComponent";
 import ApiService from "../../services/ApiService";
-import { Dialog } from "primereact/dialog";
 
 interface IField extends DialogChildProps {}
 
@@ -69,12 +68,9 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
   const [datatableDto, setDatatableDto] = useState<
     DataTableDto<TrainGroupDateDto>
   >({
+    ...new DataTableDto(),
     data: trainGroupDto.trainGroupDates,
-    first: 0,
-    rows: 10,
-    page: 1,
-    pageCount: 0,
-    dataTableSorts: [],
+    rows: 5,
     filters: [
       {
         fieldName: "TrainGroupId",
@@ -95,6 +91,14 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
   }, [trainGroupDto.trainGroupDates]);
 
   const dataTableColumns: DataTableColumns<TrainGroupDateDto>[] = [
+    {
+      field: "id",
+      header: "Id",
+      sortable: false,
+      filter: false,
+      filterPlaceholder: "Search",
+      style: { width: "20%" },
+    },
     {
       field: "trainGroupDateType",
       header: "Type",

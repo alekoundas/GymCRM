@@ -16,6 +16,7 @@ import { MailDto } from "../../model/entities/mail/MailDto";
 import MailFormComponent from "./MailFormComponent";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 import DataTableFilterDateComponent from "../../components/core/datatable/DataTableFilterDateComponent";
+import DataTableFilterNumberComponent from "../../components/core/datatable/DataTableFilterNumberComponent";
 
 export default function MailsPage() {
   const { mailDto, setMailDto, resetMailDto, updateMailDto } = useMailStore();
@@ -63,7 +64,10 @@ export default function MailsPage() {
       sortable: true,
       filter: true,
       filterPlaceholder: "Search",
-      style: { width: "20%" },
+      filterTemplate: (options) => (
+        <DataTableFilterNumberComponent options={options} />
+      ),
+      style: { width: "10%" },
     },
     {
       field: "subject",
