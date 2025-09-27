@@ -298,12 +298,6 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
             style={col.style}
             body={col.body}
             showFilterMenu={false}
-            showClearButton={dataTableDto.filters.some(
-              (x) =>
-                x.fieldName == col.field &&
-                x.filterType !== "in" &&
-                x.filterType !== "custom"
-            )}
             editor={col.cellEditor}
             onCellEditComplete={
               col.onCellEditComplete

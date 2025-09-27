@@ -25,35 +25,19 @@ export default function DataTableFilterIdComponent({
   options,
   controller,
 }: IField) {
-  // const [lookupOptions, setLookupOptions] = useState<LookupOptionDto[]>();
   const [searchValue, setSearchValue] = useState("");
   const [selectedEntities, setSelectedEntities] = useState<LookupOptionDto[]>();
   const [isDataLoaded, setIsDataLoaded] = useState(false); // used to escape lazyload firing again after dto update.
   const [lookupDto, setLookupDto] = useState<LookupDto>(new LookupDto());
 
-  // // Load lookup data.
-  // useEffect(() => {
-  //   const lookupDto: LookupDto = { take: 1000, filter: {} };
-  //   ApiService.getDataLookup(controller, lookupDto).then((response) => {
-  //     if (response?.data) {
-  //       setLookupOptions(response.data);
-  //     }
-  //   });
-  // }, []);
+  // Clear filter value where user presses clear.
+  useEffect(() => {
+    if (options.value === null) setSelectedEntities([]);
+  }, [options.value]);
 
   const fetchData = async (dto: LookupDto) => {
     dto.take = 10;
-
-    // const lookupDto: LookupDto = { take: 10, filter: {} };
     const result = ApiService.getDataLookup(controller, dto);
-    // .then(
-    //   (response) => {
-    //     if (response?.data) {
-    //       setLookupOptions(response.data);
-    //     }
-    //   }
-    // );
-
     return result;
   };
 
