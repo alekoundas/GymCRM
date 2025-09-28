@@ -59,6 +59,7 @@ export default function MailsPage() {
 
   const [datatableDto, setDatatableDto] = useState<DataTableDto<MailDto>>({
     ...new DataTableDto(),
+    rows: 5,
     filters: [
       { fieldName: "id", filterType: "equals" },
       { fieldName: "subject", filterType: "contains" },

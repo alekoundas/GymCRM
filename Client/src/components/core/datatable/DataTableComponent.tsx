@@ -217,6 +217,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
       <DataTable
         className="w-full"
         value={dataTableDto.data}
+        size="small"
         // key={"id"}
         lazy
         stripedRows
@@ -229,11 +230,19 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         loading={loading}
         // Pagging.
         paginator
-        first={dataTableDto.first ?? 0}
+        first={dataTableDto.first}
         rows={dataTableDto.rows}
         totalRecords={dataTableDto.totalRecords}
         onPage={(x) => dataTableService.onPage(dataTableDto, x)}
         rowsPerPageOptions={[5, 10, 25, 50, 100]}
+        paginatorRight={
+          <>
+            {dataTableDto.first + 1} to{" "}
+            {dataTableDto.rows * (dataTableDto.page + 1)} out of
+            {dataTableDto.totalRecords}
+          </>
+        }
+        paginatorLeft={<></>}
         // Filter.
         filterDisplay={filterDisplay}
         filters={dataTableFilters()}

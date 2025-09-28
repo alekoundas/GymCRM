@@ -104,7 +104,7 @@ export default class DataTableService<TEntity> {
     dataTableDto: DataTableDto<TEntity>,
     event: DataTablePageEvent
   ) => {
-    dataTableDto.page = event.page;
+    dataTableDto.page = event.page ?? 0;
     dataTableDto.rows = event.rows;
     dataTableDto.first = event.first;
 
