@@ -238,7 +238,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         paginatorRight={
           <>
             {dataTableDto.first + 1} to{" "}
-            {dataTableDto.rows * (dataTableDto.page + 1)} out of
+            {dataTableDto.rows * (dataTableDto.page + 1)} out of{" "}
             {dataTableDto.totalRecords}
           </>
         }

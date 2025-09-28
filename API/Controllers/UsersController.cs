@@ -379,6 +379,7 @@ namespace API.Controllers
                 .Distinct()
                 .Select(x => new TimeSlotResponseDto()
                 {
+                    Id = x.Id,
                     Title = x.Title,
                     Description = x.Description,
                     Duration = x.Duration,

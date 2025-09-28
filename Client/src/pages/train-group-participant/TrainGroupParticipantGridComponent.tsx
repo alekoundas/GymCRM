@@ -60,12 +60,8 @@ export default function TrainGroupParticipantGridComponent({
   const [datatableDto, setDatatableDto] = useState<
     DataTableDto<TrainGroupParticipantDto>
   >({
+    ...new DataTableDto(),
     data: trainGroupDto.trainGroupParticipants,
-    first: 0,
-    rows: 10,
-    page: 1,
-    pageCount: 0,
-    dataTableSorts: [],
     filters: [
       {
         fieldName: "TrainGroupId",

@@ -9,13 +9,26 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
 import { ThemeService } from "../../services/ThemeService";
+import { EventContentArg, EventSourceInput } from "@fullcalendar/core/index.js";
+import GenericDialogComponent, {
+  DialogControl,
+} from "../../components/core/dialog/GenericDialogComponent";
+import { FormMode } from "../../enum/FormMode";
 
 export default function UserProfileTimeslotsComponent() {
   const { userDto, updateUserDto } = useUserStore();
   const calendarRef = useRef<FullCalendar>(null);
   const [events, setEvents] = useState<any[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
+  const [selectedTimeSlot, setSelectedTimeSlot] =
+    useState<TimeSlotResponseDto>();
   const [loading, setLoading] = useState(true);
+  const [isDialogVisible, setDialogVisible] = useState(false); // Dialog visibility
+
+  const dialogControl: DialogControl = {
+    showDialog: () => setDialogVisible(true),
+    hideDialog: () => setDialogVisible(false),
+  };
 
   const fetchTimeSlots = async (currentDate: Date) => {
     const timeSlotDto = new TimeSlotRequestDto();
@@ -86,8 +99,8 @@ export default function UserProfileTimeslotsComponent() {
           );
 
           return {
-            // title: `${formatDate(x.date)} (${slot.title})`,
-            title: `${slot.title}`,
+            id: slot.id,
+            title: slot.title,
             start: startDate,
             end: endDate,
             backgroundColor: x.isUserJoined ? "#007ad9" : "#ced4da", // Joined: blue, not: gray
@@ -179,19 +192,21 @@ export default function UserProfileTimeslotsComponent() {
     }
   };
 
-  const formatDate = (dateStr: string): string => {
-    const date = new Date(dateStr);
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-  };
-
   if (loading) {
     return <div className="text-center p-4">Loading...</div>;
   }
+
+  const onTimeSlotClick = (arg: EventContentArg) => {
+    console.log("asd");
+    // setSelectedTimeSlot(arg.event as TimeSlotResponseDto);
+    // setDialogVisible(true);
+  };
 
   return (
     <div className="p-4">
       <FullCalendar
         ref={calendarRef}
+        events={events} // Data
         plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
         initialView="timeGridWeek"
         initialDate={new Date()}
@@ -214,10 +229,12 @@ export default function UserProfileTimeslotsComponent() {
           center: "title",
           right: "timeGridWeek,timeGridDay,listWeek",
         }}
-        events={events}
         eventContent={(arg) => (
-          <div className="">
-            <b>{arg.event.title}</b>
+          <div
+            className="flex w-full h-full justify-content-center align-items-center"
+            onClick={() => onTimeSlotClick(arg)}
+          >
+            {/* <b>{arg.event.title}</b> */}
             <p>{arg.timeText}</p>
           </div>
         )}
@@ -232,6 +249,37 @@ export default function UserProfileTimeslotsComponent() {
           return () => clearTimeout(timer);
         }} // Callback after dates render (modern equivalent for post-render DOM manipulation)
       />
+
+      {/*                                      */}
+      {/*           View Participant           */}
+      {/*                                      */}
+
+      <GenericDialogComponent
+        formMode={FormMode.VIEW}
+        visible={isDialogVisible}
+        control={dialogControl}
+      >
+        <div>
+          {selectedTimeSlot?.startOn && (
+            <div>
+              <p>
+                <strong>Time:</strong>{" "}
+                {new Date(selectedTimeSlot.startOn).toLocaleTimeString()}
+              </p>
+              <p>
+                <strong>Group Name:</strong> {selectedTimeSlot.title || "N/A"}
+              </p>
+              <p>
+                <strong>Trainer:</strong> {selectedTimeSlot.trainerId || "N/A"}
+              </p>
+              <p>
+                <strong>Description:</strong>{" "}
+                {selectedTimeSlot.description || "No description available."}
+              </p>
+            </div>
+          )}
+        </div>
+      </GenericDialogComponent>
     </div>
   );
 }
