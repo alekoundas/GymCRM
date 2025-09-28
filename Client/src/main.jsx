@@ -12,7 +12,7 @@ createRoot(document.getElementById("root")).render(
     <div className="h-screen">
       <BrowserRouter>
         <AuthProvider>
-          <PrimeReactProvider>
+          <PrimeReactProvider value={{ ripple: true, locale: "en" }}>
             <App />
           </PrimeReactProvider>
         </AuthProvider>
