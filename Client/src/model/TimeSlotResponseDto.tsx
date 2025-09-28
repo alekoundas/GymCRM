@@ -1,6 +1,7 @@
 import { TimeSlotRecurrenceDateDto } from "./TimeSlotRecurrenceDateDto";
 
 export interface TimeSlotResponseDto {
+  id: number;
   title: string;
   description: string;
   trainerId: string;
@@ -13,6 +14,7 @@ export interface TimeSlotResponseDto {
 }
 
 export class TimeSlotResponseDto {
+  id: number = 0;
   title: string = "";
   description: string = "";
   trainerId: string = "";
