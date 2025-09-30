@@ -1,10 +1,10 @@
 import { create } from "zustand";
-import { TrainGroupDateDto } from "../model/TrainGroupDateDto";
-import { TrainGroupDto } from "../model/TrainGroupDto";
 import ApiService from "../services/ApiService";
-import { TrainGroupParticipantDto } from "../model/TrainGroupParticipantDto";
 import { TokenService } from "../services/TokenService";
 import { TrainGroupDateTypeEnum } from "../enum/TrainGroupDateTypeEnum";
+import { TrainGroupDto } from "../model/entities/train-group/TrainGroupDto";
+import { TrainGroupDateDto } from "../model/entities/train-group-date/TrainGroupDateDto";
+import { TrainGroupParticipantDto } from "../model/entities/train-group-participant/TrainGroupParticipantDto";
 
 interface TrainGroupStoreState {
   trainGroupDto: TrainGroupDto;
@@ -128,7 +128,7 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
         trainGroupDateType: TrainGroupDateTypeEnum.FIXED_DAY,
         trainGroupId: undefined,
         trainGroupParticipants: [],
-        trainGroupDateCancellationSubscribers: [],
+        // trainGroupDateCancellationSubscribers: [],
       },
     });
   },

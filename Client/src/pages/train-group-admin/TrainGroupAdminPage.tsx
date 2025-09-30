@@ -6,7 +6,6 @@ import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
-import { TrainGroupDto } from "../../model/TrainGroupDto";
 import DataTableComponent from "../../components/core/datatable/DataTableComponent";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
@@ -19,6 +18,7 @@ import DataTableFilterTimeComponent from "../../components/core/datatable/DataTa
 import DataTableFilterNumberComponent from "../../components/core/datatable/DataTableFilterNumberComponent";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
+import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
 
 export default function TrainGroupAdminPage() {
   const navigate = useNavigate();
@@ -108,11 +108,13 @@ export default function TrainGroupAdminPage() {
         if (rowData.startOn) {
           const date = new Date(rowData.startOn);
           return (
-            date.getDate() +
-            "/" +
-            (date.getMonth() + 1) +
-            "/" +
-            date.getFullYear()
+            (date.getHours().toLocaleString().length == 2
+              ? date.getHours().toLocaleString()
+              : "0" + date.getHours().toLocaleString()) +
+            ":" +
+            (date.getMinutes().toLocaleString().length == 2
+              ? date.getMinutes().toLocaleString()
+              : "0" + date.getMinutes().toLocaleString())
           );
         }
       },

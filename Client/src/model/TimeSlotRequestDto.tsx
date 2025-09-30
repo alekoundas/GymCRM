@@ -6,6 +6,6 @@ export interface TimeSlotRequestDto {
 }
 
 export class TimeSlotRequestDto {
-  selectedDate: string;
+  selectedDate: string = "";
   userId: string = TokenService.getUserId() ?? "";
 }

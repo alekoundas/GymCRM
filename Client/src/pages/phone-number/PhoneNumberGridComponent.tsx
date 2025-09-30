@@ -50,11 +50,7 @@ export default function PhoneNumberGridComponent() {
   const [datatableDto, setDatatableDto] = useState<
     DataTableDto<PhoneNumberDto>
   >({
-    data: [],
-    first: 0,
-    rows: 10,
-    page: 1,
-    pageCount: 0,
+    ...new DataTableDto(),
     filters: [
       {
         fieldName: "UserId",

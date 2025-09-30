@@ -61,7 +61,7 @@ namespace API.Controllers
                     .Where(y => y.SelectedDate == null)
                     .Any(y => existingEntity.TrainGroupDates
                         .Where(z => z.Id == y.TrainGroupDateId)
-                        .Any(z => z.RecurrenceDayOfMonth?.Day == x.SelectedDate?.Day || z.RecurrenceDayOfWeek?.DayOfWeek == x.SelectedDate?.DayOfWeek)
+                        .Any(z => z.RecurrenceDayOfMonth == x.SelectedDate?.Day || z.RecurrenceDayOfWeek == x.SelectedDate?.DayOfWeek)
                     )
                 );
 
@@ -87,8 +87,8 @@ namespace API.Controllers
                             .TrainGroupDates
                             .Where(x =>
                                 x.FixedDay == updateDto.SelectedDate ||
-                                x.RecurrenceDayOfMonth?.Day == updateDto.SelectedDate.Day ||
-                                x.RecurrenceDayOfWeek?.DayOfWeek == updateDto.SelectedDate.DayOfWeek)
+                                x.RecurrenceDayOfMonth == updateDto.SelectedDate.Day ||
+                                x.RecurrenceDayOfWeek == updateDto.SelectedDate.DayOfWeek)
                             .ToList();
 
                     if (selectedTrainGroupDate.Count() == 1)
@@ -145,8 +145,8 @@ namespace API.Controllers
                     .Where(x => incomingParticipant.SelectedDate == null ? x.SelectedDate == null : true) // If SelectedDate is not set, check only for non one-off participants
                     .Where(x => !incomingParticipant.TrainGroupParticipantUnavailableDates.Any(y =>
                         y.UnavailableDate == x.TrainGroupDate.FixedDay ||
-                        y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth?.Day ||
-                        y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfMonth?.DayOfWeek))
+                        y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth ||
+                        y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfWeek))
                     .ToList()
                     .Count();
 
@@ -174,8 +174,8 @@ namespace API.Controllers
                             x.TrainGroup.TrainGroupParticipants
                                 .Where(y => y.TrainGroupDate.TrainGroupDateType != TrainGroupDateTypeEnum.FIXED_DAY)
                                 .Where(y =>
-                                    y.TrainGroupDate.RecurrenceDayOfMonth?.Day == x.SelectedDate!.Value.Day ||
-                                    y.TrainGroupDate.RecurrenceDayOfWeek?.DayOfWeek == x.SelectedDate!.Value.DayOfWeek ||
+                                    y.TrainGroupDate.RecurrenceDayOfMonth == x.SelectedDate!.Value.Day ||
+                                    y.TrainGroupDate.RecurrenceDayOfWeek == x.SelectedDate!.Value.DayOfWeek ||
                                     y.SelectedDate == x.SelectedDate!.Value
                                 )
                                 .Count()
@@ -230,8 +230,8 @@ namespace API.Controllers
                 // Validate selected date matches a TrainGroupDate
                 bool isDateValid = trainGroupDates.Any(x =>
                     x.FixedDay == participantDto.SelectedDate ||
-                    x.RecurrenceDayOfMonth?.Day == participantDto.SelectedDate.Value.Day ||
-                    x.RecurrenceDayOfWeek?.DayOfWeek == participantDto.SelectedDate.Value.DayOfWeek);
+                    x.RecurrenceDayOfMonth == participantDto.SelectedDate.Value.Day ||
+                    x.RecurrenceDayOfWeek == participantDto.SelectedDate.Value.DayOfWeek);
 
                 if (!isDateValid)
                     errorList.Add("Participant selected date doesn't match any of the Train Group Dates!");

@@ -12,7 +12,7 @@ import { useTrainGroupBookingStore } from "../../stores/TrainGroupBookingStore";
 import TrainGroupsBookingCalendarTimeslotInfoComponent from "./TrainGroupsBookingCalendarTimeslotInfoComponent";
 import TrainGroupsBookingCalendarTimeslotBookFormComponent from "./TrainGroupsBookingCalendarTimeslotBookFormComponent";
 import { ToastService } from "../../services/ToastService";
-import { TrainGroupParticipantDto } from "../../model/TrainGroupParticipantDto";
+import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
 
 export default function TrainGroupsBookingCalendarPage() {
   const {
@@ -34,13 +34,7 @@ export default function TrainGroupsBookingCalendarPage() {
 
   const handleChangeDate = (value: Date) => {
     const dateCleaned = new Date(
-      value.getFullYear(),
-      value.getMonth(),
-      value.getDate(),
-      0,
-      0,
-      0,
-      0
+      Date.UTC(value.getFullYear(), value.getMonth(), value.getDate(), 0, 0, 0)
     );
 
     // Reset selected slot when date changes

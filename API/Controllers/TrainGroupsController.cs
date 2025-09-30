@@ -43,7 +43,7 @@ namespace API.Controllers
                 .Any(x =>
                     entityDto.TrainGroupDates
                         .Where(y => y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
-                        .Any(y => x.FixedDay!.Value.DayOfWeek == y.RecurrenceDayOfWeek!.Value.DayOfWeek)
+                        .Any(y => x.FixedDay!.Value.DayOfWeek == y.RecurrenceDayOfWeek)
                 );
             if (isFixedDateValid)
                 errorList.Add("Fixed Date has the same Day of week with an existing day of week row!");
@@ -57,7 +57,7 @@ namespace API.Controllers
                 .Any(x =>
                     entityDto.TrainGroupDates
                         .Where(y => y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH)
-                        .Any(y => x.FixedDay!.Value.DayOfWeek == y.RecurrenceDayOfMonth!.Value.DayOfWeek)
+                        .Any(y => x.FixedDay!.Value.Day == y.RecurrenceDayOfMonth)
                 );
             if (isFixedDateValid)
                 errorList.Add("Fixed Date has the same day with an existing day of month row!");
@@ -93,8 +93,8 @@ namespace API.Controllers
                         .Any(x =>
                             entityDto.TrainGroupDates.Any(y =>
                                 x.SelectedDate == y.FixedDay
-                                || x.SelectedDate!.Value.Day == y.RecurrenceDayOfMonth?.Day
-                                || x.SelectedDate!.Value.DayOfWeek == y.RecurrenceDayOfWeek?.DayOfWeek)
+                                || x.SelectedDate!.Value.Day == y.RecurrenceDayOfMonth
+                                || x.SelectedDate!.Value.DayOfWeek == y.RecurrenceDayOfWeek)
                         );
                 if (isTrainGroupParticipantValid)
                     errorList.Add("Participant selected date doesnt match any of the Train Group Dates!");

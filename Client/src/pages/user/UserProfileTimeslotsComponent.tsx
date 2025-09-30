@@ -34,13 +34,15 @@ export default function UserProfileTimeslotsComponent() {
     const timeSlotDto = new TimeSlotRequestDto();
 
     const dateCleaned = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      currentDate.getDate(),
-      0,
-      0,
-      0,
-      0
+      Date.UTC(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate(),
+        0,
+        0,
+        0,
+        0
+      )
     );
 
     timeSlotDto.selectedDate = dateCleaned.toISOString();
@@ -56,15 +58,21 @@ export default function UserProfileTimeslotsComponent() {
     if (response) {
       const mappedEvents = response.flatMap((slot) =>
         slot.recurrenceDates.map((x) => {
-          let startDate: Date;
+          let startDate: Date | undefined;
 
           // Fixed Date
           if (x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY)
             startDate = new Date(x.date);
 
           // Date Of Month
-          if (x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH)
-            startDate = new Date(new Date().setDate(new Date(x.date).getDay()));
+          if (x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH) {
+            const dateOfWeek = calendarDates.find(
+              (y) => y.getDate() === new Date(x.date).getDate()
+            );
+            if (dateOfWeek) {
+              startDate = dateOfWeek;
+            }
+          }
 
           // Date Of Week
           if (x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK) {
@@ -81,34 +89,38 @@ export default function UserProfileTimeslotsComponent() {
             startDate = new Date(x.date);
           }
 
-          startDate = new Date(
-            startDate!.getFullYear(),
-            startDate!.getMonth(),
-            startDate!.getDate(),
-            new Date(slot.startOn).getHours(),
-            new Date(slot.startOn).getMinutes(),
-            0
-          );
+          if (startDate) {
+            startDate = new Date(
+              startDate!.getFullYear(),
+              startDate!.getMonth(),
+              startDate!.getDate(),
+              new Date(slot.startOn).getHours(),
+              new Date(slot.startOn).getMinutes(),
+              0
+            );
 
-          // Calculate endDate
-          const durationMinutes =
-            new Date(slot.duration).getHours() * 60 +
-            new Date(slot.duration).getMinutes();
-          const endDate = new Date(
-            startDate.getTime() + durationMinutes * 60 * 1000
-          );
+            // Calculate endDate
+            const durationMinutes =
+              new Date(slot.duration).getHours() * 60 +
+              new Date(slot.duration).getMinutes();
+            const endDate = new Date(
+              startDate.getTime() + durationMinutes * 60 * 1000
+            );
 
-          return {
-            id: slot.id,
-            title: slot.title,
-            start: startDate,
-            end: endDate,
-            backgroundColor: x.isUserJoined ? "#007ad9" : "#ced4da", // Joined: blue, not: gray
-            extendedProps: { isUserJoined: x.isUserJoined },
-          };
+            return {
+              id: slot.id,
+              title: slot.title,
+              start: startDate,
+              end: endDate,
+              backgroundColor: x.isUserJoined ? "#007ad9" : "#ced4da", // Joined: blue, not: gray
+              extendedProps: { isUserJoined: x.isUserJoined },
+            };
+          }
         })
       );
-      setEvents(mappedEvents);
+
+      const mappedEventsCleaned = mappedEvents.filter((x) => x !== undefined);
+      setEvents(mappedEventsCleaned);
       setLoading(false);
       setTimeSlots(response);
     }
@@ -234,7 +246,7 @@ export default function UserProfileTimeslotsComponent() {
             className="flex w-full h-full justify-content-center align-items-center"
             onClick={() => onTimeSlotClick(arg)}
           >
-            {/* <b>{arg.event.title}</b> */}
+            <b>{arg.event.title}</b>
             <p>{arg.timeText}</p>
           </div>
         )}

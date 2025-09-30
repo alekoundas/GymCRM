@@ -63,15 +63,20 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
               Fixed Day
             </label>
             <Calendar
-              value={
-                trainGroupDateDto.fixedDay
-                  ? new Date(trainGroupDateDto.fixedDay)
-                  : undefined
-              }
+              value={trainGroupDateDto.fixedDay}
               onChange={(e: any) => {
                 setTrainGroupDateDto({
                   ...trainGroupDateDto,
-                  fixedDay: e.target.value,
+                  fixedDay: new Date(
+                    Date.UTC(
+                      e.target.value.getFullYear(),
+                      e.target.value.getMonth(),
+                      e.target.value.getDate(),
+                      0,
+                      0,
+                      0
+                    )
+                  ),
                 });
               }}
               showIcon={true}
@@ -94,24 +99,12 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
             </label>
 
             <InputNumber
-              value={
-                trainGroupDateDto.recurrenceDayOfMonth
-                  ? new Date(trainGroupDateDto.recurrenceDayOfMonth).getDate()
-                  : undefined
-              }
+              value={trainGroupDateDto.recurrenceDayOfMonth}
               onChange={(e: InputNumberChangeEvent) => {
                 if (e.value)
                   setTrainGroupDateDto({
                     ...trainGroupDateDto,
-                    recurrenceDayOfMonth: new Date(
-                      2000,
-                      0,
-                      e.value,
-                      0,
-                      0,
-                      0,
-                      0
-                    ),
+                    recurrenceDayOfMonth: e.value,
                   });
               }}
               min={0}
@@ -130,23 +123,14 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
               Recurrence Day Of Week
             </label>
             <Dropdown
-              value={DateService.getDayOfWeekFromDate(
-                trainGroupDateDto.recurrenceDayOfWeek
-              )}
+              value={trainGroupDateDto.recurrenceDayOfWeek}
               options={Object.keys(DayOfWeekEnum)}
               onChange={(e: any) => {
                 if (e.target.value) {
-                  const updatedDate: Date | undefined =
-                    DateService.getDateFromDayOfWeek(e.target.value);
-
-                  if (updatedDate) {
-                    setTrainGroupDateDto({
-                      ...trainGroupDateDto,
-                      recurrenceDayOfWeek: DateService.getDateFromDayOfWeek(
-                        e.target.value
-                      ),
-                    });
-                  }
+                  setTrainGroupDateDto({
+                    ...trainGroupDateDto,
+                    recurrenceDayOfWeek: e.target.value,
+                  });
                 }
               }}
               placeholder="Select Type"

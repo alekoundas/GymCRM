@@ -4,7 +4,6 @@ import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
 import { FormMode } from "../../enum/FormMode";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
-import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
 import { DateService } from "../../services/DateService";
@@ -19,6 +18,7 @@ import GenericDialogComponent, {
 } from "../../components/core/dialog/GenericDialogComponent";
 import TrainGroupDateFormComponent from "./TrainGroupDateFormComponent";
 import ApiService from "../../services/ApiService";
+import { TrainGroupDateDto } from "../../model/entities/train-group-date/TrainGroupDateDto";
 
 interface IField extends DialogChildProps {}
 
@@ -150,9 +150,7 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       filter: false,
       filterPlaceholder: "Search",
       style: { width: "20%" },
-      body: (rowData: TrainGroupDateDto) => {
-        return DateService.getDayOfWeekFromDate(rowData.recurrenceDayOfWeek);
-      },
+      // body: (rowData: TrainGroupDateDto) => rowData.recurrenceDayOfWeek,
     },
     {
       field: "recurrenceDayOfMonth",
@@ -162,10 +160,6 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       filter: false,
       filterPlaceholder: "Search",
       style: { width: "20%" },
-      body: (data: TrainGroupDateDto) => {
-        if (data.recurrenceDayOfMonth)
-          return new Date(data.recurrenceDayOfMonth).getDate();
-      },
     },
   ];
 

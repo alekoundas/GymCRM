@@ -17,7 +17,7 @@ namespace Business.Services
         IGenericRepository<PhoneNumber> PhoneNumbers { get; }
         IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
         IGenericRepository<TrainGroupParticipant> TrainGroupParticipants { get; }
-        IGenericRepository<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; }
+        //IGenericRepository<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; }
 
         // Identity.
         IGenericRepository<Role> Roles { get; }

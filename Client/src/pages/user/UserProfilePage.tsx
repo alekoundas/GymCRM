@@ -14,7 +14,6 @@ import { useUserStore } from "../../stores/UserStore";
 import UserProfileFormComponent from "./UserProfileFormComponent";
 import PhoneNumberGridComponent from "../phone-number/PhoneNumberGridComponent";
 import UserProfileTimeslotsComponent from "./UserProfileTimeslotsComponent";
-import { UserPasswordChangeDto } from "../../model/entities/user/UserPasswordChangeDto";
 import UserProfilePasswordChangeFormComponent from "./UserProfilePasswordChangeFormComponent";
 
 export default function UserProfilePage() {
