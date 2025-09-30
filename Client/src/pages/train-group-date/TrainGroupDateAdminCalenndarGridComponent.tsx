@@ -10,7 +10,6 @@ import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnu
 import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
 import { FormMode } from "../../enum/FormMode";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
-import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
@@ -21,6 +20,7 @@ import {
   DataTableValueArray,
 } from "primereact/datatable";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
+import { TrainGroupDateDto } from "../../model/entities/train-group-date/TrainGroupDateDto";
 
 interface IField extends DialogChildProps {}
 
@@ -49,12 +49,8 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
   const [datatableDto, setDatatableDto] = useState<
     DataTableDto<TrainGroupDateDto>
   >({
+    ...new DataTableDto(),
     data: trainGroupDto.trainGroupDates,
-    first: 0,
-    rows: 10,
-    page: 1,
-    pageCount: 0,
-    dataTableSorts: [],
     filters: [
       {
         fieldName: "TrainGroupId",
@@ -103,7 +99,9 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
 
                 const row = editingRows.filter((x) => x.rowId === rowId)[0];
                 const rowIndex = trainGroupDto.trainGroupDates.indexOf(
-                  trainGroupDto.trainGroupDates.filter((x) => x.id === rowId)[0]
+                  trainGroupDto.trainGroupDates.filter(
+                    (x: TrainGroupDateDto) => x.id === rowId
+                  )[0]
                 );
 
                 // Update row data immediately
@@ -196,7 +194,8 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
       filterPlaceholder: "Search",
       style: { width: "20%" },
       body: (rowData: TrainGroupDateDto) => {
-        return DateService.getDayOfWeekFromDate(rowData.recurrenceDayOfWeek);
+        // return DateService.getDayOfWeekFromDate(rowData.recurrenceDayOfWeek);
+        return rowData.recurrenceDayOfWeek;
       },
       cellEditor: (options: ColumnEditorOptions) => {
         const editingRow = editingRows.filter(
@@ -210,16 +209,11 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
         ) {
           return (
             <Dropdown
-              value={DateService.getDayOfWeekFromDate(options.value)}
+              value={options.value}
               options={Object.keys(DayOfWeekEnum)}
               onChange={(e: any) => {
                 if (e.target.value) {
-                  const updatedDate: Date | undefined =
-                    DateService.getDateFromDayOfWeek(e.target.value);
-
-                  if (updatedDate) {
-                    options.editorCallback?.(updatedDate);
-                  }
+                  options.editorCallback?.(e.target.value);
                 }
               }}
               placeholder="Select Type"
@@ -254,12 +248,9 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
         ) {
           return (
             <InputNumber
-              value={new Date(options.value).getDate()}
+              value={options.value}
               onChange={(e: InputNumberChangeEvent) => {
-                if (e.value)
-                  options.editorCallback?.(
-                    new Date(2000, 0, e.value, 0, 0, 0, 0)
-                  );
+                if (e.value) options.editorCallback?.(e.value);
               }}
               min={0}
               max={31}
@@ -347,7 +338,10 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
       case ButtonTypeEnum.ADD:
         const newRow: TrainGroupDateDto = {
           id:
-            (trainGroupDto.trainGroupDates.filter((x) => x.id < 0).length + 1) *
+            (trainGroupDto.trainGroupDates.filter(
+              (x: TrainGroupDateDto) => x.id < 0
+            ).length +
+              1) *
             -1,
           trainGroupDateType: TrainGroupDateTypeEnum.FIXED_DAY,
           fixedDay: undefined,
@@ -355,7 +349,7 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
           recurrenceDayOfMonth: undefined,
           trainGroupId: trainGroupDto.id > 0 ? trainGroupDto.id : -1,
           trainGroupParticipants: [],
-          trainGroupDateCancellationSubscribers: [],
+          // trainGroupDateCancellationSubscribers: [],
         };
         addTrainGroupDate(newRow);
         break;

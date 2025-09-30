@@ -32,10 +32,6 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
             <strong>Trainer:</strong> {selectedTimeSlot.trainerId || "N/A"}
           </p>
           <p>
-            <strong>Description:</strong>{" "}
-            {selectedTimeSlot.description || "No description available."}
-          </p>
-          <p>
             <strong>Spots Left:</strong>{" "}
             {selectedTimeSlot.spotsLeft !== undefined
               ? selectedTimeSlot.spotsLeft
@@ -44,6 +40,10 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
           <p>
             <strong>Available:</strong>{" "}
             {selectedTimeSlot.spotsLeft > 0 ? "Yes" : "No"}
+          </p>
+          <p>
+            <strong>Description:</strong>{" "}
+            {selectedTimeSlot.description || "No description available."}
           </p>
 
           <h3 className="mt-6">Group is occurring on </h3>

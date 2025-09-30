@@ -1,6 +1,6 @@
-import { UserDto } from "./entities/user/UserDto";
-import { TrainGroupDateDto } from "./TrainGroupDateDto";
-import { TrainGroupParticipantDto } from "./TrainGroupParticipantDto";
+import { TrainGroupDateDto } from "../train-group-date/TrainGroupDateDto";
+import { TrainGroupParticipantDto } from "../train-group-participant/TrainGroupParticipantDto";
+import { UserDto } from "../user/UserDto";
 
 export interface TrainGroupDto {
   id: number;

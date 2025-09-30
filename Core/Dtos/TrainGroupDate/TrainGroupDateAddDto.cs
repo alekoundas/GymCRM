@@ -14,8 +14,9 @@ namespace Core.Dtos.TrainGroupDate
 
         public int? TrainGroupId { get; set; }
         public DateTime? FixedDay { get; set; }
-        public DateTime? RecurrenceDayOfMonth { get; set; }
-        public DateTime? RecurrenceDayOfWeek { get; set; }
+        public DayOfWeek? RecurrenceDayOfWeek { get; set; } // System.DayOfWeek enum
+        //[Range(1, 31, ErrorMessage = "MaxParticipants must be between 1 and 50")]
+        public int? RecurrenceDayOfMonth { get; set; }// 1-31
         public ICollection<TrainGroupParticipantAddDto> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipantAddDto>();
     }
 }

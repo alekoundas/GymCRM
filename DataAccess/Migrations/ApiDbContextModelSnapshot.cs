@@ -191,11 +191,11 @@ namespace DataAccess.Migrations
                     b.Property<DateTime?>("FixedDay")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("RecurrenceDayOfMonth")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("RecurrenceDayOfMonth")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("RecurrenceDayOfWeek")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("RecurrenceDayOfWeek")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("TrainGroupDateType")
                         .IsRequired()
@@ -212,44 +212,6 @@ namespace DataAccess.Migrations
                     b.HasIndex("TrainGroupId");
 
                     b.ToTable("TrainGroupDates");
-                });
-
-            modelBuilder.Entity("Core.Models.TrainGroupDateCancellationSubscriber", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("CreatedBy_FullName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedBy_Id")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("SelectedDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TrainGroupDateId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("TrainGroupDateId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TrainGroupCancellationSubscribers");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
@@ -577,25 +539,6 @@ namespace DataAccess.Migrations
                     b.Navigation("TrainGroup");
                 });
 
-            modelBuilder.Entity("Core.Models.TrainGroupDateCancellationSubscriber", b =>
-                {
-                    b.HasOne("Core.Models.TrainGroupDate", "TrainGroupDate")
-                        .WithMany("TrainGroupDateCancellationSubscribers")
-                        .HasForeignKey("TrainGroupDateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Models.User", "User")
-                        .WithMany("TrainGroupDatesCancellationSubscriber")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TrainGroupDate");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
                 {
                     b.HasOne("Core.Models.TrainGroupDate", "TrainGroupDate")
@@ -703,8 +646,6 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Core.Models.TrainGroupDate", b =>
                 {
-                    b.Navigation("TrainGroupDateCancellationSubscribers");
-
                     b.Navigation("TrainGroupParticipants");
                 });
 
@@ -718,8 +659,6 @@ namespace DataAccess.Migrations
                     b.Navigation("Mails");
 
                     b.Navigation("PhoneNumbers");
-
-                    b.Navigation("TrainGroupDatesCancellationSubscriber");
 
                     b.Navigation("TrainGroupParticipants");
 

@@ -4,7 +4,7 @@ import { DateService } from "../../services/DateService";
 import { Checkbox } from "primereact/checkbox";
 import { useState } from "react";
 import { TokenService } from "../../services/TokenService";
-import { TrainGroupParticipantDto } from "../../model/TrainGroupParticipantDto";
+import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
 
 interface IField {}
 

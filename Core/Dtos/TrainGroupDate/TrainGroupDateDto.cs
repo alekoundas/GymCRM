@@ -14,9 +14,11 @@ namespace Core.Dtos.TrainGroupDate
         [Required(ErrorMessage = "TrainGroupDateType is required")]
         public TrainGroupDateTypeEnum TrainGroupDateType { get; set; }
 
+
         public DateTime? FixedDay { get; set; }
-        public DateTime? RecurrenceDayOfWeek { get; set; }
-        public DateTime? RecurrenceDayOfMonth { get; set; }
+        public DayOfWeek? RecurrenceDayOfWeek { get; set; } // System.DayOfWeek enum
+        //[Range(1, 31, ErrorMessage = "MaxParticipants must be between 1 and 50")]
+        public int? RecurrenceDayOfMonth { get; set; }// 1-31
 
 
         [Required(ErrorMessage = "TrainGroupId is required")]
@@ -26,6 +28,6 @@ namespace Core.Dtos.TrainGroupDate
 
         public List<TrainGroupParticipantDto> TrainGroupDateParticipants { get; set; } = new List<TrainGroupParticipantDto>();
 
-        public List<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; set; } = new List<TrainGroupDateCancellationSubscriber>();
+        //public List<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; set; } = new List<TrainGroupDateCancellationSubscriber>();
     }
 }

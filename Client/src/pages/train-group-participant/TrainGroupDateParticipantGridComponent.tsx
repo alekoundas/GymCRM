@@ -5,7 +5,6 @@ import { FormMode } from "../../enum/FormMode";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
-import { TrainGroupParticipantDto } from "../../model/TrainGroupParticipantDto";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
 import GenericDialogComponent, {
   DialogControl,
@@ -17,6 +16,7 @@ import { DataTableFilterDto } from "../../model/datatable/DataTableFilterDto";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
+import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
 
 interface IField {
   formMode: FormMode;

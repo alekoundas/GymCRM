@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import ApiService from "../services/ApiService";
 import { RoleDto } from "../model/entities/role/RoleDto";
 
 interface RoleStoreState {

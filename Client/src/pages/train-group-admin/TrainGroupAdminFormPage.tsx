@@ -5,14 +5,13 @@ import ApiService from "../../services/ApiService";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import TrainGroupFormComponent from "./TrainGroupFormComponent";
 import TrainGroupDateGridComponent from "../train-group-date/TrainGroupDateGridComponent";
-import TrainGroupParticipantGridComponent from "../train-group-participant/TrainGroupParticipantGridComponent";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "primereact/button";
 import TrainGroupDateParticipantGridComponent from "../train-group-participant/TrainGroupDateParticipantGridComponent";
-import { TrainGroupDateDto } from "../../model/TrainGroupDateDto";
-import { TrainGroupDto } from "../../model/TrainGroupDto";
 import TrainGroupDateOneOffParticipantGridComponent from "../train-group-participant/TrainGroupDateOneOffParticipantGridComponent";
 import { Dialog } from "primereact/dialog";
+import { TrainGroupDateDto } from "../../model/entities/train-group-date/TrainGroupDateDto";
+import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
 
 interface IField {
   formMode: FormMode;
@@ -38,7 +37,7 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
   const onSave = async () => {
     if (formMode === FormMode.ADD) {
       const cleanedTrainGroupDates: TrainGroupDateDto[] =
-        trainGroupDto.trainGroupDates.map((x) => ({
+        trainGroupDto.trainGroupDates.map((x: TrainGroupDateDto) => ({
           ...x,
           trainGroupId: undefined,
           trainGroupParticipants: x.trainGroupParticipants.map((y) => ({

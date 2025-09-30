@@ -3,8 +3,8 @@ import { TimeSlotRequestDto } from "../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../model/TimeSlotResponseDto";
 import { TimeSlotRecurrenceDateDto } from "../model/TimeSlotRecurrenceDateDto";
 import { TokenService } from "../services/TokenService";
-import { TrainGroupParticipantUpdateDto } from "../model/TrainGroupParticipantUpdateDto";
 import ApiService from "../services/ApiService";
+import { TrainGroupParticipantUpdateDto } from "../model/entities/train-group-participant/TrainGroupParticipantUpdateDto";
 
 interface useTrainGroupBookingStoreState {
   timeSlotRequestDto: TimeSlotRequestDto;

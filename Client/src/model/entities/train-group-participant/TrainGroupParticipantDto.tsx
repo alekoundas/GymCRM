@@ -1,4 +1,4 @@
-import { UserDto } from "./entities/user/UserDto";
+import { UserDto } from "../user/UserDto";
 
 export interface TrainGroupParticipantDto {
   id: number;
