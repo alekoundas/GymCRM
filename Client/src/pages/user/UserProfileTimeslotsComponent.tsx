@@ -14,6 +14,8 @@ import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import { FormMode } from "../../enum/FormMode";
+import { Card } from "primereact/card";
+import { Button } from "primereact/button";
 
 export default function UserProfileTimeslotsComponent() {
   const { userDto, updateUserDto } = useUserStore();
@@ -22,7 +24,7 @@ export default function UserProfileTimeslotsComponent() {
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
   const [selectedTimeSlot, setSelectedTimeSlot] =
     useState<TimeSlotResponseDto>();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isDialogVisible, setDialogVisible] = useState(false); // Dialog visibility
 
   const dialogControl: DialogControl = {
@@ -108,7 +110,7 @@ export default function UserProfileTimeslotsComponent() {
             );
 
             return {
-              id: slot.id,
+              id: x.trainGroupDateId,
               title: slot.title,
               start: startDate,
               end: endDate,
@@ -127,13 +129,7 @@ export default function UserProfileTimeslotsComponent() {
 
     setLoading(false);
   };
-  // Load data.
-  useEffect(() => {
-    setLoading(false);
-    // fetchTimeSlots();
-  }, []);
 
-  // Listen for theme changes
   useEffect(() => {
     // Initial call on mount to set starting theme
     handleThemeChange();
@@ -148,24 +144,8 @@ export default function UserProfileTimeslotsComponent() {
     const palette = ThemeService.getCurrentThemeColors();
     const calendarApi = calendarRef.current?.getApi();
 
-    // DOM manipulation for header styling (no CSS required)
+    // DOM manipulation for header styling
     if (calendarApi && palette.primaryColor) {
-      // Update global event colors (overrides per-event if set)
-      calendarApi.setOption("eventBackgroundColor", palette.primaryColor);
-      calendarApi.setOption("eventBorderColor", palette.primaryColor);
-      calendarApi.setOption("eventTextColor", palette.textColor);
-
-      // Re-render events with updated colors
-      calendarApi.refetchEvents();
-      // Toolbar header (top bar)
-      const toolbar = document.querySelector(
-        ".fc-header-toolbar"
-      ) as HTMLElement | null;
-      if (toolbar) {
-        toolbar.style.backgroundColor = palette.surfaceCard;
-        toolbar.style.color = palette.textColor;
-      }
-
       // Day headers (e.g., "Fri 1/1") - .fc-col-header-cell
       const dayHeaders = document.querySelectorAll(
         ".fc-col-header-cell"
@@ -173,7 +153,6 @@ export default function UserProfileTimeslotsComponent() {
       dayHeaders.forEach((header) => {
         header.style.backgroundColor = palette.surfaceCard;
         header.style.color = palette.textColor;
-        // header.style.borderBottom = `1px solid ${palette.surfaceBorder}`;
       });
       // Day headers (e.g., "Fri 1/1") - .fc-col-header-cell
       const dayHeader = document.querySelectorAll(
@@ -182,34 +161,13 @@ export default function UserProfileTimeslotsComponent() {
       dayHeader.forEach((header) => {
         header.style.backgroundColor = palette.surfaceCard;
         header.style.color = palette.textColor;
-        // header.style.borderBottom = `1px solid ${palette.surfaceBorder}`;
-      });
-
-      // Grid lines - .fc-timegrid-cols .fc-timegrid-col borders (vertical/horizontal)
-      const gridCols = document.querySelectorAll(
-        ".fc-timegrid-cols .fc-timegrid-col"
-      ) as NodeListOf<HTMLElement>;
-      gridCols.forEach((col) => {
-        // col.style.borderRight = `1px solid ${palette.surfaceBorder}`; // Dynamic grey from theme
-        // col.style.borderBottom = `1px solid ${palette.surfaceBorder}`; // Dynamic grey for horizontal
-      });
-
-      // Time slot lines (horizontal grid in time axis)
-      const timeSlots = document.querySelectorAll(
-        ".fc-timegrid-slot"
-      ) as NodeListOf<HTMLElement>;
-      timeSlots.forEach((slot) => {
-        // slot.style.borderTop = `1px solid ${palette.surfaceBorder}`; // Dynamic grey for time grid lines
       });
     }
   };
 
-  if (loading) {
-    return <div className="text-center p-4">Loading...</div>;
-  }
-
   const onTimeSlotClick = (arg: EventContentArg) => {
-    console.log("asd");
+    console.log(arg.event.id);
+
     // setSelectedTimeSlot(arg.event as TimeSlotResponseDto);
     // setDialogVisible(true);
   };
@@ -239,22 +197,24 @@ export default function UserProfileTimeslotsComponent() {
         headerToolbar={{
           left: "prev,next today",
           center: "title",
-          right: "timeGridWeek,timeGridDay,listWeek",
+          right: "timeGridWeek,timeGridDay",
         }}
         eventContent={(arg) => (
-          <div
+          <Button
             className="flex w-full h-full justify-content-center align-items-center"
             onClick={() => onTimeSlotClick(arg)}
           >
-            <b>{arg.event.title}</b>
+            {/* <b>{arg.event.title}</b> */}
             <p>{arg.timeText}</p>
-          </div>
+          </Button>
         )}
         height="auto"
-        editable={false} // Optional: Allow drag-and-drop
+        editable={false} // Allow drag-and-drop
         themeSystem="standard" // Enables CSS vars theming (default, but explicit)
         datesSet={(x) => {
+          setLoading(true);
           fetchTimeSlots(x.start);
+          setLoading(false);
 
           // Apply theme after dates are rendered (includes headers, day cells, time grid)
           const timer = setTimeout(handleThemeChange, 0);
