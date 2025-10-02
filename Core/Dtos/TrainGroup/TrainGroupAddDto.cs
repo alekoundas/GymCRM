@@ -1,5 +1,4 @@
 ﻿using Core.CustomValidationAttributes;
-using Core.Dtos.Identity;
 using Core.Dtos.TrainGroupDate;
 using Core.Models;
 using System.Collections.ObjectModel;

@@ -16,20 +16,50 @@ import GenericDialogComponent, {
 import { FormMode } from "../../enum/FormMode";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
+import { TrainGroupDateDto } from "../../services/DateService";
+import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
+import { Tag } from "primereact/tag";
+import { TimeSlotRecurrenceDateDto } from "../../model/TimeSlotRecurrenceDateDto";
+import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
+import { TrainGroupParticipantUnavailableDateDto } from "../../model/entities/train-group-participant-unavailable-date/TrainGroupParticipantUnavailableDateDto";
 
 export default function UserProfileTimeslotsComponent() {
-  const { userDto, updateUserDto } = useUserStore();
+  // const { userDto, updateUserDto } = useUserStore();
   const calendarRef = useRef<FullCalendar>(null);
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]); // Data
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
-  const [selectedTimeSlot, setSelectedTimeSlot] =
-    useState<TimeSlotResponseDto>();
-  const [loading, setLoading] = useState(false);
-  const [isDialogVisible, setDialogVisible] = useState(false); // Dialog visibility
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedTrainGroup, setSelectedTrainGroup] =
+    useState<TimeSlotResponseDto>(new TimeSlotResponseDto());
+  const [selectedTimeSlotRecurrenceDate, setSelectedTimeSlotRecurrenceDate] =
+    useState<TimeSlotRecurrenceDateDto>(new TimeSlotRecurrenceDateDto());
 
-  const dialogControl: DialogControl = {
-    showDialog: () => setDialogVisible(true),
-    hideDialog: () => setDialogVisible(false),
+  const [loading, setLoading] = useState(false);
+  const [isTimeSlotDialogVisible, setTimeSlotDialogVisible] = useState(false); // Dialog visibility
+  const [isOptOutTimeSlotDialogVisible, setOptOutTimeSlotDialogVisible] =
+    useState(false); // Dialog visibility
+  const [
+    isOptOutDateTimeSlotDialogVisible,
+    setOptOutDateTimeSlotDialogVisible,
+  ] = useState(false); // Dialog visibility
+  const [isOptInDateTimeSlotDialogVisible, setOptInDateTimeSlotDialogVisible] =
+    useState(false); // Dialog visibility
+
+  const timeSlotDialogControl: DialogControl = {
+    showDialog: () => setTimeSlotDialogVisible(true),
+    hideDialog: () => setTimeSlotDialogVisible(false),
+  };
+  const optOutTimeSlotDialogControl: DialogControl = {
+    showDialog: () => setOptOutTimeSlotDialogVisible(true),
+    hideDialog: () => setOptOutTimeSlotDialogVisible(false),
+  };
+  const optOutDateTimeSlotDialogControl: DialogControl = {
+    showDialog: () => setOptOutDateTimeSlotDialogVisible(true),
+    hideDialog: () => setOptOutDateTimeSlotDialogVisible(false),
+  };
+  const optInDateTimeSlotDialogControl: DialogControl = {
+    showDialog: () => setOptInDateTimeSlotDialogVisible(true),
+    hideDialog: () => setOptInDateTimeSlotDialogVisible(false),
   };
 
   const fetchTimeSlots = async (currentDate: Date) => {
@@ -113,8 +143,10 @@ export default function UserProfileTimeslotsComponent() {
               id: x.trainGroupDateId,
               title: slot.title,
               start: startDate,
+
               end: endDate,
               backgroundColor: x.isUserJoined ? "#007ad9" : "#ced4da", // Joined: blue, not: gray
+              isUserJoined: x.isUserJoined,
               extendedProps: { isUserJoined: x.isUserJoined },
             };
           }
@@ -123,7 +155,6 @@ export default function UserProfileTimeslotsComponent() {
 
       const mappedEventsCleaned = mappedEvents.filter((x) => x !== undefined);
       setEvents(mappedEventsCleaned);
-      setLoading(false);
       setTimeSlots(response);
     }
 
@@ -165,93 +196,328 @@ export default function UserProfileTimeslotsComponent() {
     }
   };
 
-  const onTimeSlotClick = (arg: EventContentArg) => {
-    console.log(arg.event.id);
+  const onTimeSlotClick = async (arg: EventContentArg) => {
+    const timeSlot: TimeSlotResponseDto | undefined = timeSlots.find((x) =>
+      x.recurrenceDates.some((y) => y.trainGroupDateId === +arg.event.id)
+    );
 
-    // setSelectedTimeSlot(arg.event as TimeSlotResponseDto);
-    // setDialogVisible(true);
+    if (arg.event.start) {
+      const dateCleaned = new Date(
+        Date.UTC(
+          arg.event.start.getFullYear(),
+          arg.event.start.getMonth(),
+          arg.event.start.getDate(),
+          0,
+          0,
+          0,
+          0
+        )
+      );
+      setSelectedDate(dateCleaned);
+
+      if (timeSlot) {
+        const trainGroup = timeSlots.find((x) => x.id === timeSlot.id);
+
+        if (trainGroup) {
+          const timeslotDate = timeSlot.recurrenceDates.find(
+            (x) => x.trainGroupDateId === +arg.event.id
+          );
+
+          if (timeslotDate) {
+            setSelectedTimeSlotRecurrenceDate(timeslotDate);
+            setSelectedTrainGroup(trainGroup);
+            timeSlotDialogControl.showDialog();
+          }
+        }
+      }
+    }
+  };
+
+  const onOptOut = async () => {
+    if (selectedTimeSlotRecurrenceDate.trainGroupParticipantId)
+      ApiService.delete(
+        "TrainGroupParticipants",
+        selectedTimeSlotRecurrenceDate.trainGroupParticipantId
+      );
+
+    optOutTimeSlotDialogControl.hideDialog();
+    timeSlotDialogControl.hideDialog();
+    const calendarApi = calendarRef.current?.getApi();
+    const currentStart = calendarApi?.view.currentStart;
+    if (currentStart) {
+      await fetchTimeSlots(currentStart);
+    }
+  };
+
+  const onOptOutDate = async () => {
+    ApiService.create("TrainGroupParticipantUnavailableDates", {
+      trainGroupParticipantId:
+        selectedTimeSlotRecurrenceDate.trainGroupParticipantId,
+      unavailableDate: selectedDate,
+    } as TrainGroupParticipantUnavailableDateDto);
+
+    optOutDateTimeSlotDialogControl.hideDialog();
+    timeSlotDialogControl.hideDialog();
+    const calendarApi = calendarRef.current?.getApi();
+    const currentStart = calendarApi?.view.currentStart;
+    if (currentStart) {
+      await fetchTimeSlots(currentStart);
+    }
+  };
+
+  const onOptInDate = async () => {
+    if (selectedTimeSlotRecurrenceDate.trainGroupParticipantUnavailableDateId)
+      ApiService.delete(
+        "TrainGroupParticipantUnavailableDates",
+        selectedTimeSlotRecurrenceDate.trainGroupParticipantUnavailableDateId
+      );
+
+    optInDateTimeSlotDialogControl.hideDialog();
+    timeSlotDialogControl.hideDialog();
+    const calendarApi = calendarRef.current?.getApi();
+    const currentStart = calendarApi?.view.currentStart;
+    if (currentStart) {
+      await fetchTimeSlots(currentStart);
+    }
   };
 
   return (
-    <div className="p-4">
-      <FullCalendar
-        ref={calendarRef}
-        events={events} // Data
-        plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
-        initialView="timeGridWeek"
-        initialDate={new Date()}
-        allDaySlot={false} // Hide the All Day row
-        dayHeaderFormat={{
-          weekday: "short",
-          day: "numeric",
-          month: "numeric",
-          omitCommas: true,
-        }} // Custom format: "Sun 14/9"
-        slotLabelFormat={{
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-          omitZeroMinute: false,
-        }} // 24-hour format for time axis: "14:00"
-        dayMaxEvents={false}
-        headerToolbar={{
-          left: "prev,next today",
-          center: "title",
-          right: "timeGridWeek,timeGridDay",
-        }}
-        eventContent={(arg) => (
-          <Button
-            className="flex w-full h-full justify-content-center align-items-center"
-            onClick={() => onTimeSlotClick(arg)}
-          >
-            {/* <b>{arg.event.title}</b> */}
-            <p>{arg.timeText}</p>
-          </Button>
-        )}
-        height="auto"
-        editable={false} // Allow drag-and-drop
-        themeSystem="standard" // Enables CSS vars theming (default, but explicit)
-        datesSet={(x) => {
-          setLoading(true);
-          fetchTimeSlots(x.start);
-          setLoading(false);
+    <>
+      <div className="p-4">
+        <FullCalendar
+          ref={calendarRef}
+          events={events} // Data
+          plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
+          initialView="timeGridWeek"
+          initialDate={new Date()}
+          allDaySlot={false} // Hide the All Day row
+          dayHeaderFormat={{
+            weekday: "short",
+            day: "numeric",
+            month: "numeric",
+            omitCommas: true,
+          }} // Custom format: "Sun 14/9"
+          slotLabelFormat={{
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+            omitZeroMinute: false,
+          }} // 24-hour format for time axis: "14:00"
+          dayMaxEvents={false}
+          headerToolbar={{
+            left: "prev,next today",
+            center: "title",
+            right: "timeGridWeek,timeGridDay",
+          }}
+          eventContent={async (arg) => {
+            const isUserJoined = timeSlots.some((x) =>
+              x.recurrenceDates.some(
+                (y) => y.trainGroupDateId === +arg.event.id && y.isUserJoined
+              )
+            );
 
-          // Apply theme after dates are rendered (includes headers, day cells, time grid)
-          const timer = setTimeout(handleThemeChange, 0);
-          return () => clearTimeout(timer);
-        }} // Callback after dates render (modern equivalent for post-render DOM manipulation)
-      />
+            if (isUserJoined)
+              return (
+                <Button
+                  className="flex w-full h-full justify-content-center align-items-center"
+                  onClick={async () => await onTimeSlotClick(arg)}
+                >
+                  {/* <b>{arg.event.title}</b> */}
+                  <p>{arg.timeText}</p>
+                </Button>
+              );
+            else
+              return (
+                <Button
+                  severity="secondary"
+                  className="flex w-full h-full justify-content-center align-items-center"
+                  onClick={() => onTimeSlotClick(arg)}
+                >
+                  {/* <b>{arg.event.title}</b> */}
+                  <p>{arg.timeText}</p>
+                </Button>
+              );
+          }}
+          height="auto"
+          editable={false} // Allow drag-and-drop
+          themeSystem="standard" // Enables CSS vars theming (default, but explicit)
+          datesSet={(x) => {
+            setLoading(true);
+            fetchTimeSlots(x.start);
+            setLoading(false);
 
-      {/*                                      */}
-      {/*           View Participant           */}
-      {/*                                      */}
+            // Apply theme after dates are rendered (includes headers, day cells, time grid)
+            const timer = setTimeout(handleThemeChange, 0);
+            return () => clearTimeout(timer);
+          }} // Callback after dates render (modern equivalent for post-render DOM manipulation)
+        />
 
+        {/*                                      */}
+        {/*           View TrainGroup            */}
+        {/*                                      */}
+
+        <GenericDialogComponent
+          formMode={FormMode.VIEW}
+          visible={isTimeSlotDialogVisible}
+          control={timeSlotDialogControl}
+        >
+          <div>
+            {selectedTrainGroup?.startOn && (
+              <>
+                <div>
+                  <p>
+                    <strong>Time:</strong>{" "}
+                    {new Date(selectedTrainGroup.startOn).toLocaleTimeString()}
+                  </p>
+                  <p>
+                    <strong>Group Name:</strong>{" "}
+                    {selectedTrainGroup.title || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Trainer:</strong>{" "}
+                    {selectedTrainGroup.trainerId || "N/A"}
+                  </p>
+
+                  <p className="flex align-items-center ">
+                    <strong>Book Type:</strong>
+                    {selectedTimeSlotRecurrenceDate.isOneOff ? (
+                      <Tag>One-off</Tag>
+                    ) : (
+                      <Tag>Recurring</Tag>
+                    )}
+                  </p>
+
+                  <p className="flex align-items-center ">
+                    <strong>Joined:</strong>{" "}
+                    {timeSlots.some((x) =>
+                      x.recurrenceDates.some(
+                        (y) =>
+                          y.trainGroupDateId ===
+                            selectedTimeSlotRecurrenceDate.trainGroupDateId &&
+                          y.isUserJoined
+                      )
+                    ) ? (
+                      <Tag severity={"success"}>Yes</Tag>
+                    ) : (
+                      <Tag severity={"secondary"}>No</Tag>
+                    )}
+                  </p>
+                  <p>
+                    <strong>Description:</strong>{" "}
+                    {selectedTrainGroup.description ||
+                      "No description available."}
+                  </p>
+                </div>
+
+                <div>
+                  {timeSlots.some((x) =>
+                    x.recurrenceDates.some(
+                      (y) =>
+                        y.trainGroupDateId ===
+                          selectedTimeSlotRecurrenceDate.trainGroupDateId &&
+                        y.isUserJoined
+                    )
+                  ) && (
+                    <div className="flex justify-content-between pt-5">
+                      <div></div>
+                      <Button
+                        label="Opt out"
+                        severity="danger"
+                        onClick={optOutTimeSlotDialogControl.showDialog}
+                      ></Button>
+                      {timeSlots.some((x) =>
+                        x.recurrenceDates.some(
+                          (y) =>
+                            y.trainGroupDateId ===
+                              selectedTimeSlotRecurrenceDate.trainGroupDateId &&
+                            !y.isOneOff
+                        )
+                      ) && (
+                        <Button
+                          label="Opt out for this date"
+                          severity="info"
+                          onClick={optOutDateTimeSlotDialogControl.showDialog}
+                        ></Button>
+                      )}
+                      <div></div>
+                    </div>
+                  )}
+
+                  {timeSlots.some((x) =>
+                    x.recurrenceDates.some(
+                      (y) =>
+                        y.trainGroupDateId ===
+                          selectedTimeSlotRecurrenceDate.trainGroupDateId &&
+                        !y.isUserJoined &&
+                        y.trainGroupParticipantUnavailableDateId
+                    )
+                  ) && (
+                    <div className="flex justify-content-between pt-5">
+                      <div></div>
+                      <Button
+                        label="Opt out"
+                        severity="danger"
+                        onClick={optOutTimeSlotDialogControl.showDialog}
+                      ></Button>
+                      <Button
+                        label="Opt in again for this date"
+                        severity="info"
+                        onClick={optInDateTimeSlotDialogControl.showDialog}
+                      ></Button>
+                      <div></div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </GenericDialogComponent>
+      </div>
+
+      {/*                                                */}
+      {/*         Delete Train Group Participant         */}
+      {/*                                                */}
       <GenericDialogComponent
-        formMode={FormMode.VIEW}
-        visible={isDialogVisible}
-        control={dialogControl}
+        visible={isOptOutTimeSlotDialogVisible}
+        control={optOutTimeSlotDialogControl}
+        onSave={onOptOut}
+        formMode={FormMode.ADD}
+        header="Are you sure?"
       >
-        <div>
-          {selectedTimeSlot?.startOn && (
-            <div>
-              <p>
-                <strong>Time:</strong>{" "}
-                {new Date(selectedTimeSlot.startOn).toLocaleTimeString()}
-              </p>
-              <p>
-                <strong>Group Name:</strong> {selectedTimeSlot.title || "N/A"}
-              </p>
-              <p>
-                <strong>Trainer:</strong> {selectedTimeSlot.trainerId || "N/A"}
-              </p>
-              <p>
-                <strong>Description:</strong>{" "}
-                {selectedTimeSlot.description || "No description available."}
-              </p>
-            </div>
-          )}
+        <div className="flex justify-content-center">
+          <p>This action will cancel your booking for this date.</p>
         </div>
       </GenericDialogComponent>
-    </div>
+
+      {/*                                               */}
+      {/*          Opt Out Train Group Participant      */}
+      {/*                                               */}
+      <GenericDialogComponent
+        visible={isOptOutDateTimeSlotDialogVisible}
+        control={optOutDateTimeSlotDialogControl}
+        onSave={onOptOutDate}
+        formMode={FormMode.ADD}
+        header="Are you sure?"
+      >
+        <div className="flex justify-content-center">
+          <p>This action will cancel your booking ONLY for this date. </p>
+        </div>
+      </GenericDialogComponent>
+
+      {/*                                               */}
+      {/*           Opt In Train Group Participant      */}
+      {/*                                               */}
+      <GenericDialogComponent
+        visible={isOptInDateTimeSlotDialogVisible}
+        control={optInDateTimeSlotDialogControl}
+        onSave={onOptInDate}
+        formMode={FormMode.ADD}
+        header="Are you sure?"
+      >
+        <div className="flex justify-content-center">
+          <p>You will join this date, only if there are any spots available.</p>
+        </div>
+      </GenericDialogComponent>
+    </>
   );
 }

@@ -5,6 +5,7 @@ using Core.Dtos.Mail;
 using Core.Dtos.PhoneNumber;
 using Core.Dtos.TrainGroup;
 using Core.Dtos.TrainGroupDate;
+using Core.Dtos.TrainGroupParticipantUnavailableDate;
 using Core.Dtos.UserRole;
 using Core.Models;
 using Microsoft.AspNetCore.Identity;
@@ -15,7 +16,7 @@ namespace API.AutoMapper
     {
         public AutoMapperProfile()
         {
-            // TrainGroup
+            // TrainGroup mappings.
             CreateMap<TrainGroup, TrainGroupDto>();
             CreateMap<TrainGroupDto, TrainGroup>();
 
@@ -28,22 +29,15 @@ namespace API.AutoMapper
                         participant.TrainGroup = dest; //Set navigation property
                 });
 
-            // TrainGroupDate
+            // TrainGroupDate mappings.
             CreateMap<TrainGroupDate, TrainGroupDateDto>();
             CreateMap<TrainGroupDateDto, TrainGroupDate>();
 
             CreateMap<TrainGroupDate, TrainGroupDateAddDto>();
             CreateMap<TrainGroupDateAddDto, TrainGroupDate>();
-            //.ForMember(dest => dest.FixedDay, opt => opt.MapFrom<TrainGroupDateAddDtoDateTimeToDateOnlyResolver>());
+          
 
-            // PhoneNumber
-            CreateMap<PhoneNumber, PhoneNumberDto>();
-            CreateMap<PhoneNumberDto, PhoneNumber>();
-
-            CreateMap<PhoneNumber, PhoneNumberAddDto>();
-            CreateMap<PhoneNumberAddDto, PhoneNumber>();
-
-            // TrainGroupParticipant
+            // TrainGroupParticipant mappings.
             CreateMap<TrainGroupParticipant, TrainGroupParticipantDto>();
             CreateMap<TrainGroupParticipantDto, TrainGroupParticipant>();
 
@@ -51,9 +45,23 @@ namespace API.AutoMapper
             CreateMap<TrainGroupParticipantAddDto, TrainGroupParticipant>();
 
 
-            //CreateMap<TrainGroupDateCancellationSubscriber, TrainGroupCancellationSubscriberDto>();
-            //CreateMap<TrainGroupCancellationSubscriberDto, TrainGroupDateCancellationSubscriber>();
+            // TrainGroupParticipantUnavailableDate mappings.
+            CreateMap<TrainGroupParticipantUnavailableDate, TrainGroupParticipantUnavailableDateDto>();
+            CreateMap<TrainGroupParticipantUnavailableDateDto, TrainGroupParticipantUnavailableDate>();
 
+            CreateMap<TrainGroupParticipantUnavailableDate, TrainGroupParticipantUnavailableDateAddDto>();
+            CreateMap<TrainGroupParticipantUnavailableDateAddDto, TrainGroupParticipantUnavailableDate>();
+
+
+            // PhoneNumber mappings.
+            CreateMap<PhoneNumber, PhoneNumberDto>();
+            CreateMap<PhoneNumberDto, PhoneNumber>();
+
+            CreateMap<PhoneNumber, PhoneNumberAddDto>();
+            CreateMap<PhoneNumberAddDto, PhoneNumber>();
+
+
+            // Mail mappings.
             CreateMap<Mail, MailDto>();
             CreateMap<MailDto, Mail>();
 
