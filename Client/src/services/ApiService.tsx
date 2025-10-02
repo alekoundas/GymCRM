@@ -7,7 +7,6 @@ import { UserRegisterDto } from "../model/entities/user/UserRegisterDto";
 import { LookupDto } from "../model/lookup/LookupDto";
 import { TimeSlotRequestDto } from "../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../model/TimeSlotResponseDto";
-import { TrainGroupParticipantUpdateDto } from "../model/TrainGroupParticipantUpdateDto";
 import { LocalStorageService } from "./LocalStorageService";
 import { ToastService } from "./ToastService";
 import { TokenService } from "./TokenService";
@@ -16,6 +15,7 @@ import { UserPasswordForgotDto } from "../model/entities/user/UserPasswordForgot
 import { AutoCompleteDto } from "../model/core/auto-complete/AutoCompleteDto";
 import { MailSendDto } from "../model/entities/mail/MailSendDto";
 import { ChartData } from "../model/core/chart/ChartData";
+import { TrainGroupParticipantUpdateDto } from "../model/entities/train-group-participant/TrainGroupParticipantUpdateDto";
 
 export default class ApiService {
   private static readonly BASE_URL = "/api/";

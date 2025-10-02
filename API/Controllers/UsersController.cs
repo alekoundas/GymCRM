@@ -379,7 +379,7 @@ namespace API.Controllers
                                 ? new DateTime(2000, 1, 2 + (int)y.RecurrenceDayOfWeek!.Value)
                                 : new DateTime(2000, 1, y.RecurrenceDayOfMonth!.Value),
                             IsUserJoined = y.TrainGroupParticipants
-                                .First(z => z.UserId == new Guid(timeSlotRequestDto.UserId))
+                                .FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?
                                 .TrainGroupParticipantUnavailableDates
                                 .Where(z =>
                                     z.UnavailableDate >= selectedDateStart &&
@@ -388,7 +388,25 @@ namespace API.Controllers
                                 .All(z =>
                                     y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
                                     ? z.UnavailableDate.DayOfWeek != y.RecurrenceDayOfWeek
-                                    : z.UnavailableDate.Day != y.RecurrenceDayOfMonth),
+                                    : z.UnavailableDate.Day != y.RecurrenceDayOfMonth)??false,
+                            IsOneOff = y.TrainGroupParticipants
+                                .FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?
+                                .SelectedDate.HasValue??false,
+                            TrainGroupParticipantId = y.TrainGroupParticipants
+                                .FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?
+                                .Id,
+                            TrainGroupParticipantUnavailableDateId = y.TrainGroupParticipants
+                                .FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?
+                                .TrainGroupParticipantUnavailableDates
+                                .Where(z =>
+                                    z.UnavailableDate >= selectedDateStart &&
+                                    z.UnavailableDate <= selectedDateEnd
+                                )
+                                .Where(z =>
+                                    y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
+                                    ? z.UnavailableDate.DayOfWeek == y.RecurrenceDayOfWeek
+                                    : z.UnavailableDate.Day == y.RecurrenceDayOfMonth)
+                                .FirstOrDefault()?.Id
                         }
                     )
                     .Concat(
@@ -406,6 +424,10 @@ namespace API.Controllers
                                     .TrainGroupParticipantUnavailableDates
                                     .Where(z => z.UnavailableDate >= selectedDateStart && z.UnavailableDate <= selectedDateEnd)
                                     .All(z => z.UnavailableDate != y.FixedDay),
+                                 IsOneOff = true,
+                                 TrainGroupParticipantId = y.TrainGroupParticipants
+                                    .First(z => z.UserId == new Guid(timeSlotRequestDto.UserId)).Id,
+                                 TrainGroupParticipantUnavailableDateId = null,
                              }
                         )
                     )

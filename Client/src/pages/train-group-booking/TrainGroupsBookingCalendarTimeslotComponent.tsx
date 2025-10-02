@@ -11,21 +11,7 @@ export default function TrainGroupsBookingCalendarTimeslotComponent() {
       {/*                  */}
       {/*     Timeslots    */}
       {/*                  */}
-      <Card
-        title="Available Time Slots"
-        // header={
-        //   <div
-        //     style={{
-        //       display: "flex",
-        //       justifyContent: "space-between",
-        //       alignItems: "center",
-        //       padding: "1rem",
-        //     }}
-        //   >
-        //     <h2 style={{ margin: 0 }}>Available Time Slots</h2>
-        //   </div>
-        // }
-      >
+      <Card title="Available Time Slots">
         {timeSlotResponseDto?.length === 0 ? (
           <p className="text-gray-500">
             No time slots available for this date.
@@ -43,7 +29,6 @@ export default function TrainGroupsBookingCalendarTimeslotComponent() {
                     ? "p-button-raised p-button-primary"
                     : "p-button-outlined"
                 }
-                // disabled={!slot.isAvailable}
                 onClick={() => setSelectedTimeSlot(slot)}
               />
             ))}

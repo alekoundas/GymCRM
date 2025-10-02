@@ -5,7 +5,9 @@ export interface TimeSlotRecurrenceDateDto {
   trainGroupDateId: number;
   trainGroupDateType: TrainGroupDateTypeEnum | undefined;
   isUserJoined: boolean;
-  trainGroupParticipantId: number | undefined; // used as id in html
+  trainGroupParticipantId: number | undefined; // used in Profile
+  trainGroupParticipantUnavailableDateId: number | undefined; // used in Profile
+  isOneOff: boolean; // used in Profile
 }
 
 export class TimeSlotRecurrenceDateDto {
@@ -13,5 +15,7 @@ export class TimeSlotRecurrenceDateDto {
   trainGroupDateId: number = -1;
   trainGroupDateType: TrainGroupDateTypeEnum | undefined;
   isUserJoined: boolean = false;
-  trainGroupParticipantId: number | undefined; // used as id in html
+  trainGroupParticipantId: number | undefined; // used in Profile
+  trainGroupParticipantUnavailableDateId: number | undefined; // used in Profile
+  isOneOff: boolean = false; // used in Profile
 }
