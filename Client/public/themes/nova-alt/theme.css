@@ -3052,7 +3052,6 @@
     background: transparent;
     border-radius: 50%;
     transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
-    margin: 0.5rem;
   }
   .p-carousel .p-carousel-content .p-carousel-prev:enabled:hover,
   .p-carousel .p-carousel-content .p-carousel-next:enabled:hover {
@@ -3065,6 +3064,10 @@
     outline: 0 none;
     outline-offset: 0;
     box-shadow: 0 0 0 0.2rem #8dcdff;
+  }
+  .p-carousel .p-carousel-content .p-carousel-prev,
+  .p-carousel .p-carousel-content .p-carousel-next {
+    margin: 0.5rem;
   }
   .p-carousel .p-carousel-indicators {
     padding: 1rem;
@@ -4182,7 +4185,6 @@
     background: transparent;
     border-radius: 50%;
     transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
-    margin-right: 0.5rem;
   }
   .p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler:enabled:hover {
     color: #007ad9;
@@ -4193,6 +4195,9 @@
     outline: 0 none;
     outline-offset: 0;
     box-shadow: 0 0 0 0.2rem #8dcdff;
+  }
+  .p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler {
+    margin-right: 0.5rem;
   }
   .p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler + .p-checkbox {
     margin-right: 0.5rem;
@@ -4494,6 +4499,10 @@
   }
   .p-panel.p-panel-toggleable .p-panel-header {
     padding: 0.857rem 1rem;
+  }
+  .p-panel:has(> .p-panel-footer) .p-panel-content {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
   .p-panel .p-panel-content {
     padding: 0.571rem 1rem;
@@ -4847,7 +4856,6 @@
     background: transparent;
     border-radius: 50%;
     transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
-    margin-right: 0.5rem;
   }
   .p-dialog .p-dialog-header .p-dialog-header-icon:enabled:hover {
     color: #007ad9;
@@ -4858,6 +4866,9 @@
     outline: 0 none;
     outline-offset: 0;
     box-shadow: 0 0 0 0.2rem #8dcdff;
+  }
+  .p-dialog .p-dialog-header .p-dialog-header-icon {
+    margin-right: 0.5rem;
   }
   .p-dialog .p-dialog-header .p-dialog-header-icon:last-child {
     margin-right: 0;
@@ -6418,7 +6429,6 @@
   }
   .p-toast .p-toast-message .p-toast-message-content {
     padding: 1rem;
-    border-width: 0;
   }
   .p-toast .p-toast-message .p-toast-message-content .p-toast-message-text {
     margin: 0 0 0 0.5rem;
