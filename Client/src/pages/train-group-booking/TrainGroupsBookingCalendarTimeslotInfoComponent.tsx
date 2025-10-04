@@ -62,7 +62,9 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                 </p> */}
 
                 <DividerComponent>
-                  <p className="text-base">One-off</p>
+                  <p>
+                    <strong className="text-base">One-off</strong>
+                  </p>
                 </DividerComponent>
 
                 {selectedTimeSlot.recurrenceDates
@@ -114,7 +116,9 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                   <strong>One-off:</strong>
                 </p> */}
                 <DividerComponent>
-                  <p className="text-base">One-off</p>
+                  <p>
+                    <strong className="text-base">One-off</strong>
+                  </p>
                 </DividerComponent>
                 {selectedTimeSlot.recurrenceDates
                   .filter(
@@ -164,12 +168,12 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
               (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK
             ) && (
               <>
-                {/* <p>
-                  <strong>Recurring Dates(Day of the week):</strong>
-                </p> */}
-
                 <DividerComponent>
-                  <p className="text-base">Recurring Dates(Day of the week)</p>
+                  <p>
+                    <strong className="text-base">
+                      Recurring Dates (Day of week)
+                    </strong>
+                  </p>
                 </DividerComponent>
 
                 {selectedTimeSlot.recurrenceDates
@@ -213,12 +217,12 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                 x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH
             ) && (
               <>
-                {/* <p>
-                  <strong>Recurring Dates(Day of the month):</strong>
-                </p> */}
-
                 <DividerComponent>
-                  <p className="text-base">Recurring Dates(Day of the month)</p>
+                  <p>
+                    <strong className="text-base">
+                      Recurring Dates (Day of month)
+                    </strong>
+                  </p>
                 </DividerComponent>
 
                 {selectedTimeSlot.recurrenceDates

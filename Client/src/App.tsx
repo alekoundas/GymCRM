@@ -22,7 +22,6 @@ import MailsPage from "./pages/mail/MailsPage.tsx";
 import MailSendPage from "./pages/mail/MailSendPage.tsx";
 import { FormMode } from "./enum/FormMode.tsx";
 import ThemeService from "./services/ThemeService.tsx";
-import "./index.css";
 export default function App() {
   // Set Toast messages here
   const toast = useRef(null);
@@ -32,7 +31,7 @@ export default function App() {
     ToastService.setToastRef(toast);
     // ThemeService.setRef(theme);
     // ThemeService.setDefaultTheme();
-    // ThemeService.setDefaultThemeScale();
+    ThemeService.setDefaultThemeScale();
   }, []);
 
   return (
