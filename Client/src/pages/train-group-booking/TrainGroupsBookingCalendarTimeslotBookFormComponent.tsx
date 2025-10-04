@@ -96,37 +96,32 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
     console.log(newParticipants);
   };
 
+  // Helper to generate label for a date based on type
+  const getDateLabel = (
+    date: string,
+    type: TrainGroupDateTypeEnum | undefined
+  ): string => {
+    switch (type) {
+      case TrainGroupDateTypeEnum.DAY_OF_WEEK:
+        return DateService.getDayOfWeekFromDate(new Date(date)) ?? "";
+      case TrainGroupDateTypeEnum.DAY_OF_MONTH:
+        return new Date(date).getDate().toString();
+      case TrainGroupDateTypeEnum.FIXED_DAY:
+      case undefined: // One-off
+        return new Date(date).toLocaleDateString("en-GB");
+      default:
+        return "";
+    }
+  };
+
   const renderDateCheckbox = (type: TrainGroupDateTypeEnum | undefined) => {
     if (!selectedTimeSlot) return;
     const htmlElements: JSX.Element[] = [];
-    let label: string = "";
 
     selectedTimeSlot!.recurrenceDates
       .filter((x) => x.trainGroupDateType === type)
       .forEach((date) => {
-        switch (type) {
-          case TrainGroupDateTypeEnum.DAY_OF_WEEK:
-            label =
-              DateService.getDayOfWeekFromDate(
-                new Date(date.date)
-              )?.toString() ?? "";
-            break;
-
-          case TrainGroupDateTypeEnum.DAY_OF_MONTH:
-            label = new Date(date.date).getDate().toString();
-            break;
-
-          case TrainGroupDateTypeEnum.FIXED_DAY:
-            label = new Date(date.date).toLocaleDateString("en-GB");
-            break;
-
-          default:
-            label = new Date(
-              timeSlotRequestDto.selectedDate
-            ).toLocaleDateString("en-GB");
-            break;
-        }
-
+        const label = getDateLabel(date.date, type);
         const isDisabled: boolean =
           type === undefined &&
           trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.some(
