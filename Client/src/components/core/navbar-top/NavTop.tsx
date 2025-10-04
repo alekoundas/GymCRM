@@ -4,23 +4,26 @@ import { useNavigate } from "react-router-dom";
 import { Menu } from "primereact/menu";
 import { Button } from "primereact/button";
 import { MenuItem } from "primereact/menuitem";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Sidebar } from "primereact/sidebar";
 import { Image } from "primereact/image";
 import { Knob } from "primereact/knob";
 import { useAuth } from "../../../contexts/AuthContext";
 import { LocalStorageService } from "../../../services/LocalStorageService";
-import { ThemeService } from "../../../services/ThemeService";
 import { TokenService } from "../../../services/TokenService";
 import { PrimeTheme } from "../../../model/PrimeTheme";
 import { useUserStore } from "../../../stores/UserStore";
 import ApiService from "../../../services/ApiService";
+import ThemeService from "../../../services/ThemeService";
+import { PrimeReactContext } from "primereact/api";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 function NavTop() {
   const { isUserAuthenticated, logout } = useAuth();
-
+  const { changeTheme } = useContext(PrimeReactContext);
   const navigate = useNavigate();
   const menuRight = useRef<Menu>(null);
+  const { switchTheme } = useTheme(); // Add this
 
   const itemRenderer = (item: any) => (
     <a className="flex align-items-center p-menuitem-link">
@@ -206,6 +209,7 @@ function NavTop() {
   const handleChange = (value: number) => {
     // ThemeService.setThemeScale(14);
     setValue(value);
+
     ThemeService.setThemeScale(value + 5);
   };
 
@@ -288,16 +292,11 @@ function NavTop() {
             >
               <Button
                 // onClick={() => ThemeService.setTheme(row)}
-                onClick={() => {
-                  const selectedTheme = new PrimeTheme(row.themeName);
-                  ThemeService.setTheme(selectedTheme, (palette) => {
-                    document.dispatchEvent(
-                      new CustomEvent("primeThemeChange", {
-                        detail: { palette },
-                      })
-                    );
-                  });
-                }}
+                // onClick={() => {
+                //   const selectedTheme = new PrimeTheme(row.themeName);
+                //   ThemeService.setTheme(row.themeName, changeTheme);
+                // }}
+                onClick={() => switchTheme(row.themeName)}
                 className="cursor-pointer p-link"
               >
                 <Image
@@ -318,16 +317,11 @@ function NavTop() {
               className="flex bg-primary m-1 border-round"
             >
               <Button
-                onClick={() => {
-                  const selectedTheme = new PrimeTheme(row.themeName);
-                  ThemeService.setTheme(selectedTheme, (palette) => {
-                    document.dispatchEvent(
-                      new CustomEvent("primeThemeChange", {
-                        detail: { palette },
-                      })
-                    );
-                  });
-                }}
+                onClick={() => switchTheme(row.themeName)}
+                // onClick={() => {
+                //   // const selectedTheme = new PrimeTheme(row.themeName);
+                //   ThemeService.setTheme(row.themeName, changeTheme);
+                // }}
                 // onClick={() => ThemeService.setTheme(row)}
                 className="cursor-pointer p-link"
               >

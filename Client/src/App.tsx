@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { ScrollPanel } from "primereact/scrollpanel";
 import { ToastService } from "./services/ToastService.tsx";
-import { ThemeService } from "./services/ThemeService.tsx";
 import { useEffect, useRef } from "react";
 import { Toast } from "primereact/toast";
 
@@ -22,7 +21,8 @@ import UserPasswordResetPage from "./pages/user/UserPasswordResetPage.tsx";
 import MailsPage from "./pages/mail/MailsPage.tsx";
 import MailSendPage from "./pages/mail/MailSendPage.tsx";
 import { FormMode } from "./enum/FormMode.tsx";
-
+import ThemeService from "./services/ThemeService.tsx";
+import "./index.css";
 export default function App() {
   // Set Toast messages here
   const toast = useRef(null);
@@ -30,28 +30,32 @@ export default function App() {
 
   useEffect(() => {
     ToastService.setToastRef(toast);
-    ThemeService.setRef(theme);
-    ThemeService.setDefaultTheme();
-    ThemeService.setDefaultThemeScale();
+    // ThemeService.setRef(theme);
+    // ThemeService.setDefaultTheme();
+    // ThemeService.setDefaultThemeScale();
   }, []);
 
   return (
     <>
       <div className="flex flex-column p-0 m-0 h-full">
         {/* Theme switching here. */}
-        <link
+        {/* <link
           ref={theme}
           rel="stylesheet"
           type="text/css"
-        />
+        /> */}
+        {/* <link
+          id="theme-link"
+          rel="stylesheet"
+          href="public/themes/bootstrap4-dark-blue/theme.css"
+        /> */}
 
+        {/* Initial theme */}
         {/* Display messages */}
         <Toast ref={toast} />
-
         <div className="pt-0 pb-1">
           <NavTop />
         </div>
-
         {/* ScrollPanel: fills remaining space */}
         <div className="pt-1 pb-0 overflow-hidden h-full">
           <ScrollPanel className="custombar1 h-full">

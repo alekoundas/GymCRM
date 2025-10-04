@@ -1,34 +1,16 @@
-import { RefObject } from "react";
+// Updated ThemeService.tsx – Class-based with static methods, no hooks inside setTheme
 import { PrimeTheme } from "../model/PrimeTheme";
 import { LocalStorageService } from "./LocalStorageService";
 
-export namespace ThemeService {
-  let HTMLRef: RefObject<HTMLLinkElement>;
+export default class ThemeService {
+  public static setDefaultTheme() {
+    const localStorageThemeName = LocalStorageService.getThemeName();
+    const defaultThemeName = localStorageThemeName || "lara-light-blue"; // Match your initial link
 
-  export function setRef(ref: RefObject<HTMLLinkElement>) {
-    HTMLRef = ref;
+    LocalStorageService.setThemeName(defaultThemeName); // Ensure stored
   }
 
-  export const setDefaultTheme = () => {
-    const localStorageThemeName = LocalStorageService.getThemeName();
-
-    if (HTMLRef.current) {
-      if (localStorageThemeName) {
-        HTMLRef.current.href = new PrimeTheme(localStorageThemeName).themeURL;
-      } else {
-        HTMLRef.current.href = new PrimeTheme("bootstrap4-dark-blue").themeURL;
-      }
-    }
-  };
-
-  // export const setTheme = (primeTheme: PrimeTheme) => {
-  //   if (HTMLRef.current) {
-  //     HTMLRef.current.href = primeTheme.themeURL;
-  //     LocalStorageService.setThemeName(primeTheme.themeName);
-  //   }
-  // };
-
-  export const getDarkThemes = (): PrimeTheme[] => {
+  public static getDarkThemes(): PrimeTheme[] {
     const themes: PrimeTheme[] = [];
 
     themes.push(new PrimeTheme("lara-dark-purple"));
@@ -38,9 +20,9 @@ export namespace ThemeService {
     themes.push(new PrimeTheme("bootstrap4-dark-purple"));
 
     return themes;
-  };
+  }
 
-  export const getLightThemes = (): PrimeTheme[] => {
+  public static getLightThemes(): PrimeTheme[] {
     const themes: PrimeTheme[] = [];
 
     themes.push(new PrimeTheme("lara-light-purple"));
@@ -50,59 +32,72 @@ export namespace ThemeService {
     themes.push(new PrimeTheme("bootstrap4-light-purple"));
 
     return themes;
-  };
+  }
 
-  export const setDefaultThemeScale = () => {
+  public static setDefaultThemeScale() {
     const localStorageThemeScale = LocalStorageService.getThemeScale();
     if (localStorageThemeScale) {
       document.documentElement.style.fontSize = `${localStorageThemeScale}px`;
     } else {
-      document.documentElement.style.fontSize = `${14}px`;
+      // document.documentElement.style.fontSize = `${14}px`;
     }
-  };
+  }
 
-  export const setThemeScale = (size: number) => {
+  public static setThemeScale(size: number) {
     document.documentElement.style.fontSize = `${size}px`;
     LocalStorageService.setThemeScale(size.toString());
-  };
+  }
 
   /**
-   * Enhanced setTheme with optional callback (e.g., for FullCalendar updates after load).
-   * Callback receives the extracted color palette.
+   * Enhanced setTheme – Pass changeTheme from your component's useContext.
+   * Call from components only (e.g., onClick handler).
+   * Callback for post-load actions (e.g., update FullCalendar).
    */
-  export const setTheme = (
-    primeTheme: PrimeTheme,
-    onThemeLoaded?: (palette: { [key: string]: string }) => void
-  ) => {
-    if (HTMLRef.current) {
-      HTMLRef.current.href = primeTheme.themeURL;
-      LocalStorageService.setThemeName(primeTheme.themeName);
-
-      // Wait for CSS to load, then extract palette and call callback
-      const checkLoaded = () => {
-        requestAnimationFrame(() => {
-          const palette = primeTheme.getColorPalette();
-          if (onThemeLoaded) {
-            onThemeLoaded(palette);
-          }
-        });
-      };
-      // Trigger after a short delay to ensure CSS applies
-      setTimeout(checkLoaded, 50);
+  public static setTheme(
+    newThemeName: string,
+    changeTheme?: (
+      from?: string,
+      to?: string,
+      linkElementId?: string,
+      onFinish?: () => void
+    ) => void
+  ) {
+    if (!changeTheme) {
+      console.warn(
+        "changeTheme function not provided – theme switch skipped. Ensure called from a component with PrimeReactContext."
+      );
+      return;
     }
-  };
+
+    const currentThemeName = LocalStorageService.getThemeName();
+    const newTheme = new PrimeTheme(newThemeName);
+
+    changeTheme(
+      currentThemeName || "bootstrap4-dark-blue", // Optional 'from'
+      newThemeName, // Optional 'to'
+      "theme-link", // Optional linkElementId
+      () => {
+        LocalStorageService.setThemeName(newThemeName);
+        const palette = newTheme.getColorPalette();
+
+        document.dispatchEvent(
+          new CustomEvent("primeThemeChange", {
+            detail: { palette },
+          })
+        );
+      }
+    );
+  }
 
   /**
    * Gets the current theme name and dynamically extracts its color palette.
-   * Use this in components (e.g., FullCalendar) to get live vars without hardcoding.
-   * Returns { primaryColor: '#3f82f6', surfaceCard: '#ffffff', ... }
    */
-  export const getCurrentThemeColors = (): { [key: string]: string } => {
+  public static getCurrentThemeColors(): { [key: string]: string } {
     const currentThemeName = LocalStorageService.getThemeName();
     if (!currentThemeName) {
-      return {}; // Fallback empty
+      return {};
     }
     const currentTheme = new PrimeTheme(currentThemeName);
     return currentTheme.getColorPalette();
-  };
+  }
 }
