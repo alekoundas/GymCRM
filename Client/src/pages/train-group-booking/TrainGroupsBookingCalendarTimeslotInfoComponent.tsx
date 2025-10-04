@@ -5,6 +5,7 @@ import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
 import { DateService } from "../../services/DateService";
 import { Tag } from "primereact/tag";
 import { DividerComponent } from "../../components/core/divider/DividerComponent";
+import { JSX } from "react";
 
 interface IField {
   onBook: () => void;
@@ -13,7 +14,60 @@ interface IField {
 export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
   onBook,
 }: IField) {
-  const { timeSlotRequestDto, selectedTimeSlot } = useTrainGroupBookingStore();
+  const { timeSlotRequestDto, selectedTimeSlot, timeSlotResponseDto } =
+    useTrainGroupBookingStore();
+
+  // Helper to generate label for a date based on type
+  const getDateLabel = (
+    date: string,
+    type: TrainGroupDateTypeEnum | undefined
+  ): string => {
+    switch (type) {
+      case TrainGroupDateTypeEnum.DAY_OF_WEEK:
+        return DateService.getDayOfWeekFromDate(new Date(date)) ?? "";
+      case TrainGroupDateTypeEnum.DAY_OF_MONTH:
+        return new Date(date).getDate().toString();
+      case TrainGroupDateTypeEnum.FIXED_DAY:
+      case undefined: // One-off
+        return new Date(date).toLocaleDateString("en-GB");
+      default:
+        return "";
+    }
+  };
+
+  // Helper to render a Tag for a date
+  const renderDateTag = (
+    type: TrainGroupDateTypeEnum | undefined
+  ): JSX.Element[] => {
+    const htmlElements: JSX.Element[] = [];
+
+    selectedTimeSlot!.recurrenceDates
+      .filter((x) => x.trainGroupDateType === type)
+      .forEach((date) => {
+        const label = getDateLabel(date.date, type);
+        let isJoined = date.isUserJoined;
+
+        if (type === undefined)
+          isJoined = selectedTimeSlot!.recurrenceDates.some(
+            (x) =>
+              x.trainGroupDateId === date.trainGroupDateId &&
+              x.trainGroupDateType !== undefined &&
+              x.isUserJoined
+          );
+        htmlElements.push(
+          <Tag
+            key={date.trainGroupDateId}
+            className="p-2 m-1"
+            severity={isJoined ? "success" : undefined}
+          >
+            {label}
+            {isJoined && <i className="pi pi-check ml-1" />}
+          </Tag>
+        );
+      });
+
+    return htmlElements;
+  };
 
   return (
     <>
@@ -57,17 +111,15 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
               (x) => x.trainGroupDateType === undefined
             ) && (
               <>
-                {/* <p>
-                  <strong>One-off:</strong>{" "}
-                </p> */}
-
                 <DividerComponent>
                   <p>
                     <strong className="text-base">One-off</strong>
                   </p>
                 </DividerComponent>
 
-                {selectedTimeSlot.recurrenceDates
+                {renderDateTag(undefined)}
+
+                {/* {selectedTimeSlot.recurrenceDates
                   .filter((x) => x.trainGroupDateType === undefined)
                   .map((x) => {
                     if (x.isUserJoined)
@@ -99,7 +151,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                             new Date(x.date).getFullYear()}
                         </Tag>
                       );
-                  })}
+                  })} */}
               </>
             )}
           </div>
@@ -120,7 +172,8 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                     <strong className="text-base">One-off</strong>
                   </p>
                 </DividerComponent>
-                {selectedTimeSlot.recurrenceDates
+                {renderDateTag(TrainGroupDateTypeEnum.FIXED_DAY)}
+                {/* {selectedTimeSlot.recurrenceDates
                   .filter(
                     (x) =>
                       x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
@@ -155,7 +208,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                             new Date(x.date).getFullYear()}
                         </Tag>
                       );
-                  })}
+                  })} */}
               </>
             )}
           </div>
@@ -175,8 +228,9 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                     </strong>
                   </p>
                 </DividerComponent>
+                {renderDateTag(TrainGroupDateTypeEnum.DAY_OF_WEEK)}
 
-                {selectedTimeSlot.recurrenceDates
+                {/* {selectedTimeSlot.recurrenceDates
                   .filter(
                     (x) =>
                       x.trainGroupDateType ===
@@ -203,7 +257,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                           {DateService.getDayOfWeekFromDate(new Date(x.date))}
                         </Tag>
                       );
-                  })}
+                  })} */}
               </>
             )}
           </div>
@@ -224,8 +278,9 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                     </strong>
                   </p>
                 </DividerComponent>
+                {renderDateTag(TrainGroupDateTypeEnum.DAY_OF_MONTH)}
 
-                {selectedTimeSlot.recurrenceDates
+                {/* {selectedTimeSlot.recurrenceDates
                   .filter(
                     (x) =>
                       x.trainGroupDateType ===
@@ -252,7 +307,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                           {new Date(x.date).getDate()}
                         </Tag>
                       );
-                  })}
+                  })} */}
               </>
             )}
           </div>
