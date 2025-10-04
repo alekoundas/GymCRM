@@ -4,6 +4,7 @@ import { useTrainGroupBookingStore } from "../../stores/TrainGroupBookingStore";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
 import { DateService } from "../../services/DateService";
 import { Tag } from "primereact/tag";
+import { DividerComponent } from "../../components/core/divider/DividerComponent";
 
 interface IField {
   onBook: () => void;
@@ -56,9 +57,14 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
               (x) => x.trainGroupDateType === undefined
             ) && (
               <>
-                <p>
-                  <strong>Current Date:</strong>{" "}
-                </p>
+                {/* <p>
+                  <strong>One-off:</strong>{" "}
+                </p> */}
+
+                <DividerComponent>
+                  <p className="text-base">One-off</p>
+                </DividerComponent>
+
                 {selectedTimeSlot.recurrenceDates
                   .filter((x) => x.trainGroupDateType === undefined)
                   .map((x) => {
@@ -104,9 +110,12 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
               (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
             ) && (
               <>
-                <p>
-                  <strong>{"Fixed Date"}:</strong>
-                </p>
+                {/* <p>
+                  <strong>One-off:</strong>
+                </p> */}
+                <DividerComponent>
+                  <p className="text-base">One-off</p>
+                </DividerComponent>
                 {selectedTimeSlot.recurrenceDates
                   .filter(
                     (x) =>
@@ -155,9 +164,13 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
               (x) => x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK
             ) && (
               <>
-                <p>
-                  <strong>Days of the week:</strong>
-                </p>
+                {/* <p>
+                  <strong>Recurring Dates(Day of the week):</strong>
+                </p> */}
+
+                <DividerComponent>
+                  <p className="text-base">Recurring Dates(Day of the week)</p>
+                </DividerComponent>
 
                 {selectedTimeSlot.recurrenceDates
                   .filter(
@@ -200,9 +213,13 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                 x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH
             ) && (
               <>
-                <p>
-                  <strong>Days of the month:</strong>
-                </p>
+                {/* <p>
+                  <strong>Recurring Dates(Day of the month):</strong>
+                </p> */}
+
+                <DividerComponent>
+                  <p className="text-base">Recurring Dates(Day of the month)</p>
+                </DividerComponent>
 
                 {selectedTimeSlot.recurrenceDates
                   .filter(

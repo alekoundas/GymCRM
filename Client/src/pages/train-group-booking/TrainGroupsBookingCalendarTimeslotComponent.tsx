@@ -1,6 +1,9 @@
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { useTrainGroupBookingStore } from "../../stores/TrainGroupBookingStore";
+import { Divider } from "primereact/divider";
+import { DividerComponent } from "../../components/core/divider/DividerComponent";
+import { Tag } from "primereact/tag";
 
 export default function TrainGroupsBookingCalendarTimeslotComponent() {
   const { timeSlotResponseDto, selectedTimeSlot, setSelectedTimeSlot } =
@@ -13,9 +16,11 @@ export default function TrainGroupsBookingCalendarTimeslotComponent() {
       {/*                  */}
       <Card title="Available Time Slots">
         {timeSlotResponseDto?.length === 0 ? (
-          <p className="text-gray-500">
-            No time slots available for this date.
-          </p>
+          <>
+            <p className="text-gray-500">
+              No time slots available for this date.
+            </p>
+          </>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {timeSlotResponseDto?.map((slot) => (

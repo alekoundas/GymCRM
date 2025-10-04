@@ -1,4 +1,3 @@
-import { useUserStore } from "../../stores/UserStore";
 import { TimeSlotResponseDto } from "../../model/TimeSlotResponseDto";
 import { useEffect, useRef, useState } from "react";
 import ApiService from "../../services/ApiService";
@@ -8,20 +7,16 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
-import { ThemeService } from "../../services/ThemeService";
-import { EventContentArg, EventSourceInput } from "@fullcalendar/core/index.js";
+import { EventContentArg } from "@fullcalendar/core/index.js";
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import { FormMode } from "../../enum/FormMode";
-import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-import { TrainGroupDateDto } from "../../services/DateService";
-import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
 import { Tag } from "primereact/tag";
 import { TimeSlotRecurrenceDateDto } from "../../model/TimeSlotRecurrenceDateDto";
-import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
 import { TrainGroupParticipantUnavailableDateDto } from "../../model/entities/train-group-participant-unavailable-date/TrainGroupParticipantUnavailableDateDto";
+import ThemeService from "../../services/ThemeService";
 
 export default function UserProfileTimeslotsComponent() {
   // const { userDto, updateUserDto } = useUserStore();
