@@ -163,10 +163,10 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
     <>
       <div className="p-fluid">
         <div className="text-center mb-4">
-          <p className="text-lg font-semibold">
+          <p className="text-lg font-semibold mb-0">
             Select the dates you want to book for this training session.
           </p>
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-sm text-gray-600 mt-0">
             One-off dates apply only to the selected date, while recurring dates
             apply to all future sessions on that day of the week or month.
           </p>
