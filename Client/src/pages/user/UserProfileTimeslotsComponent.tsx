@@ -419,6 +419,30 @@ export default function UserProfileTimeslotsComponent() {
                         label="Opt out"
                         severity="danger"
                         onClick={optOutTimeSlotDialogControl.showDialog}
+                        disabled={
+                          new Date(
+                            Date.UTC(
+                              selectedDate.getFullYear(),
+                              selectedDate.getMonth(),
+                              selectedDate.getDate(),
+                              0,
+                              0,
+                              0,
+                              0
+                            )
+                          ) <
+                          new Date(
+                            Date.UTC(
+                              new Date().getFullYear(),
+                              new Date().getMonth(),
+                              new Date().getDate(),
+                              0,
+                              0,
+                              0,
+                              0
+                            )
+                          )
+                        }
                       ></Button>
                       {timeSlots.some((x) =>
                         x.recurrenceDates.some(
@@ -432,6 +456,30 @@ export default function UserProfileTimeslotsComponent() {
                           label="Opt out for this date"
                           severity="info"
                           onClick={optOutDateTimeSlotDialogControl.showDialog}
+                          disabled={
+                            new Date(
+                              Date.UTC(
+                                selectedDate.getFullYear(),
+                                selectedDate.getMonth(),
+                                selectedDate.getDate(),
+                                0,
+                                0,
+                                0,
+                                0
+                              )
+                            ) <
+                            new Date(
+                              Date.UTC(
+                                new Date().getFullYear(),
+                                new Date().getMonth(),
+                                new Date().getDate(),
+                                0,
+                                0,
+                                0,
+                                0
+                              )
+                            )
+                          }
                         ></Button>
                       )}
                       <div></div>
@@ -453,11 +501,59 @@ export default function UserProfileTimeslotsComponent() {
                         label="Opt out"
                         severity="danger"
                         onClick={optOutTimeSlotDialogControl.showDialog}
+                        disabled={
+                          new Date(
+                            Date.UTC(
+                              selectedDate.getFullYear(),
+                              selectedDate.getMonth(),
+                              selectedDate.getDate(),
+                              0,
+                              0,
+                              0,
+                              0
+                            )
+                          ) <
+                          new Date(
+                            Date.UTC(
+                              new Date().getFullYear(),
+                              new Date().getMonth(),
+                              new Date().getDate(),
+                              0,
+                              0,
+                              0,
+                              0
+                            )
+                          )
+                        }
                       ></Button>
                       <Button
                         label="Opt in again for this date"
                         severity="info"
                         onClick={optInDateTimeSlotDialogControl.showDialog}
+                        disabled={
+                          new Date(
+                            Date.UTC(
+                              selectedDate.getFullYear(),
+                              selectedDate.getMonth(),
+                              selectedDate.getDate(),
+                              0,
+                              0,
+                              0,
+                              0
+                            )
+                          ) <
+                          new Date(
+                            Date.UTC(
+                              new Date().getFullYear(),
+                              new Date().getMonth(),
+                              new Date().getDate(),
+                              0,
+                              0,
+                              0,
+                              0
+                            )
+                          )
+                        }
                       ></Button>
                       <div></div>
                     </div>
