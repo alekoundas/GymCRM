@@ -286,12 +286,16 @@ export default function UserProfileTimeslotsComponent() {
           initialView="timeGridWeek"
           initialDate={new Date()}
           allDaySlot={false} // Hide the All Day row
-          dayHeaderFormat={{
-            weekday: "short",
-            day: "numeric",
-            month: "numeric",
-            omitCommas: true,
-          }} // Custom format: "Sun 14/9"
+          dayHeaderFormat={(x) => {
+            const day = x.date.day;
+            const month = x.date.month + 1;
+            const weekday = new Date(
+              x.date.year,
+              month,
+              day
+            ).toLocaleDateString("en-US", { weekday: "short" });
+            return `${weekday} ${day}/${month}`;
+          }}
           slotLabelFormat={{
             hour: "2-digit",
             minute: "2-digit",

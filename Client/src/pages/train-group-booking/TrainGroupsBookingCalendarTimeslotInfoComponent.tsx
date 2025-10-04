@@ -116,42 +116,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                     <strong className="text-base">One-off</strong>
                   </p>
                 </DividerComponent>
-
                 {renderDateTag(undefined)}
-
-                {/* {selectedTimeSlot.recurrenceDates
-                  .filter((x) => x.trainGroupDateType === undefined)
-                  .map((x) => {
-                    if (x.isUserJoined)
-                      return (
-                        <Tag
-                          className="p-2 m-1"
-                          key={x.trainGroupDateId}
-                          severity={"success"}
-                        >
-                          {new Date(x.date).getDate() +
-                            "/" +
-                            (new Date(x.date).getMonth() + 1) +
-                            "/" +
-                            new Date(x.date).getFullYear()}
-                          {"  "}
-                          <i className="pi pi-check"></i>
-                        </Tag>
-                      );
-                    else
-                      return (
-                        <Tag
-                          className="p-2 m-1"
-                          key={x.trainGroupDateId}
-                        >
-                          {new Date(x.date).getDate() +
-                            "/" +
-                            (new Date(x.date).getMonth() + 1) +
-                            "/" +
-                            new Date(x.date).getFullYear()}
-                        </Tag>
-                      );
-                  })} */}
               </>
             )}
           </div>
@@ -173,42 +138,6 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                   </p>
                 </DividerComponent>
                 {renderDateTag(TrainGroupDateTypeEnum.FIXED_DAY)}
-                {/* {selectedTimeSlot.recurrenceDates
-                  .filter(
-                    (x) =>
-                      x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY
-                  )
-                  .map((x) => {
-                    if (x.isUserJoined)
-                      return (
-                        <Tag
-                          className="p-2 m-1"
-                          key={x.trainGroupDateId}
-                          severity={"success"}
-                        >
-                          {new Date(x.date).getDate() +
-                            "/" +
-                            (new Date(x.date).getMonth() + 1) +
-                            "/" +
-                            new Date(x.date).getFullYear()}
-                          {"  "}
-                          <i className="pi pi-check"></i>
-                        </Tag>
-                      );
-                    else
-                      return (
-                        <Tag
-                          className="p-2 m-1"
-                          key={x.trainGroupDateId}
-                        >
-                          {new Date(x.date).getDate() +
-                            "/" +
-                            (new Date(x.date).getMonth() + 1) +
-                            "/" +
-                            new Date(x.date).getFullYear()}
-                        </Tag>
-                      );
-                  })} */}
               </>
             )}
           </div>
@@ -229,35 +158,6 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                   </p>
                 </DividerComponent>
                 {renderDateTag(TrainGroupDateTypeEnum.DAY_OF_WEEK)}
-
-                {/* {selectedTimeSlot.recurrenceDates
-                  .filter(
-                    (x) =>
-                      x.trainGroupDateType ===
-                      TrainGroupDateTypeEnum.DAY_OF_WEEK
-                  )
-                  .map((x) => {
-                    if (x.isUserJoined)
-                      return (
-                        <Tag
-                          className="p-2 m-1"
-                          key={x.trainGroupDateId}
-                          severity={"success"}
-                        >
-                          {DateService.getDayOfWeekFromDate(new Date(x.date))}{" "}
-                          <i className="pi pi-check"></i>
-                        </Tag>
-                      );
-                    else
-                      return (
-                        <Tag
-                          className="p-2 m-1"
-                          key={x.trainGroupDateId}
-                        >
-                          {DateService.getDayOfWeekFromDate(new Date(x.date))}
-                        </Tag>
-                      );
-                  })} */}
               </>
             )}
           </div>
@@ -279,35 +179,6 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                   </p>
                 </DividerComponent>
                 {renderDateTag(TrainGroupDateTypeEnum.DAY_OF_MONTH)}
-
-                {/* {selectedTimeSlot.recurrenceDates
-                  .filter(
-                    (x) =>
-                      x.trainGroupDateType ===
-                      TrainGroupDateTypeEnum.DAY_OF_MONTH
-                  )
-                  .map((x) => {
-                    if (x.isUserJoined)
-                      return (
-                        <Tag
-                          className="p-2 m-1"
-                          key={x.trainGroupDateId}
-                          severity={"success"}
-                        >
-                          {new Date(x.date).getDate()}{" "}
-                          <i className="pi pi-check"></i>
-                        </Tag>
-                      );
-                    else
-                      return (
-                        <Tag
-                          className="p-2 m-1"
-                          key={x.trainGroupDateId}
-                        >
-                          {new Date(x.date).getDate()}
-                        </Tag>
-                      );
-                  })} */}
               </>
             )}
           </div>
@@ -318,7 +189,6 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
               icon="pi pi-check"
               className="mt-4 pr-5 pl-5 pt-3 pb-3"
               onClick={onBook}
-              // disabled={!(selectedTimeSlot.spotsLeft > 0)}
             />
           </div>
         </Card>
