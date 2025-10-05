@@ -1,21 +1,48 @@
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Hero2 from "./Hero2";
-
-// Register GSAP ScrollTrigger
-gsap.registerPlugin(ScrollTrigger);
-
-function Home() {
+export default function Home() {
   return (
     <>
-      <div style={{ minHeight: "200vh" }}>
-        {/* <div style={{ height: "100vh" }}></div> */}
-        {/* <Hero /> */}
-        <Hero2 />
+      <div className="flex flex-column justify-content-center align-content-center align-items-center h-full">
+        <div className="w-8">
+          <p className="text-center">
+            Στο ROSA CoreLab πιστεύουμε ότι η αληθινή δύναμη ξεκινά από μέσα
+            μας.
+          </p>
+
+          <p className="text-center">
+            Ο χώρος μας είναι ένας πολυχώρος αφιερωμένος στην αυτοβελτίωση, την
+            ευεξία και την προσωπική ανάπτυξη.
+          </p>
+
+          <p className="text-center">
+            Εδώ, κάθε άνθρωπος μπορεί να ανακαλύψει τον δικό του ρυθμό, να
+            καλλιεργήσει το σώμα του αλλά και το πνεύμα του, να βρει ισορροπία
+            και να προχωρήσει με σιγουριά στο επόμενο βήμα.
+          </p>
+
+          <p className="text-center">
+            Προσφέρουμε δυνατότητες στοχευμένης φυσικής ενδυνάμωσης, μέσα και
+            από τους θησαυρούς των τεχνικών των πολεμικών τεχνών, που
+            αναπτύσσουν αντοχή, πειθαρχία και αυτοπεποίθηση. Παράλληλα, μέσω του
+            life coaching και της συμβουλευτικής διατροφής, βοηθάμε τους
+            ανθρώπους να βρουν καθαρότητα στόχων και να υιοθετήσουν έναν τρόπο
+            ζωής που τους ταιριάζει.
+          </p>
+
+          <p className="text-center">
+            Η ομάδα μας συνεργάζεται με επαγγελματίες διατροφολόγους και
+            ειδικούς ψυχικής υγείας, γιατί πιστεύουμε ότι η πραγματική αλλαγή
+            έρχεται όταν φροντίζουμε ολόκληρο τον εαυτό μας σώμα, νου και ψυχή.
+          </p>
+
+          <p className="text-center">
+            Στο ROSA CoreLab, δεν χρειάζεται κανένα εφόδιο για να ξεκινήσεις.
+            Χρειάζεται μόνο η επιθυμία να βελτιώνεσαι. Είμαστε εδώ για να σε
+            στηρίξουμε στο ταξίδι σου προς μια πιο δυνατή, πιο φωτεινή εκδοχή
+            του εαυτού σου. Γιατί για εμάς, η αυτοβελτίωση δεν είναι στόχος·
+            είναι τρόπος ζωής".
+          </p>
+        </div>
       </div>
     </>
   );
 }
-
-export default Home;
