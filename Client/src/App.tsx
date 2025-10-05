@@ -25,37 +25,21 @@ import ThemeService from "./services/ThemeService.tsx";
 export default function App() {
   // Set Toast messages here
   const toast = useRef(null);
-  const theme = useRef(null);
 
   useEffect(() => {
     ToastService.setToastRef(toast);
-    // ThemeService.setRef(theme);
-    // ThemeService.setDefaultTheme();
     ThemeService.setDefaultThemeScale();
   }, []);
 
   return (
     <>
       <div className="flex flex-column p-0 m-0 h-full">
-        {/* Theme switching here. */}
-        {/* <link
-          ref={theme}
-          rel="stylesheet"
-          type="text/css"
-        /> */}
-        {/* <link
-          id="theme-link"
-          rel="stylesheet"
-          href="public/themes/bootstrap4-dark-blue/theme.css"
-        /> */}
-
-        {/* Initial theme */}
         {/* Display messages */}
         <Toast ref={toast} />
         <div className="pt-0 pb-1">
           <NavTop />
         </div>
-        {/* ScrollPanel: fills remaining space */}
+
         <div className="pt-1 pb-0 overflow-hidden h-full">
           <ScrollPanel className="custombar1 h-full">
             <Routes>
