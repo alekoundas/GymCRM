@@ -105,7 +105,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
                 validationErrors.Append(errorDetail.ErrorMessage);
             }
 
-        var response = new ApiResponse<object>().SetErrorResponse("error", validationErrors);
+        var response = new ApiResponse<object>().SetErrorResponse(validationErrors);
         return new BadRequestObjectResult(response);
     };
 });

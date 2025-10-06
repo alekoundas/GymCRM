@@ -18,11 +18,10 @@ namespace API.Filters
                         // Clean up field name (e.g., remove "$.trainerId" to "trainerId")
                         var fieldName = error.Key.StartsWith("$.") ? error.Key.Substring(2) : error.Key;
                         validationErrors.Add(errorDetail.ErrorMessage);
-                        //validationErrors.Add((fieldName, errorDetail.ErrorMessage));
                     }
                 }
 
-                var response = new ApiResponse<object>().SetErrorResponse("error",validationErrors.ToArray());
+                var response = new ApiResponse<object>().SetErrorResponse(validationErrors.ToArray());
                 context.Result = new BadRequestObjectResult(response);
             }
         }

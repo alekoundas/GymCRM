@@ -2,20 +2,23 @@ export class LocalStorageService {
   //
   //    Retrive data.
   //
-  public static getThemeName = (): string | null =>
+  public static getThemeName = (): string | undefined =>
     this.returnValue("themeName");
 
-  public static getThemeScale = (): string | null =>
+  public static getThemeScale = (): string | undefined =>
     this.returnValue("themeScale");
 
-  public static getAccessToken = (): string | null =>
+  public static getAccessToken = (): string | undefined =>
     this.returnValue("accessToken");
 
-  public static getRefreshToken = (): string | null =>
+  public static getRefreshToken = (): string | undefined =>
     this.returnValue("refreshToken");
 
-  public static getRefreshTokenExpireDate = (): string | null =>
+  public static getRefreshTokenExpireDate = (): string | undefined =>
     this.returnValue("refreshTokenExpireDate");
+
+  public static getLanguage = (): string | undefined =>
+    this.returnValue("language");
 
   //
   //    Set data.
@@ -26,6 +29,9 @@ export class LocalStorageService {
   public static setThemeName = (value: string = "") =>
     localStorage.setItem("themeName", value);
 
+  public static setLanguage = (value: string = "") =>
+    localStorage.setItem("language", value);
+
   public static setAccessToken = (value: string = "") =>
     localStorage.setItem("accessToken", value);
 
@@ -35,12 +41,12 @@ export class LocalStorageService {
   public static setRefreshTokenExpireDate = (value: string = "") =>
     localStorage.setItem("refreshTokenExpireDate", value);
 
-  private static returnValue = (fieldName: string) => {
+  private static returnValue = (fieldName: string): string | undefined => {
     const value = localStorage.getItem(fieldName);
-    if (!value) {
-      return null;
+    if (!value || value.length === 0) {
+      return undefined;
     }
 
-    return value.length > 0 ? value : null;
+    return value.length > 0 ? value : undefined;
   };
 }

@@ -35,10 +35,10 @@ namespace API.Controllers
         public override async Task<ActionResult<ApiResponse<PhoneNumber>>> Put(string? id, [FromBody] PhoneNumberDto entityDto)
         {
             if (!IsUserAuthorized("Edit"))
-                return new ApiResponse<PhoneNumber>().SetErrorResponse("error", "User is not authorized to perform this action.");
+                return new ApiResponse<PhoneNumber>().SetErrorResponse("User is not authorized to perform this action.");
 
             if (!ModelState.IsValid)
-                return new ApiResponse<PhoneNumber>().SetErrorResponse("error", "Invalid data provided.");
+                return new ApiResponse<PhoneNumber>().SetErrorResponse("Invalid data provided.");
 
             PhoneNumber entity = _mapper.Map<PhoneNumber>(entityDto);
 
@@ -51,7 +51,7 @@ namespace API.Controllers
             if (existingEntity == null)
             {
                 string className = typeof(PhoneNumber).Name;
-                return new ApiResponse<PhoneNumber>().SetErrorResponse("error", $"Requested {className} not found!");
+                return new ApiResponse<PhoneNumber>().SetErrorResponse($"Requested {className} not found!");
             }
 
             PhoneNumber? alreadyExistingPrimaryNumber = phoneNumbers
@@ -66,7 +66,7 @@ namespace API.Controllers
             }
 
             if (!entityDto.IsPrimary && alreadyExistingPrimaryNumber == null)
-                return new ApiResponse<PhoneNumber>().SetErrorResponse("error", $"At least 1 primary phone number is required!");
+                return new ApiResponse<PhoneNumber>().SetErrorResponse($"At least 1 primary phone number is required!");
 
             await _dataService.UpdateAsync(entity);
             return new ApiResponse<PhoneNumber>().SetSuccessResponse(entity);

@@ -49,7 +49,7 @@ namespace API.Controllers
         public async Task<ApiResponse<UserDto>> Get(string? id)
         {
             if (id == null)
-                return new ApiResponse<UserDto>().SetErrorResponse("error", "User ID not set!");
+                return new ApiResponse<UserDto>().SetErrorResponse("User ID not set!");
 
             User? user = await _dataService.Users
                 .Include(x => x.UserRoles)
@@ -58,7 +58,7 @@ namespace API.Controllers
 
 
             if (user == null)
-                return new ApiResponse<UserDto>().SetErrorResponse("error", "User not found!");
+                return new ApiResponse<UserDto>().SetErrorResponse("User not found!");
 
             UserDto userDto = _mapper.Map<UserDto>(user);
             return new ApiResponse<UserDto>().SetSuccessResponse(userDto);
@@ -70,19 +70,19 @@ namespace API.Controllers
         public async Task<ApiResponse<UserDto>> Update(string id, UserDto request)
         {
             if (id != request.Id)
-                return new ApiResponse<UserDto>().SetErrorResponse("error", "ID mismatch");
+                return new ApiResponse<UserDto>().SetErrorResponse("ID mismatch");
 
             if (request.UserRoles.Count() == 0)
-                return new ApiResponse<UserDto>().SetErrorResponse("error", "Role is required!");
+                return new ApiResponse<UserDto>().SetErrorResponse("Role is required!");
 
             User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == new Guid(request.Id));
             if (user == null)
-                return new ApiResponse<UserDto>().SetErrorResponse("error", "User not found");
+                return new ApiResponse<UserDto>().SetErrorResponse("User not found");
 
             string? roleName = request.UserRoles[0].Role.Name;
             bool roleExists = await _dataService.Roles.AnyAsync(x => x.Name == roleName);
             if (!roleExists)
-                return new ApiResponse<UserDto>().SetErrorResponse("error", "Role doesnt exist!");
+                return new ApiResponse<UserDto>().SetErrorResponse("Role doesnt exist!");
 
             // Update user role.
             await _userService.AssignSingleRoleAsync(user, roleName!);
@@ -99,9 +99,9 @@ namespace API.Controllers
             IdentityResult response = await _userManager.UpdateAsync(user);
 
             if (response.Succeeded)
-                return new ApiResponse<UserDto>().SetSuccessResponse(userDto, "success", "User updated successfully");
+                return new ApiResponse<UserDto>().SetSuccessResponse(userDto, "User updated successfully");
             else
-                return new ApiResponse<UserDto>().SetErrorResponse("error", response.Errors.First().Description);
+                return new ApiResponse<UserDto>().SetErrorResponse(response.Errors.First().Description);
         }
 
 
@@ -110,17 +110,17 @@ namespace API.Controllers
         public async Task<ApiResponse<IdentityUser>> Delete(string? id)
         {
             if (id == null || id.Count() == 0)
-                return new ApiResponse<IdentityUser>().SetErrorResponse("error", "User name not not set!");
+                return new ApiResponse<IdentityUser>().SetErrorResponse("User name not not set!");
 
             User? user = await _userManager.FindByIdAsync(id);
             if (user == null)
-                return new ApiResponse<IdentityUser>().SetErrorResponse("error", "User not found!");
+                return new ApiResponse<IdentityUser>().SetErrorResponse("User not found!");
 
 
             var response = await _userManager.DeleteAsync(user);
             if (response.Succeeded)
-                return new ApiResponse<IdentityUser>().SetSuccessResponse("success", $"User {user.Email} deleted successfully");
-            return new ApiResponse<IdentityUser>().SetErrorResponse("error", response.Errors.First().Description);
+                return new ApiResponse<IdentityUser>().SetSuccessResponse($"User {user.Email} deleted successfully");
+            return new ApiResponse<IdentityUser>().SetErrorResponse(response.Errors.First().Description);
 
         }
 
@@ -437,7 +437,7 @@ namespace API.Controllers
                 .ToList();
 
             if (timeSlotRequestDtos == null)
-                return new ApiResponse<List<TimeSlotResponseDto>>().SetErrorResponse("error", $"Requested data not found!");
+                return new ApiResponse<List<TimeSlotResponseDto>>().SetErrorResponse($"Requested data not found!");
 
             return new ApiResponse<List<TimeSlotResponseDto>>().SetSuccessResponse(timeSlotRequestDtos);
         }

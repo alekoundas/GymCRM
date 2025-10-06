@@ -50,7 +50,7 @@ namespace API.Controllers
                     dto.Body
                 );
 
-            return new ApiResponse<bool>().SetSuccessResponse(true, "success", "Password reset email sent.");
+            return new ApiResponse<bool>().SetSuccessResponse(true, "Password reset email sent.");
         }
 
 

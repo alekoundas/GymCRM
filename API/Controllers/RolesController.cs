@@ -47,11 +47,11 @@ namespace API.Controllers
             foreach (var role in roleDto)
             {
                 if (string.IsNullOrWhiteSpace(role.Name))
-                    return new ApiResponse<List<Role>>().SetErrorResponse("error", "Role name is required");
+                    return new ApiResponse<List<Role>>().SetErrorResponse("Role name is required");
 
                 bool roleExists = await _dataService.Roles.AnyAsync(x => x.Name == role.Name);
                 if (roleExists)
-                    return new ApiResponse<List<Role>>().SetErrorResponse("error", "Role already exists");
+                    return new ApiResponse<List<Role>>().SetErrorResponse("Role already exists");
 
                 Role identityRole = new Role();
                 identityRole.Name = role.Name;
@@ -73,7 +73,7 @@ namespace API.Controllers
                             await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, claim.Controller + "_Delete"));
                     }
                 else
-                    return new ApiResponse<List<Role>>().SetErrorResponse("errors", response.Errors.ToString() ?? "");
+                    return new ApiResponse<List<Role>>().SetErrorResponse(response.Errors.ToString() ?? "");
             }
 
             List<Role> roles = _mapper.Map<List<Role>>(roleDto);
@@ -86,11 +86,11 @@ namespace API.Controllers
         {
             // Checks.
             if (id == null)
-                return new ApiResponse<Role>().SetErrorResponse("error", "Role name not not set!");
+                return new ApiResponse<Role>().SetErrorResponse("Role name not not set!");
 
             Role? identityRole = await _dataService.Roles.FindAsync(id);
             if (identityRole == null)
-                return new ApiResponse<Role>().SetErrorResponse("error", "Role name not found!");
+                return new ApiResponse<Role>().SetErrorResponse("Role name not found!");
 
 
             // Get claims from role.
@@ -132,18 +132,18 @@ namespace API.Controllers
         public override async Task<ActionResult<ApiResponse<Role>>> Delete(string? id)
         {
             if (id == null)
-                return new ApiResponse<Role>().SetErrorResponse("error", "Role name not not set!");
+                return new ApiResponse<Role>().SetErrorResponse("Role name not not set!");
 
             var role = await _dataService.Roles.FindAsync(id);
             if (role == null)
-                return new ApiResponse<Role>().SetErrorResponse("error", "Role not found!");
+                return new ApiResponse<Role>().SetErrorResponse("Role not found!");
 
 
             var result = await _roleManager.DeleteAsync(role);
             if (result.Succeeded)
-                return new ApiResponse<Role>().SetSuccessResponse("success", $"Role {role.Name} deleted successfully");
+                return new ApiResponse<Role>().SetSuccessResponse($"Role {role.Name} deleted successfully");
 
-            return new ApiResponse<Role>().SetErrorResponse("error", result.Errors.ToString() ?? "");
+            return new ApiResponse<Role>().SetErrorResponse(result.Errors.ToString() ?? "");
         }
 
 

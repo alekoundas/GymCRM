@@ -36,7 +36,7 @@ namespace API.Controllers
         public virtual async Task<ActionResult<ApiResponse<TEntityDto>>> Get(string? id)
         {
             if (!IsUserAuthorized("View"))
-                return new ApiResponse<TEntityDto>().SetErrorResponse("error", "User is not authorized to perform this action.");
+                return new ApiResponse<TEntityDto>().SetErrorResponse("User is not authorized to perform this action.");
 
 
 
@@ -45,7 +45,7 @@ namespace API.Controllers
             if (entityDto == null)
             {
                 string className = typeof(TEntity).Name;
-                return new ApiResponse<TEntityDto>().SetErrorResponse("error", $"Requested {className} not found!");
+                return new ApiResponse<TEntityDto>().SetErrorResponse($"Requested {className} not found!");
             }
 
             return new ApiResponse<TEntityDto>().SetSuccessResponse(entityDto);
@@ -56,20 +56,20 @@ namespace API.Controllers
         public virtual async Task<ActionResult<ApiResponse<List<TEntity>>>> Post([FromBody] List<TEntityAddDto> entityDtos)
         {
             if (!IsUserAuthorized("Add"))
-                return new ApiResponse<List<TEntity>>().SetErrorResponse("error", "User is not authorized to perform this action.");
+                return new ApiResponse<List<TEntity>>().SetErrorResponse("User is not authorized to perform this action.");
 
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<List<TEntity>>().SetErrorResponse("error", "Invalid data provided."));
+                return BadRequest(new ApiResponse<List<TEntity>>().SetErrorResponse("Invalid data provided."));
 
             foreach (var entityDto in entityDtos)
                 if (CustomValidatePOST(entityDto, out string[] errors))
-                    return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", errors));
+                    return BadRequest(new ApiResponse<TEntity>().SetErrorResponse(errors));
 
             List<TEntity> entities = _mapper.Map<List<TEntity>>(entityDtos);
 
             int result = await _dataService.GetGenericRepository<TEntity>().AddRangeAsync(entities);
             if (result <= 0)
-                return new ApiResponse<List<TEntity>>().SetErrorResponse("error", "An error occurred while creating the entity.");
+                return new ApiResponse<List<TEntity>>().SetErrorResponse("An error occurred while creating the entity.");
 
             return new ApiResponse<List<TEntity>>().SetSuccessResponse(entities);
         }
@@ -79,13 +79,13 @@ namespace API.Controllers
         public virtual async Task<ActionResult<ApiResponse<TEntity>>> Put(string? id, [FromBody] TEntityDto entityDto)
         {
             if (!IsUserAuthorized("Edit"))
-                return new ApiResponse<TEntity>().SetErrorResponse("error", "User is not authorized to perform this action.");
+                return new ApiResponse<TEntity>().SetErrorResponse("User is not authorized to perform this action.");
 
             if (!ModelState.IsValid)
-                return new ApiResponse<TEntity>().SetErrorResponse("error", "Invalid data provided.");
+                return new ApiResponse<TEntity>().SetErrorResponse("Invalid data provided.");
 
             if (CustomValidatePUT(entityDto, out string[] errors))
-                return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", errors));
+                return BadRequest(new ApiResponse<TEntity>().SetErrorResponse(errors));
 
             TEntity entity = _mapper.Map<TEntity>(entityDto);
 
@@ -94,7 +94,7 @@ namespace API.Controllers
             if (existingEntity == null)
             {
                 string className = typeof(TEntity).Name;
-                return new ApiResponse<TEntity>().SetErrorResponse("error", $"Requested {className} not found!");
+                return new ApiResponse<TEntity>().SetErrorResponse($"Requested {className} not found!");
             }
 
             _dataService.Update(entity);
@@ -106,22 +106,22 @@ namespace API.Controllers
         public virtual async Task<ActionResult<ApiResponse<TEntity>>> Delete(string? id)
         {
             if (!IsUserAuthorized("Delete"))
-                return new ApiResponse<TEntity>().SetErrorResponse("error", "You dont have the permitions to request this information.");
+                return new ApiResponse<TEntity>().SetErrorResponse("You dont have the permitions to request this information.");
 
             TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
             if (entity == null)
             {
                 string className = typeof(TEntity).Name;
-                return new ApiResponse<TEntity>().SetErrorResponse("error", $"Requested {className} not found!");
+                return new ApiResponse<TEntity>().SetErrorResponse($"Requested {className} not found!");
             }
 
             if (CustomValidateDELETE(entity, out string[] errors))
-                return BadRequest(new ApiResponse<TEntity>().SetErrorResponse("error", errors));
+                return BadRequest(new ApiResponse<TEntity>().SetErrorResponse(errors));
 
 
             int result = await _dataService.GetGenericRepository<TEntity>().RemoveAsync(entity);
             if (result != 1)
-                return new ApiResponse<TEntity>().SetErrorResponse("error", "An error occurred while deleting the entity.");
+                return new ApiResponse<TEntity>().SetErrorResponse("An error occurred while deleting the entity.");
 
             return new ApiResponse<TEntity>().SetSuccessResponse(entity);
         }
@@ -201,7 +201,7 @@ namespace API.Controllers
 
 
             // Handle Pagging of DataTable.
-            int skip = dataTable.Page  * dataTable.Rows;
+            int skip = dataTable.Page * dataTable.Rows;
             int take = dataTable.Rows;
             query.AddPagging(skip, take);
 
@@ -225,7 +225,7 @@ namespace API.Controllers
                         query.FilterByColumnEquals(filter.FieldName, filter.Value != "null" ? filter.Value : null);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.notEquals)
-                        query.FilterByColumnNotEquals(filter.FieldName, filter.Value != "null" ? filter.Value : null);
+                    query.FilterByColumnNotEquals(filter.FieldName, filter.Value != "null" ? filter.Value : null);
 
                 if (filter.Values?.Count() > 0 && filter.FilterType == DataTableFiltersEnum.@in)
                     query.FilterByColumnIn(filter.FieldName, filter.Values);

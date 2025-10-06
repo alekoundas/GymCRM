@@ -161,9 +161,9 @@ namespace Business.Repository
                 _query = _contextFactory.CreateDbContext().Set<TEntity>();
 
             if (orderDirection == OrderDirectionEnum.ASCENDING)
-                _query = (_query as IOrderedQueryable<TEntity>).ThenByColumn(propertyName);
+                _query = ((IOrderedQueryable<TEntity>)_query).ThenByColumn(propertyName);
             else
-                _query = (_query as IOrderedQueryable<TEntity>).ThenByColumnDescending(propertyName);
+                _query = ((IOrderedQueryable<TEntity>)_query).ThenByColumnDescending(propertyName);
 
             return this;
         }
