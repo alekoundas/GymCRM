@@ -9,29 +9,27 @@ import { PrimeReactContext } from "primereact/api";
 import { LocalStorageService } from "../services/LocalStorageService";
 import { PrimeTheme } from "../model/PrimeTheme";
 
-// Define available themes (optional; you can remove if using ThemeService for this)
-export interface ThemeOption {
-  label: string;
-  value: string;
-}
-
 // Type for context value
 interface ThemeContextType {
   currentTheme: string;
-  switchTheme: (newTheme: string) => void;
+  currentThemeScale: number;
+
+  setTheme: (newTheme: string) => void;
+  setThemeScale: (themeScale: number) => void;
 }
 
-// Default context value (for TypeScript safety)
 const defaultThemeContext: ThemeContextType = {
-  currentTheme: "bootstrap4-dark-blue", // Default theme
-  switchTheme: () => {},
+  currentTheme: "bootstrap4-dark-blue",
+  currentThemeScale: 14,
+  setTheme: () => {},
+  setThemeScale: () => {},
 };
 
 // Create the context
 export const ThemeContext =
   createContext<ThemeContextType>(defaultThemeContext);
 
-// Custom hook for easy consumption
+// Custom hook.
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
@@ -49,8 +47,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [currentTheme, setCurrentTheme] = useState<string>(
     LocalStorageService.getThemeName() || defaultThemeContext.currentTheme
   );
+  const [currentThemeScale, setCurrentThemeScale] = useState<number>(
+    LocalStorageService.getThemeScale() ?? defaultThemeContext.currentThemeScale
+  );
 
-  // Initialize link and set initial theme (runs once on mount)
+  // Initialize (Create Link element and assign theme).
   useEffect(() => {
     let link = document.getElementById("theme-link") as HTMLLinkElement | null;
     if (!link) {
@@ -62,37 +63,37 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
     // Set href to currentTheme (saved or default)
     link.href = `/themes/${currentTheme}/theme.css`;
-  }, []); // Empty deps: Run once, currentTheme is set before this
 
-  // Apply saved theme on mount (if mismatch after init)
-  useEffect(() => {
-    const savedTheme = LocalStorageService.getThemeName();
-    if (changeTheme && savedTheme && savedTheme !== currentTheme) {
-      changeTheme(currentTheme, savedTheme, "theme-link");
-      setCurrentTheme(savedTheme);
-    }
-  }, [changeTheme, currentTheme]);
+    // Set default theme scale.
+    document.documentElement.style.fontSize = `${currentThemeScale + 5}px`;
 
-  // Switch theme function (unchanged)
-  const switchTheme = (newTheme: string) => {
-    if (changeTheme) {
-      changeTheme(currentTheme, newTheme, "theme-link", () => {
-        const palette = new PrimeTheme(newTheme).getColorPalette();
-
-        document.dispatchEvent(
-          new CustomEvent("primeThemeChange", {
-            detail: { palette },
-          })
-        );
-      });
-      setCurrentTheme(newTheme);
-      LocalStorageService.setThemeName(newTheme);
-    }
-  };
+    LocalStorageService.setThemeName(currentTheme);
+    LocalStorageService.setThemeScale(currentThemeScale);
+  }, []);
 
   const value: ThemeContextType = {
     currentTheme,
-    switchTheme,
+    currentThemeScale,
+    setTheme: (newTheme: string) => {
+      if (changeTheme) {
+        changeTheme(currentTheme, newTheme, "theme-link", () => {
+          const palette = new PrimeTheme(newTheme).getColorPalette();
+
+          document.dispatchEvent(
+            new CustomEvent("primeThemeChange", {
+              detail: { palette },
+            })
+          );
+        });
+        setCurrentTheme(newTheme);
+        LocalStorageService.setThemeName(newTheme);
+      }
+    },
+    setThemeScale: (themeScale: number) => {
+      document.documentElement.style.fontSize = `${themeScale + 5}px`;
+      setCurrentThemeScale(themeScale);
+      LocalStorageService.setThemeScale(themeScale);
+    },
   };
 
   return (
