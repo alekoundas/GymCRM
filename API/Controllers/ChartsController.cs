@@ -29,6 +29,7 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<ApiResponse<ChartDataDto>>> GetChartData()
         {
+
             DateTime now = DateTime.UtcNow;
             DateTime start = now.AddDays(-6).Date;
 

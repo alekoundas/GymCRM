@@ -176,7 +176,7 @@ namespace API.Controllers
                     query.FilterByColumnDateBetween(filter.FieldName, filter.Values[0], filter.Values[1]);
 
                 if (filter.FilterType == DataTableFiltersEnum.custom)
-                    if (fieldName == "RoleId" && filter.Values.Count() > 0)
+                    if (fieldName == "RoleId" && filter.Values?.Count() > 0)
                         query.Where(x => x.UserRoles.Any(y => filter.Values.Any(z => z == y.RoleId.ToString())));
             }
 
@@ -212,7 +212,7 @@ namespace API.Controllers
                     query.FilterByColumnDateBetween(filter.FieldName, filter.Values[0], filter.Values[1]);
 
                 if (filter.FilterType == DataTableFiltersEnum.custom)
-                    if (fieldName == "RoleId" && filter.Values.Count > 0)
+                    if (fieldName == "RoleId" && filter.Values?.Count > 0)
                         query.Where(x => x.UserRoles.Any(y => filter.Values.Any(z => z == y.RoleId.ToString())));
             }
 

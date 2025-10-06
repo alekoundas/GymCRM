@@ -47,7 +47,7 @@ namespace API.Controllers
             List<IdentityClaimDto> identityClaimsDto = new List<IdentityClaimDto>();
             List<IdentityRoleClaim<Guid>> controllerNamess = _dataService.RoleClaims.ToList();
             List<string> controllerNames = _dataService.RoleClaims.ToList()
-                .Select(x => x.ClaimValue.Split('_')[0])
+                .Select(x => x.ClaimValue!.Split('_')[0])
                 .Distinct()
                 .ToList();
 

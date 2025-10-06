@@ -4,7 +4,9 @@ using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Enums;
+using Core.Translations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace API.Controllers
 {
@@ -17,13 +19,15 @@ namespace API.Controllers
         where TEntityAddDto : class
     {
         private readonly IDataService _dataService;
-        //private readonly ILogger<TEntityController> _logger;
         private readonly IMapper _mapper;
-        public GenericController(IDataService dataService, IMapper mapper)//, ILogger<TEntityController> logger)
+        private readonly IStringLocalizer _localizer;
+        //private readonly ILogger<TEntityController> _logger;
+        public GenericController(IDataService dataService, IMapper mapper, IStringLocalizer localizer)//, ILogger<TEntityController> logger)
         {
             //_logger = logger;
             _dataService = dataService;
             _mapper = mapper;
+            _localizer = localizer;
         }
 
 
@@ -33,6 +37,7 @@ namespace API.Controllers
         {
             if (!IsUserAuthorized("View"))
                 return new ApiResponse<TEntityDto>().SetErrorResponse("error", "User is not authorized to perform this action.");
+
 
 
             TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
@@ -133,6 +138,8 @@ namespace API.Controllers
             var query = _dataService.GetGenericRepository<TEntity>();
             DataTableQueryUpdate(query);
 
+            var sss = _localizer[TranslationKeys.HelloWorld];
+            var sdfdfss = _localizer["sdfgsdfgsdf.dfgfdg"];
 
             // Handle Sorting of DataTable.
             if (dataTable.Sorts.Count() > 0)

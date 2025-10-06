@@ -1,0 +1,42 @@
+﻿<#@ template debug="true" hostspecific="True" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="$(NuGetPackageRoot)newtonsoft.json\13.0.3\lib\net45\Newtonsoft.Json.dll" #>  // Replace 13.0.3 with your installed version
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Newtonsoft.Json" #>
+<#@ import namespace="Newtonsoft.Json.Linq" #>
+<#@ output extension=".cs" #>
+
+//
+// Auto-generated from en.json - Do not edit manually!
+//
+
+namespace Core.Translations // Adjust to match your project's namespace
+{
+    public static class TranslationKeys
+    {
+<#
+        string jsonPath = Host.ResolvePath("en.json"); // Relative to .tt file location
+        if (System.IO.File.Exists(jsonPath))
+        {
+            string jsonContent = System.IO.File.ReadAllText(jsonPath);
+            JObject translations = JObject.Parse(jsonContent);
+            foreach (JProperty prop in translations.Properties())
+            {
+                string keyName = prop.Name.Replace(".", "_").Replace("-", "_"); // Sanitize for valid C# field names
+                string originalKey = prop.Name;
+#>
+        public const string <#= keyName#> = "<#= originalKey #>";
+<#
+            }
+        }
+        else
+        {
+#>
+        // en.json not found at <#= jsonPath #>. Add the file to generate keys.
+<#
+        }
+#>
+    }
+}

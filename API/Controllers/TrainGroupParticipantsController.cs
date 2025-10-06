@@ -8,6 +8,7 @@ using DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace API.Controllers
 {
@@ -17,12 +18,18 @@ namespace API.Controllers
     {
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
+        private readonly IStringLocalizer _localizer;
+
         //private readonly ILogger<TrainGroupDateController> _logger;
 
-        public TrainGroupParticipantsController(IDataService dataService, IMapper mapper) : base(dataService, mapper)
+        public TrainGroupParticipantsController(
+            IDataService dataService, 
+            IMapper mapper,
+            IStringLocalizer localizer) : base(dataService, mapper, localizer)
         {
             _dataService = dataService;
             _mapper = mapper;
+            _localizer = localizer;
         }
 
 
