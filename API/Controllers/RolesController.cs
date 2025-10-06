@@ -1,15 +1,13 @@
 ﻿using AutoMapper;
 using Business.Services;
 using Core.Dtos;
-using Core.Dtos.DataTable;
 using Core.Dtos.Identity;
 using Core.Dtos.Lookup;
-using Core.Enums;
 using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -22,18 +20,20 @@ namespace API.Controllers
         private readonly IDataService _dataService;
         private readonly ILogger<RolesController> _logger;
         private readonly IMapper _mapper;
+        private readonly IStringLocalizer _localizer;
         private readonly RoleManager<Role> _roleManager;
 
         public RolesController(
             IDataService dataService,
             ILogger<RolesController> logger,
             IMapper mapper,
-            RoleManager<Role> roleManager
-            ) : base(dataService, mapper)
+            IStringLocalizer localizer,
+            RoleManager<Role> roleManager) : base(dataService, mapper, localizer)
         {
             _dataService = dataService;
             _logger = logger;
             _mapper = mapper;
+            _localizer = localizer;
             _roleManager = roleManager;
         }
 
@@ -156,7 +156,7 @@ namespace API.Controllers
             if (lookupDto.Filter?.Id != null && lookupDto.Filter?.Id.Length > 0)
                 query = query.Where(x => lookupDto.Filter.Id.ToLower().Contains(x.Id.ToString().ToLower()));
             else if (lookupDto.Filter?.Value != null && lookupDto.Filter?.Value.Length > 0)
-                query = query.Where(x => x.Name.ToLower().Contains(lookupDto.Filter.Value.ToLower()));
+                query = query.Where(x => x.Name!.ToLower().Contains(lookupDto.Filter.Value.ToLower()));
 
 
             // Handle Pagging.

@@ -70,6 +70,7 @@ export default class ApiService {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "Accept-Language": "el",
         },
         credentials: "include",
         body: data ? JSON.stringify(data) : undefined,

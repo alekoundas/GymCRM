@@ -7,6 +7,7 @@ using Core.Dtos.Mail;
 using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace API.Controllers
 {
@@ -17,13 +18,19 @@ namespace API.Controllers
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
+        private readonly IStringLocalizer _localizer;
         //private readonly ILogger<TrainGroupDateController> _logger;
 
-        public MailsController(IDataService dataService, IMapper mapper, IEmailService emailService) : base(dataService, mapper)
+        public MailsController(
+            IDataService dataService,
+            IMapper mapper,
+            IStringLocalizer localizer,
+            IEmailService emailService) : base(dataService, mapper, localizer)
         {
             _dataService = dataService;
             _mapper = mapper;
             _emailService = emailService;
+            _localizer = localizer;
         }
 
 

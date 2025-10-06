@@ -6,6 +6,7 @@ using Core.Enums;
 using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace API.Controllers
 {
@@ -15,12 +16,17 @@ namespace API.Controllers
     {
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
+        private readonly IStringLocalizer _localizer;
         //private readonly ILogger<TrainGroupController> _logger;
 
-        public TrainGroupsController(IDataService dataService, IMapper mapper) : base(dataService, mapper)
+        public TrainGroupsController(
+            IDataService dataService, 
+            IMapper mapper,
+            IStringLocalizer localizer) : base(dataService, mapper, localizer)
         {
             _dataService = dataService;
             _mapper = mapper;
+            _localizer = localizer;
         }
 
         protected override bool CustomValidatePOST(TrainGroupAddDto entityDto, out string[] errors)

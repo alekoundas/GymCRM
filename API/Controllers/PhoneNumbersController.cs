@@ -5,6 +5,7 @@ using Core.Dtos.PhoneNumber;
 using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace API.Controllers
 {
@@ -14,12 +15,18 @@ namespace API.Controllers
     {
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
+        private readonly IStringLocalizer _localizer;
+
         //private readonly ILogger<TrainGroupDateController> _logger;
 
-        public PhoneNumbersController(IDataService dataService, IMapper mapper) : base(dataService, mapper)
+        public PhoneNumbersController(
+            IDataService dataService,
+            IMapper mapper,
+            IStringLocalizer localizer) : base(dataService, mapper, localizer)
         {
             _dataService = dataService;
             _mapper = mapper;
+            _localizer = localizer;
         }
 
 

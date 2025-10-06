@@ -4,6 +4,7 @@ using API.JsonConverter;
 using Business.Repository;
 using Business.Services;
 using Business.Services.Email;
+using Business.Services.Translator;
 using Core.Dtos;
 using Core.Models;
 using Core.System;
@@ -12,10 +13,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Globalization;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -27,10 +32,6 @@ var appSettings = builder.Configuration.GetSection("TokenSettings").Get<TokenSet
 builder.Services
     .AddControllers(options =>
     {
-        // Suppress automatic 400 response for invalid ModelState (Dto validation)
-        //options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
-        //options.ModelValidatorProviders.Clear(); // Optional: Clears default validation providers
-
         // Add custom validation filter
         options.Filters.Add<ValidateModelFilter>();
     })
@@ -49,6 +50,8 @@ builder.Services
         x.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter());
         x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
+
+
 
 // Swagger/OpenAPI configuration
 builder.Services.AddEndpointsApiExplorer();
@@ -92,19 +95,15 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
         // Log ModelState for debugging
         Console.WriteLine($"ModelState.IsValid: {context.ModelState.IsValid}");
         foreach (var entry in context.ModelState)
-        {
             Console.WriteLine($"Key: {entry.Key}, Errors: {string.Join(", ", entry.Value.Errors.Select(e => e.ErrorMessage))}");
-        }
 
         string[] validationErrors = [];
         foreach (var error in context.ModelState)
-        {
             foreach (var errorDetail in error.Value.Errors)
             {
                 var fieldName = error.Key.StartsWith("$.") ? error.Key.Substring(2) : error.Key;
                 validationErrors.Append(errorDetail.ErrorMessage);
             }
-        }
 
         var response = new ApiResponse<object>().SetErrorResponse("error", validationErrors);
         return new BadRequestObjectResult(response);
@@ -112,29 +111,36 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 
 
+
+// Add caching (in-memory for dev; use Redis for prod)
+builder.Services.AddDistributedMemoryCache();
+
+// Register built-in localization FIRST.
+// No options.ResourcesPath—your JSON factory doesn't need it
+builder.Services.AddLocalization();
+
+// Override with custom factory (after AddLocalization to take precedence)
+// Inject cache via factory provider
+builder.Services.AddSingleton<IStringLocalizerFactory>(provider =>
+    new TranslatorFactory(provider.GetRequiredService<IDistributedCache>(), provider.GetRequiredService<IWebHostEnvironment>().ContentRootPath));
+
+// Scoped non-generic IStringLocalizer (uses custom factory for global translations)
+builder.Services.AddScoped<IStringLocalizer>(provider =>
+    provider.GetRequiredService<IStringLocalizerFactory>().Create(string.Empty, string.Empty));  // Global; factory handles empty
+
+
+// Register custom localizer
+builder.Services.AddLocalization();
+
+
 // DB context and factory.
 builder.Services.AddDbContext<ApiDbContext>();
 builder.Services.AddTransient<IDbContextFactory<ApiDbContext>, ApiDbContextFactory>();
 builder.Services.AddScoped<ApiDbContextInitialiser>();
 
-// AutoMapper.
-//builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-//builder.Services.AddAutoMapper(config =>
-//{
-
-//    config.AddProfile<AutoMapperProfile>();
-//    // Scan for profiles in the current assembly or specific assemblies
-//    //config.AddMaps(builder.Environment.ContentRootPath); // Scans all assemblies in the project
-//    // Or specify specific assemblies:
-//    // config.AddMaps(typeof(Program).Assembly);
-//    // config.AddMaps(AppDomain.CurrentDomain.GetAssemblies()); // If you need to scan all assemblies
-//});
-
 builder.Services.AddAutoMapper(config =>
 {
-    //config.ConstructServicesUsing(type => builder.Services.BuildServiceProvider().GetService(type));
     config.AddProfile<AutoMapperProfile>();
-    //config.AddMaps(typeof(ValidateModelFilter).Assembly);
 });
 
 
@@ -159,7 +165,6 @@ builder.Services.AddSingleton<ClaimsIdentity>();
 builder.Services.AddSingleton(TimeProvider.System);
 
 // Add services.
-//builder.Services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddSingleton(appSettings); // appsettings.json
@@ -340,8 +345,12 @@ app.Use(async (context, next) =>
 
 
 
-
-
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en"),
+    SupportedCultures = new List<CultureInfo> { new("en"), new("el") },
+    SupportedUICultures = new List<CultureInfo> { new("en"), new("el") }
+});
 
 
 
@@ -353,12 +362,11 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 });
 
 // CORS.
-app.UseCors(options =>
-    options
-        .WithOrigins(appSettings.Audiences.ToArray())
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials());
+app.UseCors(options => options
+    .WithOrigins(appSettings.Audiences.ToArray())
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials());
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
@@ -366,15 +374,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapFallbackToFile("/index.html");
-
-
-// Run migrations and seed initial data.
-//var apiDbContext = app.Services.GetService<ApiDbContext>();
-//if (apiDbContext != null)
-//{
-//    apiDbContext.RunMigrations();
-//    await apiDbContext.TrySeedInitialData();
-//}
 
 
 // Run migrations and seed data
