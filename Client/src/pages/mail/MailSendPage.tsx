@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { Card } from "primereact/card";
-import ApiService from "../../services/ApiService";
 import { useMailStore } from "../../stores/MailStore";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import MailSendFormComponent from "./MailSendFormComponent";
 import { useNavigate } from "react-router-dom";
+import { useApiService } from "../../services/ApiService";
 
 export default function MailSendPage() {
   const navigate = useNavigate();
+  const apiService = useApiService();
 
   const { mailSendDto, resetMailSendDto } = useMailStore();
   const [isInfoDialogVisible, setInfoDialogVisible] = useState(false); // Dialog visibility
@@ -16,7 +17,7 @@ export default function MailSendPage() {
   useEffect(() => resetMailSendDto(), []); // Reset form on load.
 
   const onSend = async () => {
-    const response = await ApiService.emailSend(mailSendDto);
+    const response = await apiService.emailSend(mailSendDto);
     if (response) {
       navigate("/administrator");
     }

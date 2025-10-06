@@ -4,13 +4,14 @@ import { UserPasswordResetDto } from "../../model/entities/user/UserPasswordRese
 import { useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
-import ApiService from "../../services/ApiService";
 import { Divider } from "primereact/divider";
 import { UserPasswordForgotDto } from "../../model/entities/user/UserPasswordForgotDto";
+import { useApiService } from "../../services/ApiService";
 
 interface IField extends DialogChildProps {}
 
 export default function UserPasswordForgotPage({}: IField) {
+  const apiService = useApiService();
   const navigate = useNavigate();
 
   const [userPasswordForgotDto, setUserPasswordForgotDto] =
@@ -21,7 +22,7 @@ export default function UserPasswordForgotPage({}: IField) {
     setLoading(true);
 
     try {
-      var response = await ApiService.passwordForgot(userPasswordForgotDto);
+      var response = await apiService.passwordForgot(userPasswordForgotDto);
       if (response) {
         setTimeout(() => navigate("/users/login"), 3000); // Redirect to login after 3s
       }

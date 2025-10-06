@@ -1,13 +1,13 @@
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
-import ApiService from "../../services/ApiService";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { UserRegisterDto } from "../../model/entities/user/UserRegisterDto";
-import { classNames } from "primereact/utils";
+import { useApiService } from "../../services/ApiService";
 
 export default function RegisterPage() {
+  const apiService = useApiService();
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ export default function RegisterPage() {
     userRegisterDto.phoneNumbers.forEach(
       (x) => (x.userId = "00000000-0000-0000-0000-000000000000")
     );
-    ApiService.register(userRegisterDto, login).then((isSuccessful) => {
+    apiService.register(userRegisterDto, login).then((isSuccessful) => {
       if (isSuccessful) {
         navigate("/");
       }

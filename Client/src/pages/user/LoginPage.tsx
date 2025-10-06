@@ -1,12 +1,13 @@
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
-import ApiService from "../../services/ApiService";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { UserLoginRequestDto } from "../../model/entities/user/UserLoginRequestDto";
+import { useApiService } from "../../services/ApiService";
 
 export default function LoginPage() {
+  const apiService = useApiService();
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -20,7 +21,7 @@ export default function LoginPage() {
   };
 
   const onLogin = () => {
-    ApiService.login(userLoginDto, login).then((isSuccessful) => {
+    apiService.login(userLoginDto, login).then((isSuccessful) => {
       if (isSuccessful) {
         navigate("/");
       }

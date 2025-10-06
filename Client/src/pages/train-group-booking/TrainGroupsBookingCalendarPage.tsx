@@ -1,7 +1,6 @@
 import { Calendar } from "primereact/calendar";
 import { Card } from "primereact/card";
 import { useState } from "react";
-import ApiService from "../../services/ApiService";
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
@@ -11,8 +10,9 @@ import TrainGroupsBookingCalendarTimeslotComponent from "./TrainGroupsBookingCal
 import { useTrainGroupBookingStore } from "../../stores/TrainGroupBookingStore";
 import TrainGroupsBookingCalendarTimeslotInfoComponent from "./TrainGroupsBookingCalendarTimeslotInfoComponent";
 import TrainGroupsBookingCalendarTimeslotBookFormComponent from "./TrainGroupsBookingCalendarTimeslotBookFormComponent";
-import { ToastService } from "../../services/ToastService";
 import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
+import { useToast } from "../../contexts/ToastContext";
+import { useApiService } from "../../services/ApiService";
 
 export default function TrainGroupsBookingCalendarPage() {
   const {
@@ -21,11 +21,15 @@ export default function TrainGroupsBookingCalendarPage() {
     trainGroupDateParticipantUpdateDto,
     resetTimeSlotRequestDto,
     updateTrainGroupDateParticipantUpdateDto,
+    setTimeSlotResponseDto,
     resetTimeSlotResponseDto,
     resetSelectedTimeSlotResponseDto,
   } = useTrainGroupBookingStore();
+  const apiService = useApiService();
+
   const [isDialogVisible, setDialogVisibility] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const { showSuccess, showInfo, showWarn, showError } = useToast();
 
   const dialogControl: DialogControl = {
     showDialog: () => setDialogVisibility(true),
@@ -40,6 +44,17 @@ export default function TrainGroupsBookingCalendarPage() {
     // Reset selected slot when date changes
     resetTimeSlotResponseDto();
     resetSelectedTimeSlotResponseDto();
+
+    apiService
+      .timeslots("TrainGroupDates/TimeSlots", {
+        userId: TokenService.getUserId() ?? "",
+        selectedDate: dateCleaned.toISOString(),
+      })
+      .then((response) => {
+        if (response) {
+          setTimeSlotResponseDto(response);
+        }
+      });
 
     resetTimeSlotRequestDto(dateCleaned.toISOString());
     updateTrainGroupDateParticipantUpdateDto({
@@ -78,13 +93,12 @@ export default function TrainGroupsBookingCalendarPage() {
     if (
       trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.length === 0
     ) {
-      ToastService.showWarn("No dates selected!");
+      showWarn("No dates selected!");
     }
 
     setLoading(true);
-    return await ApiService.updateParticipants(
-      trainGroupDateParticipantUpdateDto
-    )
+    return await apiService
+      .updateParticipants(trainGroupDateParticipantUpdateDto)
       .then((response) => {
         if (response) {
           dialogControl.hideDialog();

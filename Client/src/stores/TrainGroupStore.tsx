@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import ApiService from "../services/ApiService";
 import { TokenService } from "../services/TokenService";
 import { TrainGroupDateTypeEnum } from "../enum/TrainGroupDateTypeEnum";
 import { TrainGroupDto } from "../model/entities/train-group/TrainGroupDto";
@@ -14,7 +13,7 @@ interface TrainGroupStoreState {
 
   setTrainGroupDto: (data: TrainGroupDto) => void;
   updateTrainGroupDto: (updates: Partial<TrainGroupDto>) => void;
-  resetTrainGroupDto: (id?: number) => Promise<any>;
+  resetTrainGroupDto: () => void;
 
   setTrainGroupParticipant: (data: TrainGroupParticipantDto) => void;
   resetTrainGroupParticipant: () => Promise<any>;
@@ -70,35 +69,36 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
     set((state) => ({
       trainGroupDto: { ...state.trainGroupDto, ...updates },
     })),
-  resetTrainGroupDto: async (id?: number) => {
-    if (id)
-      return await ApiService.get<TrainGroupDto>("TrainGroups", id).then(
-        (value) =>
-          value
-            ? set((state) => ({
-                trainGroupDto: {
-                  ...value,
-                  trainGroupParticipants:
-                    state.trainGroupDto.trainGroupParticipants,
-                  trainGroupDates: state.trainGroupDto.trainGroupDates,
-                },
-              }))
-            : null
-      );
-    else
-      set({
-        trainGroupDto: {
-          id: 0,
-          title: "",
-          description: "",
-          duration: new Date(2000, 0, 1, 0, 0, 0),
-          startOn: new Date(2000, 0, 1, 0, 0, 0),
-          maxParticipants: 1,
-          trainerId: "",
-          trainGroupDates: [],
-          trainGroupParticipants: [],
-        },
-      });
+  resetTrainGroupDto: () => {
+    //  if (id)
+    //   return await ApiService()
+    //     .get<TrainGroupDto>("TrainGroups", id)
+    //     .then((value) =>
+    //       value
+    //         ? set((state) => ({
+    //             trainGroupDto: {
+    //               ...value,
+    //               trainGroupParticipants:
+    //                 state.trainGroupDto.trainGroupParticipants,
+    //               trainGroupDates: state.trainGroupDto.trainGroupDates,
+    //             },
+    //           }))
+    //         : null
+    //     );
+    // else
+    set({
+      trainGroupDto: {
+        id: 0,
+        title: "",
+        description: "",
+        duration: new Date(2000, 0, 1, 0, 0, 0),
+        startOn: new Date(2000, 0, 1, 0, 0, 0),
+        maxParticipants: 1,
+        trainerId: "",
+        trainGroupDates: [],
+        trainGroupParticipants: [],
+      },
+    });
   },
 
   setTrainGroupParticipant: (data: TrainGroupParticipantDto) =>

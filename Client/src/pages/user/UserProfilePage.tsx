@@ -1,11 +1,8 @@
 // src/components/UserProfile.tsx
 import { FileUpload, FileUploadHandlerEvent } from "primereact/fileupload";
 import { Dialog } from "primereact/dialog";
-import { Password } from "primereact/password";
 import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
 import { UserDto } from "../../model/entities/user/UserDto";
-import ApiService from "../../services/ApiService";
 import { TokenService } from "../../services/TokenService";
 import { Card } from "primereact/card";
 import { Avatar } from "primereact/avatar";
@@ -15,6 +12,7 @@ import UserProfileFormComponent from "./UserProfileFormComponent";
 import PhoneNumberGridComponent from "../phone-number/PhoneNumberGridComponent";
 import UserProfileTimeslotsComponent from "./UserProfileTimeslotsComponent";
 import UserProfilePasswordChangeFormComponent from "./UserProfilePasswordChangeFormComponent";
+import { useApiService } from "../../services/ApiService";
 
 export default function UserProfilePage() {
   const {
@@ -24,6 +22,7 @@ export default function UserProfilePage() {
     resetUserDto,
     userPasswordChangeDto,
   } = useUserStore();
+  const apiService = useApiService();
 
   const [loading, setLoading] = useState(true);
   const [isImageHovered, setIsImageHovered] = useState(false);
@@ -48,7 +47,7 @@ export default function UserProfilePage() {
     const loadUser = async () => {
       const userId = TokenService.getUserId();
       if (userId) {
-        const response = await ApiService.get<UserDto>("Users", userId);
+        const response = await apiService.get<UserDto>("Users", userId);
         setUserDto(response as UserDto);
       }
 
@@ -76,7 +75,7 @@ export default function UserProfilePage() {
         // Create a copy for update with plain base64
         const updateDto: UserDto = { ...userDto, profileImage: plainBase64 };
 
-        const response = await ApiService.update<UserDto>(
+        const response = await apiService.update<UserDto>(
           "Users",
           updateDto,
           userDto.id
@@ -103,7 +102,7 @@ export default function UserProfilePage() {
   // Handle Change Password Dialog
   const handleChangePassword = async () => {
     userPasswordChangeDto.userId = TokenService.getUserId() ?? "";
-    const response = await ApiService.passwordChange(userPasswordChangeDto);
+    const response = await apiService.passwordChange(userPasswordChangeDto);
     if (response) {
       setShowChangePasswordDialog(false);
     }

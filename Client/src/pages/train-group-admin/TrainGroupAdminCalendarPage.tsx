@@ -4,7 +4,6 @@ import { Card } from "primereact/card";
 import { useState } from "react";
 import { TokenService } from "../../services/TokenService";
 import { FormMode } from "../../enum/FormMode";
-import ApiService from "../../services/ApiService";
 import { TimeSlotRequestDto } from "../../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../../model/TimeSlotResponseDto";
 import GenericDialogComponent, {
@@ -13,9 +12,14 @@ import GenericDialogComponent, {
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import TrainGroupFormComponent from "./TrainGroupFormComponent";
 import TrainGroupDateAdminCalenndarGridComponent from "../train-group-date/TrainGroupDateAdminCalenndarGridComponent";
+import { useApiService } from "../../services/ApiService";
+import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
 
 export default function TrainGroupAdminCalendarPage() {
-  const { trainGroupDto, resetTrainGroupDto } = useTrainGroupStore();
+  const apiService = useApiService();
+
+  const { trainGroupDto, resetTrainGroupDto, setTrainGroupDto } =
+    useTrainGroupStore();
   const [isViewModalVisible, setViewModalVisibility] = useState(false); // Dialog visibility
   const [isAddModalVisible, setAddModalVisibility] = useState(false); // Dialog visibility
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -27,13 +31,13 @@ export default function TrainGroupAdminCalendarPage() {
     const timeSlotDto = new TimeSlotRequestDto();
     timeSlotDto.selectedDate = value.toISOString();
     timeSlotDto.userId = TokenService.getUserId() ?? "";
-    ApiService.timeslots("TrainGroupDates/TimeSlots", timeSlotDto).then(
-      (response) => {
+    apiService
+      .timeslots("TrainGroupDates/TimeSlots", timeSlotDto)
+      .then((response) => {
         if (response) {
           setTimeSlots(response);
         }
-      }
-    );
+      });
   };
 
   const dialogControlAdd: DialogControl = {
@@ -46,26 +50,13 @@ export default function TrainGroupAdminCalendarPage() {
   };
 
   const onSaveAdd = async (): Promise<void> => {
-    const response = await ApiService.create("trainGroups", trainGroupDto);
+    const response = await apiService.create("trainGroups", trainGroupDto);
 
     if (response) {
       dialogControlAdd.hideDialog();
       resetTrainGroupDto();
     }
   };
-
-  // const onSaveEdit = async (): Promise<void> => {
-  //   const response = await ApiService.update(
-  //     "trainGroups",
-  //     trainGroupDto,
-  //     trainGroupDto.id
-  //   );
-
-  //   if (response) {
-  //     dialogControlView.hideDialog();
-  //     resetTrainGroupDto();
-  //   }
-  // };
 
   return (
     <>
@@ -152,9 +143,14 @@ export default function TrainGroupAdminCalendarPage() {
                           : new Date(slot.startOn).getMinutes())
                       }
                       onClick={() => {
-                        resetTrainGroupDto(slot.trainGroupId).then((x) => {
-                          setViewModalVisibility(true);
-                        });
+                        apiService
+                          .get<TrainGroupDto>("TrainGroups", slot.trainGroupId)
+                          .then((x) => {
+                            if (x) {
+                              setTrainGroupDto(x);
+                              setViewModalVisibility(true);
+                            }
+                          });
                       }}
                     />
                   ))}

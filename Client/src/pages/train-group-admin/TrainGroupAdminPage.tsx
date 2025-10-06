@@ -1,7 +1,6 @@
 import { Card } from "primereact/card";
 import { useRef, useState } from "react";
 import { FormMode } from "../../enum/FormMode";
-import ApiService from "../../services/ApiService";
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
@@ -19,8 +18,10 @@ import DataTableFilterNumberComponent from "../../components/core/datatable/Data
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
 import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
+import { useApiService } from "../../services/ApiService";
 
 export default function TrainGroupAdminPage() {
+    const apiService = useApiService();
   const navigate = useNavigate();
   const {
     trainGroupDto,
@@ -176,7 +177,7 @@ export default function TrainGroupAdminPage() {
   ];
 
   const onDelete = async (): Promise<void> => {
-    const response = await ApiService.delete("trainGroups", trainGroupDto.id);
+    const response = await apiService.delete("trainGroups", trainGroupDto.id);
 
     dialogControlDelete.hideDialog();
     if (triggerRefreshDataTable.current)

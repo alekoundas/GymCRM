@@ -1,7 +1,6 @@
 import { Card } from "primereact/card";
 import { useEffect, useState } from "react";
 import { FormMode } from "../../enum/FormMode";
-import ApiService from "../../services/ApiService";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import TrainGroupFormComponent from "./TrainGroupFormComponent";
 import TrainGroupDateGridComponent from "../train-group-date/TrainGroupDateGridComponent";
@@ -12,16 +11,19 @@ import TrainGroupDateOneOffParticipantGridComponent from "../train-group-partici
 import { Dialog } from "primereact/dialog";
 import { TrainGroupDateDto } from "../../model/entities/train-group-date/TrainGroupDateDto";
 import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
+import { useApiService } from "../../services/ApiService";
 
 interface IField {
   formMode: FormMode;
 }
 
 export default function TrainGroupAdminFormPage({ formMode }: IField) {
+  const apiService = useApiService();
   const params = useParams();
   const navigate = useNavigate();
 
-  const { trainGroupDto, resetTrainGroupDto } = useTrainGroupStore();
+  const { trainGroupDto, resetTrainGroupDto, setTrainGroupDto } =
+    useTrainGroupStore();
   const [isInfoDateDialogVisible, setInfoDateDialogVisible] = useState(false); // Dialog visibility
   const [isInfoParticipantDialogVisible, setInfoParticipantDialogVisible] =
     useState(false); // Dialog visibility
@@ -30,7 +32,9 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
   useEffect(() => {
     if (params["id"]) {
       const id = params["id"];
-      resetTrainGroupDto(+id);
+      apiService
+        .get<TrainGroupDto>("TrainGroups", id)
+        .then((x) => (x ? setTrainGroupDto(x) : undefined));
     }
   }, []);
 
@@ -51,7 +55,7 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
         trainGroupDates: cleanedTrainGroupDates,
       };
 
-      const response = await ApiService.create(
+      const response = await apiService.create(
         "trainGroups",
         createTrainGroupDto
       );
@@ -61,7 +65,7 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
         );
       }
     } else {
-      const response = await ApiService.update(
+      const response = await apiService.update(
         "trainGroups",
         trainGroupDto,
         trainGroupDto.id

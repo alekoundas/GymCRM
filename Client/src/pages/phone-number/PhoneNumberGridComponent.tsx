@@ -1,7 +1,5 @@
-import { Card } from "primereact/card";
 import { useRef, useState } from "react";
 import { FormMode } from "../../enum/FormMode";
-import ApiService from "../../services/ApiService";
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
@@ -13,12 +11,13 @@ import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { PhoneNumberDto } from "../../model/entities/phone-number/PhoneNumberDto";
 import PhoneNumberFormComponent from "./PhoneNumberFormComponent";
 import { usePhoneNumberStore } from "../../stores/PhoneNumberStore";
-import { InputSwitch } from "primereact/inputswitch";
 import { TokenService } from "../../services/TokenService";
 import { ColumnBodyOptions } from "primereact/column";
 import { Tag } from "primereact/tag";
+import { useApiService } from "../../services/ApiService";
 
 export default function PhoneNumberGridComponent() {
+  const apiService = useApiService();
   const { phoneNumberDto, setPhoneNumberDto, resetPhoneNumberDto } =
     usePhoneNumberStore();
 
@@ -101,7 +100,7 @@ export default function PhoneNumberGridComponent() {
   ];
 
   const OnSaveAdd = async (): Promise<void> => {
-    const response = await ApiService.create("PhoneNumbers", phoneNumberDto);
+    const response = await apiService.create("PhoneNumbers", phoneNumberDto);
 
     if (response) {
       dialogControlAdd.hideDialog();
@@ -114,7 +113,7 @@ export default function PhoneNumberGridComponent() {
 
   const OnSaveEdit = async (): Promise<void> => {
     if (phoneNumberDto.id) {
-      const response = await ApiService.update(
+      const response = await apiService.update(
         "PhoneNumbers",
         phoneNumberDto,
         phoneNumberDto.id
@@ -132,7 +131,7 @@ export default function PhoneNumberGridComponent() {
 
   const onDelete = async (): Promise<void> => {
     if (phoneNumberDto.id) {
-      const response = await ApiService.delete(
+      const response = await apiService.delete(
         "PhoneNumbers",
         phoneNumberDto.id
       );

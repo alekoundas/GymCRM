@@ -10,16 +10,16 @@ import { Image } from "primereact/image";
 import { Knob } from "primereact/knob";
 import { useAuth } from "../../../contexts/AuthContext";
 import { TokenService } from "../../../services/TokenService";
-import ApiService from "../../../services/ApiService";
 import ThemeService from "../../../services/ThemeService";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { useApiService } from "../../../services/ApiService";
 
 function NavTop() {
   const { isUserAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const menuRight = useRef<Menu>(null);
-  const { currentTheme, currentThemeScale, setTheme, setThemeScale } =
-    useTheme();
+  const { currentThemeScale, setTheme, setThemeScale } = useTheme();
+  const apiService = useApiService();
 
   const itemRenderer = (item: any) => (
     <a className="flex align-items-center p-menuitem-link">
@@ -159,7 +159,7 @@ function NavTop() {
         label: "Logout",
         icon: "pi pi-user",
         command: () => {
-          ApiService.logout(logout);
+          apiService.logout(logout);
           navigate("/users/login");
         },
       });

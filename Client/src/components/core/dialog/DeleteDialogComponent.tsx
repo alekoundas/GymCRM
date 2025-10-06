@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import ApiService from "../../../services/ApiService";
+import { useApiService } from "../../../services/ApiService";
 
 interface IField {
   id: string | number;
@@ -17,9 +17,10 @@ export default function DeleteDialogComponent({
   triggerDialogVisibility,
 }: IField) {
   const [isVisible, setIsVisible] = useState(false);
+  const apiService = useApiService();
 
   const onDelete = () => {
-    ApiService.delete("roles", id).then(() => onAfterRowDeletion());
+    apiService.delete("roles", id).then(() => onAfterRowDeletion());
   };
 
   React.useEffect(() => {

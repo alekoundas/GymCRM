@@ -17,12 +17,13 @@ import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import TrainGroupDateFormComponent from "./TrainGroupDateFormComponent";
-import ApiService from "../../services/ApiService";
 import { TrainGroupDateDto } from "../../model/entities/train-group-date/TrainGroupDateDto";
+import { useApiService } from "../../services/ApiService";
 
 interface IField extends DialogChildProps {}
 
 export default function TrainGroupDateGridComponent({ formMode }: IField) {
+  const apiService = useApiService();
   const params = useParams();
   const {
     trainGroupDto,
@@ -192,7 +193,7 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       resetTrainGroupDateDto();
       dialogControlAdd.hideDialog();
     } else {
-      const response = await ApiService.create(
+      const response = await apiService.create(
         "TrainGroupDates",
         trainGroupDateDto
       );
@@ -218,7 +219,7 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       console.log("hideDialog");
       dialogControlEdit.hideDialog();
     } else {
-      const response = await ApiService.update(
+      const response = await apiService.update(
         "TrainGroupDates",
         trainGroupDateDto,
         trainGroupDateDto.id
@@ -242,7 +243,7 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       resetTrainGroupDateDto();
       dialogControlDelete.hideDialog();
     } else {
-      const response = await ApiService.delete(
+      const response = await apiService.delete(
         "TrainGroupDates",
         trainGroupDateDto.id
       );

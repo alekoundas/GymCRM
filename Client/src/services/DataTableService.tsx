@@ -1,3 +1,5 @@
+// useDataTableService.ts (hook with preserved logic, no loops)
+import { useCallback } from "react";
 import {
   DataTableFilterEvent,
   DataTableFilterMetaData,
@@ -6,167 +8,173 @@ import {
   DataTableSortEvent,
   DataTableSortMeta,
 } from "primereact/datatable";
-import ApiService from "./ApiService";
 import { ColumnEvent } from "primereact/column";
 import { FormMode } from "../enum/FormMode";
 import { DataTableDto } from "../model/datatable/DataTableDto";
 import { DataTableFilterDto } from "../model/datatable/DataTableFilterDto";
+import { useApiService } from "./ApiService";
 
-export default class DataTableService<TEntity> {
-  private controller: string;
-  // private dataTableDto: DataTableDto<TEntity>;
-  private setLoading: any;
-  private defaultUrlSearchQuery: string | null = null;
-  private formMode: FormMode;
-  private afterDataLoaded?: (
+interface UseDataTableServiceParams<TEntity> {
+  controller: string;
+  setLoading: (loading: boolean) => void;
+  defaultUrlSearchQuery: string | null;
+  formMode: FormMode;
+  afterDataLoaded?: (
     data: DataTableDto<TEntity> | null
   ) => DataTableDto<TEntity> | null;
-
-  public constructor(
-    controller: string,
-    // dataTableDto: DataTableDto<TEntity>,
-    setLoading: any,
-    defaultUrlSearchQuery: string | null,
-    formMode: FormMode,
-    afterDataLoaded?: (
-      data: DataTableDto<TEntity> | null
-    ) => DataTableDto<TEntity> | null
-  ) {
-    this.controller = controller;
-    // this.dataTableDto = dataTableDto;
-    this.setLoading = setLoading;
-    this.defaultUrlSearchQuery = defaultUrlSearchQuery;
-    this.formMode = formMode;
-    this.afterDataLoaded = afterDataLoaded;
-  }
-
-  public loadData = async (
-    dataTableDto: DataTableDto<TEntity>,
-    urlQuery: string | null
-  ): Promise<DataTableDto<TEntity> | null> => {
-    // if (urlQuery) {
-    //   try {
-    // Decode datatable filters and ordering from base 64
-    // const dtaTableQuery: DataTableDto<TEntity> = JSON.parse(atob(urlQuery));
-    // dataTableDto = dtaTableQuery;
-    //   } catch (e: any) {
-    //     console.log(e.message);
-    //   }
-    // }
-    return this.refreshData(dataTableDto);
-  };
-
-  public onSort = (
-    dataTableDto: DataTableDto<TEntity>,
-    event: DataTableSortEvent
-  ) => {
-    dataTableDto.sorts = [];
-    if (event.multiSortMeta) {
-      dataTableDto.dataTableSorts = event.multiSortMeta;
-      event.multiSortMeta.forEach((value: DataTableSortMeta, index: number) =>
-        dataTableDto.sorts?.push({
-          fieldName: value.field,
-          order: value.order,
-        })
-      );
-    }
-    this.refreshData(dataTableDto);
-  };
-
-  public onFilter = (
-    dataTableDto: DataTableDto<TEntity>,
-    event: DataTableFilterEvent
-  ) => {
-    // dataTableDto.dataTableFilters;
-    dataTableDto.filters = [];
-
-    Object.entries(event.filters).map(([value, index]) => {
-      const filterField = event.filters[value] as DataTableFilterMetaData;
-
-      const filter = {
-        fieldName: value,
-        filterType: filterField.matchMode,
-      } as DataTableFilterDto;
-
-      if (Array.isArray(filterField.value)) {
-        filter.values = filterField.value ?? [];
-      } else {
-        filter.value = filterField.value;
-      }
-
-      dataTableDto.filters?.push(filter);
-    });
-
-    this.refreshData(dataTableDto);
-  };
-
-  public onPage = (
-    dataTableDto: DataTableDto<TEntity>,
-    event: DataTablePageEvent
-  ) => {
-    dataTableDto.page = event.page ?? 0;
-    dataTableDto.rows = event.rows;
-    dataTableDto.first = event.first;
-
-    this.refreshData(dataTableDto);
-  };
-
-  public onCellEditComplete = (e: ColumnEvent) => {
-    let { rowData, newValue, field, originalEvent: event } = e;
-    rowData[field] = newValue;
-    event.preventDefault();
-  };
-
-  public onRowEditComplete = (
-    dataTableDto: DataTableDto<TEntity>,
-    e: DataTableRowEditCompleteEvent
-  ) => {
-    let { newData, field, index } = e;
-
-    dataTableDto.data[index] = newData as TEntity;
-    this.refreshData(dataTableDto);
-  };
-
-  public refreshData = async (
-    dataTableDto: DataTableDto<TEntity>
-  ): Promise<DataTableDto<TEntity> | null> => {
-    if (this.formMode === FormMode.ADD) {
-      if (this.afterDataLoaded) {
-        this.afterDataLoaded(dataTableDto);
-      }
-
-      return dataTableDto;
-    } else {
-      this.setLoading(true);
-      dataTableDto.data = [];
-      return await ApiService.getDataGrid<TEntity>(
-        this.controller,
-        dataTableDto
-      )
-        .then(this.afterDataLoaded)
-        .then((response) => {
-          if (this.defaultUrlSearchQuery) {
-            this.setUrlSearchQuery(response);
-          }
-
-          this.setLoading(false);
-          return response;
-        });
-    }
-  };
-
-  private setUrlSearchQuery = (response: DataTableDto<TEntity> | null) => {
-    // if (response) {
-    //   const queryData = { ...response, data: [] };
-    //   // Encode datatable filters and ordering to base 64
-    //   const searchQuery = btoa(JSON.stringify(queryData));
-    //   if (searchQuery !== this.defaultUrlSearchQuery) {
-    //     window.history.replaceState(
-    //       null,
-    //       "New Page Title",
-    //       `/${this.controller}?search=${searchQuery}`
-    //     );
-    //   }
-    // }
-  };
 }
+
+export const useDataTableService = <TEntity,>({
+  controller,
+  setLoading,
+  defaultUrlSearchQuery,
+  formMode,
+  afterDataLoaded,
+}: UseDataTableServiceParams<TEntity>) => {
+  const apiService = useApiService();
+
+  const setUrlSearchQuery = useCallback(
+    (response: DataTableDto<TEntity> | null) => {
+      if (!response || !defaultUrlSearchQuery) return;
+      // Preserved logic (uncomment if needed)
+      // const queryData = { ...response, data: [] };
+      // const searchQuery = btoa(JSON.stringify(queryData));
+      // if (searchQuery !== defaultUrlSearchQuery) {
+      //   window.history.replaceState(null, "New Page Title", `/${controller}?search=${searchQuery}`);
+      // }
+    },
+    [controller, defaultUrlSearchQuery]
+  );
+
+  const refreshData = useCallback(
+    async (
+      dataTableDto: DataTableDto<TEntity>
+    ): Promise<DataTableDto<TEntity> | null> => {
+      if (formMode === FormMode.ADD) {
+        return afterDataLoaded ? afterDataLoaded(dataTableDto) : dataTableDto;
+      } else {
+        setLoading(true);
+        dataTableDto.data = [];
+        const response = await apiService.getDataGrid<TEntity>(
+          controller,
+          dataTableDto
+        );
+        const processed = afterDataLoaded
+          ? afterDataLoaded(response)
+          : response;
+        setUrlSearchQuery(processed);
+        setLoading(false);
+        return processed;
+      }
+    },
+    [
+      formMode,
+      afterDataLoaded,
+      apiService,
+      controller,
+      setUrlSearchQuery,
+      setLoading,
+    ]
+  );
+
+  const loadData = useCallback(
+    async (
+      dataTableDto: DataTableDto<TEntity>,
+      urlQuery: string | null
+    ): Promise<DataTableDto<TEntity> | null> => {
+      // Preserved logic (uncomment if needed)
+      // if (urlQuery) {
+      //   try {
+      //     const decodedQuery: DataTableDto<TEntity> = JSON.parse(atob(urlQuery));
+      //     Object.assign(dataTableDto, decodedQuery);
+      //   } catch (e: any) {
+      //     console.log(e.message);
+      //   }
+      // }
+      return refreshData(dataTableDto);
+    },
+    [refreshData]
+  );
+
+  const onSort = useCallback(
+    (dataTableDto: DataTableDto<TEntity>, event: DataTableSortEvent) => {
+      dataTableDto.sorts = [];
+      if (event.multiSortMeta) {
+        dataTableDto.dataTableSorts = event.multiSortMeta;
+        event.multiSortMeta.forEach(
+          (value: DataTableSortMeta, index: number) => {
+            dataTableDto.sorts?.push({
+              fieldName: value.field as string,
+              order: value.order,
+            });
+          }
+        );
+      }
+      refreshData(dataTableDto);
+    },
+    [refreshData]
+  );
+
+  const onFilter = useCallback(
+    (dataTableDto: DataTableDto<TEntity>, event: DataTableFilterEvent) => {
+      dataTableDto.filters = [];
+
+      Object.entries(event.filters ?? {}).map(([value, index]) => {
+        const filterField = event.filters[value] as DataTableFilterMetaData;
+
+        const filter = {
+          fieldName: value,
+          filterType: filterField.matchMode,
+        } as DataTableFilterDto;
+
+        if (Array.isArray(filterField.value)) {
+          filter.values = filterField.value ?? [];
+        } else {
+          filter.value = filterField.value;
+        }
+
+        dataTableDto.filters?.push(filter);
+      });
+
+      refreshData(dataTableDto);
+    },
+    [refreshData]
+  );
+
+  const onPage = useCallback(
+    (dataTableDto: DataTableDto<TEntity>, event: DataTablePageEvent) => {
+      dataTableDto.page = event.page ?? 0;
+      dataTableDto.rows = event.rows;
+      dataTableDto.first = event.first;
+
+      refreshData(dataTableDto);
+    },
+    [refreshData]
+  );
+
+  const onCellEditComplete = useCallback((e: ColumnEvent) => {
+    let { rowData, newValue, field, originalEvent: event } = e;
+    (rowData as any)[field as string] = newValue;
+    event?.preventDefault();
+  }, []);
+
+  const onRowEditComplete = useCallback(
+    (dataTableDto: DataTableDto<TEntity>, e: DataTableRowEditCompleteEvent) => {
+      let { newData, field, index } = e;
+
+      dataTableDto.data[index] = newData as TEntity;
+      refreshData(dataTableDto);
+    },
+    [refreshData]
+  );
+
+  return {
+    loadData,
+    onSort,
+    onFilter,
+    onPage,
+    onCellEditComplete,
+    onRowEditComplete,
+    refreshData,
+  };
+};

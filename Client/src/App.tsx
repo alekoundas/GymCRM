@@ -1,9 +1,5 @@
 import { Route, Routes } from "react-router-dom";
 import { ScrollPanel } from "primereact/scrollpanel";
-import { ToastService } from "./services/ToastService.tsx";
-import { useEffect, useRef } from "react";
-import { Toast } from "primereact/toast";
-
 import NavTop from "./components/core/navbar-top/NavTop.tsx";
 import Home from "./pages/home/Home.tsx";
 import Administrator from "./pages/administrator/administrator.tsx";
@@ -12,7 +8,6 @@ import TrainGroupAdminPage from "./pages/train-group-admin/TrainGroupAdminPage.t
 import RolesPage from "./pages/role/RolesPage.tsx";
 import UsersPage from "./pages/user/UsersPage.tsx";
 import LoginPage from "./pages/user/LoginPage.tsx";
-import RegisterPage from "./pages/user/RegisterPage.tsx";
 import TrainGroupsBookingCalendarPage from "./pages/train-group-booking/TrainGroupsBookingCalendarPage.tsx";
 import TrainGroupAdminFormPage from "./pages/train-group-admin/TrainGroupAdminFormPage.tsx";
 import UserProfilePage from "./pages/user/UserProfilePage.tsx";
@@ -21,20 +16,11 @@ import UserPasswordResetPage from "./pages/user/UserPasswordResetPage.tsx";
 import MailsPage from "./pages/mail/MailsPage.tsx";
 import MailSendPage from "./pages/mail/MailSendPage.tsx";
 import { FormMode } from "./enum/FormMode.tsx";
-import ThemeService from "./services/ThemeService.tsx";
+import RegisterPage from "./pages/user/RegisterPage.tsx";
 export default function App() {
-  // Set Toast messages here
-  const toast = useRef(null);
-
-  useEffect(() => {
-    ToastService.setToastRef(toast);
-  }, []);
-
   return (
     <>
       <div className="flex flex-column p-0 m-0 h-full">
-        {/* Display messages */}
-        <Toast ref={toast} />
         <div className="pt-0 pb-1">
           <NavTop />
         </div>

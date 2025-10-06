@@ -5,11 +5,12 @@ import { UserPasswordResetDto } from "../../model/entities/user/UserPasswordRese
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
-import ApiService from "../../services/ApiService";
+import { useApiService } from "../../services/ApiService";
 
 interface IField extends DialogChildProps {}
 
 export default function UserPasswordResetPage({}: IField) {
+  const apiService = useApiService();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams(); // Url values.
 
@@ -20,7 +21,7 @@ export default function UserPasswordResetPage({}: IField) {
   const handleSubmit = async (e: React.FormEvent) => {
     setLoading(true);
 
-    const response = await ApiService.passwordReset(userPasswordResetDto);
+    const response = await apiService.passwordReset(userPasswordResetDto);
     if (response) {
       setTimeout(() => navigate("/users/login"), 3000); // Redirect to login after 3s
     }

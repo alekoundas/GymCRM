@@ -1,11 +1,9 @@
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { VirtualScrollerLazyEvent } from "primereact/virtualscroller";
-import { Button } from "primereact/button";
 import { LookupDto } from "../../../model/lookup/LookupDto";
-import ApiService from "../../../services/ApiService";
-import { DataTableDto } from "../../../model/datatable/DataTableDto";
 import { LookupOptionDto } from "../../../model/lookup/LookupOptionDto";
+import { useApiService } from "../../../services/ApiService";
 
 interface IField {
   controller: string;
@@ -24,11 +22,12 @@ export default function LookupComponent({
   const [loading, setLoading] = useState(false);
   const [lookupDto, setLookupDto] = useState<LookupDto>(new LookupDto());
   const [selectedId, setSelectedId] = useState<string | undefined>();
+  const apiService = useApiService();
 
   const fetchData = async (dto: LookupDto) => {
     setLoading(true);
     dto.take = 10;
-    const result = await ApiService.getDataLookup(controller, dto);
+    const result = await apiService.getDataLookup(controller, dto);
     setLoading(false);
     return result;
   };

@@ -12,10 +12,11 @@ import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import { useUserStore } from "../../stores/UserStore";
-import ApiService from "../../services/ApiService";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
+import { useApiService } from "../../services/ApiService";
 
 export default function UsersPage() {
+  const apiService = useApiService();
   const { userDto, setUserDto, resetUserDto } = useUserStore();
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
@@ -124,7 +125,7 @@ export default function UsersPage() {
   };
 
   const onSaveAdd = async (): Promise<void> => {
-    const response = await ApiService.create("users", userDto);
+    const response = await apiService.create("users", userDto);
 
     if (response) {
       dialogControlAdd.hideDialog();
@@ -135,7 +136,7 @@ export default function UsersPage() {
   };
 
   const onSaveEdit = async (): Promise<void> => {
-    const response = await ApiService.update("users", userDto, userDto.id);
+    const response = await apiService.update("users", userDto, userDto.id);
 
     if (response) {
       dialogControlEdit.hideDialog();
@@ -146,7 +147,7 @@ export default function UsersPage() {
   };
 
   const onDelete = async (): Promise<void> => {
-    const response = await ApiService.delete("users", userDto.id);
+    const response = await apiService.delete("users", userDto.id);
 
     dialogControlDelete.hideDialog();
     if (triggerRefreshDataTable.current)

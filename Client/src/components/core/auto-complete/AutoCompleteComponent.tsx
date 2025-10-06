@@ -1,9 +1,9 @@
-import { JSX, useEffect, useState } from "react";
+import { JSX, useState } from "react";
 import {
   VirtualScrollerLazyEvent,
   VirtualScrollerLoadingTemplateOptions,
 } from "primereact/virtualscroller";
-import ApiService from "../../../services/ApiService";
+import { useApiService } from "../../../services/ApiService";
 import {
   AutoComplete,
   AutoCompleteChangeEvent,
@@ -36,11 +36,12 @@ export default function AutoCompleteComponent<TEntity>({
     AutoCompleteDto<TEntity>
   >(new AutoCompleteDto());
   const [selectedEntityDtos, setSelectedEntityDtos] = useState<TEntity[]>([]);
+  const apiService = useApiService();
 
   const fetchData = async (dto: AutoCompleteDto<TEntity>) => {
     dto.take = 10;
 
-    const result = await ApiService.getDataAutoComplete<TEntity>(
+    const result = await apiService.getDataAutoComplete<TEntity>(
       controller,
       dto
     );
