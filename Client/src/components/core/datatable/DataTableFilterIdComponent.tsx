@@ -5,7 +5,6 @@ import {
   MultiSelectFilterEvent,
 } from "primereact/multiselect";
 import { useEffect, useState } from "react";
-import ApiService from "../../../services/ApiService";
 import { LookupDto } from "../../../model/lookup/LookupDto";
 import { LookupOptionDto } from "../../../model/lookup/LookupOptionDto";
 import { Avatar } from "primereact/avatar";
@@ -15,6 +14,7 @@ import {
 } from "primereact/virtualscroller";
 import { classNames } from "primereact/utils";
 import { Skeleton } from "primereact/skeleton";
+import { useApiService } from "../../../services/ApiService";
 
 interface IField {
   options: ColumnFilterElementTemplateOptions;
@@ -29,6 +29,7 @@ export default function DataTableFilterIdComponent({
   const [selectedEntities, setSelectedEntities] = useState<LookupOptionDto[]>();
   const [isDataLoaded, setIsDataLoaded] = useState(false); // used to escape lazyload firing again after dto update.
   const [lookupDto, setLookupDto] = useState<LookupDto>(new LookupDto());
+  const apiService = useApiService();
 
   // Clear filter value where user presses clear.
   useEffect(() => {
@@ -37,7 +38,7 @@ export default function DataTableFilterIdComponent({
 
   const fetchData = async (dto: LookupDto) => {
     dto.take = 10;
-    const result = ApiService.getDataLookup(controller, dto);
+    const result = apiService.getDataLookup(controller, dto);
     return result;
   };
 

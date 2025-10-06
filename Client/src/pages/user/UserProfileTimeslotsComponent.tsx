@@ -1,6 +1,5 @@
 import { TimeSlotResponseDto } from "../../model/TimeSlotResponseDto";
 import { useEffect, useRef, useState } from "react";
-import ApiService from "../../services/ApiService";
 import { TimeSlotRequestDto } from "../../model/TimeSlotRequestDto";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -17,8 +16,10 @@ import { Tag } from "primereact/tag";
 import { TimeSlotRecurrenceDateDto } from "../../model/TimeSlotRecurrenceDateDto";
 import { TrainGroupParticipantUnavailableDateDto } from "../../model/entities/train-group-participant-unavailable-date/TrainGroupParticipantUnavailableDateDto";
 import ThemeService from "../../services/ThemeService";
+import { useApiService } from "../../services/ApiService";
 
 export default function UserProfileTimeslotsComponent() {
+                    const apiService = useApiService();
   // const { userDto, updateUserDto } = useUserStore();
   const calendarRef = useRef<FullCalendar>(null);
   const [events, setEvents] = useState<any[]>([]); // Data
@@ -73,7 +74,7 @@ export default function UserProfileTimeslotsComponent() {
     );
 
     timeSlotDto.selectedDate = dateCleaned.toISOString();
-    const response = await ApiService.timeslots("Users/TimeSlots", timeSlotDto); // Replace with your API endpoint
+    const response = await apiService.timeslots("Users/TimeSlots", timeSlotDto); // Replace with your API endpoint
 
     // Generate 7 days starting from sunday of current week
     const calendarDates = Array.from({ length: 7 }, (_, i) => {
@@ -230,7 +231,7 @@ export default function UserProfileTimeslotsComponent() {
 
   const onOptOut = async () => {
     if (selectedTimeSlotRecurrenceDate.trainGroupParticipantId)
-      ApiService.delete(
+      apiService.delete(
         "TrainGroupParticipants",
         selectedTimeSlotRecurrenceDate.trainGroupParticipantId
       );
@@ -245,7 +246,7 @@ export default function UserProfileTimeslotsComponent() {
   };
 
   const onOptOutDate = async () => {
-    ApiService.create("TrainGroupParticipantUnavailableDates", {
+    apiService.create("TrainGroupParticipantUnavailableDates", {
       trainGroupParticipantId:
         selectedTimeSlotRecurrenceDate.trainGroupParticipantId,
       unavailableDate: selectedDate,
@@ -262,7 +263,7 @@ export default function UserProfileTimeslotsComponent() {
 
   const onOptInDate = async () => {
     if (selectedTimeSlotRecurrenceDate.trainGroupParticipantUnavailableDateId)
-      ApiService.delete(
+      apiService.delete(
         "TrainGroupParticipantUnavailableDates",
         selectedTimeSlotRecurrenceDate.trainGroupParticipantUnavailableDateId
       );

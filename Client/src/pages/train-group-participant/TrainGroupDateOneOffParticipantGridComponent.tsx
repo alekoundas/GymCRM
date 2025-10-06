@@ -9,7 +9,6 @@ import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnu
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
-import ApiService from "../../services/ApiService";
 import { useParams } from "react-router-dom";
 import TrainGroupDateParticipantFormComponent from "./TrainGroupDateParticipantFormComponent";
 import { DataTableFilterDto } from "../../model/datatable/DataTableFilterDto";
@@ -18,6 +17,7 @@ import DataTableFilterIdComponent from "../../components/core/datatable/DataTabl
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
 import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
+import { useApiService } from "../../services/ApiService";
 
 interface IField {
   formMode: FormMode;
@@ -26,6 +26,7 @@ interface IField {
 export default function TrainGroupDateOneOffParticipantGridComponent({
   formMode,
 }: IField) {
+      const apiService = useApiService();
   const params = useParams();
 
   const {
@@ -278,7 +279,7 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
       } else {
         trainGroupParticipant.trainGroupId = trainGroupDto.id;
         trainGroupParticipant.trainGroupDateId = selectedTrainGroupDate.id;
-        const response = await ApiService.create(
+        const response = await apiService.create(
           "trainGroupParticipants",
           trainGroupParticipant
         );
@@ -322,7 +323,7 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
         resetTrainGroupParticipant();
         dialogControlEdit.hideDialog();
       } else {
-        const response = await ApiService.update(
+        const response = await apiService.update(
           "TrainGroupParticipants",
           trainGroupParticipant,
           trainGroupParticipant.id
@@ -366,7 +367,7 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
         resetTrainGroupParticipant();
         dialogControlDelete.hideDialog();
       } else {
-        const response = await ApiService.delete(
+        const response = await apiService.delete(
           "trainGroupParticipants",
           trainGroupParticipant.id
         );

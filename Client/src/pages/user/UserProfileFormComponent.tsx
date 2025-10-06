@@ -2,10 +2,11 @@ import { InputText } from "primereact/inputtext";
 import { useUserStore } from "../../stores/UserStore";
 import { Button } from "primereact/button";
 import { useEffect, useState } from "react";
-import ApiService from "../../services/ApiService";
 import { UserDto } from "../../model/entities/user/UserDto";
+import { useApiService } from "../../services/ApiService";
 
 export default function UserProfileFormComponent() {
+  const apiService = useApiService();
   const { userDto, updateUserDto } = useUserStore();
   const [editingField, setEditingField] = useState<string | null>(null); // Track which field is being edited
   const [originalValues, setOriginalValues] = useState<Partial<UserDto>>({}); // Store original values per field
@@ -45,7 +46,7 @@ export default function UserProfileFormComponent() {
         ...userDto,
         [field]: formData[field],
       };
-      const response = await ApiService.update<UserDto>(
+      const response = await apiService.update<UserDto>(
         "Users",
         updatedUser,
         userDto.id

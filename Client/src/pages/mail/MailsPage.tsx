@@ -9,7 +9,6 @@ import { DataTableDto } from "../../model/datatable/DataTableDto";
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
-import ApiService from "../../services/ApiService";
 
 import { useMailStore } from "../../stores/MailStore";
 import { MailDto } from "../../model/entities/mail/MailDto";
@@ -20,6 +19,7 @@ import DataTableFilterNumberComponent from "../../components/core/datatable/Data
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
 import MailSendFormComponent from "./MailSendFormComponent";
+import { useApiService } from "../../services/ApiService";
 
 export default function MailsPage() {
   const {
@@ -30,6 +30,7 @@ export default function MailsPage() {
     setMailSendDto,
     resetMailSendDto,
   } = useMailStore();
+  const apiService = useApiService();
 
   const triggerRefreshDataTable = useRef<
     ((dto: DataTableDto<MailDto>) => void) | undefined
@@ -187,7 +188,7 @@ export default function MailsPage() {
   };
 
   const OnSaveAdd = async () => {
-    const response = await ApiService.create("mails", MailDto);
+    const response = await apiService.create("mails", MailDto);
 
     if (response) {
       dialogControlAdd.hideDialog();
@@ -198,7 +199,7 @@ export default function MailsPage() {
   };
 
   const OnSaveEdit = async () => {
-    const response = await ApiService.update(
+    const response = await apiService.update(
       "mails",
       mailDto,
       mailDto.id ?? -1
@@ -213,7 +214,7 @@ export default function MailsPage() {
   };
 
   const onDelete = async (): Promise<void> => {
-    const response = await ApiService.delete("mails", mailDto.id ?? -1);
+    const response = await apiService.delete("mails", mailDto.id ?? -1);
 
     dialogControlDelete.hideDialog();
     if (triggerRefreshDataTable.current)

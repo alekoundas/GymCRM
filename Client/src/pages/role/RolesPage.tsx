@@ -11,12 +11,14 @@ import { RoleDto } from "../../model/entities/role/RoleDto";
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
-import ApiService from "../../services/ApiService";
 import RoleFormComponent from "./RoleFormComponent";
 import ClaimGridComponent from "../claim/ClaimGridComponent";
+import { useApiService } from "../../services/ApiService";
 
 export default function RolesPage() {
   const { roleDto, setRoleDto, resetRoleDto } = useRoleStore();
+  const apiService = useApiService();
+
   const triggerRefreshDataTable = useRef<
     ((dto: DataTableDto<RoleDto>) => void) | undefined
   >(undefined);
@@ -102,7 +104,7 @@ export default function RolesPage() {
   };
 
   const OnSaveAdd = async () => {
-    const response = await ApiService.create("roles", roleDto);
+    const response = await apiService.create("roles", roleDto);
 
     if (response) {
       dialogControlAdd.hideDialog();
@@ -113,7 +115,7 @@ export default function RolesPage() {
   };
 
   const OnSaveEdit = async () => {
-    const response = await ApiService.update("roles", roleDto, roleDto.id);
+    const response = await apiService.update("roles", roleDto, roleDto.id);
 
     if (response) {
       dialogControlEdit.hideDialog();
@@ -124,7 +126,7 @@ export default function RolesPage() {
   };
 
   const onDelete = async (): Promise<void> => {
-    const response = await ApiService.delete("roles", roleDto.id);
+    const response = await apiService.delete("roles", roleDto.id);
 
     dialogControlDelete.hideDialog();
     if (triggerRefreshDataTable.current)

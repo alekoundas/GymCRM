@@ -14,10 +14,11 @@ import { DataTableEditModeEnum } from "../../../enum/DataTableEditModeEnum";
 import { DataTableFilterDisplayEnum } from "../../../enum/DataTableFilterDisplayEnum";
 import { FormMode } from "../../../enum/FormMode";
 import { DataTableColumns } from "../../../model/datatable/DataTableColumns";
-import DataTableService from "../../../services/DataTableService";
+
 import { DataTableDto } from "../../../model/datatable/DataTableDto";
 import { TokenService } from "../../../services/TokenService";
 import DataTableGridRowActionsComponent from "./DataTableGridRowActionsComponent";
+import { useDataTableService } from "../../../services/DataTableService";
 
 interface IField<TEntity> {
   controller: string;
@@ -93,13 +94,30 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     return updateData;
   };
 
-  const dataTableService = new DataTableService(
+  // UPDATED: Use hook with memoized afterDataLoaded
+  const {
+    loadData,
+    onSort,
+    onFilter,
+    onPage,
+    onCellEditComplete,
+    onRowEditComplete: serviceOnRowEditComplete,
+    refreshData,
+  } = useDataTableService<TEntity>({
     controller,
     setLoading,
-    null,
+    defaultUrlSearchQuery: null,
     formMode,
-    afterDataLoaded
-  );
+    afterDataLoaded,
+  });
+
+  // const dataTableService = new DataTableService(
+  //   controller,
+  //   setLoading,
+  //   null,
+  //   formMode,
+  //   afterDataLoaded
+  // );
 
   // Initialize
   React.useEffect(() => {
@@ -108,19 +126,19 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     }
 
     if (loadDataOnInit) {
-      dataTableService.loadData(dataTableDto, null);
+      refreshData(dataTableDto);
     } else {
       setLoading(false);
     }
   }, []);
 
-  const refreshData = async (dto: DataTableDto<TEntity>) => {
-    return await dataTableService.refreshData(dto);
+  const refreshAllData = async (dto: DataTableDto<TEntity>) => {
+    return await refreshData(dto);
   };
 
   React.useEffect(() => {
     if (triggerRefreshData) {
-      triggerRefreshData.current = refreshData;
+      triggerRefreshData.current = refreshAllData;
     }
   }, [triggerRefreshData]);
 
@@ -233,7 +251,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         first={dataTableDto.first}
         rows={dataTableDto.rows}
         totalRecords={dataTableDto.totalRecords}
-        onPage={(x) => dataTableService.onPage(dataTableDto, x)}
+        onPage={(x) => onPage(dataTableDto, x)}
         rowsPerPageOptions={[5, 10, 25, 50, 100]}
         paginatorRight={
           <>
@@ -246,11 +264,11 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         // Filter.
         filterDisplay={filterDisplay}
         filters={dataTableFilters()}
-        onFilter={(x) => dataTableService.onFilter(dataTableDto, x)}
+        onFilter={(x) => onFilter(dataTableDto, x)}
         // Sort.
         removableSort
         sortMode="multiple"
-        onSort={(x) => dataTableService.onSort(dataTableDto, x)}
+        onSort={(x) => onSort(dataTableDto, x)}
         multiSortMeta={dataTableDto.dataTableSorts}
         header={renderHeader()}
         // Edit row/column.
@@ -260,7 +278,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         onRowEditComplete={(x) =>
           onRowEditComplete
             ? onRowEditComplete(x)
-            : dataTableService.onRowEditComplete(dataTableDto, x)
+            : serviceOnRowEditComplete(dataTableDto, x)
         }
       >
         {/* {selectedObject && (
@@ -286,7 +304,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
             onCellEditComplete={
               col.onCellEditComplete
                 ? col.onCellEditComplete
-                : dataTableService.onCellEditComplete
+                : onCellEditComplete
             }
             onCellEditInit={col.onCellEditInit}
             rowEditor={col.editor}

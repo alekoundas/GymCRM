@@ -8,6 +8,7 @@ import { PrimeReactProvider } from "primereact/api";
 import "./index.css";
 import "primeicons/primeicons.css";
 import { ThemeProvider } from "./contexts/ThemeContext.tsx";
+import { ToastProvider } from "./contexts/ToastContext.tsx";
 createRoot(document.getElementById("root")).render(
   <>
     {/* <StrictMode> */}
@@ -17,9 +18,11 @@ createRoot(document.getElementById("root")).render(
           <PrimeReactProvider
             value={{ ripple: true, locale: "en", unstyled: false }}
           >
-            <ThemeProvider>
-              <App />
-            </ThemeProvider>
+            <ToastProvider>
+              <ThemeProvider>
+                <App />
+              </ThemeProvider>
+            </ToastProvider>
           </PrimeReactProvider>
         </AuthProvider>
       </BrowserRouter>

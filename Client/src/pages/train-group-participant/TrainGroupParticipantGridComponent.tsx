@@ -9,10 +9,10 @@ import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnu
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
-import ApiService from "../../services/ApiService";
 import { useParams } from "react-router-dom";
 import TrainGroupDateParticipantFormComponent from "./TrainGroupDateParticipantFormComponent";
 import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
+import { useApiService } from "../../services/ApiService";
 
 interface IField {
   formMode: FormMode;
@@ -21,6 +21,7 @@ interface IField {
 export default function TrainGroupParticipantGridComponent({
   formMode,
 }: IField) {
+  const apiService = useApiService();
   const params = useParams();
 
   const {
@@ -170,7 +171,7 @@ export default function TrainGroupParticipantGridComponent({
       dialogControlAdd.hideDialog();
     } else {
       trainGroupParticipant.trainGroupDateId = undefined;
-      const response = await ApiService.create(
+      const response = await apiService.create(
         "trainGroupParticipants",
         trainGroupParticipant
       );
@@ -196,7 +197,7 @@ export default function TrainGroupParticipantGridComponent({
       resetTrainGroupParticipant();
       dialogControlEdit.hideDialog();
     } else {
-      const response = await ApiService.update(
+      const response = await apiService.update(
         "TrainGroupParticipants",
         trainGroupParticipant,
         trainGroupParticipant.id
@@ -221,7 +222,7 @@ export default function TrainGroupParticipantGridComponent({
       resetTrainGroupParticipant();
       dialogControlDelete.hideDialog();
     } else {
-      const response = await ApiService.delete(
+      const response = await apiService.delete(
         "TrainGroupParticipants",
         trainGroupParticipant.id
       );
