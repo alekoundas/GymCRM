@@ -33,20 +33,6 @@ export default class ThemeService {
     return themes;
   }
 
-  public static setDefaultThemeScale() {
-    const localStorageThemeScale = LocalStorageService.getThemeScale();
-    if (localStorageThemeScale) {
-      document.documentElement.style.fontSize = `${localStorageThemeScale}px`;
-    } else {
-      document.documentElement.style.fontSize = `${14}px`;
-    }
-  }
-
-  public static setThemeScale(size: number) {
-    document.documentElement.style.fontSize = `${size}px`;
-    LocalStorageService.setThemeScale(size.toString());
-  }
-
   /**
    * Gets the current theme name and dynamically extracts its color palette.
    */

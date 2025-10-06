@@ -28,7 +28,6 @@ export default function App() {
 
   useEffect(() => {
     ToastService.setToastRef(toast);
-    ThemeService.setDefaultThemeScale();
   }, []);
 
   return (

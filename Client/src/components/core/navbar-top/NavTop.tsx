@@ -4,12 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { Menu } from "primereact/menu";
 import { Button } from "primereact/button";
 import { MenuItem } from "primereact/menuitem";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Sidebar } from "primereact/sidebar";
 import { Image } from "primereact/image";
 import { Knob } from "primereact/knob";
 import { useAuth } from "../../../contexts/AuthContext";
-import { LocalStorageService } from "../../../services/LocalStorageService";
 import { TokenService } from "../../../services/TokenService";
 import ApiService from "../../../services/ApiService";
 import ThemeService from "../../../services/ThemeService";
@@ -19,7 +18,8 @@ function NavTop() {
   const { isUserAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const menuRight = useRef<Menu>(null);
-  const { switchTheme } = useTheme();
+  const { currentTheme, currentThemeScale, setTheme, setThemeScale } =
+    useTheme();
 
   const itemRenderer = (item: any) => (
     <a className="flex align-items-center p-menuitem-link">
@@ -131,16 +131,6 @@ function NavTop() {
     ></img>
   );
 
-  // const dialogFooter = () => (
-  //   <React.Fragment>
-  //     <Button
-  //       label="Cancel"
-  //       icon="pi pi-times"
-  //       outlined
-  //     />
-  //   </React.Fragment>
-  // );
-
   const getItemsSettings = (): MenuItem[] => {
     let items: MenuItem[] = [
       {
@@ -200,24 +190,6 @@ function NavTop() {
   };
 
   const [visible, setVisible] = useState<boolean>(false);
-  const [value, setValue] = useState(0);
-
-  const handleChange = (value: number) => {
-    // ThemeService.setThemeScale(14);
-    setValue(value);
-
-    ThemeService.setThemeScale(value + 5);
-  };
-
-  useEffect(() => {
-    const localStorageThemeScale = LocalStorageService.getThemeScale();
-    if (localStorageThemeScale) {
-      setValue(+localStorageThemeScale);
-    } else {
-      setValue(14);
-      ThemeService.setThemeScale(14);
-    }
-  }, []);
 
   const end = (
     <div>
@@ -261,21 +233,21 @@ function NavTop() {
 
         <div className="card flex flex-column align-items-center gap-2">
           <Knob
-            value={value}
-            onChange={(e) => handleChange(e.value)}
+            value={currentThemeScale}
+            onChange={(e) => setThemeScale(e.value)}
             max={20}
             size={100}
           />
           <div className="flex gap-2">
             <Button
               icon="pi pi-plus"
-              onClick={() => handleChange(value + 1)}
-              disabled={value === 20}
+              onClick={() => setThemeScale(currentThemeScale + 1)}
+              disabled={currentThemeScale === 20}
             />
             <Button
               icon="pi pi-minus"
-              onClick={() => handleChange(value - 1)}
-              disabled={value === 0}
+              onClick={() => setThemeScale(currentThemeScale - 1)}
+              disabled={currentThemeScale === 0}
             />
           </div>
         </div>
@@ -287,7 +259,7 @@ function NavTop() {
               className="flex bg-primary m-1 border-round"
             >
               <Button
-                onClick={() => switchTheme(row.themeName)}
+                onClick={() => setTheme(row.themeName)}
                 className="cursor-pointer p-link"
               >
                 <Image
@@ -308,7 +280,7 @@ function NavTop() {
               className="flex bg-primary m-1 border-round"
             >
               <Button
-                onClick={() => switchTheme(row.themeName)}
+                onClick={() => setTheme(row.themeName)}
                 className="cursor-pointer p-link"
               >
                 <Image
