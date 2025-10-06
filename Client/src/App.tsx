@@ -17,7 +17,18 @@ import MailsPage from "./pages/mail/MailsPage.tsx";
 import MailSendPage from "./pages/mail/MailSendPage.tsx";
 import { FormMode } from "./enum/FormMode.tsx";
 import RegisterPage from "./pages/user/RegisterPage.tsx";
+import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
+import { locale } from "primereact/api";
+
 export default function App() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const currentLang = i18n.language;  // e.g., "el" on change
+    locale(currentLang);  // Sync PrimeReact (DataTable, Calendar, etc.)
+  }, [i18n.language]);  // Re-run on language change
+
   return (
     <>
       <div className="flex flex-column p-0 m-0 h-full">

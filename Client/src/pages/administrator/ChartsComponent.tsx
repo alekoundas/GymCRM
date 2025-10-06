@@ -1,13 +1,14 @@
-// src/pages/ChartsPage.tsx
 import { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { ChartData } from "../../model/core/chart/ChartData";
 import { Chart } from "primereact/chart";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function ChartsComponent() {
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const apiService = useApiService();
+  const t = useTranslator();
 
   useEffect(() => {
     apiService.getChartData().then((data) => {
