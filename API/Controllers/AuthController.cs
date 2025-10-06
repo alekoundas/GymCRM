@@ -58,7 +58,7 @@ namespace API.Controllers
             if (user == null)
             {
                 // Don't reveal if email doesn't exist for security
-                return new ApiResponse<bool>().SetErrorResponse("error", "Password reset email didnt sent!");
+                return new ApiResponse<bool>().SetErrorResponse("Password reset email didnt sent!");
             }
 
 
@@ -80,7 +80,7 @@ namespace API.Controllers
                 emailBody
             );
 
-            return new ApiResponse<bool>().SetSuccessResponse(true, "success", "Password reset email sent.");
+            return new ApiResponse<bool>().SetSuccessResponse(true, "Password reset email sent.");
         }
 
         // POST: api/Users/ResetPassword
@@ -89,15 +89,15 @@ namespace API.Controllers
         {
             User? user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
-                return new ApiResponse<bool>().SetErrorResponse("error", "Invalid email or token.");
+                return new ApiResponse<bool>().SetErrorResponse("Invalid email or token.");
 
             var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return new ApiResponse<bool>().SetErrorResponse("error", $"Password reset failed: {errors}");
+                return new ApiResponse<bool>().SetErrorResponse($"Password reset failed: {errors}");
             }
-            return new ApiResponse<bool>().SetSuccessResponse(true, "success", "Password changed successfully.");
+            return new ApiResponse<bool>().SetSuccessResponse(true, "Password changed successfully.");
 
         }
 
@@ -107,21 +107,21 @@ namespace API.Controllers
         public async Task<ApiResponse<bool>> PasswordChange([FromBody] UserPasswordChangeDto request)
         {
             if (!ModelState.IsValid)
-                return new ApiResponse<bool>().SetErrorResponse("error", "Invalid model state.");
+                return new ApiResponse<bool>().SetErrorResponse("Invalid model state.");
 
             // Get current user from claims
             User? user = await _userManager.FindByIdAsync(request.UserId);
             if (user == null)
-                return new ApiResponse<bool>().SetErrorResponse("error", "User not found.");
+                return new ApiResponse<bool>().SetErrorResponse("User not found.");
 
             // Validate old password
             var oldPasswordValid = await _userManager.CheckPasswordAsync(user, request.OldPassword);
             if (!oldPasswordValid)
-                return new ApiResponse<bool>().SetErrorResponse("error", "Old password is incorrect.");
+                return new ApiResponse<bool>().SetErrorResponse("Old password is incorrect.");
 
             // Validate new password fields are equal
             if (request.NewPassword != request.ConfirmNewPassword)
-                return new ApiResponse<bool>().SetErrorResponse("error", "Passwords dont match.");
+                return new ApiResponse<bool>().SetErrorResponse("Passwords dont match.");
 
             // Validate new password length (Identity default is 6 chars, but customizable)
             //if (request.newPassword.Length < 6)
@@ -130,9 +130,9 @@ namespace API.Controllers
             // Change password
             var result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
             if (result.Succeeded)
-                return new ApiResponse<bool>().SetSuccessResponse(true, "success", "Password changed successfully.");
+                return new ApiResponse<bool>().SetSuccessResponse(true, "Password changed successfully.");
             else
-                return new ApiResponse<bool>().SetErrorResponse("error", string.Join(", ", result.Errors.Select(e => e.Description)));
+                return new ApiResponse<bool>().SetErrorResponse(string.Join(", ", result.Errors.Select(e => e.Description)));
         }
 
 
@@ -153,7 +153,7 @@ namespace API.Controllers
             // Create user.
             string? result = await _userService.AddNewUser(user, request.Password);
             if (result != null)
-                return new ApiResponse<bool>().SetErrorResponse("error", result);
+                return new ApiResponse<bool>().SetErrorResponse(result);
 
             // Check if SimpleUser role exists, if not create it.
             var role = new Role { Id = Guid.NewGuid(), Name = "SimpleUser", NormalizedName = "SIMPLEUSER" };
@@ -179,7 +179,7 @@ namespace API.Controllers
                 user = await _userManager.FindByNameAsync(request.UserNameOrEmail);
 
             if (user == null)
-                return new ApiResponse<UserLoginResponseDto>().SetErrorResponse("error", "User Name/Email not found");
+                return new ApiResponse<UserLoginResponseDto>().SetErrorResponse("User Name/Email not found");
 
 
             string? result = await _userService.SignInUser(user, request.Password);
@@ -189,7 +189,7 @@ namespace API.Controllers
                 return new ApiResponse<UserLoginResponseDto>().SetSuccessResponse(token);
             }
             else
-                return new ApiResponse<UserLoginResponseDto>().SetErrorResponse("error", result);
+                return new ApiResponse<UserLoginResponseDto>().SetErrorResponse(result);
         }
 
 
@@ -199,19 +199,19 @@ namespace API.Controllers
         public async Task<ApiResponse<bool>> Logout()
         {
             if (User.Identity?.IsAuthenticated == null || !User.Identity.IsAuthenticated)
-                return new ApiResponse<bool>().SetErrorResponse("error", "User is not loged in!");
+                return new ApiResponse<bool>().SetErrorResponse("User is not loged in!");
 
             string username = User.Claims.First(x => x.Type == "UserName").Value;
             User? user = await _userManager.FindByNameAsync(username);
 
             if (user == null)
-                return new ApiResponse<bool>().SetErrorResponse("error", "User doesnt exist!");
+                return new ApiResponse<bool>().SetErrorResponse("User doesnt exist!");
 
             string? result = await _userService.SignOutUser(user);
             if (result == null)
                 return new ApiResponse<bool>().SetSuccessResponse(true);
             else
-                return new ApiResponse<bool>().SetErrorResponse("error", result);
+                return new ApiResponse<bool>().SetErrorResponse(result);
         }
     }
 }

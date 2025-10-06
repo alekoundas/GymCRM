@@ -12,42 +12,42 @@
             Data = data;
             return this;
         }
-        public ApiResponse<TEntity> SetSuccessResponse(string key, string value)
+        public ApiResponse<TEntity> SetSuccessResponse(string value)
         {
-            Messages.Add(key, [value]);
+            Messages.Add("success", [value]);
             return this;
         }
-        public ApiResponse<TEntity> SetSuccessResponse(TEntity data, string key, string value)
+        public ApiResponse<TEntity> SetSuccessResponse(TEntity data, string value)
         {
             Data = data;
-            Messages.Add(key, [value]);
+            Messages.Add("success", [value]);
             return this;
         }
+        public ApiResponse<TEntity> SetSuccessResponse(TEntity data, string[] value)
+        {
+            Data = data;
+            Messages.Add("success", value);
+            return this;
+        }
+
         public ApiResponse<TEntity> SetSuccessResponse(TEntity data, Dictionary<string, string[]> message)
         {
             Data = data;
             Messages = message;
             return this;
         }
-        public ApiResponse<TEntity> SetSuccessResponse(TEntity data, string key, string[] value)
-        {
-            Data = data;
-            Messages.Add(key, value);
-            return this;
-        }
 
 
-
-        public ApiResponse<TEntity> SetErrorResponse(string key, string value)
+        public ApiResponse<TEntity> SetErrorResponse(string value)
         {
             IsSucceed = false;
-            Messages.Add(key, [value]);
+            Messages.Add("error", [value]);
             return this;
         }
-        public ApiResponse<TEntity> SetErrorResponse(string key, string[] value)
+        public ApiResponse<TEntity> SetErrorResponse(string[] value)
         {
             IsSucceed = false;
-            Messages.Add(key, value);
+            Messages.Add("error", value);
             return this;
         }
         public ApiResponse<TEntity> SetErrorResponse(Dictionary<string, string[]> message)

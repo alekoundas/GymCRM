@@ -39,7 +39,7 @@ namespace API.Controllers
         public async Task<ActionResult<ApiResponse<TrainGroup>>> UpdateParticipants([FromBody] TrainGroupParticipantUpdateDto updateDto)
         {
             if (!ModelState.IsValid)
-                return new ApiResponse<TrainGroup>().SetErrorResponse("error", "Invalid data provided.");
+                return new ApiResponse<TrainGroup>().SetErrorResponse("Invalid data provided.");
 
 
             ApiDbContext dbContext = _dataService.GetDbContext();
@@ -56,7 +56,7 @@ namespace API.Controllers
             {
                 string className = typeof(TrainGroup).Name;
                 dbContext.Dispose();
-                return new ApiResponse<TrainGroup>().SetErrorResponse("error", $"Requested {className} not found!");
+                return new ApiResponse<TrainGroup>().SetErrorResponse($"Requested {className} not found!");
             }
 
 
@@ -75,7 +75,7 @@ namespace API.Controllers
             if (isCurrentDateWithConflict)
             {
                 dbContext.Dispose();
-                return new ApiResponse<TrainGroup>().SetErrorResponse("error", $"Current date is already selected in a Recurrence date! Please select one of them.");
+                return new ApiResponse<TrainGroup>().SetErrorResponse($"Current date is already selected in a Recurrence date! Please select one of them.");
             }
 
 
@@ -103,7 +103,7 @@ namespace API.Controllers
                     else
                     {
                         dbContext.Dispose();
-                        return new ApiResponse<TrainGroup>().SetErrorResponse("error", $"Something unexpected happend! Please contact Administrator.");
+                        return new ApiResponse<TrainGroup>().SetErrorResponse($"Something unexpected happend! Please contact Administrator.");
                     }
                 }
 
@@ -140,7 +140,7 @@ namespace API.Controllers
             if (isAlreadyParticipant)
             {
                 dbContext.Dispose();
-                return new ApiResponse<TrainGroup>().SetErrorResponse("error", $"Participant already joined!");
+                return new ApiResponse<TrainGroup>().SetErrorResponse($"Participant already joined!");
             }
 
 
@@ -160,7 +160,7 @@ namespace API.Controllers
                 if (numberOfParticipants >= existingEntity.MaxParticipants)
                 {
                     dbContext.Dispose();
-                    return new ApiResponse<TrainGroup>().SetErrorResponse("error", $"Maximum amount of participants reached for ");
+                    return new ApiResponse<TrainGroup>().SetErrorResponse($"Maximum amount of participants reached for ");
                 }
             }
 

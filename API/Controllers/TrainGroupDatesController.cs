@@ -131,7 +131,7 @@ namespace API.Controllers
                 .ToList();
 
             if (timeSlotRequestDtos == null)
-                return new ApiResponse<List<TimeSlotResponseDto>>().SetErrorResponse("error", $"Requested data not found!");
+                return new ApiResponse<List<TimeSlotResponseDto>>().SetErrorResponse($"Requested data not found!");
 
             return new ApiResponse<List<TimeSlotResponseDto>>().SetSuccessResponse(timeSlotRequestDtos);
         }

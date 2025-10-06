@@ -114,19 +114,19 @@ namespace Business.Services
             var principal = GetPrincipalFromExpiredToken(_tokenSettings, request.AccessToken);
             if (principal == null || principal.FindFirst(ClaimTypes.Name)?.Value == null)
             {
-                return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("error", "User not found");
+                return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("User not found");
             }
             else
             {
                 var user = await _userManager.FindByNameAsync(principal.FindFirst(ClaimTypes.Name)?.Value ?? "");
                 if (user == null)
                 {
-                    return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("error", "User not found");
+                    return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("User not found");
                 }
                 else
                 {
                     if (!await _userManager.VerifyUserTokenAsync(user, "REFRESHTOKENPROVIDER", "RefreshToken", request.RefreshToken))
-                        return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("error", "Refresh token expired. Please Login again.");
+                        return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("Refresh token expired. Please Login again.");
 
                     var token = await GenerateUserToken(user);
                     return new ApiResponse<UserRefreshResponseDto>()

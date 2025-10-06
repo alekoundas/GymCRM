@@ -1,4 +1,3 @@
-import { ApiResponse } from "../model/ApiResponse";
 import { DataTableDto } from "../model/datatable/DataTableDto";
 import { UserPasswordChangeDto } from "../model/entities/user/UserPasswordChangeDto";
 import { UserLoginRequestDto } from "../model/entities/user/UserLoginRequestDto";
@@ -16,6 +15,7 @@ import { AutoCompleteDto } from "../model/core/auto-complete/AutoCompleteDto";
 import { MailSendDto } from "../model/entities/mail/MailSendDto";
 import { ChartData } from "../model/core/chart/ChartData";
 import { TrainGroupParticipantUpdateDto } from "../model/entities/train-group-participant/TrainGroupParticipantUpdateDto";
+import { ApiResponseDto } from "../model/core/api-response/ApiResponseDto";
 
 export default class ApiService {
   private static readonly BASE_URL = "/api/";
@@ -39,19 +39,9 @@ export default class ApiService {
   ) {
     if (!messages) return;
     const allMessages = Object.values(messages).flat();
-    // if (allMessages.length > 1) {
-    //   const summary = isSuccess
-    //     ? "Operation completed with messages."
-    //     : "Multiple errors occurred.";
-    //   isSuccess
-    //     ? ToastService.showSuccess(summary)
-    //     : ToastService.showError(summary);
-    //   console.log("Messages:", allMessages); // Log details for debugging
-    // } else {
     allMessages.forEach((msg) =>
       isSuccess ? ToastService.showSuccess(msg) : ToastService.showError(msg)
     );
-    // }
   }
 
   private static async apiFetch<TRequest, TResponse>(
@@ -59,8 +49,9 @@ export default class ApiService {
     method: string,
     data?: TRequest,
     retries = 1
-  ): Promise<ApiResponse<TResponse> | null> {
+  ): Promise<ApiResponseDto<TResponse> | null> {
     const token = LocalStorageService.getAccessToken();
+    const language = LocalStorageService.getLanguage();
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
@@ -70,7 +61,7 @@ export default class ApiService {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-          "Accept-Language": "el",
+          "Accept-Language": language ?? "",
         },
         credentials: "include",
         body: data ? JSON.stringify(data) : undefined,
@@ -84,13 +75,13 @@ export default class ApiService {
       }
 
       if (response.status === 400) {
-        const result = (await response.json()) as ApiResponse<TResponse>;
+        const result = (await response.json()) as ApiResponseDto<TResponse>;
         this.showMessages(result.messages, false);
         return null;
       }
 
       if (response.ok) {
-        return (await response.json()) as ApiResponse<TResponse>;
+        return (await response.json()) as ApiResponseDto<TResponse>;
       }
 
       if (response.status >= 500 && retries > 0) {
@@ -139,7 +130,7 @@ export default class ApiService {
     method: string,
     token: string | null | undefined,
     data?: TRequest
-  ): Promise<ApiResponse<TResponse> | null> {
+  ): Promise<ApiResponseDto<TResponse> | null> {
     if (TokenService.isRefreshTokenExpired()) {
       ToastService.showWarn("Token expired. Login required.");
       TokenService.logout();
@@ -394,8 +385,8 @@ export default class ApiService {
   public static async logout(authLogout: () => void): Promise<void> {
     const url = this.buildUrl("Auth", "logout");
     const result = await this.apiRequest<
-      ApiResponse<boolean>,
-      ApiResponse<boolean>
+      ApiResponseDto<boolean>,
+      ApiResponseDto<boolean>
     >(url, "POST");
     if (result) {
       ToastService.showSuccess("Logout successful!");
