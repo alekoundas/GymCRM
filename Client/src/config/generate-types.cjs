@@ -9,8 +9,6 @@ const outputPath = path.join(
   "../model/core/translation-types/TranslationTypes.tsx"
 );
 
-const langs = ["en", "el"];
-
 // Collect all unique keys from JSON
 if (fs.existsSync(jsonFilePath)) {
   const json = JSON.parse(fs.readFileSync(jsonFilePath, "utf8"));

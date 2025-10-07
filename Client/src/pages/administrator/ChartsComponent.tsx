@@ -8,7 +8,7 @@ import { useTranslator } from "../../services/TranslatorService";
 export default function ChartsComponent() {
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const apiService = useApiService();
-  const t = useTranslator();
+  const { t } = useTranslator();
 
   useEffect(() => {
     apiService.getChartData().then((data) => {
@@ -73,6 +73,7 @@ export default function ChartsComponent() {
 
   return (
     <div className="grid">
+      <h1>{t("welcome")}</h1>
       <div className="col-12 md:col-4">
         <Card title="Daily Emails Sent (Last 7 Days)">
           <Chart
