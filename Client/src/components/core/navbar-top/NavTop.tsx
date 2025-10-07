@@ -5,39 +5,17 @@ import { Menu } from "primereact/menu";
 import { Button } from "primereact/button";
 import { MenuItem } from "primereact/menuitem";
 import { useRef, useState } from "react";
-import { Sidebar } from "primereact/sidebar";
-import { Image } from "primereact/image";
-import { Knob } from "primereact/knob";
 import { useAuth } from "../../../contexts/AuthContext";
 import { TokenService } from "../../../services/TokenService";
-import ThemeService from "../../../services/ThemeService";
-import { useTheme } from "../../../contexts/ThemeContext";
 import { useApiService } from "../../../services/ApiService";
+import NavSidebar from "../navbar-sidebar/NavSidebar";
 
-function NavTop() {
+export default function NavTop() {
   const { isUserAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const menuRight = useRef<Menu>(null);
-  const { currentThemeScale, setTheme, setThemeScale } = useTheme();
   const apiService = useApiService();
-
-  const itemRenderer = (item: any) => (
-    <a className="flex align-items-center p-menuitem-link">
-      <span className={item.icon} />
-      <span className="mx-2">{item.label}</span>
-      {item.badge && (
-        <Badge
-          className="ml-auto"
-          value={item.badge}
-        />
-      )}
-      {item.shortcut && (
-        <span className="ml-auto border-1 surface-border border-round surface-100 text-xs p-1">
-          {item.shortcut}
-        </span>
-      )}
-    </a>
-  );
+  const [navRightVisibility, setNavRightVisibility] = useState<boolean>(false);
 
   const items: MenuItem[] = [
     {
@@ -65,61 +43,6 @@ function NavTop() {
         navigate("/administrator");
       },
     },
-    // {
-    //   label: "Features",
-    //   icon: "pi pi-star",
-    // },
-    // {
-    //   label: "Projects",
-    //   icon: "pi pi-search",
-    //   items: [
-    //     {
-    //       label: "Core",
-    //       icon: "pi pi-bolt",
-    //       shortcut: "⌘+S",
-    //       template: itemRenderer,
-    //     },
-    //     {
-    //       label: "Blocks",
-    //       icon: "pi pi-server",
-    //       shortcut: "⌘+B",
-    //       template: itemRenderer,
-    //     },
-    //     {
-    //       label: "UI Kit",
-    //       icon: "pi pi-pencil",
-    //       shortcut: "⌘+U",
-    //       template: itemRenderer,
-    //     },
-    //     {
-    //       separator: true,
-    //     },
-    //     {
-    //       label: "Templates",
-    //       icon: "pi pi-palette",
-    //       items: [
-    //         {
-    //           label: "Apollo",
-    //           icon: "pi pi-palette",
-    //           badge: 2,
-    //           template: itemRenderer,
-    //         },
-    //         {
-    //           label: "Ultima",
-    //           icon: "pi pi-palette",
-    //           badge: 3,
-    //           template: itemRenderer,
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // },
-    // {
-    //   label: "Contact",
-    //   icon: "pi pi-envelope",
-    //   badge: 3,
-    //   template: itemRenderer,
-    // },
   ];
 
   const start = (
@@ -139,9 +62,7 @@ function NavTop() {
           {
             label: "Theme",
             icon: "pi pi-palette",
-            command: () => {
-              setVisible(true);
-            },
+            command: () => setNavRightVisibility(true),
           },
 
           // {
@@ -189,8 +110,6 @@ function NavTop() {
     return items;
   };
 
-  const [visible, setVisible] = useState<boolean>(false);
-
   const end = (
     <div>
       <Menu
@@ -223,78 +142,10 @@ function NavTop() {
         />
       </div>
 
-      {/* Remove from here */}
-      <Sidebar
-        visible={visible}
-        position="right"
-        onHide={() => setVisible(false)}
-      >
-        <h2>Theme scale:</h2>
-
-        <div className="card flex flex-column align-items-center gap-2">
-          <Knob
-            value={currentThemeScale}
-            onChange={(e) => setThemeScale(e.value)}
-            max={20}
-            size={100}
-          />
-          <div className="flex gap-2">
-            <Button
-              icon="pi pi-plus"
-              onClick={() => setThemeScale(currentThemeScale + 1)}
-              disabled={currentThemeScale === 20}
-            />
-            <Button
-              icon="pi pi-minus"
-              onClick={() => setThemeScale(currentThemeScale - 1)}
-              disabled={currentThemeScale === 0}
-            />
-          </div>
-        </div>
-        <h2>Dark Themes:</h2>
-        <div className="flex flex-wrap ">
-          {ThemeService.getDarkThemes().map((row, index) => (
-            <div
-              key={index}
-              className="flex bg-primary m-1 border-round"
-            >
-              <Button
-                onClick={() => setTheme(row.themeName)}
-                className="cursor-pointer p-link"
-              >
-                <Image
-                  src={row.themeImage}
-                  width="50"
-                  alt="saga-blue"
-                />
-              </Button>
-            </div>
-          ))}
-        </div>
-
-        <h2>Light Themes:</h2>
-        <div className="flex flex-wrap ">
-          {ThemeService.getLightThemes().map((row, index) => (
-            <div
-              key={index}
-              className="flex bg-primary m-1 border-round"
-            >
-              <Button
-                onClick={() => setTheme(row.themeName)}
-                className="cursor-pointer p-link"
-              >
-                <Image
-                  src={row.themeImage}
-                  width="50"
-                  alt="saga-blue"
-                />
-              </Button>
-            </div>
-          ))}
-        </div>
-      </Sidebar>
+      <NavSidebar
+        isVisible={navRightVisibility}
+        hideSidebar={() => setNavRightVisibility(false)}
+      />
     </>
   );
 }
-
-export default NavTop;
