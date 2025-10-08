@@ -5,10 +5,13 @@ using Core.Dtos;
 using Core.Dtos.User;
 using Core.Models;
 using Core.System;
+using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using System.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace API.Controllers
 {
@@ -23,6 +26,7 @@ namespace API.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
         private readonly TokenSettings _tokenSettings;
+        private readonly IStringLocalizer _localizer;
 
         public AuthController(
             IMapper mapper,
@@ -31,7 +35,8 @@ namespace API.Controllers
             UserManager<User> userManager,
             RoleManager<Role> roleManager,
             IEmailService emailService,
-            TokenSettings tokenSettings)
+            TokenSettings tokenSettings,
+            IStringLocalizer localizer)
         {
             _logger = logger;
             _userService = userService;
@@ -40,6 +45,7 @@ namespace API.Controllers
             _mapper = mapper;
             _emailService = emailService;
             _tokenSettings = tokenSettings;
+            _localizer = localizer;
         }
 
 
@@ -58,7 +64,7 @@ namespace API.Controllers
             if (user == null)
             {
                 // Don't reveal if email doesn't exist for security
-                return new ApiResponse<bool>().SetErrorResponse("Password reset email didnt sent!");
+                return new ApiResponse<bool>().SetSuccessResponse(_localizer[TranslationKeys.Password_reset_email_sent]);
             }
 
 
@@ -80,7 +86,7 @@ namespace API.Controllers
                 emailBody
             );
 
-            return new ApiResponse<bool>().SetSuccessResponse(true, "Password reset email sent.");
+            return new ApiResponse<bool>().SetSuccessResponse(_localizer[TranslationKeys.Password_reset_email_sent]);
         }
 
         // POST: api/Users/ResetPassword
@@ -89,15 +95,15 @@ namespace API.Controllers
         {
             User? user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
-                return new ApiResponse<bool>().SetErrorResponse("Invalid email or token.");
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Invalid_email]);
 
             var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return new ApiResponse<bool>().SetErrorResponse($"Password reset failed: {errors}");
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Password_reset_failed_0,errors] );
             }
-            return new ApiResponse<bool>().SetSuccessResponse(true, "Password changed successfully.");
+            return new ApiResponse<bool>().SetSuccessResponse("Password changed successfully.");
 
         }
 
@@ -106,18 +112,18 @@ namespace API.Controllers
         [Authorize]
         public async Task<ApiResponse<bool>> PasswordChange([FromBody] UserPasswordChangeDto request)
         {
-            if (!ModelState.IsValid)
-                return new ApiResponse<bool>().SetErrorResponse("Invalid model state.");
+            //if (!ModelState.IsValid)
+            //    return new ApiResponse<bool>().SetErrorResponse("Invalid model state.");
 
             // Get current user from claims
             User? user = await _userManager.FindByIdAsync(request.UserId);
             if (user == null)
-                return new ApiResponse<bool>().SetErrorResponse("User not found.");
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
 
             // Validate old password
             var oldPasswordValid = await _userManager.CheckPasswordAsync(user, request.OldPassword);
             if (!oldPasswordValid)
-                return new ApiResponse<bool>().SetErrorResponse("Old password is incorrect.");
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Old_password_is_incorrect]);
 
             // Validate new password fields are equal
             if (request.NewPassword != request.ConfirmNewPassword)
@@ -130,7 +136,7 @@ namespace API.Controllers
             // Change password
             var result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
             if (result.Succeeded)
-                return new ApiResponse<bool>().SetSuccessResponse(true, "Password changed successfully.");
+                return new ApiResponse<bool>().SetSuccessResponse(_localizer[TranslationKeys.Password_changed_successfully]);
             else
                 return new ApiResponse<bool>().SetErrorResponse(string.Join(", ", result.Errors.Select(e => e.Description)));
         }
@@ -179,7 +185,7 @@ namespace API.Controllers
                 user = await _userManager.FindByNameAsync(request.UserNameOrEmail);
 
             if (user == null)
-                return new ApiResponse<UserLoginResponseDto>().SetErrorResponse("User Name/Email not found");
+                return new ApiResponse<UserLoginResponseDto>().SetErrorResponse(_localizer[TranslationKeys.User_Name_Email_not_found]);
 
 
             string? result = await _userService.SignInUser(user, request.Password);
@@ -199,13 +205,13 @@ namespace API.Controllers
         public async Task<ApiResponse<bool>> Logout()
         {
             if (User.Identity?.IsAuthenticated == null || !User.Identity.IsAuthenticated)
-                return new ApiResponse<bool>().SetErrorResponse("User is not loged in!");
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_loged_in]);
 
             string username = User.Claims.First(x => x.Type == "UserName").Value;
             User? user = await _userManager.FindByNameAsync(username);
 
             if (user == null)
-                return new ApiResponse<bool>().SetErrorResponse("User doesnt exist!");
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
 
             string? result = await _userService.SignOutUser(user);
             if (result == null)

@@ -4,6 +4,7 @@ using Business.Services;
 using Core.Dtos.TrainGroup;
 using Core.Enums;
 using Core.Models;
+using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -20,7 +21,7 @@ namespace API.Controllers
         //private readonly ILogger<TrainGroupController> _logger;
 
         public TrainGroupsController(
-            IDataService dataService, 
+            IDataService dataService,
             IMapper mapper,
             IStringLocalizer localizer) : base(dataService, mapper, localizer)
         {
@@ -38,7 +39,7 @@ namespace API.Controllers
                 entityDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
                 && entityDto.TrainGroupDates.Any(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH);
             if (isDayOfWeekAndMonthMixing)
-                errorList.Add("Day of week and Day of Month doesnt mix! Please select only one of those types.");
+                errorList.Add(_localizer[TranslationKeys.Day_of_week_and_day_of_month_doesnt_mix]);
 
 
 
@@ -52,7 +53,7 @@ namespace API.Controllers
                         .Any(y => x.FixedDay!.Value.DayOfWeek == y.RecurrenceDayOfWeek)
                 );
             if (isFixedDateValid)
-                errorList.Add("Fixed Date has the same Day of week with an existing day of week row!");
+                errorList.Add(_localizer[TranslationKeys.Fixed_date_0_has_the_same_day_of_week_with_an_existing_day_of_week_entry, ""]);
 
 
 
@@ -66,7 +67,7 @@ namespace API.Controllers
                         .Any(y => x.FixedDay!.Value.Day == y.RecurrenceDayOfMonth)
                 );
             if (isFixedDateValid)
-                errorList.Add("Fixed Date has the same day with an existing day of month row!");
+                errorList.Add(_localizer[TranslationKeys.Fixed_date_0_has_the_same_day_of_week_with_an_existing_day_of_month_entry, ""]);
 
 
 
@@ -76,7 +77,7 @@ namespace API.Controllers
                .Where(g => g.Count() > 1)                                                       // Find groups with more than one item
                .ToList();
             if (duplicates.Count() > 0)
-                errorList.Add("Duplicate rows found!");
+                errorList.Add(_localizer[TranslationKeys.Duplicate_train_group_date_found]);
 
 
 
@@ -86,7 +87,7 @@ namespace API.Controllers
                .Where(g => g.Count() > 1)                               // Find groups with more than one item
                .ToList();
             if (duplicates.Count() > 0)
-                errorList.Add("Duplicate participants found!");
+                errorList.Add(_localizer[TranslationKeys.Duplicate_participant_found]);
 
 
 
@@ -103,7 +104,7 @@ namespace API.Controllers
                                 || x.SelectedDate!.Value.DayOfWeek == y.RecurrenceDayOfWeek)
                         );
                 if (isTrainGroupParticipantValid)
-                    errorList.Add("Participant selected date doesnt match any of the Train Group Dates!");
+                    errorList.Add(_localizer[TranslationKeys.Participant_selected_date_doesnt_match_any_of_the_train_group_dates]);
             }
 
             errors = errorList.ToArray();
