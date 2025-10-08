@@ -4,6 +4,7 @@ using Business.Services;
 using Core.Dtos;
 using Core.Enums;
 using Core.Models;
+using Core.Translations;
 using DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -38,8 +39,8 @@ namespace API.Controllers
         [HttpPost("UpdateParticipants")]
         public async Task<ActionResult<ApiResponse<TrainGroup>>> UpdateParticipants([FromBody] TrainGroupParticipantUpdateDto updateDto)
         {
-            if (!ModelState.IsValid)
-                return new ApiResponse<TrainGroup>().SetErrorResponse("Invalid data provided.");
+            //if (!ModelState.IsValid)
+            //    return new ApiResponse<TrainGroup>().SetErrorResponse("Invalid data provided.");
 
 
             ApiDbContext dbContext = _dataService.GetDbContext();
@@ -56,7 +57,7 @@ namespace API.Controllers
             {
                 string className = typeof(TrainGroup).Name;
                 dbContext.Dispose();
-                return new ApiResponse<TrainGroup>().SetErrorResponse($"Requested {className} not found!");
+                return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, className]);
             }
 
 
@@ -75,7 +76,7 @@ namespace API.Controllers
             if (isCurrentDateWithConflict)
             {
                 dbContext.Dispose();
-                return new ApiResponse<TrainGroup>().SetErrorResponse($"Current date is already selected in a Recurrence date! Please select one of them.");
+                return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer[TranslationKeys.Current_date_is_already_selected_in_a_Recurrence_date]);
             }
 
 
@@ -140,7 +141,7 @@ namespace API.Controllers
             if (isAlreadyParticipant)
             {
                 dbContext.Dispose();
-                return new ApiResponse<TrainGroup>().SetErrorResponse($"Participant already joined!");
+                return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer[TranslationKeys.Participant_already_joined]);
             }
 
 
@@ -160,7 +161,7 @@ namespace API.Controllers
                 if (numberOfParticipants >= existingEntity.MaxParticipants)
                 {
                     dbContext.Dispose();
-                    return new ApiResponse<TrainGroup>().SetErrorResponse($"Maximum amount of participants reached for ");
+                    return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer[TranslationKeys.Maximum_amount_of_participants_has_been_reached]);
                 }
             }
 
@@ -241,11 +242,11 @@ namespace API.Controllers
                     x.RecurrenceDayOfWeek == participantDto.SelectedDate.Value.DayOfWeek);
 
                 if (!isDateValid)
-                    errorList.Add("Participant selected date doesn't match any of the Train Group Dates!");
+                    errorList.Add(_localizer[TranslationKeys.Participant_selected_date_doesnt_match_any_of_the_train_group_dates]);
 
                 // Check for overlap with FixedDate
                 if (trainGroupDates.Any(x => x.FixedDay == participantDto.SelectedDate))
-                    errorList.Add("FixedDate doesn't allow one-off Participants, please add via Train Group date participants table!");
+                    errorList.Add(_localizer[TranslationKeys.Fixed_date_doesnt_allow_one_off_participants]);
             }
 
             // Validate if user is already a participant
@@ -258,7 +259,7 @@ namespace API.Controllers
 
 
             if (isAlreadyParticipant)
-                errorList.Add("Participant already joined!");
+                errorList.Add(_localizer[TranslationKeys.Participant_already_joined]);
 
             return errorList.ToArray();
         }

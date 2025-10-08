@@ -4,6 +4,7 @@ using Core.Dtos;
 using Core.Dtos.Identity;
 using Core.Dtos.Lookup;
 using Core.Models;
+using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -47,11 +48,11 @@ namespace API.Controllers
             foreach (var role in roleDto)
             {
                 if (string.IsNullOrWhiteSpace(role.Name))
-                    return new ApiResponse<List<Role>>().SetErrorResponse("Role name is required");
+                    return new ApiResponse<List<Role>>().SetErrorResponse(_localizer[TranslationKeys._0_is_required, "Role name"]);
 
                 bool roleExists = await _dataService.Roles.AnyAsync(x => x.Name == role.Name);
                 if (roleExists)
-                    return new ApiResponse<List<Role>>().SetErrorResponse("Role already exists");
+                    return new ApiResponse<List<Role>>().SetErrorResponse(_localizer[TranslationKeys._0_already_exists, "Role"]);
 
                 Role identityRole = new Role();
                 identityRole.Name = role.Name;
@@ -77,7 +78,7 @@ namespace API.Controllers
             }
 
             List<Role> roles = _mapper.Map<List<Role>>(roleDto);
-            return new ApiResponse<List<Role>>().SetSuccessResponse(roles);
+            return new ApiResponse<List<Role>>().SetSuccessResponse(roles,_localizer[TranslationKeys._0_updated_successfully, $"Role"]);
         }
 
         // PUT: api/Roles
@@ -86,11 +87,11 @@ namespace API.Controllers
         {
             // Checks.
             if (id == null)
-                return new ApiResponse<Role>().SetErrorResponse("Role name not not set!");
+                return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys._0_is_required, "RoleId"]);
 
             Role? identityRole = await _dataService.Roles.FindAsync(id);
             if (identityRole == null)
-                return new ApiResponse<Role>().SetErrorResponse("Role name not found!");
+                return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "Role name "]);
 
 
             // Get claims from role.
@@ -123,7 +124,7 @@ namespace API.Controllers
 
 
             Role updatedRole = _mapper.Map<Role>(identityRoleDto);
-            return new ApiResponse<Role>().SetSuccessResponse(updatedRole);
+            return new ApiResponse<Role>().SetSuccessResponse(updatedRole, _localizer[TranslationKeys._0_updated_successfully, $"Role {updatedRole.Name}"]);
         }
 
 
@@ -132,16 +133,16 @@ namespace API.Controllers
         public override async Task<ActionResult<ApiResponse<Role>>> Delete(string? id)
         {
             if (id == null)
-                return new ApiResponse<Role>().SetErrorResponse("Role name not not set!");
+                return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys._0_is_required, "RoleId"]);
 
             var role = await _dataService.Roles.FindAsync(id);
             if (role == null)
-                return new ApiResponse<Role>().SetErrorResponse("Role not found!");
+                return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "Role"]);
 
 
             var result = await _roleManager.DeleteAsync(role);
             if (result.Succeeded)
-                return new ApiResponse<Role>().SetSuccessResponse($"Role {role.Name} deleted successfully");
+                return new ApiResponse<Role>().SetSuccessResponse(_localizer[TranslationKeys._0_deleted_successfully, $"Role {role.Name}"]);
 
             return new ApiResponse<Role>().SetErrorResponse(result.Errors.ToString() ?? "");
         }

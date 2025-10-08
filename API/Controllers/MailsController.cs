@@ -5,6 +5,7 @@ using Business.Services.Email;
 using Core.Dtos;
 using Core.Dtos.Mail;
 using Core.Models;
+using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -50,7 +51,7 @@ namespace API.Controllers
                     dto.Body
                 );
 
-            return new ApiResponse<bool>().SetSuccessResponse(true, "Password reset email sent.");
+            return new ApiResponse<bool>().SetSuccessResponse(_localizer[TranslationKeys.Password_reset_email_sent]);
         }
 
 

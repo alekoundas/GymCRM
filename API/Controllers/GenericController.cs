@@ -4,6 +4,7 @@ using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Enums;
+using Core.Models;
 using Core.Translations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -36,16 +37,14 @@ namespace API.Controllers
         public virtual async Task<ActionResult<ApiResponse<TEntityDto>>> Get(string? id)
         {
             if (!IsUserAuthorized("View"))
-                return new ApiResponse<TEntityDto>().SetErrorResponse("User is not authorized to perform this action.");
-
-
+                return new ApiResponse<TEntityDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
             TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
             TEntityDto entityDto = _mapper.Map<TEntityDto>(entity);
             if (entityDto == null)
             {
                 string className = typeof(TEntity).Name;
-                return new ApiResponse<TEntityDto>().SetErrorResponse($"Requested {className} not found!");
+                return new ApiResponse<TEntityDto>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, className]);
             }
 
             return new ApiResponse<TEntityDto>().SetSuccessResponse(entityDto);
@@ -55,11 +54,13 @@ namespace API.Controllers
         [HttpPost]
         public virtual async Task<ActionResult<ApiResponse<List<TEntity>>>> Post([FromBody] List<TEntityAddDto> entityDtos)
         {
+            string className = typeof(TEntity).Name;
+
             if (!IsUserAuthorized("Add"))
-                return new ApiResponse<List<TEntity>>().SetErrorResponse("User is not authorized to perform this action.");
+                return new ApiResponse<List<TEntity>>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<List<TEntity>>().SetErrorResponse("Invalid data provided."));
+                return BadRequest(new ApiResponse<List<TEntity>>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]));
 
             foreach (var entityDto in entityDtos)
                 if (CustomValidatePOST(entityDto, out string[] errors))
@@ -69,9 +70,9 @@ namespace API.Controllers
 
             int result = await _dataService.GetGenericRepository<TEntity>().AddRangeAsync(entities);
             if (result <= 0)
-                return new ApiResponse<List<TEntity>>().SetErrorResponse("An error occurred while creating the entity.");
+                return new ApiResponse<List<TEntity>>().SetErrorResponse(_localizer[TranslationKeys.An_error_occurred_while_creating_the_entity]);
 
-            return new ApiResponse<List<TEntity>>().SetSuccessResponse(entities);
+            return new ApiResponse<List<TEntity>>().SetSuccessResponse(_localizer[TranslationKeys._0_updated_successfully, className]);
         }
 
         // PUT: api/controller/5
@@ -79,10 +80,12 @@ namespace API.Controllers
         public virtual async Task<ActionResult<ApiResponse<TEntity>>> Put(string? id, [FromBody] TEntityDto entityDto)
         {
             if (!IsUserAuthorized("Edit"))
-                return new ApiResponse<TEntity>().SetErrorResponse("User is not authorized to perform this action.");
+                return new ApiResponse<TEntity>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
-            if (!ModelState.IsValid)
-                return new ApiResponse<TEntity>().SetErrorResponse("Invalid data provided.");
+            string className = typeof(TEntity).Name;
+
+            //if (!ModelState.IsValid)
+            //    return new ApiResponse<TEntity>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]);
 
             if (CustomValidatePUT(entityDto, out string[] errors))
                 return BadRequest(new ApiResponse<TEntity>().SetErrorResponse(errors));
@@ -92,13 +95,10 @@ namespace API.Controllers
 
             TEntity? existingEntity = await _dataService.GetGenericRepository<TEntity>().FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
             if (existingEntity == null)
-            {
-                string className = typeof(TEntity).Name;
-                return new ApiResponse<TEntity>().SetErrorResponse($"Requested {className} not found!");
-            }
+                return new ApiResponse<TEntity>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, className]);
 
             _dataService.Update(entity);
-            return new ApiResponse<TEntity>().SetSuccessResponse(entity);
+            return new ApiResponse<TEntity>().SetSuccessResponse(entity, _localizer[TranslationKeys._0_updated_successfully, className]);
         }
 
         // DELETE: api/controller/5
@@ -106,13 +106,13 @@ namespace API.Controllers
         public virtual async Task<ActionResult<ApiResponse<TEntity>>> Delete(string? id)
         {
             if (!IsUserAuthorized("Delete"))
-                return new ApiResponse<TEntity>().SetErrorResponse("You dont have the permitions to request this information.");
+                return new ApiResponse<TEntity>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
+            string className = typeof(TEntity).Name;
             TEntity? entity = await _dataService.GetGenericRepository<TEntity>().FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
             if (entity == null)
             {
-                string className = typeof(TEntity).Name;
-                return new ApiResponse<TEntity>().SetErrorResponse($"Requested {className} not found!");
+                return new ApiResponse<TEntity>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, className]);
             }
 
             if (CustomValidateDELETE(entity, out string[] errors))
@@ -121,9 +121,9 @@ namespace API.Controllers
 
             int result = await _dataService.GetGenericRepository<TEntity>().RemoveAsync(entity);
             if (result != 1)
-                return new ApiResponse<TEntity>().SetErrorResponse("An error occurred while deleting the entity.");
+                return new ApiResponse<TEntity>().SetErrorResponse(_localizer[TranslationKeys.An_error_occurred_while_deleting_the_entity]);
 
-            return new ApiResponse<TEntity>().SetSuccessResponse(entity);
+            return new ApiResponse<TEntity>().SetSuccessResponse(entity, _localizer[TranslationKeys._0_deleted_successfully, className]);
         }
 
 
@@ -137,9 +137,6 @@ namespace API.Controllers
         {
             var query = _dataService.GetGenericRepository<TEntity>();
             DataTableQueryUpdate(query);
-
-            var sss = _localizer[TranslationKeys.HelloWorld];
-            var sdfdfss = _localizer["sdfgsdfgsdf.dfgfdg"];
 
             // Handle Sorting of DataTable.
             if (dataTable.Sorts.Count() > 0)
@@ -163,16 +160,6 @@ namespace API.Controllers
                         query.ThenBy(fieldName, OrderDirectionEnum.DESCENDING);
                 }
             }
-
-            // Handle Filtering of DataTable.
-            //foreach (var filter in dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.equals))
-            //{
-            //    if (filter.FieldName == "UserId" && filter.Value != null)
-            //        query.FilterByColumnEquals(filter.FieldName, new Guid(filter.Value));
-            //    else
-            //        //if (filter.Value != null)
-            //        query.FilterByColumnEquals(filter.FieldName, filter.Value);
-            //}
 
             foreach (var filter in dataTable.Filters)
             {
@@ -262,13 +249,6 @@ namespace API.Controllers
             errors = Array.Empty<string>();
             return false;
         }
-
-
-        //protected virtual bool DataTableCustomFilterPOST(TEntityAddDto entity, out string[] errors)
-        //{
-        //    errors = Array.Empty<string>();
-        //    return false;
-        //}
 
         protected virtual void DataTableQueryUpdate(IGenericRepository<TEntity> query)
         {

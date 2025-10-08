@@ -8,6 +8,7 @@ using Core.System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -21,6 +22,7 @@ namespace API.Controllers
         private readonly ILogger<ClaimsController> _logger;
         private readonly IMapper _mapper;
         private readonly RoleManager<Role> _roleManager;
+        private readonly IStringLocalizer _localizer;
 
         public ClaimsController(
             IDataService dataService,
@@ -30,12 +32,14 @@ namespace API.Controllers
             SignInManager<User> signInManager,
             RoleManager<Role> roleManager,
             ClaimsIdentity claimsIdentity,
-            TokenSettings tokenSettings)
+            TokenSettings tokenSettings,
+            IStringLocalizer localizer)
         {
             _dataService = dataService;
             _logger = logger;
             _mapper = mapper;
             _roleManager = roleManager;
+            _localizer = localizer;
         }
 
 

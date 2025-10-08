@@ -3,6 +3,7 @@ using Business.Services;
 using Core.Dtos;
 using Core.Dtos.PhoneNumber;
 using Core.Models;
+using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -35,10 +36,10 @@ namespace API.Controllers
         public override async Task<ActionResult<ApiResponse<PhoneNumber>>> Put(string? id, [FromBody] PhoneNumberDto entityDto)
         {
             if (!IsUserAuthorized("Edit"))
-                return new ApiResponse<PhoneNumber>().SetErrorResponse("User is not authorized to perform this action.");
+                return new ApiResponse<PhoneNumber>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
-            if (!ModelState.IsValid)
-                return new ApiResponse<PhoneNumber>().SetErrorResponse("Invalid data provided.");
+            //if (!ModelState.IsValid)
+            //    return new ApiResponse<PhoneNumber>().SetErrorResponse("Invalid data provided.");
 
             PhoneNumber entity = _mapper.Map<PhoneNumber>(entityDto);
 
@@ -51,7 +52,7 @@ namespace API.Controllers
             if (existingEntity == null)
             {
                 string className = typeof(PhoneNumber).Name;
-                return new ApiResponse<PhoneNumber>().SetErrorResponse($"Requested {className} not found!");
+                return new ApiResponse<PhoneNumber>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found,className]);
             }
 
             PhoneNumber? alreadyExistingPrimaryNumber = phoneNumbers
@@ -66,7 +67,7 @@ namespace API.Controllers
             }
 
             if (!entityDto.IsPrimary && alreadyExistingPrimaryNumber == null)
-                return new ApiResponse<PhoneNumber>().SetErrorResponse($"At least 1 primary phone number is required!");
+                return new ApiResponse<PhoneNumber>().SetErrorResponse(_localizer[TranslationKeys.At_least_1_primary_phone_number_is_required]);
 
             await _dataService.UpdateAsync(entity);
             return new ApiResponse<PhoneNumber>().SetSuccessResponse(entity);
@@ -76,7 +77,7 @@ namespace API.Controllers
         {
             if(entity.IsPrimary)
             {
-                errors = new string[] { "Primary phone number cannot be deleted! Please set another phone number as primary first." };
+                errors = new string[] { _localizer[TranslationKeys.Primary_phone_number_cannot_be_deleted]};
                 return true;
             }
 

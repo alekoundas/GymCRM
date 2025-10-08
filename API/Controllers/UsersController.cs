@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure;
 using Business.Services;
 using Core.Dtos;
 using Core.Dtos.AutoComplete;
@@ -9,10 +8,12 @@ using Core.Dtos.Lookup;
 using Core.Dtos.TrainGroupDate;
 using Core.Enums;
 using Core.Models;
+using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using System.Data;
 using System.Linq.Expressions;
 
@@ -28,19 +29,22 @@ namespace API.Controllers
         private readonly ILogger<UsersController> _logger;
         private readonly IUserService _userService;
         private readonly UserManager<User> _userManager;
+        private readonly IStringLocalizer _localizer;
 
         public UsersController(
             IDataService dataService,
             IMapper mapper,
             ILogger<UsersController> logger,
             IUserService userService,
-            UserManager<User> userManager)
+            UserManager<User> userManager,
+            IStringLocalizer localizer)
         {
             _dataService = dataService;
             _logger = logger;
             _userService = userService;
             _userManager = userManager;
             _mapper = mapper;
+            _localizer = localizer;
         }
 
 
@@ -49,7 +53,7 @@ namespace API.Controllers
         public async Task<ApiResponse<UserDto>> Get(string? id)
         {
             if (id == null)
-                return new ApiResponse<UserDto>().SetErrorResponse("User ID not set!");
+                return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
 
             User? user = await _dataService.Users
                 .Include(x => x.UserRoles)
@@ -58,7 +62,7 @@ namespace API.Controllers
 
 
             if (user == null)
-                return new ApiResponse<UserDto>().SetErrorResponse("User not found!");
+                return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
 
             UserDto userDto = _mapper.Map<UserDto>(user);
             return new ApiResponse<UserDto>().SetSuccessResponse(userDto);
@@ -70,19 +74,19 @@ namespace API.Controllers
         public async Task<ApiResponse<UserDto>> Update(string id, UserDto request)
         {
             if (id != request.Id)
-                return new ApiResponse<UserDto>().SetErrorResponse("ID mismatch");
+                return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
 
             if (request.UserRoles.Count() == 0)
-                return new ApiResponse<UserDto>().SetErrorResponse("Role is required!");
+                return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_is_required, "Role"]);
 
             User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == new Guid(request.Id));
             if (user == null)
-                return new ApiResponse<UserDto>().SetErrorResponse("User not found");
+                return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
 
             string? roleName = request.UserRoles[0].Role.Name;
             bool roleExists = await _dataService.Roles.AnyAsync(x => x.Name == roleName);
             if (!roleExists)
-                return new ApiResponse<UserDto>().SetErrorResponse("Role doesnt exist!");
+                return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "Role"]);
 
             // Update user role.
             await _userService.AssignSingleRoleAsync(user, roleName!);
@@ -99,7 +103,7 @@ namespace API.Controllers
             IdentityResult response = await _userManager.UpdateAsync(user);
 
             if (response.Succeeded)
-                return new ApiResponse<UserDto>().SetSuccessResponse(userDto, "User updated successfully");
+                return new ApiResponse<UserDto>().SetSuccessResponse(userDto, _localizer[TranslationKeys._0_updated_successfully, "User"]);
             else
                 return new ApiResponse<UserDto>().SetErrorResponse(response.Errors.First().Description);
         }
@@ -110,16 +114,16 @@ namespace API.Controllers
         public async Task<ApiResponse<IdentityUser>> Delete(string? id)
         {
             if (id == null || id.Count() == 0)
-                return new ApiResponse<IdentityUser>().SetErrorResponse("User name not not set!");
+                return new ApiResponse<IdentityUser>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, $"User"]);
 
             User? user = await _userManager.FindByIdAsync(id);
             if (user == null)
-                return new ApiResponse<IdentityUser>().SetErrorResponse("User not found!");
+                return new ApiResponse<IdentityUser>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, $"User"]);
 
 
             var response = await _userManager.DeleteAsync(user);
             if (response.Succeeded)
-                return new ApiResponse<IdentityUser>().SetSuccessResponse($"User {user.Email} deleted successfully");
+                return new ApiResponse<IdentityUser>().SetSuccessResponse(_localizer[TranslationKeys._0_deleted_successfully, $"User {user.Email} "]);
             return new ApiResponse<IdentityUser>().SetErrorResponse(response.Errors.First().Description);
 
         }
@@ -435,9 +439,6 @@ namespace API.Controllers
                     SpotsLeft = 0 // Not needed here.
                 })
                 .ToList();
-
-            if (timeSlotRequestDtos == null)
-                return new ApiResponse<List<TimeSlotResponseDto>>().SetErrorResponse($"Requested data not found!");
 
             return new ApiResponse<List<TimeSlotResponseDto>>().SetSuccessResponse(timeSlotRequestDtos);
         }

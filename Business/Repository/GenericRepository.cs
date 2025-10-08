@@ -11,18 +11,12 @@ namespace Business.Repository
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
         private readonly IDbContextFactory<ApiDbContext> _contextFactory;
-        //protected ApiDbContext _context;
         protected IQueryable<TEntity>? _query;
 
         public GenericRepository(IDbContextFactory<ApiDbContext> contextFactory)
         {
-            //_context = contextFactory.CreateDbContext();
             _contextFactory = contextFactory;
         }
-
-        //public IQueryable<TEntity> Query => _context.Set<TEntity>();
-
-
 
 
         public GenericRepository<TEntity> Include<TProperty>(Expression<Func<TEntity, TProperty>> navigationProperty)
