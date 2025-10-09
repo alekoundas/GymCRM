@@ -1,6 +1,7 @@
 import React, { ReactNode, useState } from "react";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
+import { useTranslator } from "../../../services/TranslatorService";
 
 interface IField {
   children: ReactNode;
@@ -11,6 +12,7 @@ export default function ViewDialogComponent({
   children,
   triggerDialogVisibility,
 }: IField) {
+  const { t } = useTranslator();
   const [isVisible, setIsVisible] = useState(false);
 
   React.useEffect(() => {
@@ -20,7 +22,7 @@ export default function ViewDialogComponent({
   const dialogFooter = () => (
     <React.Fragment>
       <Button
-        label="Close"
+        label={t("Close")}
         icon="pi pi-times"
         outlined
         onClick={() => setIsVisible(false)}
@@ -33,7 +35,7 @@ export default function ViewDialogComponent({
       <Dialog
         visible={isVisible}
         style={{ width: "50%" }}
-        header="View"
+        header={t("View")}
         modal
         className="p-fluid"
         footer={dialogFooter()}

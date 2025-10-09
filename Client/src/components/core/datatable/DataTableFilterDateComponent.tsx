@@ -2,12 +2,14 @@ import { ColumnFilterElementTemplateOptions } from "primereact/column";
 import { Calendar } from "primereact/calendar";
 import { FormEvent } from "primereact/ts-helpers";
 import { SyntheticEvent, useEffect, useState } from "react";
+import { useTranslator } from "../../../services/TranslatorService";
 
 interface IField {
   options: ColumnFilterElementTemplateOptions;
 }
 
 export default function DataTableFilterDateComponent({ options }: IField) {
+  const { t } = useTranslator();
   const [dates, setDates] = useState<Date[]>([]);
 
   // Clear filter value where user presses clear.
@@ -51,7 +53,7 @@ export default function DataTableFilterDateComponent({ options }: IField) {
     <Calendar
       value={dates}
       onChange={(e) => setDates(e.value as [])}
-      placeholder="Search"
+      placeholder={t("Search")}
       selectionMode="range"
       readOnlyInput
       hideOnRangeSelection

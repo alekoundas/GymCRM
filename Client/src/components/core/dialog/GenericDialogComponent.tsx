@@ -5,6 +5,7 @@ import "primereact/resources/themes/saga-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { FormMode } from "../../../enum/FormMode";
+import { useTranslator } from "../../../services/TranslatorService";
 
 // Interface for child component props
 export interface DialogChildProps {
@@ -38,6 +39,7 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
   onSave,
   onDelete,
 }) => {
+  const { t } = useTranslator();
   const [isSaveEnabled, setIsSaveEnabled] = useState<boolean>(true);
 
   const handleSave = () => {
@@ -70,7 +72,7 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
       return (
         <div>
           <Button
-            label="Cancel"
+            label={t("Cancel")}
             icon="pi pi-times"
             onClick={control.hideDialog}
             className="p-button-text"
@@ -82,14 +84,14 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
       return (
         <div>
           <Button
-            label="Cancel"
+            label={t("Cancel")}
             icon="pi pi-times"
             onClick={control.hideDialog}
             className="p-button-text"
           />
           {onSave && (
             <Button
-              label="Save"
+              label={t("Save")}
               icon="pi pi-check"
               onClick={handleSave}
               disabled={!isSaveEnabled}
@@ -103,14 +105,14 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
       return (
         <div>
           <Button
-            label="Cancel"
+            label={t("Cancel")}
             icon="pi pi-times"
             onClick={control.hideDialog}
             className="p-button-text"
           />
           {onDelete && (
             <Button
-              label="Delete"
+              label={t("Delete")}
               icon="pi pi-danger"
               severity="danger"
               onClick={handleDelete}

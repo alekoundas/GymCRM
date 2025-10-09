@@ -12,8 +12,10 @@ import NavSidebar from "../navbar-sidebar/NavSidebar";
 import { Avatar } from "primereact/avatar";
 import { LocalStorageService } from "../../../services/LocalStorageService";
 import { Chip } from "primereact/chip";
+import { useTranslator } from "../../../services/TranslatorService";
 
 export default function NavTop() {
+  const { t } = useTranslator();
   const { isUserAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const menuRight = useRef<Menu>(null);
@@ -29,7 +31,7 @@ export default function NavTop() {
       },
     },
     {
-      label: "Apointment",
+      label: t("Apointment"),
       icon: "pi pi-book",
       command: () => {
         navigate("/appointment");
@@ -60,10 +62,10 @@ export default function NavTop() {
   const getItemsSettings = (): MenuItem[] => {
     let items: MenuItem[] = [
       {
-        label: "Options",
+        label: t("Options"),
         items: [
           {
-            label: "Theme",
+            label: t("Theme"),
             icon: "pi pi-palette",
             command: () => setNavRightVisibility(true),
           },
@@ -80,7 +82,7 @@ export default function NavTop() {
 
     if (isUserAuthenticated) {
       (items[0].items as MenuItem[])?.push({
-        label: "Logout",
+        label: t("Logout"),
         icon: "pi pi-user",
         command: () => {
           apiService.logout(logout);
@@ -88,13 +90,13 @@ export default function NavTop() {
         },
       });
       (items[0].items as MenuItem[])?.push({
-        label: "Profile",
+        label: t("Profile"),
         icon: "pi pi-user",
         command: () => navigate("/users/profile"),
       });
     } else {
       (items[0].items as MenuItem[])?.push({
-        label: "Login",
+        label: t("Login"),
         icon: "pi pi-user",
         command: () => {
           navigate("/users/login");
@@ -102,7 +104,7 @@ export default function NavTop() {
       });
 
       (items[0].items as MenuItem[])?.push({
-        label: "Register",
+        label: t("Register"),
         icon: "pi pi-user",
         command: () => {
           navigate("/users/register");

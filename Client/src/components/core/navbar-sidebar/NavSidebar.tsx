@@ -146,7 +146,7 @@ export default function NavSidebar({ isVisible, hideSidebar }: IField) {
         position="right"
         onHide={() => hideSidebar()}
       >
-        <h2>Theme scale:</h2>
+        <h2>{t("Theme scale")}:</h2>
         <div className="card flex flex-column align-items-center gap-2">
           <Knob
             value={currentThemeScale}
@@ -167,7 +167,7 @@ export default function NavSidebar({ isVisible, hideSidebar }: IField) {
             />
           </div>
         </div>
-        <h2>Dark Themes:</h2>
+        <h2>{t("Dark themes")}:</h2>
         <div className="flex flex-wrap ">
           {ThemeService.getDarkThemes().map((row, index) => (
             <div
@@ -187,7 +187,7 @@ export default function NavSidebar({ isVisible, hideSidebar }: IField) {
             </div>
           ))}
         </div>
-        <h2>Light Themes:</h2>
+        <h2>{t("Light themes")}:</h2>
         <div className="flex flex-wrap ">
           {ThemeService.getLightThemes().map((row, index) => (
             <div
@@ -208,7 +208,7 @@ export default function NavSidebar({ isVisible, hideSidebar }: IField) {
           ))}
         </div>
 
-        <h2>Languages:</h2>
+        <h2>{t("Languages")}:</h2>
         <div className="flex flex-wrap gap-2">
           {languages.map((lang) => (
             <Button

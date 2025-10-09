@@ -13,8 +13,10 @@ import TrainGroupsBookingCalendarTimeslotBookFormComponent from "./TrainGroupsBo
 import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
 import { useToast } from "../../contexts/ToastContext";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function TrainGroupsBookingCalendarPage() {
+  const { t } = useTranslator();
   const {
     timeSlotRequestDto,
     selectedTimeSlot,
@@ -93,7 +95,7 @@ export default function TrainGroupsBookingCalendarPage() {
     if (
       trainGroupDateParticipantUpdateDto.trainGroupParticipantDtos.length === 0
     ) {
-      showWarn("No dates selected!");
+      showWarn(t("No dates selected!"));
     }
 
     setLoading(true);
@@ -116,8 +118,8 @@ export default function TrainGroupsBookingCalendarPage() {
       <div className="grid w-full">
         <div className="col-12 lg:col-6 xl:col-6">
           <Card
-            title="Booking Calendar"
-            subTitle="Select a date to view available time slots"
+            title={t("Booking Calendar")}
+            subTitle={t("Select a date to view available time slots")}
           >
             <Calendar
               value={new Date(timeSlotRequestDto.selectedDate)}

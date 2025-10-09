@@ -12,18 +12,19 @@ import { Dialog } from "primereact/dialog";
 import { TrainGroupDateDto } from "../../model/entities/train-group-date/TrainGroupDateDto";
 import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField {
   formMode: FormMode;
 }
 
 export default function TrainGroupAdminFormPage({ formMode }: IField) {
+  const { t } = useTranslator();
   const apiService = useApiService();
   const params = useParams();
   const navigate = useNavigate();
 
-  const { trainGroupDto, resetTrainGroupDto, setTrainGroupDto } =
-    useTrainGroupStore();
+  const { trainGroupDto, setTrainGroupDto } = useTrainGroupStore();
   const [isInfoDateDialogVisible, setInfoDateDialogVisible] = useState(false); // Dialog visibility
   const [isInfoParticipantDialogVisible, setInfoParticipantDialogVisible] =
     useState(false); // Dialog visibility
@@ -78,12 +79,12 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
       <div className="grid ">
         <div className=" col-12  lg:col-6 xl:col-6">
           <Card
-            title="Train Group"
+            title={t("Train Group")}
             footer={
               <div className="flex justify-content-between">
                 <div></div>
                 <Button
-                  label="Save"
+                  label={t("Save")}
                   icon="pi pi-check"
                   onClick={onSave}
                   visible={formMode !== FormMode.VIEW}
@@ -102,9 +103,9 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
             header={
               <div className="flex justify-content-between align-items-center p-3">
                 <div className="flex flex-column gap-1">
-                  <h2 className="m-0">Train Group Dates</h2>
+                  <h2 className="m-0">{t("Train Group Dates")}</h2>
                   <p className="m-0 text-gray-600">
-                    Select a date to view Participants
+                    {t("Select a date to view Participants")}
                   </p>
                 </div>
                 <Button
@@ -128,9 +129,11 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
               <div className="flex justify-content-between align-items-center p-3">
                 <div className="flex flex-column gap-1">
                   <h2 className="m-0">
-                    Train Group Date Participants (One Off)
+                    {t("Train Group Date Participants (One Off)")}
                   </h2>
-                  <p className="m-0 text-gray-600">One-off participants</p>
+                  <p className="m-0 text-gray-600">
+                    {t("One-off participants")}
+                  </p>
                 </div>
                 <Button
                   label=""
@@ -153,8 +156,10 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
             header={
               <div className="flex justify-content-between align-items-center p-3">
                 <div className="flex flex-column gap-1">
-                  <h2 className="m-0">Train Group Date Participants </h2>
-                  <p className="m-0 text-gray-600">Recurring participants</p>
+                  <h2 className="m-0">{t("Train Group Date Participants")}</h2>
+                  <p className="m-0 text-gray-600">
+                    {t("Recurring participants")}
+                  </p>
                 </div>
                 <Button
                   label=""
@@ -184,18 +189,22 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
           setInfoDateDialogVisible(false);
         }}
       >
-        <p>Handle the date or dates when this Training Group occurs.</p>
-        <p>Training Group Dates must follow these rules:</p>
+        <p>{t("Handle the date or dates when this Training Group occurs")}.</p>
+        <p>{t("Training Group Dates must follow these rules")}:</p>
         <ul>
-          <li>Cannot mix day-of-week dates with day-of-month dates.</li>
-          <li>Fixed dates cannot overlap with an existing day-of-week row.</li>
-          <li>Fixed dates cannot overlap with an existing day-of-month row.</li>
-          <li>Duplicate dates are not allowed.</li>
+          <li>{t("Cannot mix day-of-week dates with day-of-month dates")}.</li>
+          <li>
+            {t("Fixed dates cannot overlap with an existing day-of-week row")}.
+          </li>
+          <li>
+            {t("Fixed dates cannot overlap with an existing day-of-month row")}.
+          </li>
+          <li>{t("Duplicate dates are not allowed")}.</li>
         </ul>
       </Dialog>
 
       <Dialog
-        header="Train group participants"
+        header={t("Train group participants")}
         visible={isInfoParticipantDialogVisible}
         style={{ width: "50vw" }}
         onHide={() => {
@@ -204,22 +213,26 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
         }}
       >
         <p>
-          Handle the participants of the selected train group date. If "Selected
-          Date" is set, then this is an one-off participant and will only join
-          the specific train group date once.
+          {t(
+            "Handle the participants of the selected train group date. If Selected Date is set, then this is an one-off participant and will only join the specific train group date once."
+          )}
         </p>
-        <p>Training Group Date Participants must follow these rules:</p>
+        <p>{t("Training Group Date Participants must follow these rules")}:</p>
         <ul>
           <li>
-            If selected date is set (one-off), then it should match at least one
-            train group date.
+            {t(
+              "If selected date is set (one-off), then it should match at least one train group date"
+            )}
+            .
           </li>
 
           <li>
-            "Selected Date" cannot be set to a Fixed Date. Fixed date is already
-            a single date and cant have one-off participants.
+            {t(
+              "Selected Date cannot be set to a Fixed Date. Fixed date is already a single date and cant have one-off participants"
+            )}
+            .
           </li>
-          <li>Duplicate participants are not allowed.</li>
+          <li>{t("Duplicate participants are not allowed")}.</li>
         </ul>
       </Dialog>
     </>

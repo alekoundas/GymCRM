@@ -19,7 +19,7 @@ export default function ChartsComponent() {
   }, []);
 
   if (!chartData) {
-    return <div>Loading charts...</div>;
+    return <div>{t("Loading charts")}...</div>;
   }
 
   const dailyEmailChartData = {
@@ -28,7 +28,7 @@ export default function ChartsComponent() {
     ),
     datasets: [
       {
-        label: "Emails Sent",
+        label: t("Emails Sent"),
         data: chartData.dailyEmails.map((d) => d.count),
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         borderColor: "rgb(75, 192, 192)",
@@ -46,7 +46,7 @@ export default function ChartsComponent() {
   };
 
   const availableEmailsData = {
-    labels: ["Used", "Available"],
+    labels: [t("Used"), t("Available")],
     datasets: [
       {
         data: [500 - chartData.availableEmails, chartData.availableEmails],
@@ -62,7 +62,7 @@ export default function ChartsComponent() {
     ),
     datasets: [
       {
-        label: "Cumulative Users",
+        label: t("Cumulative Users"),
         data: chartData.userGrowth.map((d) => d.cumulative),
         fill: false,
         borderColor: "rgb(75, 192, 192)",
@@ -73,9 +73,8 @@ export default function ChartsComponent() {
 
   return (
     <div className="grid">
-      <h1>{t("welcome")}</h1>
       <div className="col-12 md:col-4">
-        <Card title="Daily Emails Sent (Last 7 Days)">
+        <Card title={t("Daily Emails Sent (Last 7 Days)")}>
           <Chart
             type="bar"
             data={dailyEmailChartData}
@@ -84,7 +83,7 @@ export default function ChartsComponent() {
         </Card>
       </div>
       <div className="col-12 md:col-4">
-        <Card title="Available Emails (Out of 500)">
+        <Card title={t("Available Emails (Out of 500)")}>
           <Chart
             type="doughnut"
             data={availableEmailsData}
@@ -92,7 +91,7 @@ export default function ChartsComponent() {
         </Card>
       </div>
       <div className="col-12 md:col-4">
-        <Card title="User Growth">
+        <Card title={t("User Growth")}>
           <Chart
             type="line"
             data={userGrowthChartData}

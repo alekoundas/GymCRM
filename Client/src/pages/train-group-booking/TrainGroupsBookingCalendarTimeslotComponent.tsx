@@ -1,11 +1,10 @@
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { useTrainGroupBookingStore } from "../../stores/TrainGroupBookingStore";
-import { Divider } from "primereact/divider";
-import { DividerComponent } from "../../components/core/divider/DividerComponent";
-import { Tag } from "primereact/tag";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function TrainGroupsBookingCalendarTimeslotComponent() {
+  const { t } = useTranslator();
   const { timeSlotResponseDto, selectedTimeSlot, setSelectedTimeSlot } =
     useTrainGroupBookingStore();
 
@@ -14,11 +13,11 @@ export default function TrainGroupsBookingCalendarTimeslotComponent() {
       {/*                  */}
       {/*     Timeslots    */}
       {/*                  */}
-      <Card title="Available Time Slots">
+      <Card title={t("Available Time Slots")}>
         {timeSlotResponseDto?.length === 0 ? (
           <>
             <p className="text-gray-500">
-              No time slots available for this date.
+              {t("No time slots available for this date.")}
             </p>
           </>
         ) : (
@@ -27,7 +26,7 @@ export default function TrainGroupsBookingCalendarTimeslotComponent() {
               <Button
                 key={slot.trainGroupDateId}
                 label={`${new Date(slot.startOn).toLocaleTimeString()} - ${
-                  slot.title || "Train Group"
+                  slot.title || t("Train Group")
                 }`}
                 className={
                   selectedTimeSlot?.trainGroupDateId === slot.trainGroupDateId

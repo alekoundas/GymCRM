@@ -17,6 +17,7 @@ import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
 import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField {
   formMode: FormMode;
@@ -25,6 +26,7 @@ interface IField {
 export default function TrainGroupDateParticipantGridComponent({
   formMode,
 }: IField) {
+  const { t } = useTranslator();
   const apiService = useApiService();
   const params = useParams();
 
@@ -38,7 +40,6 @@ export default function TrainGroupDateParticipantGridComponent({
     setTrainGroupParticipant,
     deleteTrainGroupDateParticipant,
     resetTrainGroupParticipant,
-    updateTrainGroupDto,
   } = useTrainGroupStore();
 
   const [isViewDialogVisible, setViewDialogVisible] = useState(false); // Dialog visibility
@@ -132,10 +133,10 @@ export default function TrainGroupDateParticipantGridComponent({
   const dataTableColumns: DataTableColumns<TrainGroupParticipantDto>[] = [
     {
       field: "selectedDate",
-      header: "Selected Date",
+      header: t("Selected Date"),
       sortable: false,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "30%" },
       body: (rowData: TrainGroupParticipantDto) => {
         if (rowData.selectedDate) {
@@ -152,19 +153,19 @@ export default function TrainGroupDateParticipantGridComponent({
     },
     {
       field: "trainGroupDateId",
-      header: "Train Group Date Id",
+      header: "TrainGroupDateId",
       sortable: false,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "10%" },
     },
     {
       field: "userId",
-      header: "Participant",
+      header: t("Participant"),
       sortable: formMode !== FormMode.ADD,
       // filter: formMode !== FormMode.ADD,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       filterTemplate: (options) => (
         <DataTableFilterIdComponent
           options={options}
@@ -480,7 +481,7 @@ export default function TrainGroupDateParticipantGridComponent({
         formMode={FormMode.DELETE}
       >
         <div className="flex justify-content-center">
-          <p>Are you sure?</p>
+          <p>{t("Are you sure")}?</p>
         </div>
       </GenericDialogComponent>
     </>

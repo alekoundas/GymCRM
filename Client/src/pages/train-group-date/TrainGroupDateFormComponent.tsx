@@ -4,13 +4,14 @@ import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 import { Dropdown } from "primereact/dropdown";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
 import { Calendar } from "primereact/calendar";
-import { DateService } from "../../services/DateService";
 import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField extends DialogChildProps {}
 
 export default function TrainGroupDateFormComponent({ formMode }: IField) {
+  const { t } = useTranslator();
   const { trainGroupDateDto, setTrainGroupDateDto } = useTrainGroupStore();
 
   return (
@@ -21,7 +22,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
             htmlFor="trainGroupDateType"
             className="block text-900 font-medium mb-2"
           >
-            Train Group Date Type
+            {t("Train Group Date Type")}
           </label>
           <Dropdown
             value={trainGroupDateDto.trainGroupDateType}
@@ -45,7 +46,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
             }}
             options={Object.keys(TrainGroupDateTypeEnum)}
             optionLabel="type"
-            placeholder="Select Type"
+            placeholder={t("Select Type")}
             className="w-full"
             checkmark={true}
             highlightOnSelect={true}
@@ -60,7 +61,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
               htmlFor="fixedDay"
               className="block text-900 font-medium mb-2"
             >
-              Fixed Day
+              {t("Fixed Day")}
             </label>
             <Calendar
               value={trainGroupDateDto.fixedDay}
@@ -95,7 +96,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
               htmlFor="recurrenceDayOfMonth"
               className="block text-900 font-medium mb-2"
             >
-              Recurrence Day Of Month
+              {t("Recurrence Day Of Month")}
             </label>
 
             <InputNumber
@@ -120,7 +121,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
               htmlFor="recurrenceDayOfWeek"
               className="block text-900 font-medium mb-2"
             >
-              Recurrence Day Of Week
+              {t("Recurrence Day Of Week")}
             </label>
             <Dropdown
               value={trainGroupDateDto.recurrenceDayOfWeek}
@@ -133,7 +134,7 @@ export default function TrainGroupDateFormComponent({ formMode }: IField) {
                   });
                 }
               }}
-              placeholder="Select Type"
+              placeholder={t("Select Type")}
               className="w-full"
               checkmark={true}
               highlightOnSelect={true}

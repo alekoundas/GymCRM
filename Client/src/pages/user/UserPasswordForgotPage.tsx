@@ -1,16 +1,17 @@
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { useState } from "react";
-import { UserPasswordResetDto } from "../../model/entities/user/UserPasswordResetDto";
 import { useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
 import { UserPasswordForgotDto } from "../../model/entities/user/UserPasswordForgotDto";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField extends DialogChildProps {}
 
 export default function UserPasswordForgotPage({}: IField) {
+  const { t } = useTranslator();
   const apiService = useApiService();
   const navigate = useNavigate();
 
@@ -37,7 +38,7 @@ export default function UserPasswordForgotPage({}: IField) {
         <div className="surface-card p-4 shadow-2 border-round w-full lg:w-6">
           <div className="text-center mb-5">
             <div className="text-900 text-3xl font-medium mb-3">
-              Forgot Password
+              {t("Forgot Password")}
             </div>
           </div>
           <label
@@ -63,7 +64,7 @@ export default function UserPasswordForgotPage({}: IField) {
           />
           <Divider />
           <Button
-            label="Send Reset Link"
+            label={t("Send Reset Link")}
             className="w-full"
             disabled={loading}
             loading={loading}

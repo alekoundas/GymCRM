@@ -15,8 +15,10 @@ import { TokenService } from "../../services/TokenService";
 import { ColumnBodyOptions } from "primereact/column";
 import { Tag } from "primereact/tag";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function PhoneNumberGridComponent() {
+  const { t } = useTranslator();
   const apiService = useApiService();
   const { phoneNumberDto, setPhoneNumberDto, resetPhoneNumberDto } =
     usePhoneNumberStore();
@@ -72,18 +74,18 @@ export default function PhoneNumberGridComponent() {
   const dataTableColumns: DataTableColumns<PhoneNumberDto>[] = [
     {
       field: "number",
-      header: "Number",
+      header: t("Number"),
       sortable: false,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "40%" },
     },
     {
       field: "isPrimary",
-      header: "Primary",
+      header: t("Primary"),
       sortable: false,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
       body: (rowData: PhoneNumberDto, options: ColumnBodyOptions) => {
         if (rowData.isPrimary)
@@ -242,7 +244,7 @@ export default function PhoneNumberGridComponent() {
         formMode={FormMode.DELETE}
       >
         <div className="flex justify-content-center">
-          <p>Are you sure?</p>
+          <p>{t("Are you sure")}?</p>
         </div>
       </GenericDialogComponent>
     </>

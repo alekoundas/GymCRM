@@ -2,6 +2,7 @@ import ReactQuill from "react-quill-new";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { useState } from "react";
+import { useTranslator } from "../../../services/TranslatorService";
 
 // Define allowed tag names as a TypeScript type
 type Tag =
@@ -29,6 +30,7 @@ export default function RichTextAreaComponent({
   label,
   onChange,
 }: IField) {
+  const { t } = useTranslator();
   const [textAreaHtmlValue, setTextAreaHtmlValue] = useState(value); // used to escape lazyload firing again after dto update.
   const [isHtmlMode, setIsHtmlMode] = useState(false);
 
@@ -212,7 +214,7 @@ export default function RichTextAreaComponent({
         </label>
 
         <Button
-          label={isHtmlMode ? "Switch to Rich Text" : "Switch to HTML"}
+          label={isHtmlMode ? t("Switch to Rich Text") : t("Switch to HTML")}
           icon={isHtmlMode ? "pi pi-pencil" : "pi pi-code"}
           onClick={() => setIsHtmlMode(!isHtmlMode)}
           disabled={!isEnabled}
@@ -243,7 +245,7 @@ export default function RichTextAreaComponent({
           value={textAreaHtmlValue}
           onChange={(e) => handleChange(e)}
           readOnly={!isEnabled}
-          placeholder="Write something awesome..."
+          placeholder={t("Write something awesome!")}
           className="quill-editor"
         />
       )}

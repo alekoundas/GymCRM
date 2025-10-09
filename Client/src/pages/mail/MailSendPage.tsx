@@ -6,8 +6,10 @@ import { Dialog } from "primereact/dialog";
 import MailSendFormComponent from "./MailSendFormComponent";
 import { useNavigate } from "react-router-dom";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function MailSendPage() {
+  const { t } = useTranslator();
   const navigate = useNavigate();
   const apiService = useApiService();
 
@@ -47,8 +49,10 @@ export default function MailSendPage() {
     return (
       <div className="flex justify-content-between align-items-center p-3">
         <div className="flex flex-column gap-1">
-          <h2 className="m-0">Send new email </h2>
-          <p className="m-0 text-gray-600">Send one email to each recipient</p>
+          <h2 className="m-0">{t("Send new email")} </h2>
+          <p className="m-0 text-gray-600">
+            {t("Send one email to each recipient")}
+          </p>
         </div>
         <Button
           label=""
@@ -73,7 +77,7 @@ export default function MailSendPage() {
       {/*             Info Dialog               */}
       {/*                                       */}
       <Dialog
-        header="Send Email to multiple users"
+        header={t("Send Email to multiple users")}
         visible={isInfoDialogVisible}
         style={{ width: "50vw" }}
         onHide={() => {
@@ -81,13 +85,15 @@ export default function MailSendPage() {
           setInfoDialogVisible(false);
         }}
       >
-        <p>Create a new email and send it to multiple users.</p>
+        <p>{t("Create a new email and send it to multiple users")}.</p>
         <ul>
-          <li>A new email will be created and sent for each recipient.</li>
           <li>
-            The email body will be converted to HTML and inserted into the email
-            content. Note that different email providers may render HTML
-            differently, which could lead to inconsistencies in appearance.
+            {t("A new email will be created and sent for each recipient")}.
+          </li>
+          <li>
+            {t(
+              "The email body will be converted to HTML and inserted into the email content. Note that different email providers may render HTML differently, which could lead to inconsistencies in appearance."
+            )}
           </li>
         </ul>
       </Dialog>

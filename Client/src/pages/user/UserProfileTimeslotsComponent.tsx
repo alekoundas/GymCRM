@@ -17,9 +17,12 @@ import { TimeSlotRecurrenceDateDto } from "../../model/TimeSlotRecurrenceDateDto
 import { TrainGroupParticipantUnavailableDateDto } from "../../model/entities/train-group-participant-unavailable-date/TrainGroupParticipantUnavailableDateDto";
 import ThemeService from "../../services/ThemeService";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function UserProfileTimeslotsComponent() {
+  const { t } = useTranslator();
   const apiService = useApiService();
+
   // const { userDto, updateUserDto } = useUserStore();
   const calendarRef = useRef<FullCalendar>(null);
   const [events, setEvents] = useState<any[]>([]); // Data
@@ -372,29 +375,29 @@ export default function UserProfileTimeslotsComponent() {
               <>
                 <div>
                   <p>
-                    <strong>Time:</strong>{" "}
+                    <strong> {t("Start On")}:</strong>{" "}
                     {new Date(selectedTrainGroup.startOn).toLocaleTimeString()}
                   </p>
                   <p>
-                    <strong>Group Name:</strong>{" "}
+                    <strong>{t("Group Name")}:</strong>{" "}
                     {selectedTrainGroup.title || "N/A"}
                   </p>
                   <p>
-                    <strong>Trainer:</strong>{" "}
+                    <strong>{t("Trainer")}:</strong>{" "}
                     {selectedTrainGroup.trainerId || "N/A"}
                   </p>
 
                   <p className="flex align-items-center ">
-                    <strong>Book Type:</strong>
+                    <strong>{t("Book Type")}:</strong>
                     {selectedTimeSlotRecurrenceDate.isOneOff ? (
-                      <Tag>One-off</Tag>
+                      <Tag>{t("One-off")}</Tag>
                     ) : (
-                      <Tag>Recurring</Tag>
+                      <Tag>{t("Recurring")}</Tag>
                     )}
                   </p>
 
                   <p className="flex align-items-center ">
-                    <strong>Joined:</strong>{" "}
+                    <strong>{t("Joined")}:</strong>{" "}
                     {timeSlots.some((x) =>
                       x.recurrenceDates.some(
                         (y) =>
@@ -411,7 +414,7 @@ export default function UserProfileTimeslotsComponent() {
                   <p>
                     <strong>Description:</strong>{" "}
                     {selectedTrainGroup.description ||
-                      "No description available."}
+                      t("No description available.")}
                   </p>
                 </div>
 
@@ -427,7 +430,7 @@ export default function UserProfileTimeslotsComponent() {
                     <div className="flex justify-content-between pt-5">
                       <div></div>
                       <Button
-                        label="Opt out"
+                        label={t("Opt out")}
                         severity="danger"
                         onClick={optOutTimeSlotDialogControl.showDialog}
                         disabled={
@@ -464,7 +467,7 @@ export default function UserProfileTimeslotsComponent() {
                         )
                       ) && (
                         <Button
-                          label="Opt out for this date"
+                          label={t("Opt out for this date")}
                           severity="info"
                           onClick={optOutDateTimeSlotDialogControl.showDialog}
                           disabled={
@@ -509,7 +512,7 @@ export default function UserProfileTimeslotsComponent() {
                     <div className="flex justify-content-between pt-5">
                       <div></div>
                       <Button
-                        label="Opt out"
+                        label={t("Opt out")}
                         severity="danger"
                         onClick={optOutTimeSlotDialogControl.showDialog}
                         disabled={
@@ -538,7 +541,7 @@ export default function UserProfileTimeslotsComponent() {
                         }
                       ></Button>
                       <Button
-                        label="Opt in again for this date"
+                        label={t("Opt in again for this date")}
                         severity="info"
                         onClick={optInDateTimeSlotDialogControl.showDialog}
                         disabled={
@@ -592,8 +595,9 @@ export default function UserProfileTimeslotsComponent() {
                         <div></div>
                         <div>
                           <p className="text-xl text-primary m-0 pt-4">
-                            You havent joined this date. Please join via
-                            apointment tab.
+                            {t(
+                              "You havent joined this date. Please join via apointment tab."
+                            )}
                           </p>
                         </div>
                         <div></div>
@@ -617,7 +621,7 @@ export default function UserProfileTimeslotsComponent() {
         header="Are you sure?"
       >
         <div className="flex justify-content-center">
-          <p>This action will cancel your booking for this date.</p>
+          <p>{t("This action will cancel your booking for this date.")}</p>
         </div>
       </GenericDialogComponent>
 
@@ -632,7 +636,7 @@ export default function UserProfileTimeslotsComponent() {
         header="Are you sure?"
       >
         <div className="flex justify-content-center">
-          <p>This action will cancel your booking ONLY for this date. </p>
+          <p>{t("This action will cancel your booking ONLY for this date.")} </p>
         </div>
       </GenericDialogComponent>
 
@@ -647,7 +651,7 @@ export default function UserProfileTimeslotsComponent() {
         header="Are you sure?"
       >
         <div className="flex justify-content-center">
-          <p>You will join this date, only if there are any spots available.</p>
+          <p>{t("You will join this date, only if there are any spots available.")}</p>
         </div>
       </GenericDialogComponent>
     </>

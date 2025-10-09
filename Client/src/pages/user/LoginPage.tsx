@@ -5,8 +5,10 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { UserLoginRequestDto } from "../../model/entities/user/UserLoginRequestDto";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function LoginPage() {
+  const { t } = useTranslator();
   const apiService = useApiService();
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -39,16 +41,16 @@ export default function LoginPage() {
               className="mb-3"
             />
             <div className="text-900 text-3xl font-medium mb-3">
-              Welcome Back
+              {t("Welcome Back")}
             </div>
             <span className="text-600 font-medium line-height-3">
-              Don't have an account?
+              {t("Dont have an account?")}
             </span>
             <a
               className="font-medium no-underline ml-2 text-blue-500 cursor-pointer"
               onClick={() => navigate("/users/register")}
             >
-              Create today!
+              {t("Create today!")}
             </a>
           </div>
 
@@ -57,13 +59,13 @@ export default function LoginPage() {
               htmlFor="userNameOrEmail"
               className="block text-900 font-medium mb-2"
             >
-              Username / Email
+              {t("Username / Email")}
             </label>
             <InputText
               id="userNameOrEmail"
               name="userNameOrEmail"
               type="text"
-              placeholder="Username / Email address"
+              placeholder={t("Username / Email")}
               className="w-full mb-3"
               value={userLoginDto.userNameOrEmail}
               onChange={handleChange}
@@ -73,13 +75,13 @@ export default function LoginPage() {
               htmlFor="password"
               className="block text-900 font-medium mb-2"
             >
-              Password
+              {t("Password")}
             </label>
             <InputText
               id="password"
               name="password"
               type="password"
-              placeholder="Password"
+              placeholder={t("Password")}
               className="w-full mb-3"
               value={userLoginDto.password}
               onChange={handleChange}
@@ -99,12 +101,12 @@ export default function LoginPage() {
                 className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer"
                 onClick={() => navigate("/users/forgot-password")}
               >
-                Forgot your password?
+                {t("Forgot your password?")}
               </a>
             </div>
 
             <Button
-              label="Sign In"
+              label={t("Sign In")}
               className="w-full"
               onClick={onLogin}
             />

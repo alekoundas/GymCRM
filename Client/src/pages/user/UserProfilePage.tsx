@@ -14,8 +14,10 @@ import UserProfileTimeslotsComponent from "./UserProfileTimeslotsComponent";
 import UserProfilePasswordChangeFormComponent from "./UserProfilePasswordChangeFormComponent";
 import { useApiService } from "../../services/ApiService";
 import { LocalStorageService } from "../../services/LocalStorageService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function UserProfilePage() {
+  const { t } = useTranslator();
   const {
     userDto,
     updateUserDto,
@@ -185,7 +187,7 @@ export default function UserProfilePage() {
                 </div>
               </div>
               <Button
-                label="Change Password"
+                label={t("Change Password")}
                 icon="pi pi-key"
                 className="p-button-outlined"
                 onClick={() => setShowChangePasswordDialog(true)}
@@ -200,7 +202,7 @@ export default function UserProfilePage() {
       <div className="col-12 md:col-7">
         <Card
           className="p-4"
-          title="Phone Numbers"
+          title={t("Phone Numbers")}
           style={{
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
           }}
@@ -212,7 +214,7 @@ export default function UserProfilePage() {
       <div className="col-12">
         <Card
           className="p-4"
-          title="Upcoming Train Groups"
+          title={t("Upcoming Train Groups")}
           style={{
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
           }}
@@ -223,20 +225,20 @@ export default function UserProfilePage() {
 
       {/* Change Password Dialog */}
       <Dialog
-        header="Change Password"
+        header={t("Change Password")}
         visible={showChangePasswordDialog}
         onHide={() => setShowChangePasswordDialog(false)}
         style={{ width: "30rem" }}
         footer={
           <div className="flex justify-content-end gap-2">
             <Button
-              label="Cancel"
+              label={t("Cancel")}
               icon="pi pi-times"
               className="p-button-text"
               onClick={() => setShowChangePasswordDialog(false)}
             />
             <Button
-              label="Change Password"
+              label={t("Change Password")}
               icon="pi pi-check"
               className="p-button-primary"
               onClick={handleChangePassword}

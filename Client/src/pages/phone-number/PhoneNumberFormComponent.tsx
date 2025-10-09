@@ -4,10 +4,12 @@ import { FormMode } from "../../enum/FormMode";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { usePhoneNumberStore } from "../../stores/PhoneNumberStore";
 import { InputSwitch } from "primereact/inputswitch";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField extends DialogChildProps {}
 
 export default function PhoneNumberFormComponent({ formMode }: IField) {
+  const { t } = useTranslator();
   const { phoneNumberDto, updatePhoneNumberDto } = usePhoneNumberStore();
 
   return (
@@ -23,7 +25,7 @@ export default function PhoneNumberFormComponent({ formMode }: IField) {
           id="number"
           name="Number"
           type="text"
-          placeholder="Number"
+          placeholder={t("Number")}
           value={phoneNumberDto.number}
           onChange={(x) => updatePhoneNumberDto({ number: x.target.value })}
           disabled={formMode === FormMode.VIEW}
@@ -36,7 +38,7 @@ export default function PhoneNumberFormComponent({ formMode }: IField) {
             htmlFor="isPrimary"
             className="block text-900 font-medium mb-2"
           >
-            Primary
+            {t("Primary")}
           </label>
           <InputSwitch
             id="isPrimary"

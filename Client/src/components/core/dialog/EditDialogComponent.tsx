@@ -1,6 +1,7 @@
 import React, { ReactElement, useState } from "react";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
+import { useTranslator } from "../../../services/TranslatorService";
 
 interface IField {
   children: ReactElement;
@@ -18,6 +19,7 @@ export default function EditDialogComponent({
   triggerSaveDisable,
   triggerSaveEnable,
 }: IField) {
+  const { t } = useTranslator();
   const [isVisible, setIsVisible] = useState(false);
   const [isEnabled, setIsEnabled] = useState(true);
 
@@ -33,13 +35,13 @@ export default function EditDialogComponent({
   const dialogFooter = () => (
     <React.Fragment>
       <Button
-        label="Cancel"
+        label={t("Cancel")}
         icon="pi pi-times"
         outlined
         onClick={() => setIsVisible(false)}
       />
       <Button
-        label="Save"
+        label={t("Save")}
         icon="pi pi-check"
         onClick={() => onSaveButtonClick()}
         disabled={!isEnabled}
@@ -52,7 +54,7 @@ export default function EditDialogComponent({
       <Dialog
         visible={isVisible}
         style={{ width: "45%" }}
-        header="Edit"
+        header={t("Edit")}
         modal
         className="p-fluid"
         footer={dialogFooter()}

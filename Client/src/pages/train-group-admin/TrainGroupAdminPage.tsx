@@ -19,9 +19,11 @@ import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
 import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function TrainGroupAdminPage() {
-    const apiService = useApiService();
+  const { t } = useTranslator();
+  const apiService = useApiService();
   const navigate = useNavigate();
   const {
     trainGroupDto,
@@ -91,15 +93,15 @@ export default function TrainGroupAdminPage() {
   const dataTableColumns: DataTableColumns<TrainGroupDto>[] = [
     {
       field: "title",
-      header: "Title",
+      header: t("Title"),
       sortable: true,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "30%" },
     },
     {
       field: "startOn",
-      header: "Start On",
+      header: t("Start On"),
       sortable: true,
       filter: true,
       filterTemplate: (options) => (
@@ -119,16 +121,16 @@ export default function TrainGroupAdminPage() {
           );
         }
       },
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
 
       style: { width: "20%" },
     },
     {
       field: "duration",
-      header: "Duration",
+      header: t("Duration"),
       sortable: true,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       filterTemplate: (options) => (
         <DataTableFilterTimeComponent options={options} />
       ),
@@ -150,10 +152,10 @@ export default function TrainGroupAdminPage() {
     },
     {
       field: "maxParticipants",
-      header: "Max Participants",
+      header: t("Max participants"),
       sortable: true,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       filterTemplate: (options) => (
         <DataTableFilterNumberComponent options={options} />
       ),
@@ -161,10 +163,10 @@ export default function TrainGroupAdminPage() {
     },
     {
       field: "trainerId",
-      header: "Trainer",
+      header: t("Trainer"),
       sortable: true,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       body: (rowData, options) => chipTemplate(rowData.trainer),
       filterTemplate: (options) => (
         <DataTableFilterIdComponent
@@ -221,7 +223,7 @@ export default function TrainGroupAdminPage() {
 
   return (
     <>
-      <Card title="Train Groups">
+      <Card title={t("Train Groups")}>
         <div className="card">
           <DataTableComponent
             dataTableDto={datatableDto}
@@ -247,7 +249,7 @@ export default function TrainGroupAdminPage() {
         formMode={FormMode.DELETE}
       >
         <div className="flex justify-content-center">
-          <p>Are you sure?</p>
+          <p>{t("Are you sure")}?</p>
         </div>
       </GenericDialogComponent>
     </>

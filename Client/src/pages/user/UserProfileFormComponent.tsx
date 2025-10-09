@@ -4,9 +4,10 @@ import { Button } from "primereact/button";
 import { useEffect, useState } from "react";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { useApiService } from "../../services/ApiService";
-import { LocalStorageService } from "../../services/LocalStorageService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function UserProfileFormComponent() {
+  const { t } = useTranslator();
   const apiService = useApiService();
   const { userDto, updateUserDto } = useUserStore();
   const [editingField, setEditingField] = useState<string | null>(null); // Track which field is being edited
@@ -42,24 +43,19 @@ export default function UserProfileFormComponent() {
 
   // Handle Save for a specific field
   const handleSave = async (field: keyof typeof formData) => {
-    try {
-      const updatedUser = {
-        ...userDto,
-        [field]: formData[field],
-      };
-      const response = await apiService.update<UserDto>(
-        "Users",
-        updatedUser,
-        userDto.id
-      );
-      if (response) {
-        updateUserDto(response); // Update store with backend response
-        setEditingField(null);
-        setOriginalValues({});
-      }
-    } catch (error) {
-      console.error("Failed to save field:", error);
-      // Handle error (e.g., show toast)
+    const updatedUser = {
+      ...userDto,
+      [field]: formData[field],
+    };
+    const response = await apiService.update<UserDto>(
+      "Users",
+      updatedUser,
+      userDto.id
+    );
+    if (response) {
+      updateUserDto(response); // Update store with backend response
+      setEditingField(null);
+      setOriginalValues({});
     }
   };
 
@@ -78,13 +74,13 @@ export default function UserProfileFormComponent() {
           htmlFor="firstName"
           className="block text-900 font-medium mb-2"
         >
-          First Name
+          {t("First Name")}
         </label>
         <div className="flex align-items-center gap-2">
           <InputText
             id="firstName"
             type="text"
-            placeholder="First Name"
+            placeholder={t("First Name")}
             className="w-full mb-3"
             value={formData.firstName}
             onChange={(e) => handleChange("firstName", e.target.value)}
@@ -118,13 +114,13 @@ export default function UserProfileFormComponent() {
           htmlFor="lastName"
           className="block text-900 font-medium mb-2"
         >
-          Last Name
+          {t("Last Name")}
         </label>
         <div className="flex align-items-center gap-2">
           <InputText
             id="lastName"
             type="text"
-            placeholder="Last Name"
+            placeholder={t("Last Name")}
             className="w-full mb-3"
             value={formData.lastName}
             onChange={(e) => handleChange("lastName", e.target.value)}

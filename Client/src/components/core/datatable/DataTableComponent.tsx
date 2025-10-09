@@ -19,6 +19,7 @@ import { DataTableDto } from "../../../model/datatable/DataTableDto";
 import { TokenService } from "../../../services/TokenService";
 import DataTableGridRowActionsComponent from "./DataTableGridRowActionsComponent";
 import { useDataTableService } from "../../../services/DataTableService";
+import { useTranslator } from "../../../services/TranslatorService";
 
 interface IField<TEntity> {
   controller: string;
@@ -68,6 +69,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   onSelect,
   selectedObject,
 }: IField<TEntity>) {
+  const { t } = useTranslator();
   const [loading, setLoading] = useState(true);
 
   const afterDataLoaded = (
@@ -157,7 +159,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     if (editMode === DataTableEditModeEnum.ROW)
       columns.push({
         field: "",
-        header: "Actions",
+        header: t("Actions"),
         sortable: false,
         filter: false,
         filterPlaceholder: "",
@@ -170,7 +172,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     if (availableGridRowButtons.length > 0)
       columns.push({
         field: "",
-        header: "Actions",
+        header: t("Actions"),
         sortable: false,
         filter: false,
         filterPlaceholder: "",
@@ -206,7 +208,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         <Button
           type="button"
           icon="pi pi-plus"
-          label="Add"
+          label={t("Add")}
           outlined
           visible={isVisible}
           onClick={() => {
@@ -242,7 +244,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         // key={"id"}
         lazy
         stripedRows
-        emptyMessage="No data found."
+        emptyMessage={t("No data found.")}
         // Row selction.
         selectionMode="single"
         selection={selectedObject ?? undefined}

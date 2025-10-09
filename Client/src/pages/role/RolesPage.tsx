@@ -14,8 +14,10 @@ import GenericDialogComponent, {
 import RoleFormComponent from "./RoleFormComponent";
 import ClaimGridComponent from "../claim/ClaimGridComponent";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function RolesPage() {
+  const { t } = useTranslator();
   const { roleDto, setRoleDto, resetRoleDto } = useRoleStore();
   const apiService = useApiService();
 
@@ -65,18 +67,18 @@ export default function RolesPage() {
   const dataTableColumns: DataTableColumns<RoleDto>[] = [
     {
       field: "name",
-      header: "Name",
+      header: t("Name"),
       sortable: true,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "30%" },
     },
     {
       field: "normalizedName",
-      header: "Normalized Name",
+      header: t("Normalized name"),
       sortable: true,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "30%" },
     },
   ];
@@ -135,7 +137,7 @@ export default function RolesPage() {
 
   return (
     <>
-      <Card title="Roles">
+      <Card title={t("Roles")}>
         <div className="card">
           <DataTableComponent
             controller="roles"
@@ -208,7 +210,7 @@ export default function RolesPage() {
         formMode={FormMode.DELETE}
       >
         <div className="flex justify-content-center">
-          <p>Are you sure?</p>
+          <p>{t("Are you sure")}?</p>
         </div>
       </GenericDialogComponent>
     </>
