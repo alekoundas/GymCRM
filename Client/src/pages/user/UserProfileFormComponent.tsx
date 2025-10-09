@@ -4,6 +4,7 @@ import { Button } from "primereact/button";
 import { useEffect, useState } from "react";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { useApiService } from "../../services/ApiService";
+import { LocalStorageService } from "../../services/LocalStorageService";
 
 export default function UserProfileFormComponent() {
   const apiService = useApiService();
