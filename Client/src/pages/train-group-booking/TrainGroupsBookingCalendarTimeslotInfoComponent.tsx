@@ -47,7 +47,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
         const label = getDateLabel(date.date, type);
         let isJoined = date.isUserJoined;
 
-        if (type === undefined)
+        if (type === undefined && !isJoined)
           isJoined = selectedTimeSlot!.recurrenceDates.some(
             (x) =>
               x.trainGroupDateId === date.trainGroupDateId &&
