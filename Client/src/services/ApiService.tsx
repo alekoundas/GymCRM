@@ -18,6 +18,7 @@ import { MailSendDto } from "../model/entities/mail/MailSendDto";
 import { ChartData } from "../model/core/chart/ChartData";
 import { TrainGroupParticipantUpdateDto } from "../model/entities/train-group-participant/TrainGroupParticipantUpdateDto";
 import { ApiResponseDto } from "../model/core/api-response/ApiResponseDto";
+import { UserLoginResponseDto } from "../model/entities/user/UserLoginResponseDto";
 
 const BASE_URL = "/api/";
 const TOKEN_EXPIRATION_MS = 604800 * 1000; // 7 days
@@ -379,11 +380,10 @@ export const useApiService = () => {
       authLogin: () => void
     ): Promise<boolean> => {
       const url = buildUrl("Auth", "login");
-      const result = await apiRequest<UserLoginRequestDto, UserLoginRequestDto>(
-        url,
-        "POST",
-        data
-      );
+      const result = await apiRequest<
+        UserLoginRequestDto,
+        UserLoginResponseDto
+      >(url, "POST", data);
       if (!result) {
         showError("Login failed!");
         return false;
@@ -392,6 +392,9 @@ export const useApiService = () => {
       const expireDate = new Date(Date.now() + TOKEN_EXPIRATION_MS);
       TokenService.setAccessToken(result.accessToken);
       TokenService.setRefreshToken(result.refreshToken);
+      TokenService.setProfileImage(result.profileImage ?? "");
+      TokenService.setFirstName(result.firstName ?? "");
+      TokenService.setLastName(result.lastName ?? "");
       TokenService.setRefreshTokenExpireDate(expireDate.toISOString());
       console.debug(
         "Login successful, tokens set, expiration:",

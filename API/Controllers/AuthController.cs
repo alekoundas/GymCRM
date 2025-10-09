@@ -101,7 +101,7 @@ namespace API.Controllers
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Password_reset_failed_0,errors] );
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Password_reset_failed_0, errors]);
             }
             return new ApiResponse<bool>().SetSuccessResponse("Password changed successfully.");
 
@@ -191,8 +191,11 @@ namespace API.Controllers
             string? result = await _userService.SignInUser(user, request.Password);
             if (result == null)
             {
-                UserLoginResponseDto token = await _userService.GenerateUserToken(user);
-                return new ApiResponse<UserLoginResponseDto>().SetSuccessResponse(token);
+                UserLoginResponseDto responseDto = await _userService.GenerateUserToken(user);
+                responseDto.FirstName = user.FirstName;
+                responseDto.LastName = user.LastName;
+                responseDto.ProfileImage = user.ProfileImage;
+                return new ApiResponse<UserLoginResponseDto>().SetSuccessResponse(responseDto);
             }
             else
                 return new ApiResponse<UserLoginResponseDto>().SetErrorResponse(result);
