@@ -24,7 +24,7 @@ namespace API.Controllers
         //private readonly ILogger<TrainGroupDateController> _logger;
 
         public TrainGroupParticipantsController(
-            IDataService dataService, 
+            IDataService dataService,
             IMapper mapper,
             IStringLocalizer localizer) : base(dataService, mapper, localizer)
         {
@@ -39,9 +39,6 @@ namespace API.Controllers
         [HttpPost("UpdateParticipants")]
         public async Task<ActionResult<ApiResponse<TrainGroup>>> UpdateParticipants([FromBody] TrainGroupParticipantUpdateDto updateDto)
         {
-            //if (!ModelState.IsValid)
-            //    return new ApiResponse<TrainGroup>().SetErrorResponse("Invalid data provided.");
-
 
             ApiDbContext dbContext = _dataService.GetDbContext();
 
@@ -81,8 +78,9 @@ namespace API.Controllers
 
 
             List<TrainGroupParticipant> incomingParticipants = _mapper.Map<List<TrainGroupParticipant>>(updateDto.TrainGroupParticipantDtos);
-            List<TrainGroupParticipant> existingParticipants = existingEntity.TrainGroupParticipants
-                .Where(x => x.SelectedDate.HasValue ? x.SelectedDate == updateDto.SelectedDate : true)
+            List<TrainGroupParticipant> existingParticipants = existingEntity
+                .TrainGroupParticipants
+                .Where(x => x.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY ? x.TrainGroupDate.FixedDay == updateDto.SelectedDate : true)
                 .ToList();
 
 
@@ -117,7 +115,9 @@ namespace API.Controllers
             foreach (TrainGroupParticipant existingParticipant in participantsToRemove)
             {
                 TrainGroupParticipant? incomingParticipant = incomingParticipants
-                    .FirstOrDefault(x => x.SelectedDate == existingParticipant.SelectedDate && x.TrainGroupDateId == existingParticipant.TrainGroupDateId);
+                    .FirstOrDefault(x =>
+                        x.TrainGroupDateId == existingParticipant.TrainGroupDateId &&
+                        x.SelectedDate == existingParticipant.SelectedDate);
 
                 // Remove unchanged incoming Participants
                 if (incomingParticipant != null)
