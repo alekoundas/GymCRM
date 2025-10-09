@@ -231,50 +231,56 @@ export default function UserProfileTimeslotsComponent() {
 
   const onOptOut = async () => {
     if (selectedTimeSlotRecurrenceDate.trainGroupParticipantId)
-      apiService.delete(
-        "TrainGroupParticipants",
-        selectedTimeSlotRecurrenceDate.trainGroupParticipantId
-      );
-
-    optOutTimeSlotDialogControl.hideDialog();
-    timeSlotDialogControl.hideDialog();
-    const calendarApi = calendarRef.current?.getApi();
-    const currentStart = calendarApi?.view.currentStart;
-    if (currentStart) {
-      await fetchTimeSlots(currentStart);
-    }
+      apiService
+        .delete(
+          "TrainGroupParticipants",
+          selectedTimeSlotRecurrenceDate.trainGroupParticipantId
+        )
+        .then(async () => {
+          optOutTimeSlotDialogControl.hideDialog();
+          timeSlotDialogControl.hideDialog();
+          const calendarApi = calendarRef.current?.getApi();
+          const currentStart = calendarApi?.view.currentStart;
+          if (currentStart) {
+            await fetchTimeSlots(currentStart);
+          }
+        });
   };
 
   const onOptOutDate = async () => {
-    apiService.create("TrainGroupParticipantUnavailableDates", {
-      trainGroupParticipantId:
-        selectedTimeSlotRecurrenceDate.trainGroupParticipantId,
-      unavailableDate: selectedDate,
-    } as TrainGroupParticipantUnavailableDateDto);
-
-    optOutDateTimeSlotDialogControl.hideDialog();
-    timeSlotDialogControl.hideDialog();
-    const calendarApi = calendarRef.current?.getApi();
-    const currentStart = calendarApi?.view.currentStart;
-    if (currentStart) {
-      await fetchTimeSlots(currentStart);
-    }
+    apiService
+      .create("TrainGroupParticipantUnavailableDates", {
+        trainGroupParticipantId:
+          selectedTimeSlotRecurrenceDate.trainGroupParticipantId,
+        unavailableDate: selectedDate,
+      } as TrainGroupParticipantUnavailableDateDto)
+      .then(async () => {
+        optOutDateTimeSlotDialogControl.hideDialog();
+        timeSlotDialogControl.hideDialog();
+        const calendarApi = calendarRef.current?.getApi();
+        const currentStart = calendarApi?.view.currentStart;
+        if (currentStart) {
+          await fetchTimeSlots(currentStart);
+        }
+      });
   };
 
   const onOptInDate = async () => {
     if (selectedTimeSlotRecurrenceDate.trainGroupParticipantUnavailableDateId)
-      apiService.delete(
-        "TrainGroupParticipantUnavailableDates",
-        selectedTimeSlotRecurrenceDate.trainGroupParticipantUnavailableDateId
-      );
-
-    optInDateTimeSlotDialogControl.hideDialog();
-    timeSlotDialogControl.hideDialog();
-    const calendarApi = calendarRef.current?.getApi();
-    const currentStart = calendarApi?.view.currentStart;
-    if (currentStart) {
-      await fetchTimeSlots(currentStart);
-    }
+      apiService
+        .delete(
+          "TrainGroupParticipantUnavailableDates",
+          selectedTimeSlotRecurrenceDate.trainGroupParticipantUnavailableDateId
+        )
+        .then(async () => {
+          optInDateTimeSlotDialogControl.hideDialog();
+          timeSlotDialogControl.hideDialog();
+          const calendarApi = calendarRef.current?.getApi();
+          const currentStart = calendarApi?.view.currentStart;
+          if (currentStart) {
+            await fetchTimeSlots(currentStart);
+          }
+        });
   };
 
   return (
@@ -563,6 +569,36 @@ export default function UserProfileTimeslotsComponent() {
                       <div></div>
                     </div>
                   )}
+
+                  {timeSlots.some((x) =>
+                    x.recurrenceDates.some(
+                      (y) =>
+                        y.trainGroupDateId ===
+                          selectedTimeSlotRecurrenceDate.trainGroupDateId &&
+                        y.isUserJoined
+                    )
+                  ) === false &&
+                    timeSlots.some(
+                      (x) =>
+                        x.recurrenceDates.some(
+                          (y) =>
+                            y.trainGroupDateId ===
+                              selectedTimeSlotRecurrenceDate.trainGroupDateId &&
+                            !y.isUserJoined &&
+                            y.trainGroupParticipantUnavailableDateId
+                        ) === false
+                    ) && (
+                      <div className="flex justify-content-between pt-5">
+                        <div></div>
+                        <div>
+                          <p className="text-xl text-primary m-0 pt-4">
+                            You havent joined this date. Please join via
+                            apointment tab.
+                          </p>
+                        </div>
+                        <div></div>
+                      </div>
+                    )}
                 </div>
               </>
             )}
