@@ -19,7 +19,7 @@ import ThemeService from "../../services/ThemeService";
 import { useApiService } from "../../services/ApiService";
 
 export default function UserProfileTimeslotsComponent() {
-                    const apiService = useApiService();
+  const apiService = useApiService();
   // const { userDto, updateUserDto } = useUserStore();
   const calendarRef = useRef<FullCalendar>(null);
   const [events, setEvents] = useState<any[]>([]); // Data

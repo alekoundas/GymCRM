@@ -13,6 +13,7 @@ import PhoneNumberGridComponent from "../phone-number/PhoneNumberGridComponent";
 import UserProfileTimeslotsComponent from "./UserProfileTimeslotsComponent";
 import UserProfilePasswordChangeFormComponent from "./UserProfilePasswordChangeFormComponent";
 import { useApiService } from "../../services/ApiService";
+import { LocalStorageService } from "../../services/LocalStorageService";
 
 export default function UserProfilePage() {
   const {
@@ -82,6 +83,8 @@ export default function UserProfilePage() {
         );
         if (response) {
           // Prefix response for display (API returns plain base64)
+          LocalStorageService.setProfileImage(updateDto.profileImage ?? "");
+
           if (
             response.profileImage &&
             !response.profileImage.startsWith("data:")

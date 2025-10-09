@@ -131,22 +131,20 @@ export default function NavTop() {
 
     if (isProfileImageSet) {
       return (
-        <p className="flex m-0 p-0 align-items-center">
-          <Chip
-            template={
-              <>
-                <Avatar
-                  image={imageSrc}
-                  label={undefined}
-                  shape="circle"
-                  size="normal"
-                  className=" mr-2 "
-                />
-                {fullName}
-              </>
-            }
-          />
-        </p>
+        <Chip
+          template={
+            <>
+              <Avatar
+                image={imageSrc}
+                label={undefined}
+                shape="circle"
+                size="normal"
+                className=" mr-2 "
+              />
+              {fullName}
+            </>
+          }
+        />
       );
     } else {
       return <Chip label={fullName} />;
