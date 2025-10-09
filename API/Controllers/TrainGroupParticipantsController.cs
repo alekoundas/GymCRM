@@ -47,6 +47,7 @@ namespace API.Controllers
                 .Include(x => x.TrainGroupParticipants)
                 .Include(x => x.TrainGroupDates)
                 .ThenInclude(x => x.TrainGroupParticipants)
+                .ThenInclude(x => x.TrainGroupParticipantUnavailableDates)
                 .Where(x => x.Id == updateDto.TrainGroupId)
                 .FirstOrDefaultAsync();
 
@@ -148,10 +149,23 @@ namespace API.Controllers
             // Validate max participants
             foreach (TrainGroupParticipant incomingParticipant in incomingParticipants)
             {
-                int numberOfParticipants = existingParticipants
+                int numberOfParticipants = 0;
+
+                if (incomingParticipant.SelectedDate == null)
+                    numberOfParticipants = existingParticipants
                     .Where(x => incomingParticipant.TrainGroupDateId == x.TrainGroupDateId)
-                    .Where(x => incomingParticipant.SelectedDate == null ? x.SelectedDate == null : true) // If SelectedDate is not set, check only for non one-off participants
-                    .Where(x => !incomingParticipant.TrainGroupParticipantUnavailableDates.Any(y =>
+                    //.Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y =>
+                    //    y.UnavailableDate == x.TrainGroupDate.FixedDay ||
+                    //    y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth ||
+                    //    y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfWeek))
+                    .ToList()
+                    .Count();
+
+                else
+                    numberOfParticipants = existingParticipants
+                    .Where(x => incomingParticipant.TrainGroupDateId == x.TrainGroupDateId)
+                    //.Where(x => incomingParticipant.SelectedDate == null ?  true: false) // If SelectedDate is not set, check only for non one-off participants
+                    .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y =>
                         y.UnavailableDate == x.TrainGroupDate.FixedDay ||
                         y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth ||
                         y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfWeek))

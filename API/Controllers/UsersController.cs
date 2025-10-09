@@ -392,10 +392,10 @@ namespace API.Controllers
                                 .All(z =>
                                     y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
                                     ? z.UnavailableDate.DayOfWeek != y.RecurrenceDayOfWeek
-                                    : z.UnavailableDate.Day != y.RecurrenceDayOfMonth)??false,
+                                    : z.UnavailableDate.Day != y.RecurrenceDayOfMonth) ?? false,
                             IsOneOff = y.TrainGroupParticipants
                                 .FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?
-                                .SelectedDate.HasValue??false,
+                                .SelectedDate.HasValue ?? false,
                             TrainGroupParticipantId = y.TrainGroupParticipants
                                 .FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?
                                 .Id,
@@ -424,13 +424,13 @@ namespace API.Controllers
                                  TrainGroupDateType = y.TrainGroupDateType,
                                  Date = y.FixedDay!.Value,
                                  IsUserJoined = y.TrainGroupParticipants
-                                    .First(z => z.UserId == new Guid(timeSlotRequestDto.UserId))
+                                    .FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?
                                     .TrainGroupParticipantUnavailableDates
                                     .Where(z => z.UnavailableDate >= selectedDateStart && z.UnavailableDate <= selectedDateEnd)
-                                    .All(z => z.UnavailableDate != y.FixedDay),
+                                    .All(z => z.UnavailableDate != y.FixedDay) ?? false,
                                  IsOneOff = true,
                                  TrainGroupParticipantId = y.TrainGroupParticipants
-                                    .First(z => z.UserId == new Guid(timeSlotRequestDto.UserId)).Id,
+                                    .FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?.Id,
                                  TrainGroupParticipantUnavailableDateId = null,
                              }
                         )
