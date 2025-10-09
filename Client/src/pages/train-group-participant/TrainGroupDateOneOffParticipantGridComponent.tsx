@@ -26,7 +26,7 @@ interface IField {
 export default function TrainGroupDateOneOffParticipantGridComponent({
   formMode,
 }: IField) {
-      const apiService = useApiService();
+  const apiService = useApiService();
   const params = useParams();
 
   const {
