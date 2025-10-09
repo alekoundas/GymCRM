@@ -132,10 +132,13 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     }
   }, []);
 
+  const isInitialMount = React.useRef(true);
   const refreshAllData = async (dto: DataTableDto<TEntity>) => {
-    return await refreshData(dto);
+    if (triggerRefreshData && !isInitialMount.current) {
+      return await refreshData(dto);
+    }
+    isInitialMount.current = false;
   };
-
   React.useEffect(() => {
     if (triggerRefreshData) {
       triggerRefreshData.current = refreshAllData;
