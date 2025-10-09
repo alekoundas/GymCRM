@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { useApiService } from "../../../services/ApiService";
+import { useTranslator } from "../../../services/TranslatorService";
 
 interface IField {
   id: string | number;
@@ -16,8 +17,10 @@ export default function DeleteDialogComponent({
   onAfterRowDeletion,
   triggerDialogVisibility,
 }: IField) {
-  const [isVisible, setIsVisible] = useState(false);
+  const { t } = useTranslator();
   const apiService = useApiService();
+
+  const [isVisible, setIsVisible] = useState(false);
 
   const onDelete = () => {
     apiService.delete("roles", id).then(() => onAfterRowDeletion());
@@ -30,13 +33,13 @@ export default function DeleteDialogComponent({
   const dialogFooter = () => (
     <React.Fragment>
       <Button
-        label="Cancel"
+        label={t("Cancel")}
         icon="pi pi-times"
         outlined
         onClick={() => setIsVisible(false)}
       />
       <Button
-        label="Delete"
+        label={t("Delete")}
         icon="pi pi-trash"
         onClick={onDelete}
       />
@@ -48,7 +51,7 @@ export default function DeleteDialogComponent({
       <Dialog
         visible={isVisible}
         style={{ width: "35%" }}
-        header="Confirm"
+        header={t("Confirm")}
         modal
         className="p-fluid"
         footer={dialogFooter()}
@@ -59,7 +62,9 @@ export default function DeleteDialogComponent({
             className="pi pi-exclamation-triangle mr-3"
             style={{ fontSize: "2rem" }}
           />
-          <span>Are you sure you want to delete {name}?</span>
+          <span>
+            {t("Are you sure you want to delete ")} {name}?
+          </span>
         </div>
       </Dialog>
     </>

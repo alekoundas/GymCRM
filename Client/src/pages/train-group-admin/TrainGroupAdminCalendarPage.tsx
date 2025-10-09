@@ -14,8 +14,10 @@ import TrainGroupFormComponent from "./TrainGroupFormComponent";
 import TrainGroupDateAdminCalenndarGridComponent from "../train-group-date/TrainGroupDateAdminCalenndarGridComponent";
 import { useApiService } from "../../services/ApiService";
 import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function TrainGroupAdminCalendarPage() {
+  const { t } = useTranslator();
   const apiService = useApiService();
 
   const { trainGroupDto, resetTrainGroupDto, setTrainGroupDto } =
@@ -66,8 +68,8 @@ export default function TrainGroupAdminCalendarPage() {
       <div className="grid w-full">
         <div className="col-12 lg:col-6 xl:col-6">
           <Card
-            title="Train Groups"
-            subTitle="Handle your train groups"
+            title={t("Train Groups")}
+            subTitle={t("Handle your train groups")}
           >
             <Calendar
               value={selectedDate}
@@ -94,12 +96,12 @@ export default function TrainGroupAdminCalendarPage() {
                   padding: "1rem",
                 }}
               >
-                <h2 style={{ margin: 0 }}>Available Timeslots</h2>
+                <h2 style={{ margin: 0 }}>{t("Available Timeslots")}</h2>
                 <Button
                   className="m-2"
                   type="button"
                   icon="pi pi-plus"
-                  label="Add"
+                  label={t("Add")}
                   outlined
                   visible={TokenService.isUserAllowed("TrainGroups_Add")}
                   onClick={() => {
@@ -112,7 +114,7 @@ export default function TrainGroupAdminCalendarPage() {
           >
             {timeSlots.length === 0 ? (
               <p className="text-gray-500">
-                No time slots available for this date.
+                {t("No time slots available for this date")}.
               </p>
             ) : (
               <div>

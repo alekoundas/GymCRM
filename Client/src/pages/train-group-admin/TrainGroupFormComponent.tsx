@@ -8,10 +8,12 @@ import { FormMode } from "../../enum/FormMode";
 import { TokenService } from "../../services/TokenService";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField extends DialogChildProps {}
 
 export default function TrainGroupFormComponent({ formMode }: IField) {
+  const { t } = useTranslator();
   const { trainGroupDto, updateTrainGroupDto } = useTrainGroupStore();
 
   // Preset TrainerId
@@ -37,13 +39,13 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
           htmlFor="title"
           className="block text-900 font-medium mb-2"
         >
-          Title
+          {t("Title")}
         </label>
         <InputText
           id="title"
           name="title"
           type="text"
-          placeholder="Ttitle"
+          placeholder={t("Title")}
           className=" mb-4"
           value={trainGroupDto.title}
           onChange={handleChange}
@@ -56,7 +58,7 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
           htmlFor="startOn"
           className="block text-900 font-medium mb-2"
         >
-          Starts On
+          {t("Starts On")}
         </label>
         <Calendar
           id="startOn"
@@ -85,7 +87,7 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
           htmlFor="duration"
           className="block text-900 font-medium mb-2"
         >
-          Duration
+          {t("Duration")}
         </label>
         <Calendar
           id="duration"
@@ -116,7 +118,7 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
           htmlFor="maxParticipants"
           className="block text-900 font-medium mb-2"
         >
-          Max Participants
+          {t("Max Participants")}
         </label>
         <InputNumber
           id="maxParticipants"
@@ -144,7 +146,7 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
           htmlFor="trainer"
           className="block text-900 font-medium mb-2"
         >
-          Trainer
+          {t("Trainer")}
         </label>
         <LookupComponent
           controller="users"
@@ -169,12 +171,12 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
           htmlFor="description"
           className="block text-900 font-medium mb-2"
         >
-          Description
+          {t("Description")}
         </label>
         <InputTextarea
           id="description"
           name="description"
-          placeholder="Description"
+          placeholder={t("Description")}
           className="w-full mb-3"
           value={trainGroupDto.description}
           onChange={handleChange}

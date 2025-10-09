@@ -1,12 +1,14 @@
 import { useUserStore } from "../../stores/UserStore";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { Password } from "primereact/password";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField extends DialogChildProps {}
 
 export default function UserProfilePasswordChangeFormComponent({
   formMode,
 }: IField) {
+  const { t } = useTranslator();
   const { userPasswordChangeDto, setUserPasswordChangeDto } = useUserStore();
   return (
     <>
@@ -15,7 +17,7 @@ export default function UserProfilePasswordChangeFormComponent({
           htmlFor="oldPassword"
           className="block text-900 font-medium mb-2"
         >
-          Old Password *
+          {t("Old Password")}*
         </label>
         <Password
           id="oldPassword"
@@ -26,7 +28,7 @@ export default function UserProfilePasswordChangeFormComponent({
               oldPassword: e.target.value,
             });
           }}
-          placeholder="Enter old password"
+          placeholder={t("Old Password")}
           toggleMask
           feedback={false}
         />
@@ -36,7 +38,7 @@ export default function UserProfilePasswordChangeFormComponent({
           htmlFor="newPassword"
           className="block text-900 font-medium mb-2"
         >
-          New Password *
+          {t("New Password")}*
         </label>
         <Password
           id="newPassword"
@@ -47,7 +49,7 @@ export default function UserProfilePasswordChangeFormComponent({
               newPassword: e.target.value,
             });
           }}
-          placeholder="Enter new password"
+          placeholder={t("New Password")}
           toggleMask
           feedback={true}
         />
@@ -57,7 +59,7 @@ export default function UserProfilePasswordChangeFormComponent({
           htmlFor="confirmNewPassword"
           className="block text-900 font-medium mb-2"
         >
-          Confirm New Password *
+          {t("Confirm New Password")}*
         </label>
         <Password
           id="confirmNewPassword"
@@ -68,7 +70,7 @@ export default function UserProfilePasswordChangeFormComponent({
               confirmNewPassword: e.target.value,
             });
           }}
-          placeholder="Confirm new password"
+          placeholder={t("Confirm new password")}
           toggleMask
           feedback={false}
         />

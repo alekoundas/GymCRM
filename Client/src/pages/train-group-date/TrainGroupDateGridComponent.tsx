@@ -6,7 +6,6 @@ import { FormMode } from "../../enum/FormMode";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
-import { DateService } from "../../services/DateService";
 import { useParams } from "react-router-dom";
 import {
   DataTableSelectionSingleChangeEvent,
@@ -19,10 +18,12 @@ import GenericDialogComponent, {
 import TrainGroupDateFormComponent from "./TrainGroupDateFormComponent";
 import { TrainGroupDateDto } from "../../model/entities/train-group-date/TrainGroupDateDto";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField extends DialogChildProps {}
 
 export default function TrainGroupDateGridComponent({ formMode }: IField) {
+  const { t } = useTranslator();
   const apiService = useApiService();
   const params = useParams();
   const {
@@ -108,25 +109,25 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       header: "Id",
       sortable: false,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
     },
     {
       field: "trainGroupDateType",
-      header: "Type",
+      header: t("Type"),
       sortable: formMode !== FormMode.ADD,
       // filter: formMode !== FormMode.ADD,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
     },
     {
       field: "fixedDay",
-      header: "Fixed Day",
+      header: t("Fixed Day"),
       sortable: formMode !== FormMode.ADD,
       // filter: formMode !== FormMode.ADD,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
 
       body: (rowData: TrainGroupDateDto) => {
@@ -145,21 +146,21 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
     },
     {
       field: "recurrenceDayOfWeek",
-      header: "Recurrence Day Of Week",
+      header: t("Recurrence Day Of Week"),
       sortable: formMode !== FormMode.ADD,
       // filter: formMode !== FormMode.ADD,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
       // body: (rowData: TrainGroupDateDto) => rowData.recurrenceDayOfWeek,
     },
     {
       field: "recurrenceDayOfMonth",
-      header: "Recurrence Day Of Month",
+      header: t("Recurrence Day Of Month"),
       sortable: formMode !== FormMode.ADD,
       // filter: formMode !== FormMode.ADD,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
     },
   ];
@@ -351,7 +352,7 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
         formMode={FormMode.DELETE}
       >
         <div className="flex justify-content-center">
-          <p>Are you sure?</p>
+          <p>{t("Are you sure")}?</p>
         </div>
       </GenericDialogComponent>
     </>

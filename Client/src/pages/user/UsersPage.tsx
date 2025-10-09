@@ -14,8 +14,10 @@ import GenericDialogComponent, {
 import { useUserStore } from "../../stores/UserStore";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function UsersPage() {
+  const { t } = useTranslator();
   const apiService = useApiService();
   const { userDto, setUserDto, resetUserDto } = useUserStore();
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
@@ -63,15 +65,15 @@ export default function UsersPage() {
       header: "Id",
       sortable: true,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
     },
     {
       field: "userName",
-      header: "User Name",
+      header: t("User Name"),
       sortable: true,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
     },
     {
@@ -79,7 +81,7 @@ export default function UsersPage() {
       header: "Email",
       sortable: true,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
     },
     {
@@ -87,7 +89,7 @@ export default function UsersPage() {
       header: "Role Id",
       sortable: false,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       filterTemplate: (options) => (
         <DataTableFilterIdComponent
           options={options}
@@ -156,7 +158,7 @@ export default function UsersPage() {
 
   return (
     <>
-      <Card title="Users">
+      <Card title={t("Users")}>
         <DataTableComponent
           controller="users"
           dataTableDto={datatableDto}
@@ -223,7 +225,7 @@ export default function UsersPage() {
         formMode={FormMode.DELETE}
       >
         <div className="flex justify-content-center">
-          <p>Are you sure?</p>
+          <p>{t("Are you sure")}?</p>
         </div>
       </GenericDialogComponent>
     </>

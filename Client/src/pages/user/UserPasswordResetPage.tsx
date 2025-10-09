@@ -6,10 +6,12 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField extends DialogChildProps {}
 
 export default function UserPasswordResetPage({}: IField) {
+  const { t } = useTranslator();
   const apiService = useApiService();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams(); // Url values.
@@ -45,7 +47,7 @@ export default function UserPasswordResetPage({}: IField) {
         <div className="surface-card p-4 shadow-2 border-round w-full lg:w-6">
           <div className="text-center mb-5">
             <div className="text-900 text-3xl font-medium mb-3">
-              Reset Password
+              {t("Reset Password")}
             </div>
           </div>
 
@@ -75,12 +77,12 @@ export default function UserPasswordResetPage({}: IField) {
             htmlFor="newPassword"
             className="p-d-block"
           >
-            New Password
+            {t("New Password")}
           </label>
           <Password
             id="newPassword"
             name="newPassword"
-            placeholder="Password"
+            placeholder={t("Password")}
             value={userPasswordResetDto.newPassword}
             onChange={(e) =>
               setUserPasswordResetDto({
@@ -99,12 +101,12 @@ export default function UserPasswordResetPage({}: IField) {
               htmlFor="confirmNewPassword"
               className="p-d-block"
             >
-              New Password
+              {t("New Password")}
             </label>
             <Password
               id="confirmNewPassword"
               name="confirmNewPassword"
-              placeholder="Password"
+              placeholder={t("Password")}
               value={userPasswordResetDto.confirmNewPassword}
               onChange={(e) =>
                 setUserPasswordResetDto({
@@ -119,7 +121,7 @@ export default function UserPasswordResetPage({}: IField) {
             />
           </div>
           <Button
-            label="Reset Password"
+            label={t("Reset Password")}
             className="p-button-primary p-d-block"
             disabled={
               loading ||
@@ -132,7 +134,7 @@ export default function UserPasswordResetPage({}: IField) {
             onClick={handleSubmit}
           />
           <Button
-            label="Back to Login"
+            label={t("Back to Login")}
             className="p-button-text p-mt-2"
             onClick={() => navigate("/users/login")}
           />

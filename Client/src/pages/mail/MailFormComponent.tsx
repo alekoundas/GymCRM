@@ -7,10 +7,12 @@ import "react-quill-new/dist/quill.snow.css";
 import "primeicons/primeicons.css";
 import { InputText } from "primereact/inputtext";
 import RichTextAreaComponent from "../../components/core/text-area/RichTextAreaComponent";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField extends DialogChildProps {}
 
 export default function MailFormComponent({ formMode }: IField) {
+  const { t } = useTranslator();
   const { mailDto, updateMailDto } = useMailStore();
 
   return (
@@ -34,7 +36,7 @@ export default function MailFormComponent({ formMode }: IField) {
           htmlFor="subject"
           className="block text-900 font-medium mb-2"
         >
-          Subject
+          {t("Subject")}
         </label>
         <InputText
           id="subject"
@@ -50,7 +52,7 @@ export default function MailFormComponent({ formMode }: IField) {
           value={mailDto.body}
           onChange={(e) => updateMailDto({ body: e })}
           isEnabled={formMode !== FormMode.VIEW}
-          label="Body"
+          label={t("Body")}
         />
       </div>
     </div>

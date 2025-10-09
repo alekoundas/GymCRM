@@ -5,8 +5,10 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { UserRegisterDto } from "../../model/entities/user/UserRegisterDto";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function RegisterPage() {
+  const { t } = useTranslator();
   const apiService = useApiService();
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -49,13 +51,13 @@ export default function RegisterPage() {
               htmlFor="userName"
               className="block text-900 font-medium mb-2"
             >
-              User Name
+              {t("User Name")}
             </label>
             <InputText
               id="userName"
               name="userName"
               type="text"
-              placeholder="User Name"
+              placeholder={t("User Name")}
               className="w-full mb-3"
               value={userRegisterDto.userName}
               onChange={handleChange}
@@ -67,13 +69,13 @@ export default function RegisterPage() {
                   htmlFor="firstName"
                   className="block text-900 font-medium mb-2"
                 >
-                  First Name
+                  {t("First Name")}
                 </label>
                 <InputText
                   id="firstName"
                   name="firstName"
                   type="text"
-                  placeholder="First Name"
+                  placeholder={t("First Name")}
                   className="w-full mb-3"
                   value={userRegisterDto.firstName}
                   onChange={handleChange}
@@ -84,13 +86,13 @@ export default function RegisterPage() {
                   htmlFor="lastName"
                   className="block text-900 font-medium mb-2"
                 >
-                  Last Name
+                  {t("Last Name")}
                 </label>
                 <InputText
                   id="lastName"
                   name="lastName"
                   type="text"
-                  placeholder="Last Name"
+                  placeholder={t("Last Name")}
                   className="w-full mb-3"
                   value={userRegisterDto.lastName}
                   onChange={handleChange}
@@ -102,7 +104,7 @@ export default function RegisterPage() {
               htmlFor="phoneNumber"
               className="block text-900 font-medium mb-2"
             >
-              Phone Number
+              {t("Phone Number")}
             </label>
             <InputText
               id="phoneNumber"
@@ -112,7 +114,7 @@ export default function RegisterPage() {
                 ])
               }
               type="text"
-              placeholder="Phone Number"
+              placeholder={t("Phone Number")}
               className="w-full mb-3"
             />
 
@@ -136,13 +138,13 @@ export default function RegisterPage() {
               htmlFor="password"
               className="block text-900 font-medium mb-2"
             >
-              Password
+              {t("Password")}
             </label>
             <InputText
               id="password"
               name="password"
               type="password"
-              placeholder="Password"
+              placeholder={t("Password")}
               className="w-full mb-3"
               value={userRegisterDto.password}
               onChange={handleChange}
@@ -161,7 +163,7 @@ export default function RegisterPage() {
             </div>
 
             <Button
-              label="Register"
+              label={t("Register")}
               className="w-full"
               onClick={onSave}
             />

@@ -21,16 +21,17 @@ import {
 } from "primereact/datatable";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { TrainGroupDateDto } from "../../model/entities/train-group-date/TrainGroupDateDto";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField extends DialogChildProps {}
 
 export default function TrainGroupDateAdminCalenndarGridComponent({
   formMode,
 }: IField) {
+  const { t } = useTranslator();
   const params = useParams();
   const {
     trainGroupDto,
-    selectedTrainGroupDate,
     setSelectedTrainGroupDate,
     addTrainGroupDate,
     setTrainGroupDto,
@@ -80,10 +81,10 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
   const dataTableColumns: DataTableColumns<TrainGroupDateDto>[] = [
     {
       field: "trainGroupDateType",
-      header: "Type",
+      header: t("Type"),
       sortable: formMode !== FormMode.ADD,
       filter: formMode !== FormMode.ADD,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
       cellEditor: (options: ColumnEditorOptions) => {
         if (options.field === "trainGroupDateType") {
@@ -131,7 +132,7 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
               }}
               options={Object.keys(TrainGroupDateTypeEnum)}
               optionLabel="type"
-              placeholder="Select Type"
+              placeholder={t("Select Type")}
               className="w-full"
               checkmark={true}
               highlightOnSelect={true}
@@ -142,10 +143,10 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
     },
     {
       field: "fixedDay",
-      header: "Fixed Day",
+      header: t("Fixed Day"),
       sortable: formMode !== FormMode.ADD,
       filter: formMode !== FormMode.ADD,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
 
       body: (rowData: TrainGroupDateDto) => {
@@ -188,10 +189,10 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
     },
     {
       field: "recurrenceDayOfWeek",
-      header: "Recurrence Day Of Week",
+      header: t("Recurrence Day Of Week"),
       sortable: formMode !== FormMode.ADD,
       filter: formMode !== FormMode.ADD,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
       body: (rowData: TrainGroupDateDto) => {
         // return DateService.getDayOfWeekFromDate(rowData.recurrenceDayOfWeek);
@@ -216,7 +217,7 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
                   options.editorCallback?.(e.target.value);
                 }
               }}
-              placeholder="Select Type"
+              placeholder={t("Select Type")}
               className="w-full"
               checkmark={true}
               highlightOnSelect={true}
@@ -227,10 +228,10 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
     },
     {
       field: "recurrenceDayOfMonth",
-      header: "Recurrence Day Of Month",
+      header: t("Recurrence Day Of Month"),
       sortable: formMode !== FormMode.ADD,
       filter: formMode !== FormMode.ADD,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "20%" },
       body: (data: TrainGroupDateDto) => {
         if (data.recurrenceDayOfMonth)

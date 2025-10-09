@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
+import { useTranslator } from "../../../services/TranslatorService";
 
 interface IField {
   options: ColumnFilterElementTemplateOptions;
 }
 
 export default function DataTableFilterNumberComponent({ options }: IField) {
+  const { t } = useTranslator();
   const [value, setValue] = useState<number | undefined>();
 
   // Clear filter value where user presses clear.
@@ -29,7 +31,7 @@ export default function DataTableFilterNumberComponent({ options }: IField) {
       <InputNumber
         value={value}
         // placeholder="Select Time Range"
-        placeholder="Search"
+        placeholder={t("Search")}
         onChange={(e) => onChange(e)}
       />
     </>

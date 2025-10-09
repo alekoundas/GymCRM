@@ -6,10 +6,12 @@ import { useUserStore } from "../../stores/UserStore";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { UserRoleDto } from "../../model/entities/user-role/UserRoleDto";
 import { RoleDto } from "../../model/entities/role/RoleDto";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField extends DialogChildProps {}
 
 export default function UserFormComponent({ formMode }: IField) {
+  const { t } = useTranslator();
   const { userDto, updateUserDto } = useUserStore();
 
   return (
@@ -20,7 +22,7 @@ export default function UserFormComponent({ formMode }: IField) {
             htmlFor="name"
             className="block text-900 font-medium mb-2"
           >
-            User Name
+            {t("User Name")}
           </label>
           <InputText
             id="userName"
@@ -52,7 +54,7 @@ export default function UserFormComponent({ formMode }: IField) {
             htmlFor="roleId"
             className="block text-900 font-medium mb-2"
           >
-            Role Name
+            {t("Role Name")}
           </label>
           <LookupComponent
             controller="roles"

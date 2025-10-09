@@ -3,12 +3,14 @@ import { Calendar } from "primereact/calendar";
 import { useEffect, useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
+import { useTranslator } from "../../../services/TranslatorService";
 
 interface IField {
   options: ColumnFilterElementTemplateOptions;
 }
 
 export default function DataTableFilterTimeComponent({ options }: IField) {
+  const { t } = useTranslator();
   const emptyDate: Date = new Date(2000, 0, 1, 0, 0, 0, 0);
 
   const [startTime, setStartTime] = useState<Date>(emptyDate);
@@ -90,7 +92,7 @@ export default function DataTableFilterTimeComponent({ options }: IField) {
         value={displayValue()}
         readOnly
         // placeholder="Select Time Range"
-        placeholder="Search"
+        placeholder={t("Search")}
         onClick={(e) => overlayPanel.current?.show(e, e.target)}
       />
       <OverlayPanel
@@ -100,7 +102,7 @@ export default function DataTableFilterTimeComponent({ options }: IField) {
       >
         <div className="flex">
           <div className="p-field">
-            <p>Start Time</p>
+            <p>{t("Start Time")}</p>
             <Calendar
               value={startTime}
               onChange={(e) => setStartTime(e.value as Date)}
@@ -111,7 +113,7 @@ export default function DataTableFilterTimeComponent({ options }: IField) {
             />
           </div>
           <div className="p-field">
-            <p>End Time</p>
+            <p>{t("End Time")}</p>
             <Calendar
               value={endTime}
               onChange={(e) => setEndTime(e.value as Date)}

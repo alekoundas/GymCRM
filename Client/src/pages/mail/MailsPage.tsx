@@ -20,8 +20,11 @@ import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
 import MailSendFormComponent from "./MailSendFormComponent";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function MailsPage() {
+  const { t } = useTranslator();
+
   const {
     mailDto,
     setMailDto,
@@ -105,7 +108,7 @@ export default function MailsPage() {
       header: "Id",
       sortable: true,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       filterTemplate: (options) => (
         <DataTableFilterNumberComponent options={options} />
       ),
@@ -113,18 +116,18 @@ export default function MailsPage() {
     },
     {
       field: "subject",
-      header: "Subject",
+      header: t("Subject"),
       sortable: true,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "30%" },
     },
     {
       field: "userId",
-      header: "Recipient",
+      header: t("Recipient"),
       sortable: true,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       filterTemplate: (options) => (
         <DataTableFilterIdComponent
           options={options}
@@ -136,10 +139,10 @@ export default function MailsPage() {
     },
     {
       field: "createdOn",
-      header: "CreatedOn",
+      header: t("CreatedOn"),
       sortable: true,
       filter: true,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       filterTemplate: (options) => (
         <DataTableFilterDateComponent options={options} />
       ),
@@ -223,7 +226,7 @@ export default function MailsPage() {
 
   return (
     <>
-      <Card title="Email History">
+      <Card title={t("Email History")}>
         <div className="h-full">
           <DataTableComponent
             controller="mails"
@@ -293,7 +296,7 @@ export default function MailsPage() {
         formMode={FormMode.DELETE}
       >
         <div className="flex justify-content-center">
-          <p>Are you sure?</p>
+          <p>{t("Are you sure")}?</p>
         </div>
       </GenericDialogComponent>
     </>

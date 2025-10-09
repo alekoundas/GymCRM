@@ -4,6 +4,7 @@ import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
 import { TokenService } from "../../../services/TokenService";
 import { Button } from "primereact/button";
+import { useTranslator } from "../../../services/TranslatorService";
 interface IField<TEntity> {
   rowData: TEntity;
   onButtonClick: (buttonType: ButtonTypeEnum, rowData?: TEntity) => void;
@@ -19,6 +20,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
   controller,
   availableGridRowButtons,
 }: IField<TEntity>) {
+  const { t } = useTranslator();
   const menuRef = useRef<Menu>(null);
 
   const getMenuItems: () => MenuItem[] = () => {
@@ -26,7 +28,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
 
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.VIEW))
       menuItems.push({
-        label: "View",
+        label: t("View"),
         icon: "pi pi-eye",
         command: () => onButtonClick(ButtonTypeEnum.VIEW, rowData),
         visible: authorize
@@ -36,7 +38,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
 
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.EDIT))
       menuItems.push({
-        label: "Edit",
+        label: t("Edit"),
         icon: "pi pi-pencil",
         command: () => onButtonClick(ButtonTypeEnum.EDIT, rowData),
         visible: authorize
@@ -46,7 +48,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
 
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.CLONE))
       menuItems.push({
-        label: "Clone",
+        label: t("Clone"),
         icon: "pi pi-copy",
         command: () => onButtonClick(ButtonTypeEnum.CLONE, rowData),
         visible: authorize
@@ -56,7 +58,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
 
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.DELETE))
       menuItems.push({
-        label: "Delete",
+        label: t("Delete"),
         icon: "pi pi-trash",
         command: () => onButtonClick(ButtonTypeEnum.DELETE, rowData),
         visible: authorize

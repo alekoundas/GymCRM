@@ -3,12 +3,14 @@ import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import LookupComponent from "../../components/core/dropdown/LookupComponent";
 import { InputNumber } from "primereact/inputnumber";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField extends DialogChildProps {}
 
 export default function TrainGroupDateParticipantFormComponent({
   formMode,
 }: IField) {
+  const { t } = useTranslator();
   const { trainGroupParticipant, setTrainGroupParticipant } =
     useTrainGroupStore();
 
@@ -26,7 +28,7 @@ export default function TrainGroupDateParticipantFormComponent({
             id="trainGroupDateId"
             name="trainGroupDateId"
             type="text"
-            placeholder="Train Group Date"
+            placeholder="TrainGroupDateId"
             className="w-full mb-3"
             value={trainGroupParticipant.trainGroupDateId}
             disabled={true}
@@ -38,7 +40,7 @@ export default function TrainGroupDateParticipantFormComponent({
             htmlFor="userId"
             className="block text-900 font-medium mb-2"
           >
-            User
+            {t("User")}
           </label>
           <LookupComponent
             controller="users"

@@ -2,9 +2,10 @@ import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
 import { useNavigate } from "react-router-dom";
 import { TokenService } from "../../../services/TokenService";
+import { useTranslator } from "../../../services/TranslatorService";
 
 export default function NavLeft() {
-  // const toast = useRef<Toast>(null);
+  const { t } = useTranslator();
   const navigate = useNavigate();
 
   const items: MenuItem[] = [
@@ -15,7 +16,7 @@ export default function NavLeft() {
         TokenService.isUserAllowed("Roles_View"),
       items: [
         {
-          label: "Users",
+          label: t("Users"),
           icon: "pi pi-users",
           visible: TokenService.isUserAllowed("Users_View"),
           command: () => {
@@ -23,7 +24,7 @@ export default function NavLeft() {
           },
         },
         {
-          label: "Roles",
+          label: t("Roles"),
           icon: "pi pi-key",
           visible: TokenService.isUserAllowed("Roles_View"),
           command: () => {
@@ -33,11 +34,11 @@ export default function NavLeft() {
       ],
     },
     {
-      label: "Trainer",
+      label: t("Trainer"),
       visible: TokenService.isUserAllowed("TrainGroups_View"),
       items: [
         {
-          label: "Calendar",
+          label: t("Calendar"),
           icon: "pi pi-calendar",
           visible: TokenService.isUserAllowed("TrainGroups_View"),
           command: () => {
@@ -45,7 +46,7 @@ export default function NavLeft() {
           },
         },
         {
-          label: "Train Groups",
+          label: t("Train Groups"),
           icon: "pi pi-users",
           visible: TokenService.isUserAllowed("TrainGroups_View"),
           command: () => {
@@ -68,7 +69,7 @@ export default function NavLeft() {
           },
         },
         {
-          label: "Send New Mail",
+          label: t("Send new Mail"),
           icon: "pi pi-send",
           visible: TokenService.isUserAllowed("Mails_Add"),
           command: () => {

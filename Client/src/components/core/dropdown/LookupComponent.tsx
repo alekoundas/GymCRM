@@ -4,6 +4,7 @@ import { VirtualScrollerLazyEvent } from "primereact/virtualscroller";
 import { LookupDto } from "../../../model/lookup/LookupDto";
 import { LookupOptionDto } from "../../../model/lookup/LookupOptionDto";
 import { useApiService } from "../../../services/ApiService";
+import { useTranslator } from "../../../services/TranslatorService";
 
 interface IField {
   controller: string;
@@ -18,11 +19,13 @@ export default function LookupComponent({
   isEnabled,
   onChange,
 }: IField) {
+  const { t } = useTranslator();
+  const apiService = useApiService();
+
   const [isDataLoaded, setIsDataLoaded] = useState(false); // used to escape lazyload firing again after dto update.
   const [loading, setLoading] = useState(false);
   const [lookupDto, setLookupDto] = useState<LookupDto>(new LookupDto());
   const [selectedId, setSelectedId] = useState<string | undefined>();
-  const apiService = useApiService();
 
   const fetchData = async (dto: LookupDto) => {
     setLoading(true);
@@ -98,7 +101,7 @@ export default function LookupComponent({
         value={selectedId}
         onChange={handleChange}
         options={lookupDto.data}
-        placeholder="Select a value"
+        placeholder={t("Select a value")}
         className="w-full md:w-14rem"
         disabled={!isEnabled}
         showClear

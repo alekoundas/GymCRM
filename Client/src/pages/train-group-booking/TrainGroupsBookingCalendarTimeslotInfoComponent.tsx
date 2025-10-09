@@ -6,8 +6,8 @@ import { DateService } from "../../services/DateService";
 import { Tag } from "primereact/tag";
 import { DividerComponent } from "../../components/core/divider/DividerComponent";
 import { JSX } from "react";
-import { LocalStorageService } from "../../services/LocalStorageService";
 import { TokenService } from "../../services/TokenService";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField {
   onBook: () => void;
@@ -16,6 +16,7 @@ interface IField {
 export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
   onBook,
 }: IField) {
+  const { t } = useTranslator();
   const { timeSlotRequestDto, selectedTimeSlot, timeSlotResponseDto } =
     useTrainGroupBookingStore();
 
@@ -75,18 +76,20 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
     <>
       {timeSlotRequestDto.selectedDate && selectedTimeSlot && (
         <Card
-          title="Selected Time Slot Details"
+          title={t("Selected Time Slot Details")}
           className="mt-4"
         >
           <p>
-            <strong>Time:</strong>{" "}
+            <strong>{t("Start On")}:</strong>{" "}
             {new Date(selectedTimeSlot.startOn).toLocaleTimeString()}
           </p>
           <p>
-            <strong>Group Name:</strong> {selectedTimeSlot.title || "N/A"}
+            <strong>{t("Group Name")}:</strong>{" "}
+            {selectedTimeSlot.title || "N/A"}
           </p>
           <p>
-            <strong>Trainer:</strong> {selectedTimeSlot.trainerId || "N/A"}
+            <strong>{t("Trainer")}:</strong>{" "}
+            {selectedTimeSlot.trainerId || "N/A"}
           </p>
           <p>
             <strong>Spots Left:</strong>{" "}
@@ -95,12 +98,12 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
               : "N/A"}
           </p>
           <p>
-            <strong>Available:</strong>{" "}
-            {selectedTimeSlot.spotsLeft > 0 ? "Yes" : "No"}
+            <strong>{t("Available")}:</strong>{" "}
+            {selectedTimeSlot.spotsLeft > 0 ? t("Yes") : t("No")}
           </p>
           <p>
             <strong>Description:</strong>{" "}
-            {selectedTimeSlot.description || "No description available."}
+            {selectedTimeSlot.description || t("No description available.")}
           </p>
 
           <h3 className="mt-6">Group is occurring on </h3>
@@ -115,7 +118,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
               <>
                 <DividerComponent>
                   <p>
-                    <strong className="text-base">One-off</strong>
+                    <strong className="text-base">{t("One-off")}</strong>
                   </p>
                 </DividerComponent>
                 {renderDateTag(undefined)}
@@ -136,7 +139,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                 </p> */}
                 <DividerComponent>
                   <p>
-                    <strong className="text-base">One-off</strong>
+                    <strong className="text-base">{t("One-off")}</strong>
                   </p>
                 </DividerComponent>
                 {renderDateTag(TrainGroupDateTypeEnum.FIXED_DAY)}
@@ -155,7 +158,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                 <DividerComponent>
                   <p>
                     <strong className="text-base">
-                      Recurring Dates (Day of week)
+                      {t("Recurring Dates (Day of Week)")}
                     </strong>
                   </p>
                 </DividerComponent>
@@ -176,7 +179,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
                 <DividerComponent>
                   <p>
                     <strong className="text-base">
-                      Recurring Dates (Day of month)
+                      {t("Recurring Dates (Day of month)")}
                     </strong>
                   </p>
                 </DividerComponent>
@@ -187,7 +190,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
           {TokenService.getUserId() && (
             <div className="flex justify-content-center">
               <Button
-                label="Book Now"
+                label={t("Book Now")}
                 icon="pi pi-check"
                 className="mt-4 pr-5 pl-5 pt-3 pb-3"
                 onClick={onBook}

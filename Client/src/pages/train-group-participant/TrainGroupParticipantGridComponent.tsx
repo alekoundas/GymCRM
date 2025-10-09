@@ -13,6 +13,7 @@ import { useParams } from "react-router-dom";
 import TrainGroupDateParticipantFormComponent from "./TrainGroupDateParticipantFormComponent";
 import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
 import { useApiService } from "../../services/ApiService";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField {
   formMode: FormMode;
@@ -21,6 +22,7 @@ interface IField {
 export default function TrainGroupParticipantGridComponent({
   formMode,
 }: IField) {
+  const { t } = useTranslator();
   const apiService = useApiService();
   const params = useParams();
 
@@ -103,10 +105,10 @@ export default function TrainGroupParticipantGridComponent({
   const dataTableColumns: DataTableColumns<TrainGroupParticipantDto>[] = [
     {
       field: "selectedDate",
-      header: "Selected Date",
+      header: t("Selected Date"),
       sortable: true,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "30%" },
       body: (rowData: TrainGroupParticipantDto) => {
         if (rowData.selectedDate) {
@@ -126,7 +128,7 @@ export default function TrainGroupParticipantGridComponent({
       header: "TrainGroupId",
       sortable: true,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "10%" },
     },
     {
@@ -134,15 +136,15 @@ export default function TrainGroupParticipantGridComponent({
       header: "TrainGroupDateId",
       sortable: true,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "10%" },
     },
     {
       field: "userId",
-      header: "Participant",
+      header: t("Participant"),
       sortable: true,
       filter: false,
-      filterPlaceholder: "Search",
+      filterPlaceholder: t("Search"),
       style: { width: "10%" },
     },
   ];
@@ -329,7 +331,7 @@ export default function TrainGroupParticipantGridComponent({
         formMode={FormMode.DELETE}
       >
         <div className="flex justify-content-center">
-          <p>Are you sure?</p>
+          <p>{"Are you sure"}?</p>
         </div>
       </GenericDialogComponent>
     </>

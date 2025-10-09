@@ -6,10 +6,12 @@ import AutoCompleteComponent from "../../components/core/auto-complete/AutoCompl
 import { Avatar } from "primereact/avatar";
 import RichTextAreaComponent from "../../components/core/text-area/RichTextAreaComponent";
 import { useMailStore } from "../../stores/MailStore";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField extends DialogChildProps {}
 
 export default function MailSendFormComponent({ formMode }: IField) {
+  const { t } = useTranslator();
   const { mailSendDto, updateMailSendDto } = useMailStore();
 
   const getDisplayImageSrc = (
@@ -78,7 +80,7 @@ export default function MailSendFormComponent({ formMode }: IField) {
   return (
     <div className="flex flex-column gap-3">
       <div className="field ">
-        <label htmlFor="recipients">Recipients</label>
+        <label htmlFor="recipients">{t("Recipients")}</label>
         <AutoCompleteComponent
           controller="users"
           isEnabled={true}
@@ -88,7 +90,7 @@ export default function MailSendFormComponent({ formMode }: IField) {
         />
       </div>
       <div className="field">
-        <label htmlFor="subject">Subject</label>
+        <label htmlFor="subject">{t("Subject")}</label>
         <InputText
           id="subject"
           name="subject"
@@ -103,7 +105,7 @@ export default function MailSendFormComponent({ formMode }: IField) {
           value={mailSendDto.body}
           onChange={(e) => updateMailSendDto({ body: e })}
           isEnabled={formMode !== FormMode.VIEW}
-          label="Body"
+          label={t("Body")}
         />
       </div>
     </div>

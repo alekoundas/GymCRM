@@ -4,13 +4,14 @@ import { DateService } from "../../services/DateService";
 import { Checkbox } from "primereact/checkbox";
 import { TokenService } from "../../services/TokenService";
 import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
-import { Divider } from "primereact/divider";
 import { DividerComponent } from "../../components/core/divider/DividerComponent";
 import { JSX } from "react";
+import { useTranslator } from "../../services/TranslatorService";
 
 interface IField {}
 
 export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: IField) {
+  const { t } = useTranslator();
   const {
     timeSlotRequestDto,
     selectedTimeSlot,
@@ -159,11 +160,12 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
       <div className="p-fluid">
         <div className="text-center mb-4">
           <p className="text-lg font-semibold mb-0">
-            Select the dates you want to book for this training session.
+            {t("Select the dates you want to book for this training session.")}
           </p>
           <p className="text-sm text-gray-600 mt-0">
-            One-off dates apply only to the selected date, while recurring dates
-            apply to all future sessions on that day of the week or month.
+            {t(
+              "One-off dates apply only to the selected date, while recurring dates apply to all future sessions on that day of the week or month."
+            )}
           </p>
         </div>
 
@@ -180,7 +182,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                   <div className="field">
                     <DividerComponent>
                       <p>
-                        <strong className="text-base">One-off</strong>
+                        <strong className="text-base">{t("One-off")}</strong>
                       </p>
                     </DividerComponent>
                     {renderDateCheckbox(undefined)}
@@ -197,7 +199,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                   <div className="field">
                     <DividerComponent>
                       <p>
-                        <strong className="text-base">One-off</strong>
+                        <strong className="text-base">{t("One-off")}</strong>
                       </p>
                     </DividerComponent>
 
@@ -216,7 +218,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                     <DividerComponent>
                       <p>
                         <strong className="text-base">
-                          Recurring Dates (Day of Week)
+                          {t("Recurring Dates (Day of Week)")}
                         </strong>
                       </p>
                     </DividerComponent>
@@ -236,7 +238,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
                     <DividerComponent>
                       <p>
                         <strong className="text-base">
-                          Recurring Dates (Day of month)
+                          {t("Recurring Dates (Day of month)")}
                         </strong>
                       </p>
                     </DividerComponent>
