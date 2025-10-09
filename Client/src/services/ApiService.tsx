@@ -21,10 +21,9 @@ import { ApiResponseDto } from "../model/core/api-response/ApiResponseDto";
 
 const BASE_URL = "/api/";
 const TOKEN_EXPIRATION_MS = 604800 * 1000; // 7 days
-
+const refreshPromiseRef = { current: null as Promise<boolean> | null };
 export const useApiService = () => {
   const { showSuccess, showInfo, showWarn, showError } = useToast();
-  const refreshPromiseRef = useRef<Promise<boolean> | null>(null);
 
   const buildUrl = useCallback(
     (
