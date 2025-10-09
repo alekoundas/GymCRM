@@ -9,6 +9,9 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { TokenService } from "../../../services/TokenService";
 import { useApiService } from "../../../services/ApiService";
 import NavSidebar from "../navbar-sidebar/NavSidebar";
+import { Avatar } from "primereact/avatar";
+import { LocalStorageService } from "../../../services/LocalStorageService";
+import { Chip } from "primereact/chip";
 
 export default function NavTop() {
   const { isUserAuthenticated, logout } = useAuth();
@@ -110,8 +113,49 @@ export default function NavTop() {
     return items;
   };
 
+  const chipTemplate = () => {
+    const firstName = LocalStorageService.getFirstName() ?? "";
+    const lastName = LocalStorageService.getLastName() ?? "";
+    const profileImage = LocalStorageService.getProfileImage();
+    const isProfileImageSet = profileImage && profileImage?.length > 0;
+    const imageSrc = `data:image/png;base64,${profileImage}`;
+
+    if (firstName.length === 0 || lastName.length === 0) return "";
+
+    const fullName =
+      " " +
+      firstName[0].toUpperCase() +
+      ". " +
+      lastName[0].toUpperCase() +
+      lastName.slice(1, lastName.length);
+
+    if (isProfileImageSet) {
+      return (
+        <p className="flex m-0 p-0 align-items-center">
+          <Chip
+            template={
+              <>
+                <Avatar
+                  image={imageSrc}
+                  label={undefined}
+                  shape="circle"
+                  size="normal"
+                  className=" mr-2 "
+                />
+                {fullName}
+              </>
+            }
+          />
+        </p>
+      );
+    } else {
+      return <Chip label={fullName} />;
+    }
+  };
+
   const end = (
-    <div>
+    <div className="flex align-items-center gap-2">
+      <div className="pr-4">{chipTemplate()}</div>
       <Menu
         model={getItemsSettings()}
         popup

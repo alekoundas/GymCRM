@@ -20,6 +20,15 @@ export class LocalStorageService {
   public static getRefreshTokenExpireDate = (): string | undefined =>
     this.returnString("refreshTokenExpireDate");
 
+  public static getProfileImage = (): string | undefined =>
+    this.returnString("profileImage");
+
+  public static getFirstName = (): string | undefined =>
+    this.returnString("firstName");
+
+  public static getLastName = (): string | undefined =>
+    this.returnString("lastName");
+
   //
   //    Set data.
   //
@@ -40,6 +49,15 @@ export class LocalStorageService {
 
   public static setRefreshTokenExpireDate = (value: string = "") =>
     localStorage.setItem("refreshTokenExpireDate", value);
+
+  public static setProfileImage = (value: string = "") =>
+    localStorage.setItem("profileImage", value);
+
+  public static setFirstName = (value: string = "") =>
+    localStorage.setItem("firstName", value);
+
+  public static setLastName = (value: string = "") =>
+    localStorage.setItem("lastName", value);
 
   //
   //  Retrieve data logic.

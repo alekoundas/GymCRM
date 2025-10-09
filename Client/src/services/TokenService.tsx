@@ -108,6 +108,9 @@ export class TokenService {
     LocalStorageService.setRefreshToken();
     LocalStorageService.setAccessToken();
     LocalStorageService.setRefreshTokenExpireDate();
+    LocalStorageService.setProfileImage();
+    LocalStorageService.setFirstName();
+    LocalStorageService.setLastName();
   };
 
   // Login
@@ -119,6 +122,15 @@ export class TokenService {
 
   public static setRefreshTokenExpireDate = (value: string) =>
     LocalStorageService.setRefreshTokenExpireDate(value);
+
+  public static setProfileImage = (value: string) =>
+    LocalStorageService.setProfileImage(value);
+
+  public static setFirstName = (value: string) =>
+    LocalStorageService.setFirstName(value);
+
+  public static setLastName = (value: string) =>
+    LocalStorageService.setLastName(value);
 
   // Refresh tokens
   public static getUserRefreshTokenDto = (): UserRefreshTokenDto => ({
