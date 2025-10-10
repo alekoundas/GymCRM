@@ -1,5 +1,4 @@
 import { Menubar } from "primereact/menubar";
-import { Badge } from "primereact/badge";
 import { useNavigate } from "react-router-dom";
 import { Menu } from "primereact/menu";
 import { Button } from "primereact/button";
@@ -69,13 +68,6 @@ export default function NavTop() {
             icon: "pi pi-palette",
             command: () => setNavRightVisibility(true),
           },
-
-          // {
-          //   separator: true,
-          // },
-          // {
-          //   template: dialogFooter,
-          // },
         ],
       },
     ];
@@ -121,7 +113,6 @@ export default function NavTop() {
     const profileImage = LocalStorageService.getProfileImage();
     const isProfileImageSet = profileImage && profileImage?.length > 0;
     const imageSrc = `data:image/png;base64,${profileImage}`;
-
     if (firstName.length === 0 || lastName.length === 0) return "";
 
     const fullName =
@@ -134,13 +125,15 @@ export default function NavTop() {
     if (isProfileImageSet) {
       return (
         <Chip
+          className=" transition-colors transition-duration-300 surface-section hover:bg-primary hover:text-gray-900 cursor-pointer "
+          onClick={() => navigate("/users/profile")}
           template={
             <>
               <Avatar
                 image={imageSrc}
                 label={undefined}
                 shape="circle"
-                size="normal"
+                size="large"
                 className=" mr-2 "
               />
               {fullName}
@@ -149,7 +142,12 @@ export default function NavTop() {
         />
       );
     } else {
-      return <Chip label={fullName} />;
+      return (
+        <Chip
+          className="transition-colors transition-duration-300 surface-section hover:bg-primary hover:text-gray-900 cursor-pointer "
+          label={fullName}
+        />
+      );
     }
   };
 
