@@ -148,5 +148,14 @@
   "You havent joined this date. Please join via apointment tab.": "__STRING_NOT_TRANSLATED__",
   "This action will cancel your booking for this date.": "__STRING_NOT_TRANSLATED__",
   "This action will cancel your booking ONLY for this date.": "__STRING_NOT_TRANSLATED__",
-  "You will join this date, only if there are any spots available.": "__STRING_NOT_TRANSLATED__"
+  "You will join this date, only if there are any spots available.": "__STRING_NOT_TRANSLATED__",
+  "Spots Left": "__STRING_NOT_TRANSLATED__",
+  "Group is occurring on": "__STRING_NOT_TRANSLATED__",
+  "MONDAY": "__STRING_NOT_TRANSLATED__",
+  "TUESDAY": "__STRING_NOT_TRANSLATED__",
+  "WEDNESDAY": "__STRING_NOT_TRANSLATED__",
+  "THURSDAY": "__STRING_NOT_TRANSLATED__",
+  "FRIDAY": "__STRING_NOT_TRANSLATED__",
+  "SATURDAY": "__STRING_NOT_TRANSLATED__",
+  "SUNDAY": "__STRING_NOT_TRANSLATED__"
 }

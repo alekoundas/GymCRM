@@ -155,6 +155,15 @@
   'This action will cancel your booking for this date.': string;
   'This action will cancel your booking ONLY for this date.': string;
   'You will join this date, only if there are any spots available.': string;
+  'Spots Left': string;
+  'Group is occurring on': string;
+  'MONDAY': string;
+  'TUESDAY': string;
+  'WEDNESDAY': string;
+  'THURSDAY': string;
+  'FRIDAY': string;
+  'SATURDAY': string;
+  'SUNDAY': string;
     }
 
 

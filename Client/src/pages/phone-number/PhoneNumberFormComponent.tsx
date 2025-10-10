@@ -19,7 +19,7 @@ export default function PhoneNumberFormComponent({ formMode }: IField) {
           htmlFor="number"
           className="block text-900 font-medium mb-2"
         >
-          Phone Number
+          {t("Phone Number")}
         </label>
         <InputText
           id="number"

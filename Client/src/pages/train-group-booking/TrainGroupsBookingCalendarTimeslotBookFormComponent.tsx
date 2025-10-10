@@ -1,6 +1,6 @@
 import { useTrainGroupBookingStore } from "../../stores/TrainGroupBookingStore";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
-import { DateService } from "../../services/DateService";
+import { useDateService } from "../../services/DateService";
 import { Checkbox } from "primereact/checkbox";
 import { TokenService } from "../../services/TokenService";
 import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
@@ -12,6 +12,7 @@ interface IField {}
 
 export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: IField) {
   const { t } = useTranslator();
+  const { getDayOfWeekFromDate } = useDateService();
   const {
     timeSlotRequestDto,
     selectedTimeSlot,
@@ -104,7 +105,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
   ): string => {
     switch (type) {
       case TrainGroupDateTypeEnum.DAY_OF_WEEK:
-        return DateService.getDayOfWeekFromDate(new Date(date)) ?? "";
+        return getDayOfWeekFromDate(new Date(date)) ?? "";
       case TrainGroupDateTypeEnum.DAY_OF_MONTH:
         return new Date(date).getDate().toString();
       case TrainGroupDateTypeEnum.FIXED_DAY:

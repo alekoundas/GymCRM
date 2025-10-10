@@ -18,6 +18,7 @@ import { TrainGroupParticipantUnavailableDateDto } from "../../model/entities/tr
 import ThemeService from "../../services/ThemeService";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
+import { LocalStorageService } from "../../services/LocalStorageService";
 
 export default function UserProfileTimeslotsComponent() {
   const { t } = useTranslator();
@@ -303,7 +304,9 @@ export default function UserProfileTimeslotsComponent() {
               x.date.year,
               month,
               day
-            ).toLocaleDateString("en-US", { weekday: "short" });
+            ).toLocaleDateString(LocalStorageService.getLanguage() ?? "el", {
+              weekday: "short",
+            });
             return `${weekday} ${day}/${month}`;
           }}
           slotLabelFormat={{
@@ -636,7 +639,9 @@ export default function UserProfileTimeslotsComponent() {
         header="Are you sure?"
       >
         <div className="flex justify-content-center">
-          <p>{t("This action will cancel your booking ONLY for this date.")} </p>
+          <p>
+            {t("This action will cancel your booking ONLY for this date.")}{" "}
+          </p>
         </div>
       </GenericDialogComponent>
 
@@ -651,7 +656,11 @@ export default function UserProfileTimeslotsComponent() {
         header="Are you sure?"
       >
         <div className="flex justify-content-center">
-          <p>{t("You will join this date, only if there are any spots available.")}</p>
+          <p>
+            {t(
+              "You will join this date, only if there are any spots available."
+            )}
+          </p>
         </div>
       </GenericDialogComponent>
     </>
