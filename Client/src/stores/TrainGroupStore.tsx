@@ -167,9 +167,9 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
           (x) => x.id === newRow.trainGroupDateId
         )!,
         trainGroupParticipants: [
-          ...state.trainGroupDto.trainGroupDates.find(
+          ...(state.trainGroupDto.trainGroupDates.find(
             (x) => x.id === newRow.trainGroupDateId
-          )!.trainGroupParticipants,
+          )?.trainGroupParticipants || []),
           newRow,
         ],
       };

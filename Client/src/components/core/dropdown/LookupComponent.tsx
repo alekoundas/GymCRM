@@ -49,7 +49,7 @@ export default function LookupComponent({
       setSelectedOptionById(selectedEntityId);
       setSelectedId(selectedEntityId);
     }
-  }, []);
+  }, [selectedEntityId]);
 
   const onLazyLoad = async (event: VirtualScrollerLazyEvent) => {
     if (isDataLoaded) {

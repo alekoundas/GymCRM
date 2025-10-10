@@ -24,7 +24,7 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
   const params = useParams();
   const navigate = useNavigate();
 
-  const { trainGroupDto, setTrainGroupDto } = useTrainGroupStore();
+  const { trainGroupDto, updateTrainGroupDto } = useTrainGroupStore();
   const [isInfoDateDialogVisible, setInfoDateDialogVisible] = useState(false); // Dialog visibility
   const [isInfoParticipantDialogVisible, setInfoParticipantDialogVisible] =
     useState(false); // Dialog visibility
@@ -33,9 +33,18 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
   useEffect(() => {
     if (params["id"]) {
       const id = params["id"];
-      apiService
-        .get<TrainGroupDto>("TrainGroups", id)
-        .then((x) => (x ? setTrainGroupDto(x) : undefined));
+      apiService.get<TrainGroupDto>("TrainGroups", id).then((response) => {
+        if (response) {
+          updateTrainGroupDto({ id: response.id });
+          updateTrainGroupDto({ title: response.title });
+          updateTrainGroupDto({ startOn: response.startOn });
+          updateTrainGroupDto({ duration: response.duration });
+          updateTrainGroupDto({ maxParticipants: response.maxParticipants });
+          updateTrainGroupDto({ trainer: response.trainer });
+          updateTrainGroupDto({ trainerId: response.trainerId });
+          updateTrainGroupDto({ description: response.description });
+        }
+      });
     }
   }, []);
 
