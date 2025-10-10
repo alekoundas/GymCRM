@@ -62,7 +62,7 @@
   "Name": "Όνομα",
   "Normalized name": "Κανονικοποιημένο όνομα",
   "Handle your train groups": "Διαχειριστείτε τις ομάδες εκπαίδευσής σας",
-  "Available Timeslots": "Διαθέσιμες Χρονοθυρίδες",
+  "Available Timeslots": "Διαθέσιμες ΧρονοθυρίSδες",
   "No time slots available for this date": "Δεν υπάρχουν διαθέσιμες χρονοθυρίδες για αυτή την ημερομηνία",
   "Train Group": "Ομάδα Εκπαίδευσης",
   "Train Group Dates": "Ημερομηνίες Ομάδας Εκπαίδευσης",
@@ -148,5 +148,14 @@
   "You havent joined this date. Please join via apointment tab.": "Δεν έχετε συμμετάσχει σε αυτή την ημερομηνία. Παρακαλώ συμμετάσχετε μέσω καρτέλας ραντεβού.",
   "This action will cancel your booking for this date.": "Αυτή η ενέργεια θα ακυρώσει την κράτησή σας για αυτή την ημερομηνία.",
   "This action will cancel your booking ONLY for this date.": "Αυτή η ενέργεια θα ακυρώσει την κράτησή σας ΜΟΝΟ για αυτή την ημερομηνία.",
-  "You will join this date, only if there are any spots available.": "Θα συμμετάσχετε σε αυτή την ημερομηνία, μόνο αν υπάρχουν διαθέσιμες θέσεις."
+  "You will join this date, only if there are any spots available.": "Θα συμμετάσχετε σε αυτή την ημερομηνία, μόνο αν υπάρχουν διαθέσιμες θέσεις.",
+  "Spots Left": "Διαθέσιμες Θέσεις",
+  "Group is occurring on": "Η ομάδα πραγματοποιείται στις",
+  "MONDAY": "Δευτέρα",
+  "TUESDAY": "Τρίτη",
+  "WEDNESDAY": "Τετάρτη",
+  "THURSDAY": "Πέμπτη",
+  "FRIDAY": "Παρασκευή",
+  "SATURDAY": "Σάββατο",
+  "SUNDAY": "Κυριακή"
 }

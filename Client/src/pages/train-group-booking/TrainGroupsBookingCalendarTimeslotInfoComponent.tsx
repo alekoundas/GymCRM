@@ -2,7 +2,7 @@ import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { useTrainGroupBookingStore } from "../../stores/TrainGroupBookingStore";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
-import { DateService } from "../../services/DateService";
+import { useDateService } from "../../services/DateService";
 import { Tag } from "primereact/tag";
 import { DividerComponent } from "../../components/core/divider/DividerComponent";
 import { JSX } from "react";
@@ -17,6 +17,8 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
   onBook,
 }: IField) {
   const { t } = useTranslator();
+  const { getDayOfWeekFromDate } = useDateService();
+
   const { timeSlotRequestDto, selectedTimeSlot, timeSlotResponseDto } =
     useTrainGroupBookingStore();
 
@@ -27,7 +29,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
   ): string => {
     switch (type) {
       case TrainGroupDateTypeEnum.DAY_OF_WEEK:
-        return DateService.getDayOfWeekFromDate(new Date(date)) ?? "";
+        return getDayOfWeekFromDate(new Date(date)) ?? "";
       case TrainGroupDateTypeEnum.DAY_OF_MONTH:
         return new Date(date).getDate().toString();
       case TrainGroupDateTypeEnum.FIXED_DAY:
@@ -92,7 +94,7 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
             {selectedTimeSlot.trainerId || "N/A"}
           </p>
           <p>
-            <strong>Spots Left:</strong>{" "}
+            <strong>{t("Spots Left")}:</strong>{" "}
             {selectedTimeSlot.spotsLeft !== undefined
               ? selectedTimeSlot.spotsLeft
               : "N/A"}
@@ -102,11 +104,11 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
             {selectedTimeSlot.spotsLeft > 0 ? t("Yes") : t("No")}
           </p>
           <p>
-            <strong>Description:</strong>{" "}
+            <strong>{t("Description")}:</strong>{" "}
             {selectedTimeSlot.description || t("No description available.")}
           </p>
 
-          <h3 className="mt-6">Group is occurring on </h3>
+          <h3 className="mt-6">{t("Group is occurring on")}:</h3>
 
           {/*                      */}
           {/*     Current Date     */}

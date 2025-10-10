@@ -82,17 +82,17 @@ export default function NavTop() {
 
     if (isUserAuthenticated) {
       (items[0].items as MenuItem[])?.push({
-        label: t("Logout"),
+        label: t("Profile"),
         icon: "pi pi-user",
+        command: () => navigate("/users/profile"),
+      });
+      (items[0].items as MenuItem[])?.push({
+        label: t("Logout"),
+        icon: "pi pi-sign-out",
         command: () => {
           apiService.logout(logout);
           navigate("/users/login");
         },
-      });
-      (items[0].items as MenuItem[])?.push({
-        label: t("Profile"),
-        icon: "pi pi-user",
-        command: () => navigate("/users/profile"),
       });
     } else {
       (items[0].items as MenuItem[])?.push({

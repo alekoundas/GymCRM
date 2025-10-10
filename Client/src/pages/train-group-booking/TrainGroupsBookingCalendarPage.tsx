@@ -14,6 +14,7 @@ import { TrainGroupParticipantDto } from "../../model/entities/train-group-parti
 import { useToast } from "../../contexts/ToastContext";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
+import { LocalStorageService } from "../../services/LocalStorageService";
 
 export default function TrainGroupsBookingCalendarPage() {
   const { t } = useTranslator();

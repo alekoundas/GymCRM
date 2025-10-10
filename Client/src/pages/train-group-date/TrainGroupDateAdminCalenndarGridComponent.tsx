@@ -13,7 +13,6 @@ import { DataTableColumns } from "../../model/datatable/DataTableColumns";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
-import { DateService } from "../../services/DateService";
 import { useParams } from "react-router-dom";
 import {
   DataTableSelectionSingleChangeEvent,
@@ -22,6 +21,7 @@ import {
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { TrainGroupDateDto } from "../../model/entities/train-group-date/TrainGroupDateDto";
 import { useTranslator } from "../../services/TranslatorService";
+import { useDateService } from "../../services/DateService";
 
 interface IField extends DialogChildProps {}
 
@@ -29,6 +29,8 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
   formMode,
 }: IField) {
   const { t } = useTranslator();
+  const { translateEnum } = useDateService();
+
   const params = useParams();
   const {
     trainGroupDto,
@@ -195,8 +197,7 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
       filterPlaceholder: t("Search"),
       style: { width: "20%" },
       body: (rowData: TrainGroupDateDto) => {
-        // return DateService.getDayOfWeekFromDate(rowData.recurrenceDayOfWeek);
-        return rowData.recurrenceDayOfWeek;
+        return translateEnum(rowData.recurrenceDayOfWeek);
       },
       cellEditor: (options: ColumnEditorOptions) => {
         const editingRow = editingRows.filter(

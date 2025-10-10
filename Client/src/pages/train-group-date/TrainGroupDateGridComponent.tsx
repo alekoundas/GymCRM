@@ -19,11 +19,13 @@ import TrainGroupDateFormComponent from "./TrainGroupDateFormComponent";
 import { TrainGroupDateDto } from "../../model/entities/train-group-date/TrainGroupDateDto";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
+import { useDateService } from "../../services/DateService";
 
 interface IField extends DialogChildProps {}
 
 export default function TrainGroupDateGridComponent({ formMode }: IField) {
   const { t } = useTranslator();
+  const { translateEnum } = useDateService();
   const apiService = useApiService();
   const params = useParams();
   const {
@@ -152,7 +154,8 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
       filter: false,
       filterPlaceholder: t("Search"),
       style: { width: "20%" },
-      // body: (rowData: TrainGroupDateDto) => rowData.recurrenceDayOfWeek,
+      body: (rowData: TrainGroupDateDto) =>
+        translateEnum(rowData.recurrenceDayOfWeek),
     },
     {
       field: "recurrenceDayOfMonth",
