@@ -19,6 +19,8 @@ import ThemeService from "../../services/ThemeService";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
 import { LocalStorageService } from "../../services/LocalStorageService";
+import { UserDto } from "../../model/entities/user/UserDto";
+import { Avatar } from "primereact/avatar";
 
 export default function UserProfileTimeslotsComponent() {
   const { t } = useTranslator();
@@ -287,6 +289,33 @@ export default function UserProfileTimeslotsComponent() {
         });
   };
 
+  // Custom chip template for selected users
+  const chipTemplate = (user: UserDto | undefined) => {
+    if (user) {
+      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
+        0
+      )}`.toUpperCase();
+      const imageSrc = "data:image/png;base64," + user.profileImage;
+      return (
+        <div className="flex m-0 p-0 pl-3 align-items-center ">
+          <Avatar
+            image={user.profileImage ? imageSrc : ""}
+            label={user.profileImage ? undefined : initials}
+            shape="circle"
+            size="normal"
+            className=" mr-2 "
+          />
+          {" " +
+            user.firstName[0].toUpperCase() +
+            user.firstName.slice(1, user.firstName.length) +
+            " " +
+            user.lastName[0].toUpperCase() +
+            user.lastName.slice(1, user.lastName.length)}
+        </div>
+      );
+    }
+  };
+
   return (
     <>
       <div className="p-4">
@@ -381,16 +410,18 @@ export default function UserProfileTimeslotsComponent() {
                     <strong> {t("Start On")}:</strong>{" "}
                     {new Date(selectedTrainGroup.startOn).toLocaleTimeString()}
                   </p>
-                  <p>
+                  <p className="mb-0">
                     <strong>{t("Group Name")}:</strong>{" "}
                     {selectedTrainGroup.title || "N/A"}
                   </p>
-                  <p>
-                    <strong>{t("Trainer")}:</strong>{" "}
-                    {selectedTrainGroup.trainerId || "N/A"}
-                  </p>
+                  <div className="flex p-0 m-0">
+                    <p>
+                      <strong>{t("Trainer")}:</strong>
+                    </p>
+                    {chipTemplate(selectedTrainGroup.trainer)}
+                  </div>
 
-                  <p className="flex align-items-center ">
+                  <p className="flex align-items-center mt-0">
                     <strong>{t("Book Type")}:</strong>
                     {selectedTimeSlotRecurrenceDate.isOneOff ? (
                       <Tag>{t("One-off")}</Tag>

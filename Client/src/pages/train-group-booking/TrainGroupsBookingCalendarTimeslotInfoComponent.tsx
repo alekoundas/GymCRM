@@ -8,6 +8,9 @@ import { DividerComponent } from "../../components/core/divider/DividerComponent
 import { JSX } from "react";
 import { TokenService } from "../../services/TokenService";
 import { useTranslator } from "../../services/TranslatorService";
+import { UserDto } from "../../model/entities/user/UserDto";
+import { Avatar } from "primereact/avatar";
+import { Chip } from "primereact/chip";
 
 interface IField {
   onBook: () => void;
@@ -73,6 +76,32 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
 
     return htmlElements;
   };
+  // Custom chip template for selected users
+  const chipTemplate = (user: UserDto | undefined) => {
+    if (user) {
+      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
+        0
+      )}`.toUpperCase();
+      const imageSrc = "data:image/png;base64," + user.profileImage;
+      return (
+        <div className="flex m-0 p-0 pl-3 align-items-center ">
+          <Avatar
+            image={user.profileImage ? imageSrc : ""}
+            label={user.profileImage ? undefined : initials}
+            shape="circle"
+            size="normal"
+            className=" mr-2 "
+          />
+          {" " +
+            user.firstName[0].toUpperCase() +
+            user.firstName.slice(1, user.firstName.length) +
+            " " +
+            user.lastName[0].toUpperCase() +
+            user.lastName.slice(1, user.lastName.length)}
+        </div>
+      );
+    }
+  };
 
   return (
     <>
@@ -85,19 +114,18 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
             <strong>{t("Start On")}:</strong>{" "}
             {new Date(selectedTimeSlot.startOn).toLocaleTimeString()}
           </p>
-          <p>
+          <p className="mb-0">
             <strong>{t("Group Name")}:</strong>{" "}
             {selectedTimeSlot.title || "N/A"}
           </p>
-          <p>
-            <strong>{t("Trainer")}:</strong>{" "}
-            {selectedTimeSlot.trainerId || "N/A"}
-          </p>
-          <p>
-            <strong>{t("Spots Left")}:</strong>{" "}
-            {selectedTimeSlot.spotsLeft !== undefined
-              ? selectedTimeSlot.spotsLeft
-              : "N/A"}
+          <div className="flex p-0 m-0">
+            <p>
+              <strong>{t("Trainer")}:</strong>
+            </p>
+            {chipTemplate(selectedTimeSlot.trainer)}
+          </div>
+          <p className="mt-0">
+            <strong>{t("Spots Left")}:</strong> {selectedTimeSlot.spotsLeft}
           </p>
           <p>
             <strong>{t("Available")}:</strong>{" "}
