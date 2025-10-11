@@ -49,7 +49,7 @@ builder.Services
         // Configure DateTime handling to always use UTC with 'Z'
         x.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter());
         x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-    }).AddDataAnnotationsLocalization(); 
+    }).AddDataAnnotationsLocalization();
 
 
 
@@ -349,13 +349,11 @@ app.Use(async (context, next) =>
 //});
 
 
-
-
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture("en"),
-    SupportedCultures = new List<CultureInfo> { new("en"), new("el") },
-    SupportedUICultures = new List<CultureInfo> { new("en"), new("el") }
+    SupportedCultures = new List<CultureInfo> { new("ar"), new("cs"), new("da"), new("de"), new("el"), new("en"), new("es"), new("fi"), new("fr"), new("it"), new("ja"), new("ko"), new("nl"), new("no"), new("pl"), new("pt"), new("ru"), new("sq"), new("sv"), new("tr"), new("zh") },
+    SupportedUICultures = new List<CultureInfo> { new("ar"), new("cs"), new("da"), new("de"), new("el"), new("en"), new("es"), new("fi"), new("fr"), new("it"), new("ja"), new("ko"), new("nl"), new("no"), new("pl"), new("pt"), new("ru"), new("sq"), new("sv"), new("tr"), new("zh") },
 });
 
 
