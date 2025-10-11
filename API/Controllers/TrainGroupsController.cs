@@ -90,21 +90,33 @@ namespace API.Controllers
                 errorList.Add(_localizer[TranslationKeys.Duplicate_participant_found]);
 
 
-
-            // Check for TrainGroup participant selected date validity
-            if (entityDto.TrainGroupParticipants.Count() > 0)
+            // Validate Participant Selected Date.
+            foreach (var trainGroupDate in entityDto.TrainGroupDates)
             {
-                bool isTrainGroupParticipantValid =
-                    !entityDto.TrainGroupParticipants
+                if (trainGroupDate.TrainGroupDateType != TrainGroupDateTypeEnum.FIXED_DAY)
+                {
+                    // Check for TrainGroup participant selected date validity
+                    bool isTrainGroupParticipantValid =
+                        !trainGroupDate
+                        .TrainGroupParticipants
                         .Where(x => x.SelectedDate.HasValue)
                         .Any(x =>
-                            entityDto.TrainGroupDates.Any(y =>
-                                x.SelectedDate == y.FixedDay
-                                || x.SelectedDate!.Value.Day == y.RecurrenceDayOfMonth
-                                || x.SelectedDate!.Value.DayOfWeek == y.RecurrenceDayOfWeek)
+                                x.SelectedDate!.Value.Day == trainGroupDate.RecurrenceDayOfMonth ||
+                                x.SelectedDate!.Value.DayOfWeek == trainGroupDate.RecurrenceDayOfWeek
                         );
-                if (isTrainGroupParticipantValid)
-                    errorList.Add(_localizer[TranslationKeys.Participant_selected_date_doesnt_match_any_of_the_train_group_dates]);
+
+                    if (isTrainGroupParticipantValid)
+                        errorList.Add(_localizer[TranslationKeys.Participant_selected_date_doesnt_match_any_of_the_train_group_dates]);
+                }
+                else
+                {
+                    // Check for selected date NOT equal to fixed date.
+                    bool isTrainGroupParticipantValid = trainGroupDate.TrainGroupParticipants.Any(x => x.SelectedDate.HasValue);
+
+                    if (isTrainGroupParticipantValid)
+                        errorList.Add(_localizer[TranslationKeys.Fixed_date_doesnt_allow_one_off_participants]);
+                }
+
             }
 
             errors = errorList.ToArray();
