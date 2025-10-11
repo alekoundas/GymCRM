@@ -40,7 +40,6 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
     setTrainGroupParticipant,
     deleteTrainGroupDateParticipant,
     resetTrainGroupParticipant,
-    updateTrainGroupDto,
   } = useTrainGroupStore();
 
   const [isViewDialogVisible, setViewDialogVisible] = useState(false); // Dialog visibility
@@ -72,21 +71,26 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
     DataTableDto<TrainGroupParticipantDto>
   >({
     ...new DataTableDto(),
-    filters: [
-      {
-        fieldName: "TrainGroupId",
-        value:
-          trainGroupDto.id > 0 ? trainGroupDto.id.toString() : params["id"],
+    filters:
+      formMode === FormMode.ADD
+        ? []
+        : [
+            {
+              fieldName: "TrainGroupId",
+              value:
+                trainGroupDto.id > 0
+                  ? trainGroupDto.id.toString()
+                  : params["id"],
 
-        filterType: "equals",
-      },
-      {
-        fieldName: "SelectedDate",
-        value: "null",
-        filterType: "notEquals",
-      },
-      { fieldName: "userId", filterType: "in" },
-    ],
+              filterType: "equals",
+            },
+            {
+              fieldName: "SelectedDate",
+              value: "null",
+              filterType: "notEquals",
+            },
+            { fieldName: "userId", filterType: "in" },
+          ],
   });
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
@@ -163,7 +167,7 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
     },
     {
       field: "userId",
-      header: t("Selected Date"),
+      header: t("Participant"),
       sortable: formMode !== FormMode.ADD,
       // filter: formMode !== FormMode.ADD,
       filter: false,
@@ -179,56 +183,36 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
     },
   ];
 
-  // Update datatableDto when trainGroupDto.trainGroupDates changes
+  // Update datatableDto when selected-TrainGroupDate changes
   useEffect(() => {
     if (!datatableDto.filters) return;
 
-    let newFilters: DataTableFilterDto[] = datatableDto.filters.filter(
+    let filters: DataTableFilterDto[] = datatableDto.filters.filter(
       (x) => x.fieldName !== "TrainGroupDateId"
     );
 
-    let newData = datatableDto.data;
-    let newPageCount = datatableDto.pageCount;
+    if (formMode === FormMode.ADD) {
+      const newData =
+        selectedTrainGroupDate?.trainGroupParticipants.filter(
+          (x) => x.selectedDate !== undefined
+        ) ?? [];
 
-    if (selectedTrainGroupDate?.id) {
-      newFilters.push({
-        fieldName: "TrainGroupDateId",
-        value: selectedTrainGroupDate.id.toString(),
-        filterType: "equals",
-      });
-
-      if (formMode === FormMode.ADD) {
-        const participants =
-          trainGroupDto.trainGroupDates
-            .find((x) => x.id === selectedTrainGroupDate.id)
-            ?.trainGroupParticipants.filter((x) => x.selectedDate) ?? [];
-        newData = participants;
-        newPageCount = participants.length;
-      }
+      setDatatableDto((prev) => ({
+        ...prev,
+        data: newData,
+      }));
     } else {
-      newFilters.push({
+      filters.push({
         fieldName: "TrainGroupDateId",
-        value: "0",
+        value: selectedTrainGroupDate
+          ? selectedTrainGroupDate.id.toString()
+          : "0",
         filterType: "equals",
       });
-
-      if (formMode === FormMode.ADD) {
-        newData = [];
-        newPageCount = 0;
-      }
     }
 
-    const newDto: DataTableDto<TrainGroupParticipantDto> = {
-      ...datatableDto,
-      filters: newFilters,
-      data: newData,
-      pageCount: newPageCount,
-    };
-
-    setDatatableDto(newDto);
-
     if (formMode !== FormMode.ADD && triggerRefreshDataTable.current) {
-      triggerRefreshDataTable.current(newDto);
+      triggerRefreshDataTable.current({ ...datatableDto, filters: filters });
     }
   }, [selectedTrainGroupDate]);
 
@@ -242,7 +226,6 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
     ) {
       resetTrainGroupDateParticipant(selectedTrainGroupDate.id);
       data.data.forEach((x) => addTrainGroupDateParticipant(x));
-      // data.data = [];
     }
     return data;
   };
@@ -250,32 +233,23 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
   const OnSaveAdd = async (): Promise<void> => {
     if (selectedTrainGroupDate?.id) {
       if (formMode === FormMode.ADD) {
-        const participantCount: number =
-          trainGroupDto.trainGroupDates
-            .find((x) => x.id === selectedTrainGroupDate.id)
-            ?.trainGroupParticipants.filter((x) => x.id < 0).length ?? 0;
-
-        const id = (participantCount + 1) * -1;
+        const id =
+          (selectedTrainGroupDate.trainGroupParticipants.length + 1) * -1;
 
         addTrainGroupDateParticipant({
           id,
           trainGroupId: trainGroupDto.id,
           trainGroupDateId: selectedTrainGroupDate.id,
-          userId: trainGroupParticipant.userId, // Use from store (form selection)
+          userId: trainGroupParticipant.userId,
           selectedDate: trainGroupParticipant.selectedDate,
         });
         resetTrainGroupParticipant();
         dialogControlAdd.hideDialog();
 
-        const participants =
-          trainGroupDto.trainGroupDates.find(
-            (x) => x.id === selectedTrainGroupDate.id
-          )?.trainGroupParticipants ?? [];
         // Force DTO refresh to pick up new participant
         setDatatableDto((prev) => ({
           ...prev,
-          data: participants,
-          pageCount: participants.length,
+          data: selectedTrainGroupDate.trainGroupParticipants,
         }));
       } else {
         trainGroupParticipant.trainGroupId = trainGroupDto.id;
@@ -306,13 +280,10 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
         // updateTrainGroupDto(trainGroupDto);
 
         const participants =
-          trainGroupDto.trainGroupDates
-            .find((x) => x.id === selectedTrainGroupDate.id)
-            ?.trainGroupParticipants.filter(
-              (x) =>
-                x.selectedDate !== undefined &&
-                x.id !== trainGroupParticipant.id
-            ) ?? [];
+          selectedTrainGroupDate.trainGroupParticipants.filter(
+            (x) =>
+              x.selectedDate !== undefined && x.id !== trainGroupParticipant.id
+          ) ?? [];
 
         // Force DTO refresh to pick up new participant
         setDatatableDto((prev) => ({
@@ -350,19 +321,15 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
         deleteTrainGroupDateParticipant(trainGroupParticipant);
 
         const participants =
-          trainGroupDto.trainGroupDates
-            .find((x) => x.id === selectedTrainGroupDate.id)
-            ?.trainGroupParticipants.filter(
-              (x) =>
-                x.selectedDate !== undefined &&
-                x.id !== trainGroupParticipant.id
-            ) ?? [];
+          selectedTrainGroupDate.trainGroupParticipants.filter(
+            (x) =>
+              x.selectedDate !== undefined && x.id !== trainGroupParticipant.id
+          ) ?? [];
 
         // Force DTO refresh to pick up new participant
         setDatatableDto((prev) => ({
           ...prev,
           data: participants,
-          pageCount: participants.length,
         }));
 
         resetTrainGroupParticipant();

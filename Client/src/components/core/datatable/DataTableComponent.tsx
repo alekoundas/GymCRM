@@ -113,14 +113,6 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     afterDataLoaded,
   });
 
-  // const dataTableService = new DataTableService(
-  //   controller,
-  //   setLoading,
-  //   null,
-  //   formMode,
-  //   afterDataLoaded
-  // );
-
   // Initialize
   React.useEffect(() => {
     if (formMode === FormMode.ADD) {
@@ -141,6 +133,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     }
     isInitialMount.current = false;
   };
+
   React.useEffect(() => {
     if (triggerRefreshData) {
       triggerRefreshData.current = refreshAllData;
@@ -148,9 +141,9 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   }, [triggerRefreshData]);
 
   // Log if they have changed
-  React.useEffect(() => {
-    // console.log("data updated:", JSON.stringify(dataTableDto.data));
-  }, [dataTableDto.data]);
+  // React.useEffect(() => {
+  //   console.log("data updated:", JSON.stringify(dataTableDto.data));
+  // }, [dataTableDto.data]);
 
   const getDataTableColumns = () => {
     const columns = dataTableColumns;
@@ -242,7 +235,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         value={dataTableDto.data}
         size="small"
         // key={"id"}
-        lazy
+        lazy={formMode !== FormMode.ADD}
         stripedRows
         emptyMessage={t("No data found.")}
         // Row selction.
