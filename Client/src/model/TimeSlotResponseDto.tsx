@@ -1,3 +1,4 @@
+import { UserDto } from "./entities/user/UserDto";
 import { TimeSlotRecurrenceDateDto } from "./TimeSlotRecurrenceDateDto";
 
 export interface TimeSlotResponseDto {
@@ -5,6 +6,7 @@ export interface TimeSlotResponseDto {
   title: string;
   description: string;
   trainerId: string;
+  trainer: UserDto;
   trainGroupId: number;
   trainGroupDateId: number;
   duration: string;
@@ -18,6 +20,7 @@ export class TimeSlotResponseDto {
   title: string = "";
   description: string = "";
   trainerId: string = "";
+  trainer: UserDto = new UserDto();
   trainGroupId: number = -1;
   trainGroupDateId: number = -1;
   duration: string = "";

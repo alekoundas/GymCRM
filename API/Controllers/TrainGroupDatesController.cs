@@ -2,6 +2,7 @@
 using AutoMapper;
 using Business.Services;
 using Core.Dtos;
+using Core.Dtos.Identity;
 using Core.Dtos.TrainGroupDate;
 using Core.Enums;
 using Core.Models;
@@ -41,6 +42,7 @@ namespace API.Controllers
             DateTime selectedDate = timeSlotRequestDto.SelectedDate.Date;
 
             List<TrainGroupDate>? trainGroupDates = await _dataService.TrainGroupDates
+                    .Include(x => x.TrainGroup.Trainer)
                     .Include(x => x.TrainGroupParticipants)
                     .Include(x => x.TrainGroup.TrainGroupDates)
                     .Include(x => x.TrainGroup.TrainGroupParticipants)
@@ -60,6 +62,7 @@ namespace API.Controllers
                     Duration = x.Key.Duration,
                     StartOn = x.Key.StartOn,
                     TrainerId = x.Key.TrainerId,
+                    Trainer = _mapper.Map<UserDto>(x.Key.Trainer),
                     TrainGroupId = x.Key.Id,
                     RecurrenceDates = x.Key.TrainGroupDates
                         .Where(y => y.RecurrenceDayOfMonth.HasValue || y.RecurrenceDayOfWeek.HasValue)
