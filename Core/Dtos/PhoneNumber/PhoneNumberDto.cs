@@ -1,20 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Translations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Dtos.PhoneNumber
 {
     public class PhoneNumberDto
     {
-        public int? Id { get; set; } // Optional for creation
+        public int? Id { get; set; }
 
-        [Required(ErrorMessage = "Phone number is required")]
-        [StringLength(20, ErrorMessage = "Phone number cannot exceed 20 characters")]
-        [RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = "Invalid phone number format")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
+        [StringLength(20, ErrorMessage = TranslationKeys.Phone_number_cannot_exceed_20_characters)]
+        [RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = TranslationKeys.Invalid_phone_number_format)]
         public string Number { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Primary status is required")]
         public bool IsPrimary { get; set; }
 
-        [Required(ErrorMessage = "UserId is required")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string UserId { get; set; } = "";
     }
 }

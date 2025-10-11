@@ -49,7 +49,7 @@ builder.Services
         // Configure DateTime handling to always use UTC with 'Z'
         x.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter());
         x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-    });
+    }).AddDataAnnotationsLocalization(); 
 
 
 
@@ -85,8 +85,8 @@ builder.Services.AddSwaggerGen(config =>
 
 
 
-
-// Configure ApiBehaviorOptions to customize invalid ModelState response
+// Handle DTO validation errors!
+// Configure ApiBehaviorOptions to customize invalid ModelState response.
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true; // Disable default validation response
@@ -116,21 +116,27 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddDistributedMemoryCache();
 
 // Register built-in localization FIRST.
-// No options.ResourcesPath—your JSON factory doesn't need it
 builder.Services.AddLocalization();
 
 // Override with custom factory (after AddLocalization to take precedence)
 // Inject cache via factory provider
 builder.Services.AddSingleton<IStringLocalizerFactory>(provider =>
-    new TranslatorFactory(provider.GetRequiredService<IDistributedCache>(), provider.GetRequiredService<IWebHostEnvironment>().ContentRootPath));
+    new TranslatorFactory(
+        provider.GetRequiredService<IDistributedCache>(),
+        provider.GetRequiredService<IWebHostEnvironment>().ContentRootPath
+    ));
+
+// Scoped non-generic IStringLocalizer (global; use empty for no prefix)
+//builder.Services.AddScoped<IStringLocalizer>(provider =>
+//    provider.GetRequiredService<IStringLocalizerFactory>().Create("Global", ""));  // Or "" for flat
 
 // Scoped non-generic IStringLocalizer (uses custom factory for global translations)
 builder.Services.AddScoped<IStringLocalizer>(provider =>
     provider.GetRequiredService<IStringLocalizerFactory>().Create(string.Empty, string.Empty));  // Global; factory handles empty
 
 
-// Register custom localizer
-builder.Services.AddLocalization();
+
+
 
 
 // DB context and factory.
