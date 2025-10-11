@@ -70,9 +70,10 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
         createTrainGroupDto
       );
       if (response?.[0]) {
-        navigate(
-          "/administrator/train-groups/" + response[0]?.["id"] + "/view"
-        );
+        // navigate(
+        //   "/administrator/train-groups/" + response[0]?.["id"] + "/view"
+        // );
+        navigate("/administrator/train-groups");
       }
     } else {
       const response = await apiService.update(
