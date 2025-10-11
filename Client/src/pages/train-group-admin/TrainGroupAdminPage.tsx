@@ -179,11 +179,13 @@ export default function TrainGroupAdminPage() {
   ];
 
   const onDelete = async (): Promise<void> => {
-    const response = await apiService.delete("trainGroups", trainGroupDto.id);
-
-    dialogControlDelete.hideDialog();
-    if (triggerRefreshDataTable.current)
-      triggerRefreshDataTable.current(datatableDto);
+    const response = await apiService
+      .delete("trainGroups", trainGroupDto.id)
+      .then(() => {
+        dialogControlDelete.hideDialog();
+        if (triggerRefreshDataTable.current)
+          triggerRefreshDataTable.current(datatableDto);
+      });
   };
 
   const onDataTableClick = (
