@@ -131,13 +131,13 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     if (triggerRefreshData && !isInitialMount.current) {
       return await refreshData(dto);
     }
-    isInitialMount.current = false;
   };
 
   React.useEffect(() => {
     if (triggerRefreshData) {
       triggerRefreshData.current = refreshAllData;
     }
+    isInitialMount.current = false;
   }, [triggerRefreshData]);
 
   // Log if they have changed
@@ -186,6 +186,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   );
 
   const renderHeader = () => {
+    dataTableDto.data;
     let isVisible: boolean = availableGridRowButtons.some(
       (x) => x === ButtonTypeEnum.ADD
     );
