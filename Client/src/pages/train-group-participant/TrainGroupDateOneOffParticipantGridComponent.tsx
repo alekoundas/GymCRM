@@ -242,6 +242,7 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
           trainGroupDateId: selectedTrainGroupDate.id,
           userId: trainGroupParticipant.userId,
           selectedDate: trainGroupParticipant.selectedDate,
+          user: trainGroupParticipant.user,
         });
         resetTrainGroupParticipant();
         dialogControlAdd.hideDialog();
@@ -366,6 +367,7 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
         }
         break;
       case ButtonTypeEnum.ADD:
+        resetTrainGroupParticipant();
         setAddDialogVisible(true);
         const participant = new TrainGroupParticipantDto();
         participant.selectedDate = new Date(

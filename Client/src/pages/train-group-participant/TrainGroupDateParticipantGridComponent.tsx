@@ -241,6 +241,7 @@ export default function TrainGroupDateParticipantGridComponent({
         trainGroupId: trainGroupDto.id,
         trainGroupDateId: selectedTrainGroupDate.id,
         userId: trainGroupParticipant.userId, // Use from store (form selection)
+        user: trainGroupParticipant.user,
         selectedDate: undefined,
       });
 
@@ -366,6 +367,8 @@ export default function TrainGroupDateParticipantGridComponent({
         }
         break;
       case ButtonTypeEnum.ADD:
+        resetTrainGroupParticipant();
+        trainGroupParticipant;
         setAddDialogVisible(true);
         break;
       case ButtonTypeEnum.EDIT:

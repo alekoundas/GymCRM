@@ -262,6 +262,8 @@ namespace API.Controllers
                   {
                       Id = x.Id.ToString(),
                       Value = x.UserName,
+                      FirstName = x.FirstName,
+                      LastName = x.LastName,
                       ProfileImage = x.ProfileImage
                   })
               .ToList();
