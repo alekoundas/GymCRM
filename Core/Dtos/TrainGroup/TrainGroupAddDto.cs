@@ -1,6 +1,7 @@
 ﻿using Core.CustomValidationAttributes;
 using Core.Dtos.TrainGroupDate;
 using Core.Models;
+using Core.Translations;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -9,29 +10,26 @@ namespace Core.Dtos.TrainGroup
     public class TrainGroupAddDto
     {
 
-        [Required(ErrorMessage = "Title is required")]
-        [StringLength(100, ErrorMessage = "Title cannot exceed 100 characters")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
+        [StringLength(100, ErrorMessage = TranslationKeys.Title_cannot_exceed_100_characters)]
         public string Title { get; set; } = "";
 
-        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
+        [StringLength(500, ErrorMessage = TranslationKeys.Description_cannot_exceed_500_characters)]
         public string Description { get; set; } = "";
 
-        [Required(ErrorMessage = "Duration is required")]
-        //[Range(typeof(TimeSpan), "00:15:00", "04:00:00", ErrorMessage = "Duration must be between 5 minutes and 8 hours")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public DateTime Duration { get; set; }
 
-        [Required(ErrorMessage = "StartOn is required")]
-        //[Range(typeof(TimeSpan), "00:00:00", "23:59:59", ErrorMessage = "StartOn must be a valid time of day")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public DateTime StartOn { get; set; }
 
-        [Required(ErrorMessage = "MaxParticipants is required")]
-        //[Range(1, 50, ErrorMessage = "MaxParticipants must be between 1 and 50")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public int MaxParticipants { get; set; }
 
-        [Required(ErrorMessage = "TrainerId is required")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string? TrainerId { get; set; }
 
-        [MinListCount(1,ErrorMessage ="At least 1 Train Group Date is required!")]
+        [MinListCount(1, ErrorMessage = TranslationKeys.At_least_1_Train_Group_Date_is_required)]
         public ICollection<TrainGroupDateAddDto> TrainGroupDates { get; set; } = new Collection<TrainGroupDateAddDto>();
         public ICollection<TrainGroupParticipantAddDto> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipantAddDto>();
     }

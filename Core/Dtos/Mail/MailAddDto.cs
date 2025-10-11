@@ -1,19 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Translations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Dtos.Mail
 {
     public class MailAddDto
     {
-        [Required(ErrorMessage = "Subject is required")]
-        [StringLength(200, ErrorMessage = "Subject length must be between 5 and 200 character long!", MinimumLength = 5)]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
+        [StringLength(200, ErrorMessage = TranslationKeys.Subject_length_must_be_between_5_and_200_character_long, MinimumLength = 5)]
         public string Subject { get; set; } = string.Empty;
 
 
-        [Required(ErrorMessage = "Body is required")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string Body { get; set; } = string.Empty;
 
 
-        [Required(ErrorMessage = "UserId is required")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string UserId { get; set; } = "";
     }
 }

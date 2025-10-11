@@ -3,6 +3,7 @@ using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Business.Services.Translator
 {
@@ -11,12 +12,14 @@ namespace Business.Services.Translator
         private readonly IDistributedCache _cache;
         private readonly string _cultureName;
         private readonly string _translationsPath;
+        //private readonly bool _isGlobal; // 
 
-        public Translator(IDistributedCache cache, string translationsPath)
+        public Translator(IDistributedCache cache, string translationsPath/*, bool isGlobal = false*/)
         {
             _cache = cache;
             _cultureName = CultureInfo.CurrentCulture.Name;
             _translationsPath = translationsPath;
+            //_isGlobal = isGlobal;
         }
 
         public LocalizedString this[string name]
@@ -33,10 +36,14 @@ namespace Business.Services.Translator
         {
             get
             {
+                // Try to translate the arguments(Only needed for DTO attribute messages)
+                arguments = arguments.Select(x =>this[x.ToString()??""]).ToArray();
+
                 LocalizedString? actualValue = this[name];
-                return actualValue.ResourceNotFound
-                    ? actualValue
-                    : new LocalizedString(name, string.Format(actualValue.Value, arguments), false);
+                var result = actualValue.ResourceNotFound
+                 ? actualValue
+                 : new LocalizedString(name, string.Format(actualValue.Value, arguments), false);
+                return result;
             }
         }
 
@@ -72,7 +79,7 @@ namespace Business.Services.Translator
                 return value ?? key;
             }
 
-            return "";
+            return $"__CANT_FIND_PATH__";
         }
 
 

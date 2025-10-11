@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Translations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Dtos.Lookup
 
@@ -9,7 +10,7 @@ namespace Core.Dtos.Lookup
         public int Take { get; set; }
         public int TotalRecords { get; set; }
 
-        [Required(ErrorMessage = "Filter is required")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public LookupFilterDto Filter { get; set; } = null!;
 
         public List<LookupOptionDto> Data { get; set; } = new List<LookupOptionDto>();

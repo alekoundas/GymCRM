@@ -1,17 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Translations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Models
 {
     public class TrainGroupParticipantUpdateDto
     {
-        [Required(ErrorMessage = "TrainGroupId is required")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public int TrainGroupId { get; set; }
 
-        [Required(ErrorMessage = "UserId is required")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string UserId { get; set; } = "";
 
-        [Required(ErrorMessage = "SelectedDate is required")]
-        public DateTime SelectedDate { get; set; } 
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
+        public DateTime SelectedDate { get; set; }
 
         public List<TrainGroupParticipantDto> TrainGroupParticipantDtos { get; set; } = new List<TrainGroupParticipantDto>();
     }

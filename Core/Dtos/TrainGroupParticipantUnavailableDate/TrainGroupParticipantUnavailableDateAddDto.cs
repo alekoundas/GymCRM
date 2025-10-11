@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.Translations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Dtos.TrainGroupParticipantUnavailableDate
 {
     public class TrainGroupParticipantUnavailableDateAddDto
     {
 
-        [Required(ErrorMessage = "UnavailableDate is required")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public DateTime UnavailableDate { get; set; }
 
-        [Required(ErrorMessage = "TrainGroupParticipantId is required")]
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public int TrainGroupParticipantId { get; set; }
     }
 }

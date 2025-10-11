@@ -8,6 +8,30 @@ namespace Core.Translations // Adjust to match your project's namespace
 {
     public static class TranslationKeys
     {
+        public const string Title = "Title";
+        public const string Duration = "Duration";
+        public const string StartOn = "StartOn";
+        public const string MaxParticipants = "MaxParticipants";
+        public const string Subject = "Subject";
+        public const string Body = "Body";
+        public const string Number = "Number";
+        public const string SelectedDate = "SelectedDate";
+        public const string OldPassword = "OldPassword";
+        public const string NewPassword = "NewPassword";
+        public const string UserName = "UserName";
+        public const string Title_cannot_exceed_100_characters = "Title_cannot_exceed_100_characters";
+        public const string Description_cannot_exceed_500_characters = "Description_cannot_exceed_500_characters";
+        public const string At_least_1_Train_Group_Date_is_required = "At_least_1_Train_Group_Date_is_required";
+        public const string Subject_length_must_be_between_5_and_200_character_long = "Subject_length_must_be_between_5_and_200_character_long";
+        public const string Phone_number_cannot_exceed_20_characters = "Phone_number_cannot_exceed_20_characters";
+        public const string Invalid_phone_number_format = "Invalid_phone_number_format";
+        public const string New_password_must_be_at_least_6_characters = "New_password_must_be_at_least_6_characters";
+        public const string UserName_cannot_exceed_100_characters = "UserName_cannot_exceed_100_characters";
+        public const string Invalid_email_address = "Invalid_email_address";
+        public const string Email_cannot_exceed_100_characters = "Email_cannot_exceed_100_characters";
+        public const string FirstName_cannot_exceed_50_characters = "FirstName_cannot_exceed_50_characters";
+        public const string LastName_cannot_exceed_50_characters = "LastName_cannot_exceed_50_characters";
+        public const string Phone_number_is_required = "Phone_number_is_required";
         public const string User_is_not_authorized_to_perform_this_action = "User_is_not_authorized_to_perform_this_action";
         public const string Requested_0_not_found = "Requested_0_not_found";
         public const string Invalid_data_provided = "Invalid_data_provided";
