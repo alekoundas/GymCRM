@@ -110,7 +110,8 @@ export const useTrainGroupStore = create<TrainGroupStoreState>((set) => ({
         selectedDate: undefined,
         trainGroupId: 0,
         trainGroupDateId: undefined,
-        userId: TokenService.getUserId() ?? "",
+        userId: "",
+        // userId: TokenService.getUserId() ?? "",
       },
     });
   },

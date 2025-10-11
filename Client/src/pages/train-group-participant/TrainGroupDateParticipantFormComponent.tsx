@@ -4,6 +4,7 @@ import LookupComponent from "../../components/core/dropdown/LookupComponent";
 import { InputNumber } from "primereact/inputnumber";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { useTranslator } from "../../services/TranslatorService";
+import { UserDto } from "../../model/entities/user/UserDto";
 
 interface IField extends DialogChildProps {}
 
@@ -50,6 +51,14 @@ export default function TrainGroupDateParticipantFormComponent({
               setTrainGroupParticipant({
                 ...trainGroupParticipant,
                 userId: x?.id ?? "",
+                user: x
+                  ? ({
+                      ...new UserDto(),
+                      firstName: x.firstName,
+                      lastName: x.lastName,
+                      profileImage: x.profileImage ?? "",
+                    } as UserDto)
+                  : undefined,
               })
             }
           />

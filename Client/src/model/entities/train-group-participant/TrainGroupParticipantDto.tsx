@@ -6,7 +6,7 @@ export interface TrainGroupParticipantDto {
   trainGroupDateId: number | undefined;
   trainGroupId: number;
   userId: string; // GUID as string
-  user?: UserDto;
+  user?: UserDto | undefined;
 }
 
 export class TrainGroupParticipantDto {
@@ -15,5 +15,5 @@ export class TrainGroupParticipantDto {
   trainGroupDateId: number | undefined;
   trainGroupId: number = -1;
   userId: string = ""; // GUID as string
-  user?: UserDto;
+  user?: UserDto | undefined;
 }
