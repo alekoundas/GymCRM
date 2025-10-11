@@ -21,7 +21,9 @@ import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
 import { useDateService } from "../../services/DateService";
 
-interface IField extends DialogChildProps {}
+interface IField extends DialogChildProps {
+  formMode: FormMode;
+}
 
 export default function TrainGroupDateGridComponent({ formMode }: IField) {
   const { t } = useTranslator();
@@ -72,7 +74,6 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
     DataTableDto<TrainGroupDateDto>
   >({
     ...new DataTableDto(),
-    data: trainGroupDto.trainGroupDates,
     rows: 5,
     filters: [
       {
@@ -95,15 +96,6 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
 
     return [];
   };
-
-  // Update datatableDto when trainGroupDto.trainGroupDates changes
-  useEffect(() => {
-    setDatatableDto((prev) => ({
-      ...prev,
-      data: trainGroupDto.trainGroupDates,
-      pageCount: trainGroupDto.trainGroupDates.length,
-    }));
-  }, [trainGroupDto.trainGroupDates]);
 
   const dataTableColumns: DataTableColumns<TrainGroupDateDto>[] = [
     {
@@ -168,10 +160,26 @@ export default function TrainGroupDateGridComponent({ formMode }: IField) {
     },
   ];
 
+  // const onAfterDataLoaded = (data: DataTableDto<TrainGroupDateDto> | null) => {
+  //   if (data) {
+  //     updateTrainGroupDto({ trainGroupDates: data.data });
+  //     data.data = [];
+  //   }
+  //   return data;
+  // };
+
+  // Update datatableDto when trainGroupDto.trainGroupDates changes
+  useEffect(() => {
+    setDatatableDto((prev) => ({
+      ...prev,
+      data: trainGroupDto.trainGroupDates,
+      pageCount: trainGroupDto.trainGroupDates.length,
+    }));
+  }, [trainGroupDto.trainGroupDates]);
+
   const onAfterDataLoaded = (data: DataTableDto<TrainGroupDateDto> | null) => {
     if (data) {
       updateTrainGroupDto({ trainGroupDates: data.data });
-      data.data = [];
     }
     return data;
   };
