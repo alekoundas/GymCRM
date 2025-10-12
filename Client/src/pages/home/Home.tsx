@@ -1,9 +1,13 @@
+import { useTranslator } from "../../services/TranslatorService";
+
 export default function Home() {
+  const { t } = useTranslator();
+
   return (
     <>
       <div className="flex flex-column justify-content-center align-content-center align-items-center h-full">
         <div className="w-8">
-          <p className="text-center">
+          {/* <p className="text-center">
             Στο ROSA CoreLab πιστεύουμε ότι η αληθινή δύναμη ξεκινά από μέσα
             μας.
           </p>
@@ -39,7 +43,43 @@ export default function Home() {
             Χρειάζεται μόνο η επιθυμία να βελτιώνεσαι. Είμαστε εδώ για να σε
             στηρίξουμε στο ταξίδι σου προς μια πιο δυνατή, πιο φωτεινή εκδοχή
             του εαυτού σου. Γιατί για εμάς, η αυτοβελτίωση δεν είναι στόχος·
-            είναι τρόπος ζωής".
+            είναι τρόπος ζωής.
+          </p> */}
+
+          <p className="text-center">
+            {t(
+              "At ROSA CoreLab, we believe that true strength starts from within us."
+            )}
+          </p>
+
+          <p className="text-center">
+            {t(
+              "Our space is a multi-purpose venue dedicated to self-improvement, wellness, and personal development."
+            )}
+          </p>
+
+          <p className="text-center">
+            {t(
+              "Here, every person can discover their own rhythm, cultivate their body as well as their mind, find balance, and proceed with confidence to the next step."
+            )}
+          </p>
+
+          <p className="text-center">
+            {t(
+              "We offer opportunities for targeted physical strengthening, also through the treasures of martial arts techniques, which develop endurance, discipline, and self-confidence. At the same time, through life coaching and nutritional counseling, we help people find clarity in their goals and adopt a lifestyle that suits them."
+            )}
+          </p>
+
+          <p className="text-center">
+            {t(
+              "Our team collaborates with professional nutritionists and mental health experts, because we believe that real change comes when we care for our entire self—body, mind, and soul."
+            )}
+          </p>
+
+          <p className="text-center">
+            {t(
+              "At ROSA CoreLab, you dont need any equipment to start. All you need is the desire to improve. We are here to support you on your journey toward a stronger, brighter version of yourself. Because for us, self-improvement is not a goal; it is a way of life."
+            )}
           </p>
         </div>
       </div>
