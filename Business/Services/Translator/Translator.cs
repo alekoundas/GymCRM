@@ -63,7 +63,7 @@ namespace Business.Services.Translator
 
         private string GetString(string key)
         {
-            string cacheKey = $"locale_{_cultureName}_{key}";
+            string cacheKey = $"locale_{CultureInfo.CurrentCulture.Name}_{key}";
             string? cachedValue = _cache.GetString(cacheKey);
             if (!string.IsNullOrEmpty(cachedValue)) return cachedValue;
 
@@ -86,12 +86,12 @@ namespace Business.Services.Translator
         private string? GetFilePath(string culture)
         {
             // Release.
-            string filePath = Path.Combine(_translationsPath, "Translations", $"{culture}.json");
+            string filePath = Path.Combine(_translationsPath, "Translations", $"{CultureInfo.CurrentCulture.Name}.json");
             if (File.Exists(filePath))
                 return filePath;
 
             // Debug.
-            filePath = "/" + Path.Combine("src", "Core", "Translations", $"{culture}.json");
+            filePath = "/" + Path.Combine("src", "Core", "Translations", $"{CultureInfo.CurrentCulture.Name}.json");
             if (File.Exists(filePath))
                 return filePath;
 
