@@ -353,7 +353,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture("en"),
     SupportedCultures = new List<CultureInfo> { new("ar"), new("cs"), new("da"), new("de"), new("el"), new("en"), new("es"), new("fi"), new("fr"), new("it"), new("ja"), new("ko"), new("nl"), new("no"), new("pl"), new("pt"), new("ru"), new("sq"), new("sv"), new("tr"), new("zh") },
-    SupportedUICultures = new List<CultureInfo> { new("ar"), new("cs"), new("da"), new("de"), new("el"), new("en"), new("es"), new("fi"), new("fr"), new("it"), new("ja"), new("ko"), new("nl"), new("no"), new("pl"), new("pt"), new("ru"), new("sq"), new("sv"), new("tr"), new("zh") },
+    //SupportedUICultures = new List<CultureInfo> { new("ar"), new("cs"), new("da"), new("de"), new("el"), new("en"), new("es"), new("fi"), new("fr"), new("it"), new("ja"), new("ko"), new("nl"), new("no"), new("pl"), new("pt"), new("ru"), new("sq"), new("sv"), new("tr"), new("zh") },
 });
 
 
