@@ -1,0 +1,79 @@
+Step 1: Create a Google Cloud Project and Enable APIs
+	Go to console.cloud.google.com.
+	Sign in with your Google account (e.g., your-email@gmail.com).
+	Click the project dropdown at the top (next to "Google Cloud").
+	Click NEW PROJECT.
+	
+	In the popup:
+		Project name: Enter a name like "GymCRM Gmail API".
+		Location: Leave as "No organization" (default for personal accounts).
+		Click CREATE.
+
+	Once created, select the new project from the dropdown at the top.
+	Enable the Gmail API:
+		From the left menu, go to APIs & Services → Library.
+		Search for "Gmail API".
+		Click Gmail API.
+		Click ENABLE.
+		Wait for the API to enable (a few seconds).
+
+Step 2: Configure the OAuth Consent Screen The consent screen defines how your app asks for permissions (e.g., to send emails).
+	From the left menu, go to APIs & Services → OAuth consent screen.
+	Click "Get started
+	App Information
+		Set App name
+		Set User support email
+	Audience
+		External
+	Contact Information 
+		email (e.g., your-email@gmail.com)
+
+	Click on the left, the tab of 'Data Access'
+	Click Add or remove scopes
+	Check the box for https://www.googleapis.com/auth/gmail.send (under Gmail API, described as "Send messages only").
+	Click update
+
+
+	
+2. Generate Client ID and Client SecretWith the consent screen and scopes configured, create the OAuth credentials:
+	Go to APIs & Services → Credentials.
+	Click + Create Credentials → OAuth client ID.
+		Fill in:Application type: Select Web application.
+		Name: "GymCRM SMTP OAuth".
+		Click +Add URI in Authorized redirect URIs section
+			Add https://developers.google.com/oauthplayground  (required for the Playground).
+	Click Create.
+	Copy from the popup:Client ID: E.g., your-client-id.apps.googleusercontent.com.
+	Client Secret: E.g., GOCSPX-abc123....
+
+	Click Download JSON to save a backup (client_secret_*.json).
+	Click OK. Revisit credentials later in the Credentials list (click the pencil icon to view).
+	
+	From left navigation click the audience tab
+	Click +Add users
+	Set email and save
+
+
+3. Generate Refresh Token Using OAuth 2.0 Playground
+	Open developers.google.com/oauthplayground
+	Configure custom credentials:
+		Click the gear icon (top right, "OAuth 2.0 configuration").
+		Check checkbox for Use your own OAuth credentials.
+		OAuth Client ID: Paste your Client ID.
+		OAuth Client Secret: Paste your Client Secret.
+		Ensure OAuth endpoints is "Google".
+		Click Close.
+
+	Select the scope:
+		In "Step 1 - Select & authorize APIs," expand Gmail API v1.
+		Check https://www.googleapis.com/auth/gmail.send (only this scope).
+		Click Authorize APIs.
+
+Sign in with your-email@gmail.com.
+Click Allow in the permission popup.
+If "This app isn't verified" appears, click Advanced → Go to GymCRM Email Service (unsafe).
+
+Exchange for tokens:In "Step 2 - Exchange authorization code for tokens," click Exchange authorization code for tokens.
+Copy the Refresh Token (e.g., 1//abc123...) from the response.
+If no Refresh Token appears, uncheck "Auto-refresh the token before it expires" in the gear settings and retry.
+

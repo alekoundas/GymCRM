@@ -86,7 +86,7 @@ export default function UsersPage() {
     },
     {
       field: "roleId",
-      header: "Role Id",
+      header: t("Roles"),
       sortable: false,
       filter: true,
       filterPlaceholder: t("Search"),
