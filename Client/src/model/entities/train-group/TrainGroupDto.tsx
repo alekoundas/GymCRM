@@ -19,8 +19,8 @@ export class TrainGroupDto {
   id: number = 0;
   title: string = "";
   description: string = "";
-  duration: string = "";
-  startOn: string = "";
+  duration: string = new Date(Date.UTC(2000, 0, 1, 0, 0, 0)).toISOString();
+  startOn: string = new Date(Date.UTC(2000, 0, 1, 0, 0, 0)).toISOString();
   maxParticipants: number = 0;
   trainerId: string = "";
   trainer?: UserDto | undefined;
