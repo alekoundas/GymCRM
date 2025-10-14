@@ -9,11 +9,13 @@ import { TokenService } from "../../services/TokenService";
 import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { useTranslator } from "../../services/TranslatorService";
+import { useDateService } from "../../services/DateService";
 
 interface IField extends DialogChildProps {}
 
 export default function TrainGroupFormComponent({ formMode }: IField) {
   const { t } = useTranslator();
+  const { getUTCDate, getUTCTime } = useDateService();
   const { trainGroupDto, updateTrainGroupDto } = useTrainGroupStore();
 
   // Preset TrainerId
@@ -63,19 +65,19 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
         <Calendar
           id="startOn"
           name="startOn"
-          value={new Date(trainGroupDto.startOn)}
+          value={getUTCTime(trainGroupDto.startOn)} // Parse string to Date for display
           onChange={(e) => {
-            const date = new Date(
-              2000,
-              0,
-              1,
-              e.value?.getHours(),
-              e.value?.getMinutes(),
-              0
-            );
-            handleChange({ target: { name: "startOn", value: date } });
+            const inputDate = e.value || new Date("2000-01-01T00:00:00.000Z"); // Fallback to zero
+            const selectedHours = inputDate.getHours();
+            const selectedMinutes = inputDate.getMinutes();
+            const utcIso = new Date(
+              Date.UTC(2000, 0, 1, selectedHours, selectedMinutes, 0)
+            ).toISOString();
+            handleChange({ target: { name: "startOn", value: utcIso } });
           }}
           showIcon
+          hourFormat="24"
+          placeholder="HH:mm"
           timeOnly
           icon={() => <i className="pi pi-clock" />}
           disabled={formMode === FormMode.VIEW}
@@ -92,17 +94,15 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
         <Calendar
           id="duration"
           name="duration"
-          value={new Date(trainGroupDto.duration)}
+          value={getUTCTime(trainGroupDto.duration)} // Parse string to Date
           onChange={(e) => {
-            const date = new Date(
-              2000,
-              0,
-              1,
-              e.value?.getHours(),
-              e.value?.getMinutes(),
-              0
-            );
-            handleChange({ target: { name: "duration", value: date } });
+            const inputDate = e.value || new Date("2000-01-01T00:00:00.000Z"); // Fallback to zero
+            const selectedHours = inputDate.getHours();
+            const selectedMinutes = inputDate.getMinutes();
+            const utcIso = new Date(
+              Date.UTC(2000, 0, 1, selectedHours, selectedMinutes, 0)
+            ).toISOString();
+            handleChange({ target: { name: "duration", value: utcIso } });
           }}
           showIcon
           hourFormat="24"

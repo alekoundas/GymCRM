@@ -134,15 +134,16 @@ export default function TrainGroupAdminCalendarPage() {
                     <Button
                       key={slot.trainGroupDateId}
                       label={
-                        (new Date(slot.startOn).getHours().toString().length ===
-                        1
-                          ? "0" + new Date(slot.startOn).getHours().toString()
-                          : new Date(slot.startOn).getHours()) +
-                        ":" +
-                        (new Date(slot.startOn).getMinutes().toString()
-                          .length === 1
-                          ? "0" + new Date(slot.startOn).getMinutes().toString()
-                          : new Date(slot.startOn).getMinutes())
+                        new Date(slot.startOn).toTimeString()
+                        // (new Date(slot.startOn).getHours().toString().length ===
+                        // 1
+                        //   ? "0" + new Date(slot.startOn).getHours().toString()
+                        //   : new Date(slot.startOn).getHours()) +
+                        // ":" +
+                        // (new Date(slot.startOn).getMinutes().toString()
+                        //   .length === 1
+                        //   ? "0" + new Date(slot.startOn).getMinutes().toString()
+                        //   : new Date(slot.startOn).getMinutes())
                       }
                       onClick={() => {
                         apiService

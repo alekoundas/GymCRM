@@ -112,8 +112,30 @@ export default function TrainGroupsBookingCalendarTimeslotInfoComponent({
         >
           <p>
             <strong>{t("Start On")}:</strong>{" "}
-            {new Date(selectedTimeSlot.startOn).toLocaleTimeString()}
+            {new Date(selectedTimeSlot.startOn)
+              .getUTCHours()
+              .toString()
+              .padStart(2, "0") +
+              ":" +
+              new Date(selectedTimeSlot.startOn)
+                .getUTCMinutes()
+                .toString()
+                .padStart(2, "0")}
           </p>
+
+          <p>
+            <strong>{t("Duration")}:</strong>{" "}
+            {new Date(selectedTimeSlot.duration)
+              .getUTCHours()
+              .toString()
+              .padStart(2, "0") +
+              ":" +
+              new Date(selectedTimeSlot.duration)
+                .getUTCMinutes()
+                .toString()
+                .padStart(2, "0")}
+          </p>
+
           <p className="mb-0">
             <strong>{t("Group Name")}:</strong>{" "}
             {selectedTimeSlot.title || "N/A"}

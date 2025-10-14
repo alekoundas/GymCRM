@@ -21,9 +21,11 @@ import { useTranslator } from "../../services/TranslatorService";
 import { LocalStorageService } from "../../services/LocalStorageService";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
+import { useDateService } from "../../services/DateService";
 
 export default function UserProfileTimeslotsComponent() {
   const { t } = useTranslator();
+  const { getUTCDate, getUTCTime } = useDateService();
   const apiService = useApiService();
 
   // const { userDto, updateUserDto } = useUserStore();
@@ -124,19 +126,20 @@ export default function UserProfileTimeslotsComponent() {
           }
 
           if (startDate) {
+            const startTime = getUTCTime(slot.startOn);
             startDate = new Date(
-              startDate!.getFullYear(),
-              startDate!.getMonth(),
-              startDate!.getDate(),
-              new Date(slot.startOn).getHours(),
-              new Date(slot.startOn).getMinutes(),
+              startDate.getFullYear(),
+              startDate.getMonth(),
+              startDate.getDate(),
+              startTime.getHours(),
+              startTime.getMinutes(),
               0
             );
 
             // Calculate endDate
+            const durationTime = getUTCTime(slot.duration);
             const durationMinutes =
-              new Date(slot.duration).getHours() * 60 +
-              new Date(slot.duration).getMinutes();
+              durationTime.getHours() * 60 + durationTime.getMinutes();
             const endDate = new Date(
               startDate.getTime() + durationMinutes * 60 * 1000
             );
@@ -258,7 +261,7 @@ export default function UserProfileTimeslotsComponent() {
       .create("TrainGroupParticipantUnavailableDates", {
         trainGroupParticipantId:
           selectedTimeSlotRecurrenceDate.trainGroupParticipantId,
-        unavailableDate: selectedDate,
+        unavailableDate: selectedDate.toISOString(),
       } as TrainGroupParticipantUnavailableDateDto)
       .then(async () => {
         optOutDateTimeSlotDialogControl.hideDialog();
@@ -327,15 +330,18 @@ export default function UserProfileTimeslotsComponent() {
           initialDate={new Date()}
           allDaySlot={false} // Hide the All Day row
           dayHeaderFormat={(x) => {
-            const day = x.date.day;
-            const month = x.date.month + 1;
-            const weekday = new Date(
-              x.date.year,
-              month,
-              day
-            ).toLocaleDateString(LocalStorageService.getLanguage() ?? "el", {
-              weekday: "short",
-            });
+            const utcDate = new Date(
+              Date.UTC(x.date.year, x.date.month, x.date.day, 0, 0, 0, 0)
+            );
+            const day = utcDate.getUTCDate();
+            const month = utcDate.getUTCMonth() + 1;
+            const weekday = utcDate.toLocaleDateString(
+              LocalStorageService.getLanguage() ?? "el",
+              {
+                weekday: "short",
+                timeZone: "UTC",
+              }
+            );
             return `${weekday} ${day}/${month}`;
           }}
           slotLabelFormat={{
@@ -408,7 +414,27 @@ export default function UserProfileTimeslotsComponent() {
                 <div>
                   <p>
                     <strong> {t("Start On")}:</strong>{" "}
-                    {new Date(selectedTrainGroup.startOn).toLocaleTimeString()}
+                    {new Date(selectedTrainGroup.startOn)
+                      .getUTCHours()
+                      .toString()
+                      .padStart(2, "0") +
+                      ":" +
+                      new Date(selectedTrainGroup.startOn)
+                        .getUTCMinutes()
+                        .toString()
+                        .padStart(2, "0")}
+                  </p>
+                  <p>
+                    <strong>{t("Duration")}:</strong>{" "}
+                    {new Date(selectedTrainGroup.duration)
+                      .getUTCHours()
+                      .toString()
+                      .padStart(2, "0") +
+                      ":" +
+                      new Date(selectedTrainGroup.duration)
+                        .getUTCMinutes()
+                        .toString()
+                        .padStart(2, "0")}
                   </p>
                   <p className="mb-0">
                     <strong>{t("Group Name")}:</strong>{" "}
@@ -612,31 +638,23 @@ export default function UserProfileTimeslotsComponent() {
                       (y) =>
                         y.trainGroupDateId ===
                           selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-                        y.isUserJoined
+                        !y.isUserJoined &&
+                        !y.trainGroupParticipantId &&
+                        !y.trainGroupParticipantUnavailableDateId
                     )
-                  ) === false &&
-                    timeSlots.some(
-                      (x) =>
-                        x.recurrenceDates.some(
-                          (y) =>
-                            y.trainGroupDateId ===
-                              selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-                            !y.isUserJoined &&
-                            y.trainGroupParticipantUnavailableDateId
-                        ) === false
-                    ) && (
-                      <div className="flex justify-content-between pt-5">
-                        <div></div>
-                        <div>
-                          <p className="text-xl text-primary m-0 pt-4">
-                            {t(
-                              "You havent joined this date. Please join via apointment tab."
-                            )}
-                          </p>
-                        </div>
-                        <div></div>
+                  ) && (
+                    <div className="flex justify-content-between pt-5">
+                      <div></div>
+                      <div>
+                        <p className="text-xl text-primary m-0 pt-4">
+                          {t(
+                            "You havent joined this date. Please join via apointment tab."
+                          )}
+                        </p>
                       </div>
-                    )}
+                      <div></div>
+                    </div>
+                  )}
                 </div>
               </>
             )}

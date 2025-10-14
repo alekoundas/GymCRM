@@ -1,13 +1,11 @@
-import { UserDto } from "../user/UserDto";
-
 export interface TrainGroupParticipantUnavailableDateDto {
   id: number;
-  unavailableDate: Date;
+  unavailableDate: string;
   trainGroupParticipantId: number;
 }
 
 export class TrainGroupParticipantUnavailableDateDto {
   id: number = -1;
-  unavailableDate: Date = new Date();
+  unavailableDate: string = "";
   trainGroupParticipantId: number = 0;
 }

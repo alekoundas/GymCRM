@@ -25,9 +25,19 @@ export default function TrainGroupsBookingCalendarTimeslotComponent() {
             {timeSlotResponseDto?.map((slot) => (
               <Button
                 key={slot.trainGroupDateId}
-                label={`${new Date(slot.startOn).toLocaleTimeString()} - ${
-                  slot.title || t("Train Group")
-                }`}
+                label={
+                  new Date(slot.startOn)
+                    .getUTCHours()
+                    .toString()
+                    .padStart(2, "0") +
+                  ":" +
+                  new Date(slot.startOn)
+                    .getUTCMinutes()
+                    .toString()
+                    .padStart(2, "0") +
+                  " - " +
+                  slot.title
+                }
                 className={
                   selectedTimeSlot?.trainGroupDateId === slot.trainGroupDateId
                     ? "p-button-raised p-button-primary"

@@ -5,6 +5,44 @@ import { useTranslator } from "./TranslatorService";
 export const useDateService = () => {
   const { t } = useTranslator();
 
+  const getUTCDate = (dateString: string | undefined): Date => {
+    if (!dateString) return new Date(Date.UTC(2000, 0, 1, 0, 0, 0));
+
+    const date = new Date(dateString);
+    if (dateString.endsWith("Z")) {
+      return new Date(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDay(),
+        date.getUTCHours(),
+        date.getUTCMinutes(),
+        0
+      );
+    } else {
+      console.log(date.getMonth());
+      console.log(date.getDay());
+      return new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDay(),
+        date.getHours(),
+        date.getMinutes(),
+        0
+      );
+    }
+  };
+
+  const getUTCTime = (dateString: string | undefined): Date => {
+    if (!dateString) return new Date(Date.UTC(2000, 0, 1, 0, 0, 0));
+
+    const date = new Date(dateString);
+    if (dateString.endsWith("Z")) {
+      return new Date(2000, 0, 1, date.getUTCHours(), date.getUTCMinutes(), 0);
+    } else {
+      return new Date(2000, 0, 1, date.getHours(), date.getMinutes(), 0);
+    }
+  };
+
   const getDayOfWeekFromDate = useCallback(
     (date: Date | undefined): string | undefined => {
       const dayOfWeekMap: { [key: number]: DayOfWeekEnum } = {
@@ -50,6 +88,8 @@ export const useDateService = () => {
   );
 
   return {
+    getUTCDate,
+    getUTCTime,
     getDayOfWeekFromDate,
     translateEnum,
   };

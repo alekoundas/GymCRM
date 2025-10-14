@@ -1,4 +1,4 @@
-import { TrainGroupParticipantDto } from "./TrainGroupParticipantDto";
+import { TrainGroupParticipantDto } from "../train-group-participant/TrainGroupParticipantDto";
 
 export interface TrainGroupParticipantUpdateDto {
   userId: string | undefined;
