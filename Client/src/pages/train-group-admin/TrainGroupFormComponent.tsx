@@ -22,7 +22,9 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
   const { getUTCDate, getUTCTime } = useDateService();
   const { trainGroupDto, updateTrainGroupDto } = useTrainGroupStore();
 
-  const [editingField, setEditingField] = useState<string | null>(null); // Track which field is being edited
+  const [editingField, setEditingField] = useState<string | undefined>(
+    undefined
+  ); // Track which field is being edited
   const [originalValues, setOriginalValues] = useState<Partial<TrainGroupDto>>(
     {}
   ); // Store original values per field
@@ -47,7 +49,7 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
     updateTrainGroupDto({
       [field]: originalValues[field] ?? trainGroupDto[field],
     });
-    setEditingField(null);
+    setEditingField(undefined);
     setOriginalValues({});
   };
 
@@ -71,7 +73,7 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
     );
     if (response) {
       updateTrainGroupDto(response); // Update store with backend response
-      setEditingField(null);
+      setEditingField(undefined);
       setOriginalValues({});
     }
   };
@@ -97,26 +99,28 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
             (formMode === FormMode.EDIT && editingField !== "title")
           }
         />
-        {formMode === FormMode.EDIT && editingField !== "title" ? (
-          <Button
-            icon="pi pi-pencil"
-            className="p-button-rounded p-button-text p-button-secondary"
-            onClick={() => handleEdit("title")}
-          />
-        ) : (
-          <>
+        {formMode === FormMode.EDIT &&
+          (editingField !== "title" ? (
             <Button
-              icon="pi pi-times"
-              className="p-button-rounded p-button-text p-button-danger"
-              onClick={() => handleCancel("title")}
+              icon="pi pi-pencil"
+              className="p-button-rounded p-button-text p-button-secondary"
+              onClick={() => handleEdit("title")}
+              visible={editingField === undefined}
             />
-            <Button
-              icon="pi pi-check"
-              className="p-button-rounded p-button-text p-button-success"
-              onClick={() => handleSave("title")}
-            />
-          </>
-        )}
+          ) : (
+            <>
+              <Button
+                icon="pi pi-times"
+                className="p-button-rounded p-button-text p-button-danger"
+                onClick={() => handleCancel("title")}
+              />
+              <Button
+                icon="pi pi-check"
+                className="p-button-rounded p-button-text p-button-success"
+                onClick={() => handleSave("title")}
+              />
+            </>
+          ))}
       </div>
 
       <div className="field">
@@ -149,26 +153,29 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
             (formMode === FormMode.EDIT && editingField !== "startOn")
           }
         />
-        {formMode === FormMode.EDIT && editingField !== "startOn" ? (
-          <Button
-            icon="pi pi-pencil"
-            className="p-button-rounded p-button-text p-button-secondary"
-            onClick={() => handleEdit("startOn")}
-          />
-        ) : (
-          <>
+
+        {formMode === FormMode.EDIT &&
+          (editingField !== "startOn" ? (
             <Button
-              icon="pi pi-times"
-              className="p-button-rounded p-button-text p-button-danger"
-              onClick={() => handleCancel("startOn")}
+              icon="pi pi-pencil"
+              className="p-button-rounded p-button-text p-button-secondary"
+              onClick={() => handleEdit("startOn")}
+              visible={editingField === undefined}
             />
-            <Button
-              icon="pi pi-check"
-              className="p-button-rounded p-button-text p-button-success"
-              onClick={() => handleSave("startOn")}
-            />
-          </>
-        )}
+          ) : (
+            <>
+              <Button
+                icon="pi pi-times"
+                className="p-button-rounded p-button-text p-button-danger"
+                onClick={() => handleCancel("startOn")}
+              />
+              <Button
+                icon="pi pi-check"
+                className="p-button-rounded p-button-text p-button-success"
+                onClick={() => handleSave("startOn")}
+              />
+            </>
+          ))}
       </div>
 
       <div className="field">
@@ -201,26 +208,28 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
             (formMode === FormMode.EDIT && editingField !== "duration")
           }
         />
-        {formMode === FormMode.EDIT && editingField !== "duration" ? (
-          <Button
-            icon="pi pi-pencil"
-            className="p-button-rounded p-button-text p-button-secondary"
-            onClick={() => handleEdit("duration")}
-          />
-        ) : (
-          <>
+        {formMode === FormMode.EDIT &&
+          (editingField !== "duration" ? (
             <Button
-              icon="pi pi-times"
-              className="p-button-rounded p-button-text p-button-danger"
-              onClick={() => handleCancel("duration")}
+              icon="pi pi-pencil"
+              className="p-button-rounded p-button-text p-button-secondary"
+              onClick={() => handleEdit("duration")}
+              visible={editingField === undefined}
             />
-            <Button
-              icon="pi pi-check"
-              className="p-button-rounded p-button-text p-button-success"
-              onClick={() => handleSave("duration")}
-            />
-          </>
-        )}
+          ) : (
+            <>
+              <Button
+                icon="pi pi-times"
+                className="p-button-rounded p-button-text p-button-danger"
+                onClick={() => handleCancel("duration")}
+              />
+              <Button
+                icon="pi pi-check"
+                className="p-button-rounded p-button-text p-button-success"
+                onClick={() => handleSave("duration")}
+              />
+            </>
+          ))}
       </div>
 
       <div className="field">
@@ -252,26 +261,28 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
             (formMode === FormMode.EDIT && editingField !== "maxParticipants")
           }
         />
-        {formMode === FormMode.EDIT && editingField !== "maxParticipants" ? (
-          <Button
-            icon="pi pi-pencil"
-            className="p-button-rounded p-button-text p-button-secondary"
-            onClick={() => handleEdit("maxParticipants")}
-          />
-        ) : (
-          <>
+        {formMode === FormMode.EDIT &&
+          (editingField !== "maxParticipants" ? (
             <Button
-              icon="pi pi-times"
-              className="p-button-rounded p-button-text p-button-danger"
-              onClick={() => handleCancel("maxParticipants")}
+              icon="pi pi-pencil"
+              className="p-button-rounded p-button-text p-button-secondary"
+              onClick={() => handleEdit("maxParticipants")}
+              visible={editingField === undefined}
             />
-            <Button
-              icon="pi pi-check"
-              className="p-button-rounded p-button-text p-button-success"
-              onClick={() => handleSave("maxParticipants")}
-            />
-          </>
-        )}
+          ) : (
+            <>
+              <Button
+                icon="pi pi-times"
+                className="p-button-rounded p-button-text p-button-danger"
+                onClick={() => handleCancel("maxParticipants")}
+              />
+              <Button
+                icon="pi pi-check"
+                className="p-button-rounded p-button-text p-button-success"
+                onClick={() => handleSave("maxParticipants")}
+              />
+            </>
+          ))}
       </div>
 
       <div className="field">
@@ -302,26 +313,28 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
             TokenService.getRoleName() === "Administrator"
           }
         />
-        {formMode === FormMode.EDIT && editingField !== "trainerId" ? (
-          <Button
-            icon="pi pi-pencil"
-            className="p-button-rounded p-button-text p-button-secondary"
-            onClick={() => handleEdit("trainerId")}
-          />
-        ) : (
-          <>
+        {formMode === FormMode.EDIT &&
+          (editingField !== "trainerId" ? (
             <Button
-              icon="pi pi-times"
-              className="p-button-rounded p-button-text p-button-danger"
-              onClick={() => handleCancel("trainerId")}
+              icon="pi pi-pencil"
+              className="p-button-rounded p-button-text p-button-secondary"
+              onClick={() => handleEdit("trainerId")}
+              visible={editingField === undefined}
             />
-            <Button
-              icon="pi pi-check"
-              className="p-button-rounded p-button-text p-button-success"
-              onClick={() => handleSave("trainerId")}
-            />
-          </>
-        )}
+          ) : (
+            <>
+              <Button
+                icon="pi pi-times"
+                className="p-button-rounded p-button-text p-button-danger"
+                onClick={() => handleCancel("trainerId")}
+              />
+              <Button
+                icon="pi pi-check"
+                className="p-button-rounded p-button-text p-button-success"
+                onClick={() => handleSave("trainerId")}
+              />
+            </>
+          ))}
       </div>
 
       <div className="field">
@@ -343,26 +356,28 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
             (formMode === FormMode.EDIT && editingField !== "description")
           }
         />
-        {formMode === FormMode.EDIT && editingField !== "description" ? (
-          <Button
-            icon="pi pi-pencil"
-            className="p-button-rounded p-button-text p-button-secondary"
-            onClick={() => handleEdit("description")}
-          />
-        ) : (
-          <>
+        {formMode === FormMode.EDIT &&
+          (editingField !== "description" ? (
             <Button
-              icon="pi pi-times"
-              className="p-button-rounded p-button-text p-button-danger"
-              onClick={() => handleCancel("description")}
+              icon="pi pi-pencil"
+              className="p-button-rounded p-button-text p-button-secondary"
+              onClick={() => handleEdit("description")}
+              visible={editingField === undefined}
             />
-            <Button
-              icon="pi pi-check"
-              className="p-button-rounded p-button-text p-button-success"
-              onClick={() => handleSave("description")}
-            />
-          </>
-        )}
+          ) : (
+            <>
+              <Button
+                icon="pi pi-times"
+                className="p-button-rounded p-button-text p-button-danger"
+                onClick={() => handleCancel("description")}
+              />
+              <Button
+                icon="pi pi-check"
+                className="p-button-rounded p-button-text p-button-success"
+                onClick={() => handleSave("description")}
+              />
+            </>
+          ))}
       </div>
     </div>
   );
