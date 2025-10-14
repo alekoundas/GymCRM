@@ -10,7 +10,9 @@ export default function UserProfileFormComponent() {
   const { t } = useTranslator();
   const apiService = useApiService();
   const { userDto, updateUserDto } = useUserStore();
-  const [editingField, setEditingField] = useState<string | null>(null); // Track which field is being edited
+  const [editingField, setEditingField] = useState<string | undefined>(
+    undefined
+  ); // Track which field is being edited
   const [originalValues, setOriginalValues] = useState<Partial<UserDto>>({}); // Store original values per field
   const [formData, setFormData] = useState({
     firstName: userDto.firstName,
@@ -37,7 +39,7 @@ export default function UserProfileFormComponent() {
       ...formData,
       [field]: originalValues[field] ?? userDto[field],
     });
-    setEditingField(null);
+    setEditingField(undefined);
     setOriginalValues({});
   };
 
@@ -54,7 +56,7 @@ export default function UserProfileFormComponent() {
     );
     if (response) {
       updateUserDto(response); // Update store with backend response
-      setEditingField(null);
+      setEditingField(undefined);
       setOriginalValues({});
     }
   };
@@ -91,6 +93,7 @@ export default function UserProfileFormComponent() {
               icon="pi pi-pencil"
               className="p-button-rounded p-button-text p-button-secondary"
               onClick={() => handleEdit("firstName")}
+              visible={editingField === undefined}
             />
           ) : (
             <>
@@ -131,6 +134,7 @@ export default function UserProfileFormComponent() {
               icon="pi pi-pencil"
               className="p-button-rounded p-button-text p-button-secondary"
               onClick={() => handleEdit("lastName")}
+              visible={editingField === undefined}
             />
           ) : (
             <>

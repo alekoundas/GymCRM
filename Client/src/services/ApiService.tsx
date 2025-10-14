@@ -53,7 +53,7 @@ export const useApiService = () => {
 
   const refreshUserToken = useCallback(async (): Promise<boolean> => {
     if (refreshPromiseRef.current) {
-      console.debug("Reusing existing token refresh promise.");
+      console.log("Reusing existing token refresh promise.");
       return refreshPromiseRef.current;
     }
 
@@ -70,10 +70,6 @@ export const useApiService = () => {
           return false;
         }
 
-        console.debug("Sending refresh token request:", {
-          url,
-          refreshTokenDto,
-        });
         const response = await apiFetch<
           UserRefreshTokenDto,
           UserRefreshTokenDto
@@ -87,11 +83,11 @@ export const useApiService = () => {
         TokenService.setAccessToken(response.data.accessToken);
         TokenService.setRefreshToken(response.data.refreshToken);
         TokenService.setRefreshTokenExpireDate(expireDate.toISOString());
-        console.debug(
+        console.log(
           "Token refresh successful, new expiration:",
           expireDate.toISOString()
         );
-        showSuccess("Token refreshed successfully!");
+        // showSuccess("Token refreshed successfully!");
         return true;
       } catch (error) {
         console.error("Unexpected error during token refresh:", error);
@@ -118,10 +114,10 @@ export const useApiService = () => {
         return null;
       }
 
-      showInfo("Token expired. Attempting to renew.");
+      // showInfo("Token expired. Attempting to renew.");
       const isSuccess = await refreshUserToken();
       if (isSuccess) {
-        showInfo("Token renewed.");
+        // showInfo("Token renewed.");
         return apiFetch(url, method, data);
       }
       console.warn("Token refresh failed.");

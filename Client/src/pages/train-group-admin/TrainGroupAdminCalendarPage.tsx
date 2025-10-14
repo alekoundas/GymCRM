@@ -97,7 +97,7 @@ export default function TrainGroupAdminCalendarPage() {
                 }}
               >
                 <h2 style={{ margin: 0 }}>{t("Available Timeslots")}</h2>
-                <Button
+                {/* <Button
                   className="m-2"
                   type="button"
                   icon="pi pi-plus"
@@ -108,7 +108,7 @@ export default function TrainGroupAdminCalendarPage() {
                     setAddModalVisibility(true);
                     resetTrainGroupDto();
                   }}
-                />
+                /> */}
               </div>
             }
           >
@@ -134,16 +134,17 @@ export default function TrainGroupAdminCalendarPage() {
                     <Button
                       key={slot.trainGroupDateId}
                       label={
-                        new Date(slot.startOn).toTimeString()
-                        // (new Date(slot.startOn).getHours().toString().length ===
-                        // 1
-                        //   ? "0" + new Date(slot.startOn).getHours().toString()
-                        //   : new Date(slot.startOn).getHours()) +
-                        // ":" +
-                        // (new Date(slot.startOn).getMinutes().toString()
-                        //   .length === 1
-                        //   ? "0" + new Date(slot.startOn).getMinutes().toString()
-                        //   : new Date(slot.startOn).getMinutes())
+                        new Date(slot.startOn)
+                          .getUTCHours()
+                          .toString()
+                          .padStart(2, "0") +
+                        ":" +
+                        new Date(slot.startOn)
+                          .getUTCMinutes()
+                          .toString()
+                          .padStart(2, "0") +
+                        " - " +
+                        slot.title
                       }
                       onClick={() => {
                         apiService
