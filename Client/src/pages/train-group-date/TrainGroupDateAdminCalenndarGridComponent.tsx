@@ -2,7 +2,7 @@ import { Calendar } from "primereact/calendar";
 import { ColumnEditorOptions } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import DataTableComponent from "../../components/core/datatable/DataTableComponent";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { DataTableEditModeEnum } from "../../enum/DataTableEditModeEnum";
@@ -22,6 +22,7 @@ import { DialogChildProps } from "../../components/core/dialog/GenericDialogComp
 import { TrainGroupDateDto } from "../../model/entities/train-group-date/TrainGroupDateDto";
 import { useTranslator } from "../../services/TranslatorService";
 import { useDateService } from "../../services/DateService";
+import { useApiService } from "../../services/ApiService";
 
 interface IField extends DialogChildProps {}
 
@@ -29,6 +30,7 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
   formMode,
 }: IField) {
   const { t } = useTranslator();
+  const apiService = useApiService();
   const { translateEnum } = useDateService();
 
   const params = useParams();
@@ -63,6 +65,9 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
       },
     ],
   });
+  const triggerRefreshDataTable = useRef<
+    ((dto: DataTableDto<TrainGroupDateDto>) => void) | undefined
+  >(undefined);
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
     if (formMode !== FormMode.VIEW)
@@ -84,8 +89,8 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
     {
       field: "trainGroupDateType",
       header: t("Type"),
-      sortable: formMode !== FormMode.ADD,
-      filter: formMode !== FormMode.ADD,
+      sortable: false,
+      filter: false,
       filterPlaceholder: t("Search"),
       style: { width: "20%" },
       cellEditor: (options: ColumnEditorOptions) => {
@@ -146,8 +151,8 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
     {
       field: "fixedDay",
       header: t("Fixed Day"),
-      sortable: formMode !== FormMode.ADD,
-      filter: formMode !== FormMode.ADD,
+      sortable: false,
+      filter: false,
       filterPlaceholder: t("Search"),
       style: { width: "20%" },
 
@@ -192,8 +197,8 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
     {
       field: "recurrenceDayOfWeek",
       header: t("Recurrence Day Of Week"),
-      sortable: formMode !== FormMode.ADD,
-      filter: formMode !== FormMode.ADD,
+      sortable: false,
+      filter: false,
       filterPlaceholder: t("Search"),
       style: { width: "20%" },
       body: (rowData: TrainGroupDateDto) => {
@@ -230,13 +235,12 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
     {
       field: "recurrenceDayOfMonth",
       header: t("Recurrence Day Of Month"),
-      sortable: formMode !== FormMode.ADD,
-      filter: formMode !== FormMode.ADD,
+      sortable: false,
+      filter: false,
       filterPlaceholder: t("Search"),
       style: { width: "20%" },
       body: (data: TrainGroupDateDto) => {
-        if (data.recurrenceDayOfMonth)
-          return new Date(data.recurrenceDayOfMonth).getDate();
+        if (data.recurrenceDayOfMonth) return data.recurrenceDayOfMonth;
       },
       cellEditor: (options: ColumnEditorOptions) => {
         const editingRow = editingRows.filter(
@@ -290,7 +294,7 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
     return data;
   };
 
-  const onRowEditComplete = (e: any) => {
+  const onRowEditComplete = async (e: any) => {
     const { newData, index } = e;
     const updatedDates = [...trainGroupDto.trainGroupDates];
     // Apply conditional logic to reset fields based on trainGroupDateType
@@ -318,6 +322,20 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
     const rowId = newData.id;
     const rows = editingRows.filter((x) => x.rowId !== rowId);
     setEditingRows(rows);
+
+    // if (formMode === FormMode.EDIT) {
+    //   const response = await apiService.update(
+    //     "TrainGroupDates",
+    //     updatedRow,
+    //     updatedRow.id
+    //   );
+    //   if (response) {
+    //     // dialogControlEdit.hideDialog();
+    //     // resetTrainGroupDateDto();
+    //     if (triggerRefreshDataTable.current)
+    //       triggerRefreshDataTable.current(datatableDto);
+    //   }
+    // }
   };
 
   const onSelect = (
@@ -384,6 +402,7 @@ export default function TrainGroupDateAdminCalenndarGridComponent({
         onAfterDataLoaded={onAfterDataLoaded}
         authorize={true}
         availableGridRowButtons={availableGridRowButtons()}
+        triggerRefreshData={triggerRefreshDataTable}
       />
     </>
   );
