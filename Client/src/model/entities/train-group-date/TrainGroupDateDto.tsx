@@ -6,7 +6,7 @@ import { TrainGroupDto } from "../train-group/TrainGroupDto";
 export interface TrainGroupDateDto {
   id: number;
   trainGroupDateType?: TrainGroupDateTypeEnum;
-  fixedDay?: Date;
+  fixedDay?: string;
   recurrenceDayOfWeek?: DayOfWeekEnum;
   recurrenceDayOfMonth?: number;
   trainGroupId?: number;
@@ -18,7 +18,7 @@ export interface TrainGroupDateDto {
 export class TrainGroupDateDto {
   id: number = 0;
   trainGroupDateType?: TrainGroupDateTypeEnum;
-  fixedDay?: Date;
+  fixedDay?: string;
   recurrenceDayOfWeek?: DayOfWeekEnum;
   recurrenceDayOfMonth?: number;
   trainGroupId?: number;

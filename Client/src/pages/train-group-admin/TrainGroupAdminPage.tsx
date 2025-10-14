@@ -109,16 +109,15 @@ export default function TrainGroupAdminPage() {
       ),
       body: (rowData: TrainGroupDto) => {
         if (rowData.startOn) {
-          const date = new Date(rowData.startOn);
-          return (
-            (date.getHours().toLocaleString().length == 2
-              ? date.getHours().toLocaleString()
-              : "0" + date.getHours().toLocaleString()) +
-            ":" +
-            (date.getMinutes().toLocaleString().length == 2
-              ? date.getMinutes().toLocaleString()
-              : "0" + date.getMinutes().toLocaleString())
-          );
+          const hours = new Date(rowData.startOn)
+            .getUTCHours()
+            .toString()
+            .padStart(2, "0");
+          const minutes = new Date(rowData.startOn)
+            .getUTCMinutes()
+            .toString()
+            .padStart(2, "0");
+          return `${hours}:${minutes}`;
         }
       },
       filterPlaceholder: t("Search"),
@@ -135,18 +134,15 @@ export default function TrainGroupAdminPage() {
         <DataTableFilterTimeComponent options={options} />
       ),
       body: (rowData: TrainGroupDto) => {
-        if (rowData.duration) {
-          const date = new Date(rowData.duration);
-          return (
-            (date.getHours().toLocaleString().length == 2
-              ? date.getHours().toLocaleString()
-              : "0" + date.getHours().toLocaleString()) +
-            ":" +
-            (date.getMinutes().toLocaleString().length == 2
-              ? date.getMinutes().toLocaleString()
-              : "0" + date.getMinutes().toLocaleString())
-          );
-        }
+        const hours = new Date(rowData.duration)
+          .getUTCHours()
+          .toString()
+          .padStart(2, "0");
+        const minutes = new Date(rowData.duration)
+          .getUTCMinutes()
+          .toString()
+          .padStart(2, "0");
+        return `${hours}:${minutes}`;
       },
       style: { width: "20%" },
     },

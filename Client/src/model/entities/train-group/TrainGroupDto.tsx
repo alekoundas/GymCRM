@@ -6,8 +6,8 @@ export interface TrainGroupDto {
   id: number;
   title: string;
   description: string;
-  duration: Date;
-  startOn: Date;
+  duration: string;
+  startOn: string;
   maxParticipants: number;
   trainerId: string;
   trainer?: UserDto | undefined;
@@ -19,8 +19,8 @@ export class TrainGroupDto {
   id: number = 0;
   title: string = "";
   description: string = "";
-  duration: Date = new Date();
-  startOn: Date = new Date();
+  duration: string = "";
+  startOn: string = "";
   maxParticipants: number = 0;
   trainerId: string = "";
   trainer?: UserDto | undefined;
