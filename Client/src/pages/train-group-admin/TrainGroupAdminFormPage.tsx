@@ -97,7 +97,7 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
                   label={t("Save")}
                   icon="pi pi-check"
                   onClick={onSave}
-                  visible={formMode !== FormMode.VIEW}
+                  visible={formMode === FormMode.ADD}
                   autoFocus
                 />
               </div>
