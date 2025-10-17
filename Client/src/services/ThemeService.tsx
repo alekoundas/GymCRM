@@ -15,6 +15,9 @@ export default class ThemeService {
     themes.push(new PrimeTheme("lara-dark-purple"));
     themes.push(new PrimeTheme("lara-dark-blue"));
     themes.push(new PrimeTheme("lara-dark-indigo"));
+    themes.push(new PrimeTheme("lara-dark-teal"));
+    themes.push(new PrimeTheme("soho-dark"));
+    themes.push(new PrimeTheme("viva-dark"));
     themes.push(new PrimeTheme("bootstrap4-dark-blue"));
     themes.push(new PrimeTheme("bootstrap4-dark-purple"));
 
@@ -27,6 +30,9 @@ export default class ThemeService {
     themes.push(new PrimeTheme("lara-light-purple"));
     themes.push(new PrimeTheme("lara-light-blue"));
     themes.push(new PrimeTheme("lara-light-indigo"));
+    themes.push(new PrimeTheme("lara-light-teal"));
+    themes.push(new PrimeTheme("soho-light"));
+    themes.push(new PrimeTheme("viva-light"));
     themes.push(new PrimeTheme("bootstrap4-light-blue"));
     themes.push(new PrimeTheme("bootstrap4-light-purple"));
 

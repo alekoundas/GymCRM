@@ -181,7 +181,14 @@ export default function NavSidebar({ isVisible, hideSidebar }: IField) {
                 <Image
                   src={row.themeImage}
                   width="50"
-                  alt="saga-blue"
+                  alt={row.themeName}
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    if (img.src.endsWith(".svg")) {
+                      // Try PNG if SVG fails
+                      img.src = row.themeImage.replace(".svg", ".png");
+                    }
+                  }}
                 />
               </Button>
             </div>
@@ -201,7 +208,14 @@ export default function NavSidebar({ isVisible, hideSidebar }: IField) {
                 <Image
                   src={row.themeImage}
                   width="50"
-                  alt="saga-blue"
+                  alt={row.themeName}
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    if (img.src.endsWith(".svg")) {
+                      // Try PNG if SVG fails
+                      img.src = row.themeImage.replace(".svg", ".png");
+                    }
+                  }}
                 />
               </Button>
             </div>

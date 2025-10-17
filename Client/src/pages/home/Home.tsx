@@ -28,10 +28,7 @@ export default function Home() {
           />
         </div>
         <div className="z-10 absolute top-0 left-0 flex align-items-center justify-content-center w-full h-full">
-          <div
-            className="w-8 text-4xl font-bold"
-            // style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)" }}
-          >
+          <div className="w-8 text-sm  lg:text-lg xl:text-lg font-bold">
             <p className="text-center">
               {t(
                 "At ROSA CoreLab, we believe that true strength starts from within us."
