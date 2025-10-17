@@ -26,6 +26,16 @@ export default function DataTableGridRowActionsComponent<TEntity>({
   const getMenuItems: () => MenuItem[] = () => {
     const menuItems: MenuItem[] = [];
 
+    if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.PROFILE))
+      menuItems.push({
+        label: t("Profile"),
+        icon: "pi pi-user-edit",
+        command: () => onButtonClick(ButtonTypeEnum.PROFILE, rowData),
+        visible: authorize
+          ? TokenService.isUserAllowed(controller + "_View")
+          : true,
+      });
+
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.VIEW))
       menuItems.push({
         label: t("View"),

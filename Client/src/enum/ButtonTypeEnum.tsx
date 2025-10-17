@@ -4,4 +4,5 @@ export enum ButtonTypeEnum {
   EDIT = "EDIT",
   DELETE = "DELETE",
   CLONE = "CLONE",
+  PROFILE = "PROFILE",
 }
