@@ -83,6 +83,11 @@ export default function App() {
                   path="roles"
                   element={<RolesPage />}
                 />
+
+                <Route
+                  path="users/:id/profile"
+                  element={<UserProfilePage />}
+                />
               </Route>
 
               {/* Users */}

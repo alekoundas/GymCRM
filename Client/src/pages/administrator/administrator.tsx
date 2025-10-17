@@ -10,6 +10,7 @@ import { FormMode } from "../../enum/FormMode";
 import MailsPage from "../mail/MailsPage";
 import MailSendPage from "../mail/MailSendPage";
 import ChartsComponent from "./ChartsComponent";
+import UserProfilePage from "../user/UserProfilePage";
 
 export default function Administrator() {
   return (
@@ -65,6 +66,11 @@ export default function Administrator() {
             <Route
               path="roles"
               element={<RolesPage />}
+            />
+
+            <Route
+              path="users/:id/profile"
+              element={<UserProfilePage />}
             />
           </Routes>
           {/* </ScrollPanel> */}

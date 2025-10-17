@@ -15,9 +15,11 @@ import { useUserStore } from "../../stores/UserStore";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
+import { useNavigate } from "react-router-dom";
 
 export default function UsersPage() {
   const { t } = useTranslator();
+  const navigate = useNavigate();
   const apiService = useApiService();
   const { userDto, setUserDto, resetUserDto } = useUserStore();
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
@@ -56,7 +58,12 @@ export default function UsersPage() {
   });
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
-    return [ButtonTypeEnum.VIEW, ButtonTypeEnum.EDIT, ButtonTypeEnum.DELETE];
+    return [
+      ButtonTypeEnum.PROFILE,
+      ButtonTypeEnum.VIEW,
+      ButtonTypeEnum.EDIT,
+      ButtonTypeEnum.DELETE,
+    ];
   };
 
   const dataTableColumns: DataTableColumns<UserDto>[] = [
@@ -119,6 +126,9 @@ export default function UsersPage() {
         break;
       case ButtonTypeEnum.DELETE:
         setDeleteDialogVisibility(true);
+        break;
+      case ButtonTypeEnum.PROFILE:
+        navigate("/administrator/users/"+rowData?.id+"/profile");
         break;
 
       default:

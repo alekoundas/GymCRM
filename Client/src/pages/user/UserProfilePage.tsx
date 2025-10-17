@@ -15,9 +15,13 @@ import UserProfilePasswordChangeFormComponent from "./UserProfilePasswordChangeF
 import { useApiService } from "../../services/ApiService";
 import { LocalStorageService } from "../../services/LocalStorageService";
 import { useTranslator } from "../../services/TranslatorService";
+import { useParams } from "react-router-dom";
 
 export default function UserProfilePage() {
   const { t } = useTranslator();
+  const params = useParams();
+  const apiService = useApiService();
+
   const {
     userDto,
     updateUserDto,
@@ -25,11 +29,12 @@ export default function UserProfilePage() {
     resetUserDto,
     userPasswordChangeDto,
   } = useUserStore();
-  const apiService = useApiService();
 
   const [loading, setLoading] = useState(true);
   const [isImageHovered, setIsImageHovered] = useState(false);
   const [isImageUploadSelected, setIsImageUploadSelected] = useState(false);
+
+  const userId: string | undefined = params["id"] ?? TokenService.getUserId();
 
   // Change Password Dialog State
   const [showChangePasswordDialog, setShowChangePasswordDialog] =
@@ -48,7 +53,6 @@ export default function UserProfilePage() {
   useEffect(() => {
     resetUserDto();
     const loadUser = async () => {
-      const userId = TokenService.getUserId();
       if (userId) {
         const response = await apiService.get<UserDto>("Users", userId);
         setUserDto(response as UserDto);
@@ -106,10 +110,12 @@ export default function UserProfilePage() {
 
   // Handle Change Password Dialog
   const handleChangePassword = async () => {
-    userPasswordChangeDto.userId = TokenService.getUserId() ?? "";
-    const response = await apiService.passwordChange(userPasswordChangeDto);
-    if (response) {
-      setShowChangePasswordDialog(false);
+    if (userId) {
+      userPasswordChangeDto.userId = userId;
+      const response = await apiService.passwordChange(userPasswordChangeDto);
+      if (response) {
+        setShowChangePasswordDialog(false);
+      }
     }
   };
 
