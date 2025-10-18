@@ -2,6 +2,8 @@
 using Business.Repository;
 using Business.Services;
 using Core.Dtos;
+using Core.Dtos.DataTable;
+using Core.Dtos.Mail;
 using Core.Enums;
 using Core.Models;
 using Core.Translations;
@@ -224,6 +226,7 @@ namespace API.Controllers
             return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity);
         }
 
+
         protected override bool CustomValidatePOST(TrainGroupParticipantAddDto entityDto, out string[] errors)
         {
             TrainGroupParticipant trainGroupParticipant = _mapper.Map<TrainGroupParticipant>(entityDto);
@@ -279,9 +282,26 @@ namespace API.Controllers
         }
 
 
-        protected override void DataTableQueryUpdate(IGenericRepository<TrainGroupParticipant> query)
+        protected override void DataTableQueryUpdate(IGenericRepository<TrainGroupParticipant> query, DataTableDto<TrainGroupParticipantDto> dataTable)
         {
             query = query.Include(x => x.User);
+
+
+            List<DataTableFilterDto> customFilters = dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.custom).ToList();
+
+            if (customFilters.Any())
+            {
+                DataTableFilterDto? filter = customFilters.FirstOrDefault(x => x.FieldName == "ParticipantGridSelectedDate");
+                if (filter != null)
+                {
+                    DateTime selectedDate = DateTime.Parse(filter?.Value!);
+                    query = query.Where(x =>
+                        x.SelectedDate == selectedDate ||
+                        x.TrainGroupDate.FixedDay == selectedDate ||
+                        x.TrainGroupDate.RecurrenceDayOfWeek == selectedDate.DayOfWeek ||
+                        x.TrainGroupDate.RecurrenceDayOfMonth == selectedDate.Month);
+                }
+            }
         }
     }
 }

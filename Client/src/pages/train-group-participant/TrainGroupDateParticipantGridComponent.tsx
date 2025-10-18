@@ -7,6 +7,7 @@ import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
 import GenericDialogComponent, {
+  DialogChildProps,
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import { useParams } from "react-router-dom";
@@ -19,9 +20,7 @@ import { TrainGroupParticipantDto } from "../../model/entities/train-group-parti
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
 
-interface IField {
-  formMode: FormMode;
-}
+interface IField extends DialogChildProps {}
 
 export default function TrainGroupDateParticipantGridComponent({
   formMode,
@@ -393,7 +392,7 @@ export default function TrainGroupDateParticipantGridComponent({
     <>
       <DataTableComponent
         controller="TrainGroupParticipants"
-        formMode={formMode}
+        formMode={formMode ?? FormMode.VIEW}
         dataTableDto={datatableDto}
         setDataTableDto={setDatatableDto}
         dataTableColumns={dataTableColumns}

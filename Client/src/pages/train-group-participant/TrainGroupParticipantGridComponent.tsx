@@ -7,6 +7,7 @@ import { useTrainGroupStore } from "../../stores/TrainGroupStore";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
 import GenericDialogComponent, {
+  DialogChildProps,
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
 import { useParams } from "react-router-dom";
@@ -14,18 +15,23 @@ import TrainGroupDateParticipantFormComponent from "./TrainGroupDateParticipantF
 import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
+import { useDateService } from "../../services/DateService";
+import { UserDto } from "../../model/entities/user/UserDto";
+import { Avatar } from "primereact/avatar";
 
-interface IField {
-  formMode: FormMode;
+interface IField extends DialogChildProps {
+  trainGroupId: number;
+  selectedDate: Date;
 }
 
 export default function TrainGroupParticipantGridComponent({
   formMode,
+  trainGroupId,
+  selectedDate,
 }: IField) {
   const { t } = useTranslator();
   const apiService = useApiService();
   const params = useParams();
-
   const {
     trainGroupDto,
     trainGroupParticipant,
@@ -60,6 +66,21 @@ export default function TrainGroupParticipantGridComponent({
     hideDialog: () => setDeleteDialogVisible(false),
   };
 
+  const getSelectedDate = () => {
+    const dateCleaned = new Date(
+      Date.UTC(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate(),
+        0,
+        0,
+        0
+      )
+    );
+    console.log("new " + dateCleaned.toISOString());
+    return dateCleaned;
+  };
+
   const [datatableDto, setDatatableDto] = useState<
     DataTableDto<TrainGroupParticipantDto>
   >({
@@ -68,15 +89,14 @@ export default function TrainGroupParticipantGridComponent({
     filters: [
       {
         fieldName: "TrainGroupId",
-        value:
-          trainGroupDto.id > 0 ? trainGroupDto.id.toString() : params["id"],
-
+        value: trainGroupId.toString(),
         filterType: "equals",
       },
+
       {
-        fieldName: "TrainGroupDateId",
-        value: "null",
-        filterType: "equals",
+        fieldName: "ParticipantGridSelectedDate",
+        value: getSelectedDate().toISOString(),
+        filterType: "custom",
       },
     ],
   });
@@ -101,6 +121,33 @@ export default function TrainGroupParticipantGridComponent({
       pageCount: trainGroupDto.trainGroupParticipants.length,
     }));
   }, [trainGroupDto.trainGroupParticipants]);
+
+  // Custom chip template for selected users
+  const chipTemplate = (user: UserDto | undefined) => {
+    if (user) {
+      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
+        0
+      )}`.toUpperCase();
+      const imageSrc = "data:image/png;base64," + user.profileImage;
+      return (
+        <div className="flex m-0 p-0 align-items-center">
+          <Avatar
+            image={user.profileImage ? imageSrc : ""}
+            label={user.profileImage ? undefined : initials}
+            shape="circle"
+            size="normal"
+            className=" mr-2 "
+          />
+          {" " +
+            user.firstName[0].toUpperCase() +
+            user.firstName.slice(1, user.firstName.length) +
+            " " +
+            user.lastName[0].toUpperCase() +
+            user.lastName.slice(1, user.lastName.length)}
+        </div>
+      );
+    }
+  };
 
   const dataTableColumns: DataTableColumns<TrainGroupParticipantDto>[] = [
     {
@@ -145,6 +192,8 @@ export default function TrainGroupParticipantGridComponent({
       sortable: true,
       filter: false,
       filterPlaceholder: t("Search"),
+      body: (rowData, options) => chipTemplate(rowData.user),
+
       style: { width: "10%" },
     },
   ];
@@ -273,7 +322,7 @@ export default function TrainGroupParticipantGridComponent({
         controller="TrainGroupParticipants"
         dataTableDto={datatableDto}
         setDataTableDto={setDatatableDto}
-        formMode={formMode}
+        formMode={formMode ?? FormMode.VIEW}
         dataTableColumns={dataTableColumns}
         filterDisplay={DataTableFilterDisplayEnum.ROW}
         onButtonClick={onDataTableClick}

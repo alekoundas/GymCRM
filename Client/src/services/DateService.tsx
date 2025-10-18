@@ -19,8 +19,6 @@ export const useDateService = () => {
         0
       );
     } else {
-      console.log(date.getMonth());
-      console.log(date.getDay());
       return new Date(
         date.getFullYear(),
         date.getMonth(),

@@ -3,6 +3,7 @@ using Business.Repository;
 using Business.Services;
 using Business.Services.Email;
 using Core.Dtos;
+using Core.Dtos.DataTable;
 using Core.Dtos.Mail;
 using Core.Models;
 using Core.Translations;
@@ -55,7 +56,7 @@ namespace API.Controllers
         }
 
 
-        protected override void DataTableQueryUpdate(IGenericRepository<Mail> query)
+        protected override void DataTableQueryUpdate(IGenericRepository<Mail> query, DataTableDto<MailDto> dataTable)
         {
             query = query.Include(x => x.User);
         }
