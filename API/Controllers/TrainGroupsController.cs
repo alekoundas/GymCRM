@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Repository;
 using Business.Services;
+using Core.Dtos.DataTable;
 using Core.Dtos.TrainGroup;
 using Core.Enums;
 using Core.Models;
@@ -124,7 +125,7 @@ namespace API.Controllers
         }
 
 
-        protected override void DataTableQueryUpdate(IGenericRepository<TrainGroup> query)
+        protected override void DataTableQueryUpdate(IGenericRepository<TrainGroup> query, DataTableDto<TrainGroupDto> dataTable)
         {
             query = query.Include(x => x.Trainer);
         }

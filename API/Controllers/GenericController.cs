@@ -8,6 +8,7 @@ using Core.Models;
 using Core.Translations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System.Data;
 
 namespace API.Controllers
 {
@@ -136,7 +137,7 @@ namespace API.Controllers
         public async Task<ApiResponse<DataTableDto<TEntityDto>>> GetDataTable([FromBody] DataTableDto<TEntityDto> dataTable)
         {
             var query = _dataService.GetGenericRepository<TEntity>();
-            DataTableQueryUpdate(query);
+            DataTableQueryUpdate(query, dataTable);
 
             // Handle Sorting of DataTable.
             if (dataTable.Sorts.Count() > 0)
@@ -250,7 +251,7 @@ namespace API.Controllers
             return false;
         }
 
-        protected virtual void DataTableQueryUpdate(IGenericRepository<TEntity> query)
+        protected virtual void DataTableQueryUpdate(IGenericRepository<TEntity> query, DataTableDto<TEntityDto> dataTable)
         {
         }
 
