@@ -1,8 +1,8 @@
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
 import { useNavigate } from "react-router-dom";
-import { TokenService } from "../../../services/TokenService";
-import { useTranslator } from "../../../services/TranslatorService";
+import { useTranslator } from "../../services/TranslatorService";
+import { TokenService } from "../../services/TokenService";
 
 export default function NavLeft() {
   const { t } = useTranslator();
@@ -51,6 +51,15 @@ export default function NavLeft() {
           visible: TokenService.isUserAllowed("TrainGroups_View"),
           command: () => {
             navigate("/administrator/train-groups");
+          },
+        },
+
+        {
+          label: t("Workout Plans"),
+          icon: "pi pi-clipboard",
+          visible: TokenService.isUserAllowed("WorkoutPlans_View"),
+          command: () => {
+            navigate("/administrator/workout-plans");
           },
         },
       ],

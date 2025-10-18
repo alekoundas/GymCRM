@@ -13,12 +13,12 @@ namespace Business.Services
 
         // Repositories.
         public IGenericRepository<Mail> Mails { get; }
+        public IGenericRepository<Exercise> Exercises { get; }
         public IGenericRepository<TrainGroup> TrainGroups { get; }
+        public IGenericRepository<WorkoutPlan> WorkoutPlans { get; }
         public IGenericRepository<PhoneNumber> PhoneNumbers { get; }
-
         public IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
         public IGenericRepository<TrainGroupParticipant> TrainGroupParticipants { get; }
-        //public IGenericRepository<TrainGroupDateCancellationSubscriber> TrainGroupCancellationSubscribers { get; }
         public IGenericRepository<TrainGroupParticipantUnavailableDate> TrainGroupParticipantUnavailableDates { get; }
 
         // Identity.
@@ -32,11 +32,12 @@ namespace Business.Services
         public DataService(
             IDbContextFactory<ApiDbContext> dbContextFactory,
             IGenericRepository<Mail> mailRepository,
+            IGenericRepository<Exercise> exerciseRepository,
+            IGenericRepository<WorkoutPlan> workoutPlanRepository,
             IGenericRepository<TrainGroup> trainGroupRepository,
             IGenericRepository<PhoneNumber> phoneNumberRepository,
             IGenericRepository<TrainGroupDate> trainGroupDateRepository,
             IGenericRepository<TrainGroupParticipant> trainGroupParticipantRepository,
-            //IGenericRepository<TrainGroupDateCancellationSubscriber> trainGroupCancellationSubscriberRepository,
             IGenericRepository<TrainGroupParticipantUnavailableDate> trainGroupParticipantUnavailableDateRepository,
             IGenericRepository<User> userRepository,
             IGenericRepository<Role> roleRepository,
@@ -46,16 +47,16 @@ namespace Business.Services
             _dbContextFactory = dbContextFactory;
 
             // Repositories.
+            Mails = mailRepository;
+            Exercises = exerciseRepository;
             TrainGroups = trainGroupRepository;
             PhoneNumbers = phoneNumberRepository;
-            Mails = mailRepository;
+            WorkoutPlans = workoutPlanRepository;
 
             // TrainGroup.
             TrainGroupDates = trainGroupDateRepository;
             TrainGroupParticipants = trainGroupParticipantRepository;
-            //TrainGroupCancellationSubscribers = trainGroupCancellationSubscriberRepository;
             TrainGroupParticipantUnavailableDates = trainGroupParticipantUnavailableDateRepository;
-
 
             // Identity.
             Users = userRepository;

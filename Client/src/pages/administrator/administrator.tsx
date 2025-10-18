@@ -1,6 +1,4 @@
-import { ScrollPanel } from "primereact/scrollpanel";
 import { Route, Routes } from "react-router-dom";
-import NavLeft from "../../components/core/navbar-left/NavLeft";
 import TrainGroupAdminPage from "../train-group-admin/TrainGroupAdminPage";
 import TrainGroupAdminCalendarPage from "../train-group-admin/TrainGroupAdminCalendarPage";
 import RolesPage from "../role/RolesPage";
@@ -11,6 +9,8 @@ import MailsPage from "../mail/MailsPage";
 import MailSendPage from "../mail/MailSendPage";
 import ChartsComponent from "./ChartsComponent";
 import UserProfilePage from "../user/UserProfilePage";
+import NavLeft from "../../components/navbar-left/NavLeft";
+import WorkoutPlansPage from "../workout-plan/WorkoutPlansPage";
 
 export default function Administrator() {
   return (
@@ -56,6 +56,11 @@ export default function Administrator() {
             <Route
               path="email-send"
               element={<MailSendPage />}
+            />
+
+            <Route
+              path="workout-plans"
+              element={<WorkoutPlansPage />}
             />
 
             {/* Users */}

@@ -15,6 +15,7 @@ namespace Core.Models
         public virtual ICollection<Mail> Mails { get; set; } = new Collection<Mail>();
         public virtual ICollection<PhoneNumber> PhoneNumbers { get; set; } = new Collection<PhoneNumber>();
 
+        public virtual ICollection<WorkoutPlan> WorkoutPlans { get; set; } = new Collection<WorkoutPlan>();
 
 
         public virtual ICollection<UserRole> UserRoles { get; set; } = new Collection<UserRole>();

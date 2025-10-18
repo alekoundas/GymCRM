@@ -19,6 +19,11 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string OldPassword = "OldPassword";
         public const string NewPassword = "NewPassword";
         public const string UserName = "UserName";
+        public const string Name = "Name";
+        public const string Description = "Description";
+        public const string Sets = "Sets";
+        public const string Reps = "Reps";
+        public const string Weight = "Weight";
         public const string Title_cannot_exceed_100_characters = "Title_cannot_exceed_100_characters";
         public const string Description_cannot_exceed_500_characters = "Description_cannot_exceed_500_characters";
         public const string At_least_1_Train_Group_Date_is_required = "At_least_1_Train_Group_Date_is_required";
@@ -59,6 +64,7 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string _0_is_required = "_0_is_required";
         public const string _0_already_exists = "_0_already_exists";
         public const string _0_not_found = "_0_not_found";
+        public const string _0_must_be_a_positive_number = "_0_must_be_a_positive_number";
         public const string _0_created_successfully = "_0_created_successfully";
         public const string _0_updated_successfully = "_0_updated_successfully";
         public const string _0_deleted_successfully = "_0_deleted_successfully";

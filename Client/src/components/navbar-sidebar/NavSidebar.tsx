@@ -1,12 +1,12 @@
 import { Knob } from "primereact/knob";
 import { Sidebar } from "primereact/sidebar";
-import { useTheme } from "../../../contexts/ThemeContext";
 import { Button } from "primereact/button";
-import ThemeService from "../../../services/ThemeService";
 import { Image } from "primereact/image";
 import { useState } from "react";
-import { useTranslator } from "../../../services/TranslatorService";
-import { LocalStorageService } from "../../../services/LocalStorageService";
+import { useTranslator } from "../../services/TranslatorService";
+import { LocalStorageService } from "../../services/LocalStorageService";
+import { useTheme } from "../../contexts/ThemeContext";
+import ThemeService from "../../services/ThemeService";
 
 interface IField {
   isVisible: boolean;
