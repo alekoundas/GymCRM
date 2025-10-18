@@ -1,6 +1,5 @@
-// useApiService.ts (corrected as a custom hook)
-import { useCallback, useRef } from "react";
-import { useToast } from "../contexts/ToastContext"; // Adjust path
+import { useCallback } from "react";
+import { useToast } from "../contexts/ToastContext";
 import { DataTableDto } from "../model/datatable/DataTableDto";
 import { UserPasswordChangeDto } from "../model/entities/user/UserPasswordChangeDto";
 import { UserLoginRequestDto } from "../model/entities/user/UserLoginRequestDto";

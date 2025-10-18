@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { ScrollPanel } from "primereact/scrollpanel";
-import NavTop from "./components/core/navbar-top/NavTop.tsx";
+import NavTop from "./components/navbar-top/NavTop.tsx";
 import Home from "./pages/home/Home.tsx";
 import Administrator from "./pages/administrator/administrator.tsx";
 import TrainGroupAdminCalendarPage from "./pages/train-group-admin/TrainGroupAdminCalendarPage.tsx";
@@ -17,6 +17,7 @@ import MailsPage from "./pages/mail/MailsPage.tsx";
 import MailSendPage from "./pages/mail/MailSendPage.tsx";
 import { FormMode } from "./enum/FormMode.tsx";
 import RegisterPage from "./pages/user/RegisterPage.tsx";
+import WorkoutPlansPage from "./pages/workout-plan/WorkoutPlansPage.tsx";
 
 export default function App() {
   return (
@@ -37,6 +38,11 @@ export default function App() {
               <Route
                 path="/appointment"
                 element={<TrainGroupsBookingCalendarPage />}
+              />
+
+              <Route
+                path="/workout-plans"
+                element={<WorkoutPlansPage />}
               />
 
               {/* Administrator */}
@@ -74,6 +80,11 @@ export default function App() {
                   element={<MailSendPage />}
                 />
 
+                <Route
+                  path="workout-plans"
+                  element={<WorkoutPlansPage />}
+                />
+
                 {/* Users */}
                 <Route
                   path="users"
@@ -90,7 +101,6 @@ export default function App() {
                 />
               </Route>
 
-              {/* Users */}
               <Route
                 path="/users/login"
                 element={<LoginPage />}

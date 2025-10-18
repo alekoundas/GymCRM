@@ -4,14 +4,14 @@ import { Menu } from "primereact/menu";
 import { Button } from "primereact/button";
 import { MenuItem } from "primereact/menuitem";
 import { useRef, useState } from "react";
-import { useAuth } from "../../../contexts/AuthContext";
-import { TokenService } from "../../../services/TokenService";
-import { useApiService } from "../../../services/ApiService";
-import NavSidebar from "../navbar-sidebar/NavSidebar";
+import { useAuth } from "../../contexts/AuthContext";
+import { TokenService } from "../../services/TokenService";
+import { useApiService } from "../../services/ApiService";
 import { Avatar } from "primereact/avatar";
-import { LocalStorageService } from "../../../services/LocalStorageService";
+import { LocalStorageService } from "../../services/LocalStorageService";
 import { Chip } from "primereact/chip";
-import { useTranslator } from "../../../services/TranslatorService";
+import { useTranslator } from "../../services/TranslatorService";
+import NavSidebar from "../navbar-sidebar/NavSidebar";
 
 export default function NavTop() {
   const { t } = useTranslator();
@@ -35,6 +35,14 @@ export default function NavTop() {
       command: () => {
         navigate("/appointment");
       },
+    },
+    {
+      label: t("Workout Plans"),
+      icon: "pi pi-clipboard",
+      command: () => {
+        navigate("/workout-plans");
+      },
+      visible: TokenService.isUserAllowed("WorkoutPlans_View"),
     },
     {
       label: "Admin",

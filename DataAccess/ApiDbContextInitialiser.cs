@@ -106,6 +106,11 @@ namespace DataAccess
                     new Claim("Permission", "TrainGroupParticipants_Add"),
                     new Claim("Permission", "TrainGroupParticipants_Edit"),
                     new Claim("Permission", "TrainGroupParticipants_Delete"),
+
+                    new Claim("Permission", "WorkoutPlans_View"),
+                    new Claim("Permission", "WorkoutPlans_Add"),
+                    new Claim("Permission", "WorkoutPlans_Edit"),
+                    new Claim("Permission", "WorkoutPlans_Delete"),
                 };
 
                 foreach (var claim in claims)

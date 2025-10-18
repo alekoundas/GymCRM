@@ -10,6 +10,11 @@
   "OldPassword": "Old Password",
   "NewPassword": "New Password",
   "UserName": "User Name",
+  "Name": "Name",
+  "Description": "Description",
+  "Sets": "Sets",
+  "Reps": "Reps",
+  "Weight": "Weight",
 
   "Title_cannot_exceed_100_characters": "Title cannot exceed 100 characters",
   "Description_cannot_exceed_500_characters": "Description cannot exceed 500 characters!",
@@ -54,6 +59,7 @@
   "_0_is_required": "{0} is required!",
   "_0_already_exists": "{0} already exists!",
   "_0_not_found": "{0} not found!",
+  "_0_must_be_a_positive_number": "{0} must be a positive number.",
   "_0_created_successfully": "{0} created successfully!",
   "_0_updated_successfully": "{0} updated successfully!",
   "_0_deleted_successfully": "{0} deleted successfully!"
