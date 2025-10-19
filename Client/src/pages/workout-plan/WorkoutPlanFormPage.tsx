@@ -24,8 +24,7 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
   const navigate = useNavigate();
   const location = useLocation();
   const isAdminPage = location.pathname.includes("/administrator");
-  const { workoutPlanDto, resetWorkoutPlanDto, setWorkoutPlanDto } =
-    useWorkoutPlanStore();
+  const { workoutPlanDto, setWorkoutPlanDto } = useWorkoutPlanStore();
 
   // Load Initial data
   useEffect(() => {
@@ -71,14 +70,17 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
               label={t("Save")}
               icon="pi pi-check"
               onClick={onSave}
-              visible={formMode === FormMode.ADD}
+              visible={formMode === FormMode.ADD && isAdminPage}
               autoFocus
             />
           </div>
         }
       >
         <div className="card">
-          <WorkoutPlanFormComponent formMode={formMode} />
+          <WorkoutPlanFormComponent
+            formMode={formMode}
+            isAdminPage={isAdminPage}
+          />
         </div>
       </Card>
       <div className="pt-3">

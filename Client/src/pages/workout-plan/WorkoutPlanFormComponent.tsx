@@ -10,9 +10,14 @@ import { useApiService } from "../../services/ApiService";
 import { Button } from "primereact/button";
 import LookupComponent from "../../components/core/dropdown/LookupComponent";
 
-interface IField extends DialogChildProps {}
+interface IField extends DialogChildProps {
+  isAdminPage: boolean;
+}
 
-export default function WorkoutPlanFormComponent({ formMode }: IField) {
+export default function WorkoutPlanFormComponent({
+  formMode,
+  isAdminPage,
+}: IField) {
   const { t } = useTranslator();
   const apiService = useApiService();
   const { workoutPlanDto, updateWorkoutPlanDto, setWorkoutPlanDto } =
@@ -81,7 +86,7 @@ export default function WorkoutPlanFormComponent({ formMode }: IField) {
             (formMode === FormMode.EDIT && editingField !== "title")
           }
         />
-        {formMode === FormMode.EDIT &&
+        {(formMode === FormMode.EDIT && isAdminPage) &&
           (editingField !== "title" ? (
             <Button
               icon="pi pi-pencil"

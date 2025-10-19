@@ -173,6 +173,10 @@
   'Workout Plans': string;
   'Workout plan': string;
   'Exercises': string;
+  'Add Exercise': string;
+  'Sets': string;
+  'Reps': string;
+  'Weight': string;
     }
 
 
