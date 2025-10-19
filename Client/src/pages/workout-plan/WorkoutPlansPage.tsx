@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { FormMode } from "../../enum/FormMode";
-import { DialogControl } from "../../components/core/dialog/GenericDialogComponent";
+import GenericDialogComponent, {
+  DialogControl,
+} from "../../components/core/dialog/GenericDialogComponent";
 import DataTableComponent from "../../components/core/datatable/DataTableComponent";
 import { DataTableFilterDisplayEnum } from "../../enum/DataTableFilterDisplayEnum";
 import { DataTableDto } from "../../model/datatable/DataTableDto";
@@ -14,14 +16,24 @@ import { WorkoutPlanDto } from "../../model/entities/workout-plan/WorkoutPlanDto
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Card } from "primereact/card";
 
 export default function WorkoutPlansPage() {
   const { t } = useTranslator();
-  const params = useParams();
   const apiService = useApiService();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isAdminPage = location.pathname.includes("/administrator");
   const { workoutPlanDto, resetWorkoutPlanDto, setWorkoutPlanDto } =
     useWorkoutPlanStore();
+
+  const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
+
+  const dialogControlDelete: DialogControl = {
+    showDialog: () => setDeleteDialogVisibility(true),
+    hideDialog: () => setDeleteDialogVisibility(false),
+  };
 
   const triggerRefreshDataTable = useRef<
     ((dto: DataTableDto<WorkoutPlanDto>) => void) | undefined
@@ -31,7 +43,7 @@ export default function WorkoutPlansPage() {
     DataTableDto<WorkoutPlanDto>
   >({
     ...new DataTableDto(),
-    filters: params["administrator"] // If Admin see everything
+    filters: isAdminPage // If Admin see everything
       ? []
       : [
           {
@@ -44,12 +56,15 @@ export default function WorkoutPlansPage() {
   });
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
-    return [
-      ButtonTypeEnum.VIEW,
-      ButtonTypeEnum.ADD,
-      ButtonTypeEnum.EDIT,
-      ButtonTypeEnum.DELETE,
-    ];
+    if (isAdminPage)
+      return [
+        ButtonTypeEnum.VIEW,
+        ButtonTypeEnum.ADD,
+        ButtonTypeEnum.EDIT,
+        ButtonTypeEnum.DELETE,
+      ];
+
+    return [ButtonTypeEnum.VIEW, ButtonTypeEnum.EDIT];
   };
 
   // Custom chip template for selected users
@@ -112,20 +127,22 @@ export default function WorkoutPlansPage() {
     switch (buttonType) {
       case ButtonTypeEnum.VIEW:
         if (rowData) {
-          setWorkoutPlanDto(rowData);
+          navigate(rowData.id + "/view");
         }
         break;
       case ButtonTypeEnum.ADD:
         resetWorkoutPlanDto();
+        navigate("add");
         break;
       case ButtonTypeEnum.EDIT:
         if (rowData) {
-          setWorkoutPlanDto(rowData);
+          navigate(rowData.id + "/edit");
         }
         break;
       case ButtonTypeEnum.DELETE:
         if (rowData) {
           setWorkoutPlanDto(rowData);
+          dialogControlDelete.showDialog();
         }
         break;
 
@@ -134,19 +151,45 @@ export default function WorkoutPlansPage() {
     }
   };
 
+  const onDelete = async (): Promise<void> => {
+    const response = await apiService
+      .delete("trainGroups", workoutPlanDto.id)
+      .then(() => {
+        dialogControlDelete.hideDialog();
+        if (triggerRefreshDataTable.current)
+          triggerRefreshDataTable.current(datatableDto);
+      });
+  };
+
   return (
     <>
-      <DataTableComponent
-        dataTableDto={datatableDto}
-        setDataTableDto={setDatatableDto}
-        formMode={FormMode.EDIT}
-        onButtonClick={onDataTableClick}
-        controller="WorkoutPlans"
-        filterDisplay={DataTableFilterDisplayEnum.ROW}
-        dataTableColumns={dataTableColumns}
-        triggerRefreshData={triggerRefreshDataTable}
-        availableGridRowButtons={availableGridRowButtons()}
-      />
+      <Card title={t("Workout Plans")}>
+        <DataTableComponent
+          dataTableDto={datatableDto}
+          setDataTableDto={setDatatableDto}
+          formMode={FormMode.EDIT}
+          onButtonClick={onDataTableClick}
+          controller="WorkoutPlans"
+          filterDisplay={DataTableFilterDisplayEnum.ROW}
+          dataTableColumns={dataTableColumns}
+          triggerRefreshData={triggerRefreshDataTable}
+          availableGridRowButtons={availableGridRowButtons()}
+        />
+      </Card>
+
+      {/*                                       */}
+      {/*          Delete Train Group           */}
+      {/*                                       */}
+      <GenericDialogComponent
+        visible={isDeleteDialogVisible}
+        control={dialogControlDelete}
+        onDelete={onDelete}
+        formMode={FormMode.DELETE}
+      >
+        <div className="flex justify-content-center">
+          <p>{t("Are you sure")}?</p>
+        </div>
+      </GenericDialogComponent>
     </>
   );
 }

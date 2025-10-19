@@ -67,18 +67,20 @@ namespace Business.Services
 
         public IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : class
         {
-            if (typeof(TEntity) == typeof(TrainGroup))
-                return (IGenericRepository<TEntity>)TrainGroups;
-            if (typeof(TEntity) == typeof(PhoneNumber))
-                return (IGenericRepository<TEntity>)PhoneNumbers;
             if (typeof(TEntity) == typeof(Mail))
                 return (IGenericRepository<TEntity>)Mails;
+            if (typeof(TEntity) == typeof(Exercise))
+                return (IGenericRepository<TEntity>)Exercises;
+            if (typeof(TEntity) == typeof(TrainGroup))
+                return (IGenericRepository<TEntity>)TrainGroups;
+            if (typeof(TEntity) == typeof(WorkoutPlan))
+                return (IGenericRepository<TEntity>)WorkoutPlans;
+            if (typeof(TEntity) == typeof(PhoneNumber))
+                return (IGenericRepository<TEntity>)PhoneNumbers;
             if (typeof(TEntity) == typeof(TrainGroupDate))
                 return (IGenericRepository<TEntity>)TrainGroupDates;
             if (typeof(TEntity) == typeof(TrainGroupParticipant))
                 return (IGenericRepository<TEntity>)TrainGroupParticipants;
-            //if (typeof(TEntity) == typeof(TrainGroupDateCancellationSubscriber))
-            //    return (IGenericRepository<TEntity>)TrainGroupCancellationSubscribers;
             if (typeof(TEntity) == typeof(TrainGroupParticipantUnavailableDate))
                 return (IGenericRepository<TEntity>)TrainGroupParticipantUnavailableDates;
             if (typeof(TEntity) == typeof(User))

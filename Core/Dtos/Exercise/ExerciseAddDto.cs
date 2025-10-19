@@ -9,8 +9,6 @@ namespace Core.Dtos.Exercise
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string Name { get; set; } = string.Empty;
 
-        
-        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string Description { get; set; } = string.Empty;
 
         
