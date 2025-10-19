@@ -18,6 +18,7 @@ import MailSendPage from "./pages/mail/MailSendPage.tsx";
 import { FormMode } from "./enum/FormMode.tsx";
 import RegisterPage from "./pages/user/RegisterPage.tsx";
 import WorkoutPlansPage from "./pages/workout-plan/WorkoutPlansPage.tsx";
+import WorkoutPlanFormPage from "./pages/workout-plan/WorkoutPlanFormPage.tsx";
 
 export default function App() {
   return (
@@ -83,6 +84,18 @@ export default function App() {
                 <Route
                   path="workout-plans"
                   element={<WorkoutPlansPage />}
+                />
+                <Route
+                  path="workout-plans/add"
+                  element={<WorkoutPlanFormPage formMode={FormMode.ADD} />}
+                />
+                <Route
+                  path="workout-plans/:id/edit"
+                  element={<WorkoutPlanFormPage formMode={FormMode.EDIT} />}
+                />
+                <Route
+                  path="workout-plans/:id/view"
+                  element={<WorkoutPlanFormPage formMode={FormMode.VIEW} />}
                 />
 
                 {/* Users */}

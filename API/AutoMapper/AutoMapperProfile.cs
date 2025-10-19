@@ -77,6 +77,13 @@ namespace API.AutoMapper
             CreateMap<Exercise, ExerciseAddDto>();
             CreateMap<ExerciseAddDto, Exercise>();
 
+            // WorkoutPlan mappings.
+            CreateMap<WorkoutPlan, WorkoutPlanDto>();
+            CreateMap<WorkoutPlanDto, WorkoutPlan>();
+
+            CreateMap<WorkoutPlan, WorkoutPlanAddDto>();
+            CreateMap<WorkoutPlanAddDto, WorkoutPlan>();
+
 
             // Mail mappings.
             CreateMap<Mail, MailDto>();

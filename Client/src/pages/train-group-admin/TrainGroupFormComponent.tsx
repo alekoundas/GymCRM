@@ -295,10 +295,6 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
         <LookupComponent
           controller="users"
           selectedEntityId={trainGroupDto.trainerId}
-          // isEnabled={
-          //   formMode !== FormMode.VIEW &&
-          //   TokenService.getRoleName() === "Administrator"
-          // }
           onChange={(x) =>
             handleChange({
               target: {

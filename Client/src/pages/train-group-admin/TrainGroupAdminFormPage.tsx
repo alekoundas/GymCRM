@@ -75,13 +75,14 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
         // );
         navigate("/administrator/train-groups");
       }
-    } else {
-      const response = await apiService.update(
-        "trainGroups",
-        trainGroupDto,
-        trainGroupDto.id
-      );
     }
+    // else {
+    //   const response = await apiService.update(
+    //     "trainGroups",
+    //     trainGroupDto,
+    //     trainGroupDto.id
+    //   );
+    // }
   };
 
   return (

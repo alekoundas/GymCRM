@@ -15,7 +15,7 @@ namespace Core.Dtos.WorkoutPlan
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string UserId { get; set; } = "";
-        public UserDto? User { get; set; }
+        //public UserDto? User { get; set; }
 
 
         public ICollection<ExerciseAddDto> Exercises { get; set; } = new Collection<ExerciseAddDto>();
