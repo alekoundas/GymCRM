@@ -1,8 +1,9 @@
 ﻿using Core.Dtos.UserRole;
+using Core.Dtos.UserStatus;
 using Core.Translations;
 using System.ComponentModel.DataAnnotations;
 
-namespace Core.Dtos.Identity
+namespace Core.Dtos.User
 {
     public class UserDto
     {
@@ -28,6 +29,8 @@ namespace Core.Dtos.Identity
         [StringLength(50, ErrorMessage = TranslationKeys.LastName_cannot_exceed_50_characters)]
         public string LastName { get; set; } = "";
 
+        public int? UserStatusId { get; set; }
+        public UserStatusDto? UserStatus { get; set; }
 
         public byte[]? ProfileImage { get; set; }
 

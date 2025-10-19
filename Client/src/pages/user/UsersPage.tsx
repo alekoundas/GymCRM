@@ -16,6 +16,7 @@ import DataTableFilterIdComponent from "../../components/core/datatable/DataTabl
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
 import { useNavigate } from "react-router-dom";
+import { Tag } from "primereact/tag";
 
 export default function UsersPage() {
   const { t } = useTranslator();
@@ -108,6 +109,33 @@ export default function UsersPage() {
       },
       style: { width: "20%" },
     },
+    {
+      field: "userStatusId",
+      header: t("UserStatuses"),
+      sortable: false,
+      filter: true,
+      filterPlaceholder: t("Search"),
+      filterTemplate: (options) => (
+        <DataTableFilterIdComponent
+          options={options}
+          controller="UserStatuses"
+        />
+      ),
+      body: (rowData, options) => {
+        if (rowData.userStatus)
+          return (
+            <Tag
+              className="p-2 opacity-100 w-full"
+              style={{
+                backgroundColor: "#" + rowData.color,
+              }}
+            >
+              {rowData.userStatus?.name}
+            </Tag>
+          );
+      },
+      style: { width: "20%" },
+    },
   ];
 
   const onDataTableClick = (buttonType: ButtonTypeEnum, rowData?: UserDto) => {
@@ -128,7 +156,7 @@ export default function UsersPage() {
         setDeleteDialogVisibility(true);
         break;
       case ButtonTypeEnum.PROFILE:
-        navigate("/administrator/users/"+rowData?.id+"/profile");
+        navigate("/administrator/users/" + rowData?.id + "/profile");
         break;
 
       default:

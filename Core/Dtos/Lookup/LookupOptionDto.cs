@@ -6,6 +6,7 @@
         public string? Value { get; set; } = "";
         public string? FirstName { get; set; } = "";// TODO: Refactor all the lookup logic
         public string? LastName { get; set; } = ""; // TODO: Refactor all the lookup logic
+        public string? UserColor { get; set; } = ""; // TODO: Refactor all the lookup logic
         public byte[]? ProfileImage { get; set; }
 
     }

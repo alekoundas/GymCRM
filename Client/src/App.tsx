@@ -19,6 +19,7 @@ import { FormMode } from "./enum/FormMode.tsx";
 import RegisterPage from "./pages/user/RegisterPage.tsx";
 import WorkoutPlansPage from "./pages/workout-plan/WorkoutPlansPage.tsx";
 import WorkoutPlanFormPage from "./pages/workout-plan/WorkoutPlanFormPage.tsx";
+import UserStatusesPage from "./pages/user-status/UserStatusesPage.tsx";
 
 export default function App() {
   return (
@@ -111,6 +112,11 @@ export default function App() {
                 <Route
                   path="users/:id/profile"
                   element={<UserProfilePage />}
+                />
+
+                <Route
+                  path="user-statuses"
+                  element={<UserStatusesPage />}
                 />
               </Route>
 

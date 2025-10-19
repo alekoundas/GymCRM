@@ -7,6 +7,7 @@ import { DialogChildProps } from "../../components/core/dialog/GenericDialogComp
 import { UserRoleDto } from "../../model/entities/user-role/UserRoleDto";
 import { RoleDto } from "../../model/entities/role/RoleDto";
 import { useTranslator } from "../../services/TranslatorService";
+import { UserStatusDto } from "../../model/entities/user-status/UserStatusDto";
 
 interface IField extends DialogChildProps {}
 
@@ -76,6 +77,31 @@ export default function UserFormComponent({ formMode }: IField) {
                   : [],
               })
             }
+          />
+        </div>
+
+        <div className="field ">
+          <label
+            htmlFor="roleId"
+            className="block text-900 font-medium mb-2"
+          >
+            {t("Status")}
+          </label>
+          <LookupComponent
+            controller="UserStatuses"
+            selectedEntityId={userDto.userStatusId?.toString() ?? ""}
+            isEnabled={formMode === FormMode.EDIT}
+            onChange={(x) => {
+              if (x && x.id)
+                updateUserDto({
+                  userStatusId: +x.id,
+                  // userStatus: {
+                  //   ...new UserStatusDto(),
+                  //   color: x.userColor ?? "",
+                  //   name: x.value ?? "",
+                  // },
+                });
+            }}
           />
         </div>
       </div>

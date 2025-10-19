@@ -3,9 +3,9 @@ using Business.Services;
 using Core.Dtos;
 using Core.Dtos.AutoComplete;
 using Core.Dtos.DataTable;
-using Core.Dtos.Identity;
 using Core.Dtos.Lookup;
 using Core.Dtos.TrainGroupDate;
+using Core.Dtos.User;
 using Core.Enums;
 using Core.Models;
 using Core.Translations;
@@ -56,6 +56,7 @@ namespace API.Controllers
                 return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
 
             User? user = await _dataService.Users
+                .Include(x => x.UserStatus)
                 .Include(x => x.UserRoles)
                 .ThenInclude<UserRole, Role>(x => x.Role)
                 .FirstOrDefaultAsync(x => x.Id == new Guid(id));
@@ -98,6 +99,7 @@ namespace API.Controllers
             user.Email = request.Email; // Only admin can update email.
             user.UserName = request.UserName;
             user.ProfileImage = request.ProfileImage;
+            user.UserStatusId = request.UserStatusId;
 
             UserDto userDto = _mapper.Map<UserDto>(user);
             IdentityResult response = await _userManager.UpdateAsync(user);
@@ -135,6 +137,7 @@ namespace API.Controllers
             List<Expression<Func<User, bool>>>? filterQuery = new List<Expression<Func<User, bool>>>();
 
             var query = _dataService.Users
+                .Include(x => x.UserStatus)
                 .Include(x => x.UserRoles)
                 .ThenInclude<UserRole, Role>(x => x.Role);
 
@@ -237,7 +240,8 @@ namespace API.Controllers
         public async Task<ApiResponse<LookupDto>> Lookup([FromBody] LookupDto lookupDto)
         {
 
-            var query = _dataService.GetGenericRepository<User>();
+            var query = _dataService.GetGenericRepository<User>()
+                .Include(x=>x.UserStatus);
 
             if (lookupDto.Filter.Id.Length > 0)
                 query.Where(x => x.Id == new Guid(lookupDto.Filter.Id));
@@ -264,7 +268,8 @@ namespace API.Controllers
                       Value = x.UserName,
                       FirstName = x.FirstName,
                       LastName = x.LastName,
-                      ProfileImage = x.ProfileImage
+                      ProfileImage = x.ProfileImage,
+                      UserColor=x.UserStatus?.Color
                   })
               .ToList();
 
@@ -297,12 +302,12 @@ namespace API.Controllers
             string searchValue = autoCompleteDto.SearchValue.ToLower();
             if (autoCompleteDto.SearchValue.Length > 0)
                 query.Where(x =>
-                x.FirstName.ToLower().Contains(searchValue) ||
-                x.LastName.ToLower().Contains(searchValue) ||
-                x.Email.ToLower().Contains(searchValue) ||
-                x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
-                x.UserName!.ToLower().Contains(searchValue)
-            );
+                    x.FirstName.ToLower().Contains(searchValue) ||
+                    x.LastName.ToLower().Contains(searchValue) ||
+                    x.Email.ToLower().Contains(searchValue) ||
+                    x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
+                    x.UserName!.ToLower().Contains(searchValue)
+                );
 
             // Handle Pagging.
             query.AddPagging(autoCompleteDto.Skip, autoCompleteDto.Take);
@@ -313,12 +318,12 @@ namespace API.Controllers
 
             if (autoCompleteDto.SearchValue.Length > 0)
                 query.Where(x =>
-                x.FirstName.ToLower().Contains(searchValue) ||
-                x.LastName.ToLower().Contains(searchValue) ||
-                x.Email.ToLower().Contains(searchValue) ||
-                x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
-                x.UserName!.ToLower().Contains(searchValue)
-            );
+                    x.FirstName.ToLower().Contains(searchValue) ||
+                    x.LastName.ToLower().Contains(searchValue) ||
+                    x.Email.ToLower().Contains(searchValue) ||
+                    x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
+                    x.UserName!.ToLower().Contains(searchValue)
+                );
 
             autoCompleteDto.Suggestions = customerDto;
             autoCompleteDto.TotalRecords = await query.CountAsync();

@@ -1,5 +1,5 @@
-﻿using Core.Dtos.Identity;
-using Core.Dtos.TrainGroupDate;
+﻿using Core.Dtos.TrainGroupDate;
+using Core.Dtos.User;
 using Core.Models;
 using Core.Translations;
 using System.Collections.ObjectModel;

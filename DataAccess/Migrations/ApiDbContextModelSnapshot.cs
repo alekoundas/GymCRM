@@ -398,6 +398,9 @@ namespace DataAccess.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("UserStatusId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
@@ -412,6 +415,8 @@ namespace DataAccess.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("UserStatusId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -429,6 +434,39 @@ namespace DataAccess.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Core.Models.UserStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("UserStatuses");
                 });
 
             modelBuilder.Entity("Core.Models.WorkoutPlan", b =>
@@ -660,6 +698,16 @@ namespace DataAccess.Migrations
                     b.Navigation("TrainGroupParticipant");
                 });
 
+            modelBuilder.Entity("Core.Models.User", b =>
+                {
+                    b.HasOne("Core.Models.UserStatus", "UserStatus")
+                        .WithMany("Users")
+                        .HasForeignKey("UserStatusId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("UserStatus");
+                });
+
             modelBuilder.Entity("Core.Models.UserRole", b =>
                 {
                     b.HasOne("Core.Models.Role", "Role")
@@ -761,6 +809,11 @@ namespace DataAccess.Migrations
                     b.Navigation("UserRoles");
 
                     b.Navigation("WorkoutPlans");
+                });
+
+            modelBuilder.Entity("Core.Models.UserStatus", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Core.Models.WorkoutPlan", b =>

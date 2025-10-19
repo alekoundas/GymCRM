@@ -12,6 +12,10 @@ namespace Core.Models
         public byte[]? ProfileImage { get; set; }
 
 
+        public int? UserStatusId { get; set; }
+        public UserStatus? UserStatus { get; set; }
+
+
         public virtual ICollection<Mail> Mails { get; set; } = new Collection<Mail>();
         public virtual ICollection<PhoneNumber> PhoneNumbers { get; set; } = new Collection<PhoneNumber>();
 

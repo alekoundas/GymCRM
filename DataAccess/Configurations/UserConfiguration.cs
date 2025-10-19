@@ -26,6 +26,14 @@ namespace DataAccess.Configurations
 
             builder.Property(u => u.Email)
               .IsRequired();
+
+
+            // Relationship with UserStatus (zero-to-many)
+            builder.HasOne(x => x.UserStatus)
+              .WithMany(x => x.Users)
+              .HasForeignKey(x => x.UserStatusId)
+              .IsRequired(false)
+              .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
         }
     }
 }

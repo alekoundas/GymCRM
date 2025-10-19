@@ -15,6 +15,7 @@ namespace Business.Services
         public IGenericRepository<Mail> Mails { get; }
         public IGenericRepository<Exercise> Exercises { get; }
         public IGenericRepository<TrainGroup> TrainGroups { get; }
+        public IGenericRepository<UserStatus> UserStatuses { get; }
         public IGenericRepository<WorkoutPlan> WorkoutPlans { get; }
         public IGenericRepository<PhoneNumber> PhoneNumbers { get; }
         public IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
@@ -33,8 +34,9 @@ namespace Business.Services
             IDbContextFactory<ApiDbContext> dbContextFactory,
             IGenericRepository<Mail> mailRepository,
             IGenericRepository<Exercise> exerciseRepository,
-            IGenericRepository<WorkoutPlan> workoutPlanRepository,
             IGenericRepository<TrainGroup> trainGroupRepository,
+            IGenericRepository<UserStatus> userStatusesRepository,
+            IGenericRepository<WorkoutPlan> workoutPlanRepository,
             IGenericRepository<PhoneNumber> phoneNumberRepository,
             IGenericRepository<TrainGroupDate> trainGroupDateRepository,
             IGenericRepository<TrainGroupParticipant> trainGroupParticipantRepository,
@@ -52,6 +54,7 @@ namespace Business.Services
             TrainGroups = trainGroupRepository;
             PhoneNumbers = phoneNumberRepository;
             WorkoutPlans = workoutPlanRepository;
+            UserStatuses = userStatusesRepository;  
 
             // TrainGroup.
             TrainGroupDates = trainGroupDateRepository;
@@ -73,6 +76,8 @@ namespace Business.Services
                 return (IGenericRepository<TEntity>)Exercises;
             if (typeof(TEntity) == typeof(TrainGroup))
                 return (IGenericRepository<TEntity>)TrainGroups;
+            if (typeof(TEntity) == typeof(UserStatus))
+                return (IGenericRepository<TEntity>)UserStatuses;
             if (typeof(TEntity) == typeof(WorkoutPlan))
                 return (IGenericRepository<TEntity>)WorkoutPlans;
             if (typeof(TEntity) == typeof(PhoneNumber))

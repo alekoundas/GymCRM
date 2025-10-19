@@ -60,8 +60,8 @@ namespace API.Controllers
             if (!IsUserAuthorized("Add"))
                 return new ApiResponse<List<TEntity>>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
-            if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<List<TEntity>>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]));
+            //if (entityDtos.Count() == 0)
+            //    return BadRequest(new ApiResponse<List<TEntity>>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]));
 
             foreach (var entityDto in entityDtos)
                 if (CustomValidatePOST(entityDto, out string[] errors))
@@ -73,7 +73,7 @@ namespace API.Controllers
             if (result <= 0)
                 return new ApiResponse<List<TEntity>>().SetErrorResponse(_localizer[TranslationKeys.An_error_occurred_while_creating_the_entity]);
 
-            return new ApiResponse<List<TEntity>>().SetSuccessResponse(entities,_localizer[TranslationKeys._0_updated_successfully, className]);
+            return new ApiResponse<List<TEntity>>().SetSuccessResponse(entities, _localizer[TranslationKeys._0_updated_successfully, className]);
         }
 
         // PUT: api/controller/5

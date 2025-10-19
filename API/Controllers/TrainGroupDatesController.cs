@@ -2,8 +2,8 @@
 using AutoMapper;
 using Business.Services;
 using Core.Dtos;
-using Core.Dtos.Identity;
 using Core.Dtos.TrainGroupDate;
+using Core.Dtos.User;
 using Core.Enums;
 using Core.Models;
 using Core.Translations;
