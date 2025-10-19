@@ -15,6 +15,7 @@
   "Sets": "Sets",
   "Reps": "Reps",
   "Weight": "Weight",
+  "Color": "Color",
 
   "Title_cannot_exceed_100_characters": "Title cannot exceed 100 characters",
   "Description_cannot_exceed_500_characters": "Description cannot exceed 500 characters!",

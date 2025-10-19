@@ -1,5 +1,4 @@
-﻿
-using Core.Dtos.Identity;
+﻿using Core.Dtos.User;
 
 namespace Core.Dtos.TrainGroupDate
 {

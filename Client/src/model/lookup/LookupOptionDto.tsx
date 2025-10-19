@@ -4,6 +4,7 @@ export interface LookupOptionDto {
   firstName?: string;
   lastName?: string;
   profileImage?: string | null; // Base64-encoded image (e.g., "data:image/jpeg;base64,...") or null
+  userColor?: string | null;
 }
 
 // Class
@@ -13,4 +14,5 @@ export class LookupOptionDto {
   firstName?: string = "";
   lastName?: string = "";
   profileImage?: string | null; // Base64-encoded image (e.g., "data:image/jpeg;base64,...") or null
+  userColor?: string | null;
 }

@@ -7,7 +7,9 @@ using Core.Dtos.PhoneNumber;
 using Core.Dtos.TrainGroup;
 using Core.Dtos.TrainGroupDate;
 using Core.Dtos.TrainGroupParticipantUnavailableDate;
+using Core.Dtos.User;
 using Core.Dtos.UserRole;
+using Core.Dtos.UserStatus;
 using Core.Dtos.WorkoutPlan;
 using Core.Models;
 using Microsoft.AspNetCore.Identity;
@@ -83,6 +85,14 @@ namespace API.AutoMapper
 
             CreateMap<WorkoutPlan, WorkoutPlanAddDto>();
             CreateMap<WorkoutPlanAddDto, WorkoutPlan>();
+
+
+            // UserStatus mappings.
+            CreateMap<UserStatus, UserStatusDto>();
+            CreateMap<UserStatusDto, UserStatus>();
+
+            CreateMap<UserStatus, UserStatusAddDto>();
+            CreateMap<UserStatusAddDto, UserStatus>();
 
 
             // Mail mappings.

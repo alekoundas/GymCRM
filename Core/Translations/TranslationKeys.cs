@@ -24,6 +24,7 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string Sets = "Sets";
         public const string Reps = "Reps";
         public const string Weight = "Weight";
+        public const string Color = "Color";
         public const string Title_cannot_exceed_100_characters = "Title_cannot_exceed_100_characters";
         public const string Description_cannot_exceed_500_characters = "Description_cannot_exceed_500_characters";
         public const string At_least_1_Train_Group_Date_is_required = "At_least_1_Train_Group_Date_is_required";

@@ -12,6 +12,7 @@ import UserProfilePage from "../user/UserProfilePage";
 import NavLeft from "../../components/navbar-left/NavLeft";
 import WorkoutPlansPage from "../workout-plan/WorkoutPlansPage";
 import WorkoutPlanFormPage from "../workout-plan/WorkoutPlanFormPage";
+import UserStatusesPage from "../user-status/UserStatusesPage";
 
 export default function Administrator() {
   return (
@@ -89,6 +90,11 @@ export default function Administrator() {
             <Route
               path="users/:id/profile"
               element={<UserProfilePage />}
+            />
+
+            <Route
+              path="user-statuses"
+              element={<UserStatusesPage />}
             />
           </Routes>
           {/* </ScrollPanel> */}

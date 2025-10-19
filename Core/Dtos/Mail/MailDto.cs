@@ -1,4 +1,4 @@
-﻿using Core.Dtos.Identity;
+﻿using Core.Dtos.User;
 using Core.Translations;
 using System.ComponentModel.DataAnnotations;
 

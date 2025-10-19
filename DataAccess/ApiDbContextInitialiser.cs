@@ -111,6 +111,11 @@ namespace DataAccess
                     new Claim("Permission", "WorkoutPlans_Add"),
                     new Claim("Permission", "WorkoutPlans_Edit"),
                     new Claim("Permission", "WorkoutPlans_Delete"),
+
+                    new Claim("Permission", "UserStatuses_View"),
+                    new Claim("Permission", "UserStatuses_Add"),
+                    new Claim("Permission", "UserStatuses_Edit"),
+                    new Claim("Permission", "UserStatuses_Delete"),
                 };
 
                 foreach (var claim in claims)
@@ -176,6 +181,8 @@ namespace DataAccess
 
                 var claims = new List<Claim>
                 {
+                    new Claim("Permission", "WorkoutPlans_View"),
+                    new Claim("Permission", "WorkoutPlans_Edit"),
                 };
 
                 foreach (var claim in claims)

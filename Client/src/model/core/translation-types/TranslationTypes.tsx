@@ -177,6 +177,10 @@
   'Sets': string;
   'Reps': string;
   'Weight': string;
+  'UserStatuses': string;
+  'Color': string;
+  'User Statuses': string;
+  'Status': string;
     }
 
 

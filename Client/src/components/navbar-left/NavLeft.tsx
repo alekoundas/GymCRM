@@ -16,6 +16,14 @@ export default function NavLeft() {
         TokenService.isUserAllowed("Roles_View"),
       items: [
         {
+          label: t("Roles"),
+          icon: "pi pi-key",
+          visible: TokenService.isUserAllowed("Roles_View"),
+          command: () => {
+            navigate("/administrator/roles");
+          },
+        },
+        {
           label: t("Users"),
           icon: "pi pi-users",
           visible: TokenService.isUserAllowed("Users_View"),
@@ -24,11 +32,11 @@ export default function NavLeft() {
           },
         },
         {
-          label: t("Roles"),
-          icon: "pi pi-key",
-          visible: TokenService.isUserAllowed("Roles_View"),
+          label: t("User Statuses"),
+          icon: "pi pi-users",
+          visible: TokenService.isUserAllowed("UserStatuses_View"),
           command: () => {
-            navigate("/administrator/roles");
+            navigate("/administrator/user-statuses");
           },
         },
       ],

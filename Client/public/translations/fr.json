@@ -170,5 +170,9 @@
   "Add Exercise": "__STRING_NOT_TRANSLATED__",
   "Sets": "__STRING_NOT_TRANSLATED__",
   "Reps": "__STRING_NOT_TRANSLATED__",
-  "Weight": "__STRING_NOT_TRANSLATED__"
+  "Weight": "__STRING_NOT_TRANSLATED__",
+  "UserStatuses": "__STRING_NOT_TRANSLATED__",
+  "Color": "__STRING_NOT_TRANSLATED__",
+  "User Statuses": "__STRING_NOT_TRANSLATED__",
+  "Status": "__STRING_NOT_TRANSLATED__"
 }

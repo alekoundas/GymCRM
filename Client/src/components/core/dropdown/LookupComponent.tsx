@@ -1,10 +1,11 @@
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { VirtualScrollerLazyEvent } from "primereact/virtualscroller";
 import { LookupDto } from "../../../model/lookup/LookupDto";
 import { LookupOptionDto } from "../../../model/lookup/LookupOptionDto";
 import { useApiService } from "../../../services/ApiService";
 import { useTranslator } from "../../../services/TranslatorService";
+import { Tag } from "primereact/tag";
 
 interface IField {
   controller: string;
@@ -93,6 +94,24 @@ export default function LookupComponent({
     if (onChange) onChange(entity);
   };
 
+  const template = (data: LookupOptionDto, props?: any): JSX.Element => {
+    if (data)
+      if (data.userColor)
+        return (
+          <Tag
+            className="p-2 opacity-100 w-full"
+            style={{
+              backgroundColor: "#" + data.userColor,
+            }}
+          >
+            {data.value}
+          </Tag>
+        );
+      else {
+        return <span>{data.value}</span>;
+      }
+    return <span>{props.placeholder}</span>;
+  };
   return (
     <>
       <Dropdown
@@ -101,6 +120,8 @@ export default function LookupComponent({
         value={selectedId}
         onChange={handleChange}
         options={lookupDto.data}
+        itemTemplate={template}
+        valueTemplate={template}
         placeholder={t("Select a value")}
         className="w-full md:w-14rem"
         disabled={!isEnabled}

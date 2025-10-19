@@ -11,6 +11,10 @@ namespace DataAccess.Configurations
             builder.HasIndex(x => x.Id).IsUnique();
             builder.HasKey(x => x.Id);
 
+            builder.Property(x => x.Number)
+                .IsRequired()
+                .HasMaxLength(20);
+
 
             // Relationship with User (one-to-many)
             builder.HasOne(x => x.User)
