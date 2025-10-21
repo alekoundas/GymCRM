@@ -173,5 +173,16 @@
   "Weight": "وزن",
   "Color": "لون",
   "User Statuses": "حالات المستخدم",
-  "Status": "حالة"
+  "Status": "حالة",
+  "Invalid or missing token. Please log in again.": "Token غير صالح أو مفقود. الرجاء تسجيل الدخول مرة أخرى.",
+  "Failed to refresh token. Please log in again.": "فشل في تحديث token. الرجاء تسجيل الدخول مرة أخرى.",
+  "Token expired. Login required.": "Token منتهي الصلاحية. تسجيل الدخول مطلوب.",
+  "Token refresh failed.": "فشل تحديث token.",
+  "API call failed with status ": "فشل استدعاء API مع الحالة ",
+  "Request timed out.": "انتهت مهلة الطلب.",
+  "Network or unexpected error during API call.": "خطأ في الشبكة أو غير متوقع أثناء استدعاء API.",
+  "Login failed!": "فشل تسجيل الدخول!",
+  "Login successful!": "تسجيل الدخول ناجح!",
+  "Registration successful!": "التسجيل ناجح!",
+  "Logout successful!": "تسجيل الخروج ناجح!"
 }

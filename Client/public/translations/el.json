@@ -173,5 +173,16 @@
   "Weight": "Βάρος",
   "Color": "Χρώμα",
   "User Statuses": "Καταστάσεις χρηστών",
-  "Status": "Κατάσταση"
+  "Status": "Κατάσταση",
+  "Invalid or missing token. Please log in again.": "Μη έγκυρο ή ελλιπές token. Παρακαλώ συνδεθείτε ξανά.",
+  "Failed to refresh token. Please log in again.": "Αποτυχία ανανέωσης του token. Παρακαλώ συνδεθείτε ξανά.",
+  "Token expired. Login required.": "Το token έληξε. Απαιτείται σύνδεση.",
+  "Token refresh failed.": "Η ανανέωση του token απέτυχε.",
+  "API call failed with status ": "Η κλήση API απέτυχε με κατάσταση ",
+  "Request timed out.": "Το αίτημα έληξε.",
+  "Network or unexpected error during API call.": "Σφάλμα δικτύου ή απροσδόκητο σφάλμα κατά την κλήση API.",
+  "Login failed!": "Η σύνδεση απέτυχε!",
+  "Login successful!": "Η σύνδεση ήταν επιτυχής!",
+  "Registration successful!": "Η εγγραφή ήταν επιτυχής!",
+  "Logout successful!": "Η αποσύνδεση ήταν επιτυχής!"
 }

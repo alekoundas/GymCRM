@@ -173,5 +173,16 @@
   "Weight": "Peso",
   "Color": "Colore",
   "User Statuses": "Stati degli utenti",
-  "Status": "Stato"
+  "Status": "Stato",
+  "Invalid or missing token. Please log in again.": "Token non valido o mancante. Effettua di nuovo il login.",
+  "Failed to refresh token. Please log in again.": "Impossibile aggiornare il token. Effettua di nuovo il login.",
+  "Token expired. Login required.": "Token scaduto. Login richiesto.",
+  "Token refresh failed.": "Aggiornamento del token fallito.",
+  "API call failed with status ": "Chiamata API fallita con stato ",
+  "Request timed out.": "Richiesta scaduta.",
+  "Network or unexpected error during API call.": "Errore di rete o imprevisto durante la chiamata API.",
+  "Login failed!": "Login fallito!",
+  "Login successful!": "Login riuscito!",
+  "Registration successful!": "Registrazione riuscita!",
+  "Logout successful!": "Logout riuscito!"
 }

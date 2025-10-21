@@ -173,5 +173,16 @@
   "Weight": "Váha",
   "Color": "Barva",
   "User Statuses": "Stavy uživatele",
-  "Status": "Stav"
+  "Status": "Stav",
+  "Invalid or missing token. Please log in again.": "Neplatný nebo chybějící token. Přihlaste se znovu.",
+  "Failed to refresh token. Please log in again.": "Nepodařilo se obnovit token. Přihlaste se znovu.",
+  "Token expired. Login required.": "Token vypršel. Je vyžadováno přihlášení.",
+  "Token refresh failed.": "Obnovení token selhalo.",
+  "API call failed with status ": "Volání API selhalo se stavem ",
+  "Request timed out.": "Vypršel časový limit požadavku.",
+  "Network or unexpected error during API call.": "Chyba sítě nebo neočekávaná chyba během volání API.",
+  "Login failed!": "Přihlášení selhalo!",
+  "Login successful!": "Přihlášení úspěšné!",
+  "Registration successful!": "Registrace úspěšná!",
+  "Logout successful!": "Odhlášení úspěšné!"
 }

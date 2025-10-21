@@ -177,10 +177,20 @@
   'Sets': string;
   'Reps': string;
   'Weight': string;
-  'UserStatuses': string;
   'Color': string;
   'User Statuses': string;
   'Status': string;
+  'Invalid or missing token. Please log in again.': string;
+  'Failed to refresh token. Please log in again.': string;
+  'Token expired. Login required.': string;
+  'Token refresh failed.': string;
+  'API call failed with status ': string;
+  'Request timed out.': string;
+  'Network or unexpected error during API call.': string;
+  'Login failed!': string;
+  'Login successful!': string;
+  'Registration successful!': string;
+  'Logout successful!': string;
     }
 
 

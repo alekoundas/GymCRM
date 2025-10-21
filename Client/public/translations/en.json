@@ -173,5 +173,16 @@
   "Weight": "Weight",
   "Color": "Color",
   "User Statuses": "User Statuses",
-  "Status": "Status"
+  "Status": "Status",
+  "Invalid or missing token. Please log in again.": "Invalid or missing token. Please log in again.",
+  "Failed to refresh token. Please log in again.": "Failed to refresh token. Please log in again.",
+  "Token expired. Login required.": "Token expired. Login required.",
+  "Token refresh failed.": "Token refresh failed.",
+  "API call failed with status ": "API call failed with status ",
+  "Request timed out.": "Request timed out.",
+  "Network or unexpected error during API call.": "Network or unexpected error during API call.",
+  "Login failed!": "Login failed!",
+  "Login successful!": "Login successful!",
+  "Registration successful!": "Registration successful!",
+  "Logout successful!": "Logout successful!"
 }

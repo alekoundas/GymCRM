@@ -173,5 +173,16 @@
   "Weight": "Gewicht",
   "Color": "Kleur",
   "User Statuses": "Gebruikersstatussen",
-  "Status": "Status"
+  "Status": "Status",
+  "Invalid or missing token. Please log in again.": "Ongeldig of ontbrekend token. Log opnieuw in.",
+  "Failed to refresh token. Please log in again.": "Kon token niet vernieuwen. Log opnieuw in.",
+  "Token expired. Login required.": "Token verlopen. Inloggen vereist.",
+  "Token refresh failed.": "Vernieuwen van token mislukt.",
+  "API call failed with status ": "API-aanroep mislukt met status ",
+  "Request timed out.": "Verzoek verlopen.",
+  "Network or unexpected error during API call.": "Netwerk- of onverwachte fout tijdens API-aanroep.",
+  "Login failed!": "Inloggen mislukt!",
+  "Login successful!": "Inloggen gelukt!",
+  "Registration successful!": "Registratie gelukt!",
+  "Logout successful!": "Uitloggen gelukt!"
 }
