@@ -173,5 +173,16 @@
   "Weight": "重量",
   "Color": "颜色",
   "User Statuses": "用户状态",
-  "Status": "状态"
+  "Status": "状态",
+  "Invalid or missing token. Please log in again.": "无效或缺失的token。请重新登录。",
+  "Failed to refresh token. Please log in again.": "刷新token失败。请重新登录。",
+  "Token expired. Login required.": "Token已过期。需要登录。",
+  "Token refresh failed.": "Token刷新失败。",
+  "API call failed with status ": "API调用失败，状态为 ",
+  "Request timed out.": "请求超时。",
+  "Network or unexpected error during API call.": "API调用期间发生网络或意外错误。",
+  "Login failed!": "登录失败！",
+  "Login successful!": "登录成功！",
+  "Registration successful!": "注册成功！",
+  "Logout successful!": "登出成功！"
 }

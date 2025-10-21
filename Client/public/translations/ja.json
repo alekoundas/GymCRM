@@ -173,5 +173,16 @@
   "Weight": "重量",
   "Color": "色",
   "User Statuses": "ユーザーのステータス",
-  "Status": "ステータス"
+  "Status": "ステータス",
+  "Invalid or missing token. Please log in again.": "無効または欠落しているtoken。もう一度ログインしてください。",
+  "Failed to refresh token. Please log in again.": "Tokenのリフレッシュに失敗しました。もう一度ログインしてください。",
+  "Token expired. Login required.": "Tokenが期限切れです。ログインが必要です。",
+  "Token refresh failed.": "Tokenのリフレッシュに失敗しました。",
+  "API call failed with status ": "API呼び出しがステータスで失敗しました ",
+  "Request timed out.": "リクエストがタイムアウトしました。",
+  "Network or unexpected error during API call.": "API呼び出し中のネットワークまたは予期しないエラー。",
+  "Login failed!": "ログインに失敗しました！",
+  "Login successful!": "ログイン成功！",
+  "Registration successful!": "登録成功！",
+  "Logout successful!": "ログアウト成功！"
 }

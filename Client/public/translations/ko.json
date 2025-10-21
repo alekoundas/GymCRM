@@ -173,5 +173,16 @@
   "Weight": "무게",
   "Color": "색상",
   "User Statuses": "사용자 상태",
-  "Status": "상태"
+  "Status": "상태",
+  "Invalid or missing token. Please log in again.": "잘못된 또는 누락된 token. 다시 로그인하십시오.",
+  "Failed to refresh token. Please log in again.": "Token 새로 고침에 실패했습니다. 다시 로그인하십시오.",
+  "Token expired. Login required.": "Token이 만료되었습니다. 로그인이 필요합니다.",
+  "Token refresh failed.": "Token 새로 고침에 실패했습니다.",
+  "API call failed with status ": "API 호출이 상태로 실패했습니다 ",
+  "Request timed out.": "요청 시간이 초과되었습니다.",
+  "Network or unexpected error during API call.": "API 호출 중 네트워크 또는 예기치 않은 오류.",
+  "Login failed!": "로그인 실패!",
+  "Login successful!": "로그인 성공!",
+  "Registration successful!": "등록 성공!",
+  "Logout successful!": "로그아웃 성공!"
 }

@@ -173,5 +173,16 @@
   "Weight": "Paino",
   "Color": "Väri",
   "User Statuses": "Käyttäjän tilat",
-  "Status": "Tila"
+  "Status": "Tila",
+  "Invalid or missing token. Please log in again.": "Virheellinen tai puuttuva token. Kirjaudu sisään uudelleen.",
+  "Failed to refresh token. Please log in again.": "Tokenin päivitys epäonnistui. Kirjaudu sisään uudelleen.",
+  "Token expired. Login required.": "Token vanhentunut. Kirjautuminen vaaditaan.",
+  "Token refresh failed.": "Tokenin päivitys epäonnistui.",
+  "API call failed with status ": "API-kutsu epäonnistui tilalla ",
+  "Request timed out.": "Pyyntö aikakatkaistiin.",
+  "Network or unexpected error during API call.": "Verkko- tai odottamaton virhe API-kutsun aikana.",
+  "Login failed!": "Kirjautuminen epäonnistui!",
+  "Login successful!": "Kirjautuminen onnistui!",
+  "Registration successful!": "Rekisteröityminen onnistui!",
+  "Logout successful!": "Uloskirjautuminen onnistui!"
 }

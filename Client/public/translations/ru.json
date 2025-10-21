@@ -173,5 +173,16 @@
   "Weight": "Вес",
   "Color": "Цвет",
   "User Statuses": "Статусы пользователя",
-  "Status": "Статус"
+  "Status": "Статус",
+  "Invalid or missing token. Please log in again.": "Недействительный или отсутствующий token. Пожалуйста, войдите снова.",
+  "Failed to refresh token. Please log in again.": "Не удалось обновить token. Пожалуйста, войдите снова.",
+  "Token expired. Login required.": "Token истек. Требуется вход.",
+  "Token refresh failed.": "Обновление token не удалось.",
+  "API call failed with status ": "Вызов API не удался с статусом ",
+  "Request timed out.": "Время ожидания запроса истекло.",
+  "Network or unexpected error during API call.": "Сетевая или непредвиденная ошибка во время вызова API.",
+  "Login failed!": "Вход не удался!",
+  "Login successful!": "Вход успешен!",
+  "Registration successful!": "Регистрация успешна!",
+  "Logout successful!": "Выход успешен!"
 }

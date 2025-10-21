@@ -173,5 +173,16 @@
   "Weight": "Vekt",
   "Color": "Farge",
   "User Statuses": "Brukerstatuser",
-  "Status": "Status"
+  "Status": "Status",
+  "Invalid or missing token. Please log in again.": "Ugyldig eller manglende token. Logg inn igjen.",
+  "Failed to refresh token. Please log in again.": "Kunne ikke oppdatere token. Logg inn igjen.",
+  "Token expired. Login required.": "Token utløpt. Innlogging kreves.",
+  "Token refresh failed.": "Oppdatering av token mislyktes.",
+  "API call failed with status ": "API-kall mislyktes med status ",
+  "Request timed out.": "Forespørselen tok for lang tid.",
+  "Network or unexpected error during API call.": "Nettverks- eller uventet feil under API-kall.",
+  "Login failed!": "Innlogging mislyktes!",
+  "Login successful!": "Innlogging vellykket!",
+  "Registration successful!": "Registrering vellykket!",
+  "Logout successful!": "Utmelding vellykket!"
 }

@@ -173,5 +173,16 @@
   "Weight": "Poids",
   "Color": "Couleur",
   "User Statuses": "Statuts des utilisateurs",
-  "Status": "Statut"
+  "Status": "Statut",
+  "Invalid or missing token. Please log in again.": "Token invalide ou manquant. Veuillez vous reconnecter.",
+  "Failed to refresh token. Please log in again.": "Échec de l'actualisation du token. Veuillez vous reconnecter.",
+  "Token expired. Login required.": "Token expiré. Connexion requise.",
+  "Token refresh failed.": "L'actualisation du token a échoué.",
+  "API call failed with status ": "L'appel API a échoué avec le statut ",
+  "Request timed out.": "La requête a expiré.",
+  "Network or unexpected error during API call.": "Erreur réseau ou inattendue lors de l'appel API.",
+  "Login failed!": "Connexion échouée !",
+  "Login successful!": "Connexion réussie !",
+  "Registration successful!": "Inscription réussie !",
+  "Logout successful!": "Déconnexion réussie !"
 }

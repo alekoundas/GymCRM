@@ -18,11 +18,13 @@ import { ChartData } from "../model/core/chart/ChartData";
 import { TrainGroupParticipantUpdateDto } from "../model/entities/train-group-participant/TrainGroupParticipantUpdateDto";
 import { ApiResponseDto } from "../model/core/api-response/ApiResponseDto";
 import { UserLoginResponseDto } from "../model/entities/user/UserLoginResponseDto";
+import { useTranslator } from "./TranslatorService";
 
 const BASE_URL = "/api/";
 const TOKEN_EXPIRATION_MS = 604800 * 1000; // 7 days
 const refreshPromiseRef = { current: null as Promise<boolean> | null };
 export const useApiService = () => {
+  const { t } = useTranslator();
   const { showSuccess, showInfo, showWarn, showError } = useToast();
 
   const buildUrl = useCallback(
@@ -64,7 +66,7 @@ export const useApiService = () => {
         const refreshToken = refreshTokenDto.refreshToken;
 
         if (!token || !refreshToken) {
-          showError("Invalid or missing token. Please log in again.");
+          showError(t("Invalid or missing token. Please log in again."));
           TokenService.logout();
           return false;
         }
@@ -90,7 +92,7 @@ export const useApiService = () => {
         return true;
       } catch (error) {
         console.error("Unexpected error during token refresh:", error);
-        showError("Failed to refresh token. Please log in again.");
+        showError(t("Failed to refresh token. Please log in again."));
         return false;
       } finally {
         refreshPromiseRef.current = null;
@@ -108,7 +110,7 @@ export const useApiService = () => {
       data?: TRequest
     ): Promise<ApiResponseDto<TResponse> | null> => {
       if (TokenService.isRefreshTokenExpired()) {
-        showWarn("Token expired. Login required.");
+        showWarn(t("Token expired. Login required."));
         TokenService.logout();
         return null;
       }
@@ -119,7 +121,7 @@ export const useApiService = () => {
         // showInfo("Token renewed.");
         return apiFetch(url, method, data);
       }
-      console.warn("Token refresh failed.");
+      console.warn(t("Token refresh failed."));
       return null;
     },
     [showWarn, showInfo, refreshUserToken]
@@ -171,19 +173,19 @@ export const useApiService = () => {
           return apiFetch(url, method, data, retries - 1);
         }
 
-        showError(`API call failed with status ${response.status}`);
+        showError(t("API call failed with status ") + response.status);
         return null;
       } catch (error) {
         clearTimeout(timeoutId);
         if (error instanceof DOMException && error.name === "AbortError") {
-          showError("Request timed out.");
+          showError(t("Request timed out."));
           return null;
         }
         if (error instanceof TypeError && retries > 0) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
           return apiFetch(url, method, data, retries - 1);
         }
-        showError("Network or unexpected error during API call.");
+        showError(t("Network or unexpected error during API call."));
         console.error(error);
         return null;
       }
@@ -380,7 +382,7 @@ export const useApiService = () => {
         UserLoginResponseDto
       >(url, "POST", data);
       if (!result) {
-        showError("Login failed!");
+        showError(t("Login failed!"));
         return false;
       }
 
@@ -396,7 +398,7 @@ export const useApiService = () => {
         expireDate.toISOString()
       );
       authLogin();
-      showSuccess("Login successful!");
+      showSuccess(t("Login successful!"));
       return true;
     },
     [buildUrl, apiRequest, showError, showSuccess]
@@ -415,7 +417,7 @@ export const useApiService = () => {
       const loginDto = new UserLoginRequestDto();
       loginDto.userNameOrEmail = data.email;
       loginDto.password = data.password;
-      showSuccess("Registration successful!");
+      showSuccess(t("Registration successful!"));
       return login(loginDto, authLogin);
     },
     [buildUrl, apiRequest, showSuccess, login]
@@ -429,7 +431,7 @@ export const useApiService = () => {
         ApiResponseDto<boolean>
       >(url, "POST");
       if (result?.isSucceed) {
-        showSuccess("Logout successful!");
+        showSuccess(t("Logout successful!"));
       }
       TokenService.logout();
       authLogout();
