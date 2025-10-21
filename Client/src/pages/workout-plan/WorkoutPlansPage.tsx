@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormMode } from "../../enum/FormMode";
 import GenericDialogComponent, {
   DialogControl,
@@ -18,6 +18,8 @@ import { Avatar } from "primereact/avatar";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Card } from "primereact/card";
+import { Tag } from "primereact/tag";
+import { ColumnFilterElementTemplateOptions } from "primereact/column";
 
 export default function WorkoutPlansPage() {
   const { t } = useTranslator();
@@ -109,16 +111,49 @@ export default function WorkoutPlansPage() {
       sortable: true,
       filter: true,
       filterPlaceholder: t("Search"),
-      filterTemplate: (options) => (
+      filterTemplate: (options: ColumnFilterElementTemplateOptions) => (
         <DataTableFilterIdComponent
           options={options}
           controller="users"
         />
       ),
-      body: (rowData, options) => chipTemplate(rowData.user),
+      body: (rowData: { user: UserDto | undefined }, options: any) =>
+        chipTemplate(rowData.user),
       style: { width: "10%" },
     },
-  ];
+  ].concat(
+    isAdminPage
+      ? [
+          {
+            field: "userStatusId",
+            header: t("User Statuses"),
+            sortable: true,
+            filter: true,
+            filterPlaceholder: t("Search"),
+            filterTemplate: (options) => (
+              <DataTableFilterIdComponent
+                options={options}
+                controller="UserStatuses"
+              />
+            ),
+            body: (rowData, options) => {
+              if (rowData?.user?.userStatus)
+                return (
+                  <Tag
+                    className="p-2 opacity-100 w-full"
+                    style={{
+                      backgroundColor: "#" + rowData.user.userStatus.color,
+                    }}
+                  >
+                    {rowData.user.userStatus.name}
+                  </Tag>
+                );
+            },
+            style: { width: "20%" },
+          },
+        ]
+      : []
+  );
 
   const onDataTableClick = (
     buttonType: ButtonTypeEnum,

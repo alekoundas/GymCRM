@@ -111,8 +111,8 @@ export default function UsersPage() {
     },
     {
       field: "userStatusId",
-      header: t("UserStatuses"),
-      sortable: false,
+      header: t("User Statuses"),
+      sortable: true,
       filter: true,
       filterPlaceholder: t("Search"),
       filterTemplate: (options) => (
@@ -127,7 +127,7 @@ export default function UsersPage() {
             <Tag
               className="p-2 opacity-100 w-full"
               style={{
-                backgroundColor: "#" + rowData.color,
+                backgroundColor: "#" + rowData?.color,
               }}
             >
               {rowData.userStatus?.name}

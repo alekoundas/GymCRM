@@ -57,7 +57,7 @@ namespace API.Controllers
 
         protected override void DataTableQueryUpdate(IGenericRepository<WorkoutPlan> query, DataTableDto<WorkoutPlanDto> dataTable)
         {
-            query = query.Include(x => x.User);
+            query = query.Include(x => x.User).ThenInclude<User,UserStatus>(x=>x.UserStatus!);
         }
     }
 }
