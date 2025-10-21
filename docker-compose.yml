@@ -74,7 +74,7 @@ services:
 
                 # Runs Certbot in a loop to check for certificate renewals every 12 hours.
                 # Ensures the container exits cleanly when stopped by Docker (via the trap).
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot --webroot-path /var/www/certbot; sleep 12h & wait $${!}; done;'"
 
 
 
