@@ -4,9 +4,15 @@ import { ExerciseDto } from "../model/entities/exercise/ExerciseDto";
 
 interface WorkoutPlanStoreState {
   workoutPlanDto: WorkoutPlanDto;
+  newExerciseDto: ExerciseDto;
+
   setWorkoutPlanDto: (data: WorkoutPlanDto) => void;
   updateWorkoutPlanDto: (updates: Partial<WorkoutPlanDto>) => void;
   resetWorkoutPlanDto: () => void;
+
+  setNewExerciseDto: (data: ExerciseDto) => void;
+  updateNewExerciseDto: (updates: Partial<ExerciseDto>) => void;
+  resetNewExerciseDto: () => void;
 
   setExercises: (data: ExerciseDto[]) => void;
   // resetExercises: () => void;
@@ -14,17 +20,32 @@ interface WorkoutPlanStoreState {
 
 export const useWorkoutPlanStore = create<WorkoutPlanStoreState>((set) => ({
   workoutPlanDto: new WorkoutPlanDto(),
-  setWorkoutPlanDto: (data) => set({ workoutPlanDto: data }),
+  newExerciseDto: new ExerciseDto(),
 
+  // workoutPlanDto
+  setWorkoutPlanDto: (data) => set({ workoutPlanDto: data }),
   updateWorkoutPlanDto: (updates) =>
     set((state) => ({
       workoutPlanDto: { ...state.workoutPlanDto, ...updates },
     })),
-
   resetWorkoutPlanDto: () => {
     set({
       workoutPlanDto: {
         ...new WorkoutPlanDto(),
+      },
+    });
+  },
+
+  // newExerciseDto
+  setNewExerciseDto: (data) => set({ newExerciseDto: data }),
+  updateNewExerciseDto: (updates) =>
+    set((state) => ({
+      newExerciseDto: { ...state.newExerciseDto, ...updates },
+    })),
+  resetNewExerciseDto: () => {
+    set({
+      newExerciseDto: {
+        ...new ExerciseDto(),
       },
     });
   },

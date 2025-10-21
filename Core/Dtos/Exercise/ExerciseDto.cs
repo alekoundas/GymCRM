@@ -28,5 +28,9 @@ namespace Core.Dtos.Exercise
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         [Range(1, int.MaxValue, ErrorMessage = TranslationKeys._0_must_be_a_positive_number)]
         public int Weight { get; set; }
+
+
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
+        public int WorkoutPlanId { get; set; }
     }
 }

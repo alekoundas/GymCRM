@@ -5,6 +5,7 @@ export interface ExerciseDto {
   sets: number;
   reps: number;
   weight: number;
+  workoutPlanId: number;
 }
 
 export class ExerciseDto {
@@ -14,4 +15,5 @@ export class ExerciseDto {
   sets: number = 0;
   reps: number = 0;
   weight: number = 0;
+  workoutPlanId: number = 0;
 }
