@@ -48,7 +48,6 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
       setIsSaveEnabled(false);
       if (onSave) {
         onSave().finally(() => {
-          console.log("finaly");
           setIsSaveEnabled(true);
         });
       }

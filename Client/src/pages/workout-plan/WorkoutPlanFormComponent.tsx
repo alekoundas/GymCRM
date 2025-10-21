@@ -86,7 +86,8 @@ export default function WorkoutPlanFormComponent({
             (formMode === FormMode.EDIT && editingField !== "title")
           }
         />
-        {(formMode === FormMode.EDIT && isAdminPage) &&
+        {formMode === FormMode.EDIT &&
+          isAdminPage &&
           (editingField !== "title" ? (
             <Button
               icon="pi pi-pencil"
@@ -112,17 +113,17 @@ export default function WorkoutPlanFormComponent({
 
       <div className="field">
         <label
-          htmlFor="trainer"
+          htmlFor="userId"
           className="block text-900 font-medium mb-2"
         >
-          {t("Trainer")}
+          {t("User")}
         </label>
         <LookupComponent
           controller="users"
           selectedEntityId={workoutPlanDto.userId}
           onChange={(e) => updateWorkoutPlanDto({ userId: e?.id })}
           isEnabled={
-            (formMode === FormMode.EDIT && editingField === "trainerId") ||
+            (formMode === FormMode.EDIT && editingField === "userId") ||
             formMode === FormMode.ADD
           }
         />
