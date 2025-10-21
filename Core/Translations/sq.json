@@ -10,6 +10,12 @@
   "OldPassword": "Fjalëkalimi i vjetër",
   "NewPassword": "Fjalëkalim i ri",
   "UserName": "Emri i përdoruesit",
+  "Name": "Emri",
+  "Description": "Përshkrimi",
+  "Sets": "Sete",
+  "Reps": "Përsëritje",
+  "Weight": "Pesha",
+  "Color": "Ngjyrë",
 
   "Title_cannot_exceed_100_characters": "Titulli nuk mund të kalojë 100 karaktere",
   "Description_cannot_exceed_500_characters": "Përshkrimi nuk mund të kalojë 500 karaktere!",
@@ -53,6 +59,7 @@
   "_0_is_required": "{0} kërkohet!",
   "_0_already_exists": "{0} ekziston tashmë!",
   "_0_not_found": "{0} nuk u gjet!",
+  "_0_must_be_a_positive_number": "{0} duhet të jetë një numër pozitiv.",
   "_0_created_successfully": "{0} u krijua me sukses!",
   "_0_updated_successfully": "{0} u përditësua me sukses!",
   "_0_deleted_successfully": "{0} u fshi me sukses!"

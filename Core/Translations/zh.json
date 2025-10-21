@@ -10,6 +10,12 @@
   "OldPassword": "旧密码",
   "NewPassword": "新密码",
   "UserName": "用户名",
+  "Name": "名称",
+  "Description": "描述",
+  "Sets": "组",
+  "Reps": "次数",
+  "Weight": "重量",
+  "Color": "颜色",
 
   "Title_cannot_exceed_100_characters": "标题不能超过100个字符",
   "Description_cannot_exceed_500_characters": "描述不能超过500个字符!",
@@ -53,6 +59,7 @@
   "_0_is_required": "{0} 是必需的!",
   "_0_already_exists": "{0} 已存在!",
   "_0_not_found": "{0} 未找到!",
+  "_0_must_be_a_positive_number": "{0} 必须是正数。",
   "_0_created_successfully": "{0} 成功创建!",
   "_0_updated_successfully": "{0} 成功更新!",
   "_0_deleted_successfully": "{0} 成功删除!"

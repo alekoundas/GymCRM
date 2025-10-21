@@ -10,6 +10,12 @@
   "OldPassword": "Παλιός Κωδικός Πρόσβασης",
   "NewPassword": "Νέος Κωδικός Πρόσβασης",
   "UserName": "Όνομα Χρήστη",
+  "Name": "Όνομα",
+  "Description": "Περιγραφή",
+  "Sets": "Σετ",
+  "Reps": "Επαναλήψεις",
+  "Weight": "Βάρος",
+  "Color": "Χρώμα",
 
   "Title_cannot_exceed_100_characters": "Ο τίτλος δεν μπορεί να υπερβαίνει τους 100 χαρακτήρες",
   "Description_cannot_exceed_500_characters": "Η περιγραφή δεν μπορεί να υπερβαίνει τους 500 χαρακτήρες!",
@@ -55,6 +61,7 @@
   "_0_is_required": "{0} απαιτείται!",
   "_0_already_exists": "{0} υπάρχει ήδη!",
   "_0_not_found": "{0} δεν βρέθηκε!",
+  "_0_must_be_a_positive_number": "{0} πρέπει να είναι θετικός αριθμός.",
   "_0_created_successfully": "{0} δημιουργήθηκε επιτυχώς!",
   "_0_updated_successfully": "{0} ενημερώθηκε επιτυχώς!",
   "_0_deleted_successfully": "{0} διαγράφηκε επιτυχώς!"

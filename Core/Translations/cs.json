@@ -10,6 +10,12 @@
   "OldPassword": "Staré heslo",
   "NewPassword": "Nové heslo",
   "UserName": "Uživatelské jméno",
+  "Name": "Jméno",
+  "Description": "Popis",
+  "Sets": "Série",
+  "Reps": "Opakování",
+  "Weight": "Váha",
+  "Color": "Barva",
 
   "Title_cannot_exceed_100_characters": "Nadpis nemůže překročit 100 znaků",
   "Description_cannot_exceed_500_characters": "Popis nemůže překročit 500 znaků!",
@@ -53,6 +59,7 @@
   "_0_is_required": "{0} je vyžadováno!",
   "_0_already_exists": "{0} již existuje!",
   "_0_not_found": "{0} nenalezeno!",
+  "_0_must_be_a_positive_number": "{0} musí být kladné číslo.",
   "_0_created_successfully": "{0} vytvořeno úspěšně!",
   "_0_updated_successfully": "{0} aktualizováno úspěšně!",
   "_0_deleted_successfully": "{0} smazáno úspěšně!"

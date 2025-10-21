@@ -10,6 +10,12 @@
   "OldPassword": "Gammelt password",
   "NewPassword": "Nyt password",
   "UserName": "Brugernavn",
+  "Name": "Navn",
+  "Description": "Beskrivelse",
+  "Sets": "Sæt",
+  "Reps": "Gentagelser",
+  "Weight": "Vægt",
+  "Color": "Farve",
 
   "Title_cannot_exceed_100_characters": "Titel kan ikke overstige 100 tegn",
   "Description_cannot_exceed_500_characters": "Beskrivelse kan ikke overstige 500 tegn!",
@@ -53,6 +59,7 @@
   "_0_is_required": "{0} er påkrævet!",
   "_0_already_exists": "{0} eksisterer allerede!",
   "_0_not_found": "{0} ikke fundet!",
+  "_0_must_be_a_positive_number": "{0} skal være et positivt tal.",
   "_0_created_successfully": "{0} oprettet successfully!",
   "_0_updated_successfully": "{0} opdateret successfully!",
   "_0_deleted_successfully": "{0} slettet successfully!"
