@@ -54,7 +54,7 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
 
       const response = await apiService.create("WorkoutPlans", createEntity);
       if (response?.[0]) {
-        navigate("/administrator/train-groups");
+        navigate("/administrator/workout-plans");
       }
     }
   };
