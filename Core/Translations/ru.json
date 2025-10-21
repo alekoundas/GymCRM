@@ -10,6 +10,12 @@
   "OldPassword": "Старый пароль",
   "NewPassword": "Новый пароль",
   "UserName": "Имя пользователя",
+  "Name": "Имя",
+  "Description": "Описание",
+  "Sets": "Подходы",
+  "Reps": "Повторения",
+  "Weight": "Вес",
+  "Color": "Цвет",
 
   "Title_cannot_exceed_100_characters": "Заголовок не может превышать 100 символов",
   "Description_cannot_exceed_500_characters": "Описание не может превышать 500 символов!",
@@ -53,6 +59,7 @@
   "_0_is_required": "{0} требуется!",
   "_0_already_exists": "{0} уже существует!",
   "_0_not_found": "{0} не найден!",
+  "_0_must_be_a_positive_number": "{0} должно быть положительным числом.",
   "_0_created_successfully": "{0} создан успешно!",
   "_0_updated_successfully": "{0} обновлен успешно!",
   "_0_deleted_successfully": "{0} удален успешно!"

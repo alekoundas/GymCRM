@@ -10,6 +10,12 @@
   "OldPassword": "Vanha salasana",
   "NewPassword": "Uusi salasana",
   "UserName": "Käyttäjänimi",
+  "Name": "Nimi",
+  "Description": "Kuvaus",
+  "Sets": "Sarjat",
+  "Reps": "Toistot",
+  "Weight": "Paino",
+  "Color": "Väri",
 
   "Title_cannot_exceed_100_characters": "Otsikko ei saa ylittää 100 merkkiä",
   "Description_cannot_exceed_500_characters": "Kuvaus ei saa ylittää 500 merkkiä!",
@@ -53,6 +59,7 @@
   "_0_is_required": "{0} vaaditaan!",
   "_0_already_exists": "{0} on jo olemassa!",
   "_0_not_found": "{0} ei löytynyt!",
+  "_0_must_be_a_positive_number": "{0} on oltava positiivinen luku.",
   "_0_created_successfully": "{0} luotu onnistuneesti!",
   "_0_updated_successfully": "{0} päivitetty onnistuneesti!",
   "_0_deleted_successfully": "{0} poistettu onnistuneesti!"

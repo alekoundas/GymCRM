@@ -10,6 +10,12 @@
   "OldPassword": "Oud wachtwoord",
   "NewPassword": "Nieuw wachtwoord",
   "UserName": "Gebruikersnaam",
+  "Name": "Naam",
+  "Description": "Beschrijving",
+  "Sets": "Sets",
+  "Reps": "Herhalingen",
+  "Weight": "Gewicht",
+  "Color": "Kleur",
 
   "Title_cannot_exceed_100_characters": "Titel mag niet meer dan 100 tekens bevatten",
   "Description_cannot_exceed_500_characters": "Beschrijving mag niet meer dan 500 tekens bevatten!",
@@ -53,6 +59,7 @@
   "_0_is_required": "{0} is vereist!",
   "_0_already_exists": "{0} bestaat al!",
   "_0_not_found": "{0} niet gevonden!",
+  "_0_must_be_a_positive_number": "{0} moet een positief getal zijn.",
   "_0_created_successfully": "{0} succesvol aangemaakt!",
   "_0_updated_successfully": "{0} succesvol bijgewerkt!",
   "_0_deleted_successfully": "{0} succesvol verwijderd!"

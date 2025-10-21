@@ -52,7 +52,7 @@ export default function WorkoutPlanFormComponent({
       [field]: workoutPlanDto[field],
     };
     const response = await apiService.update<WorkoutPlanDto>(
-      "TrainGroups",
+      "WorkoutPlans",
       updatedDto,
       workoutPlanDto.id
     );

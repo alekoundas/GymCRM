@@ -10,6 +10,12 @@
   "OldPassword": "كلمة المرور القديمة",
   "NewPassword": "كلمة مرور جديدة",
   "UserName": "اسم المستخدم",
+  "Name": "الاسم",
+  "Description": "الوصف",
+  "Sets": "مجموعات",
+  "Reps": "تكرارات",
+  "Weight": "وزن",
+  "Color": "لون",
 
   "Title_cannot_exceed_100_characters": "العنوان لا يمكن أن يتجاوز 100 حرف",
   "Description_cannot_exceed_500_characters": "الوصف لا يمكن أن يتجاوز 500 حرف!",
@@ -53,6 +59,7 @@
   "_0_is_required": "{0} مطلوب!",
   "_0_already_exists": "{0} موجود بالفعل!",
   "_0_not_found": "{0} لم يتم العثور عليه!",
+  "_0_must_be_a_positive_number": "{0} يجب أن يكون رقمًا موجبًا.",
   "_0_created_successfully": "{0} تم إنشاؤه بنجاح!",
   "_0_updated_successfully": "{0} تم تحديثه بنجاح!",
   "_0_deleted_successfully": "{0} تم حذفه بنجاح!"
