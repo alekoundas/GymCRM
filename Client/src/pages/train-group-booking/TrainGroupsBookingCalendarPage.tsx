@@ -54,7 +54,9 @@ export default function TrainGroupsBookingCalendarPage() {
       })
       .then((response) => {
         if (response) {
-          setTimeSlotResponseDto(response);
+          setTimeSlotResponseDto(
+            response.filter((x) => !x.isUnavailableTrainGroup)
+          );
         }
       });
 

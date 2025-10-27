@@ -15,13 +15,18 @@ import { useApiService } from "../../services/ApiService";
 import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
 import { useTranslator } from "../../services/TranslatorService";
 import TrainGroupParticipantGridComponent from "../train-group-participant/TrainGroupParticipantGridComponent";
+import { TrainGroupUnavailableDateDto } from "../../model/entities/train-group-unavailable-date/TrainGroupUnavailableDateDto";
 
 export default function TrainGroupAdminCalendarPage() {
   const { t } = useTranslator();
   const apiService = useApiService();
 
-  const { trainGroupDto, resetTrainGroupDto, setTrainGroupDto } =
-    useTrainGroupStore();
+  const {
+    trainGroupDto,
+    resetTrainGroupDto,
+    setTrainGroupDto,
+    resetSelectedTrainGroupDate,
+  } = useTrainGroupStore();
   const [isViewModalVisible, setViewModalVisibility] = useState(false); // Dialog visibility
   const [isAddModalVisible, setAddModalVisibility] = useState(false); // Dialog visibility
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -47,21 +52,50 @@ export default function TrainGroupAdminCalendarPage() {
       });
   };
 
-  const dialogControlAdd: DialogControl = {
-    showDialog: () => setAddModalVisibility(true),
-    hideDialog: () => setAddModalVisibility(false),
-  };
   const dialogControlView: DialogControl = {
     showDialog: () => setViewModalVisibility(true),
     hideDialog: () => setViewModalVisibility(false),
   };
 
-  const onSaveAdd = async (): Promise<void> => {
-    const response = await apiService.create("trainGroups", trainGroupDto);
+  const onDateDisable = async (
+    trainGroupId: number | undefined
+  ): Promise<void> => {
+    if (trainGroupId) {
+      const trainGroupUnavailableDateDto: TrainGroupUnavailableDateDto = {
+        trainGroupId: trainGroupId,
+        unavailableDate: selectedDate?.toISOString() ?? "",
+        id: 0,
+      };
 
-    if (response) {
-      dialogControlAdd.hideDialog();
-      resetTrainGroupDto();
+      const response = await apiService.create(
+        "trainGroupUnavailableDates",
+        trainGroupUnavailableDateDto
+      );
+
+      if (response) {
+        dialogControlView.hideDialog();
+        resetTrainGroupDto();
+        resetSelectedTrainGroupDate();
+        setTimeSlots([]);
+      }
+    }
+  };
+
+  const onDateEnable = async (
+    unavailableTrainGroupId: number | undefined
+  ): Promise<void> => {
+    if (unavailableTrainGroupId) {
+      const response = await apiService.delete(
+        "trainGroupUnavailableDates",
+        unavailableTrainGroupId
+      );
+
+      if (response) {
+        dialogControlView.hideDialog();
+        resetTrainGroupDto();
+        resetSelectedTrainGroupDate();
+        setTimeSlots([]);
+      }
     }
   };
 
@@ -102,18 +136,6 @@ export default function TrainGroupAdminCalendarPage() {
                 }}
               >
                 <h2 style={{ margin: 0 }}>{t("Available Timeslots")}</h2>
-                {/* <Button
-                  className="m-2"
-                  type="button"
-                  icon="pi pi-plus"
-                  label={t("Add")}
-                  outlined
-                  visible={TokenService.isUserAllowed("TrainGroups_Add")}
-                  onClick={() => {
-                    setAddModalVisibility(true);
-                    resetTrainGroupDto();
-                  }}
-                /> */}
               </div>
             }
           >
@@ -184,15 +206,37 @@ export default function TrainGroupAdminCalendarPage() {
             <div className="flex flex-column gap-1"></div>
             <Button
               label={t("Disable for this day")}
-              icon="pi pi-info-circle"
-              // onClick={() => onDateDisable(true)}
+              // icon="pi pi-info-circle"
+              onClick={() =>
+                onDateDisable(
+                  timeSlots.find(
+                    (x) => x.trainGroupId === selectedTrainGroupDateId
+                  )?.trainGroupId
+                )
+              }
               className="p-button-text"
+              visible={
+                !timeSlots.find(
+                  (x) => x.trainGroupId === selectedTrainGroupDateId
+                )?.isUnavailableTrainGroup
+              }
             />
             <Button
               label={t("Enable for this day")}
-              icon="pi pi-info-circle"
-              // onClick={() => onDateEnable(true)}
+              // icon="pi pi-info-circle"
+              onClick={() =>
+                onDateEnable(
+                  timeSlots.find(
+                    (x) => x.trainGroupId === selectedTrainGroupDateId
+                  )?.unavailableTrainGroupId
+                )
+              }
               className="p-button-text"
+              visible={
+                timeSlots.find(
+                  (x) => x.trainGroupId === selectedTrainGroupDateId
+                )?.isUnavailableTrainGroup
+              }
             />
           </div>
           <TrainGroupFormComponent />

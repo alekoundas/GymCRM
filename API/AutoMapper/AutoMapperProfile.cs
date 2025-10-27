@@ -7,6 +7,7 @@ using Core.Dtos.PhoneNumber;
 using Core.Dtos.TrainGroup;
 using Core.Dtos.TrainGroupDate;
 using Core.Dtos.TrainGroupParticipantUnavailableDate;
+using Core.Dtos.TrainGroupUnavailableDate;
 using Core.Dtos.User;
 using Core.Dtos.UserRole;
 using Core.Dtos.UserStatus;
@@ -48,6 +49,12 @@ namespace API.AutoMapper
             CreateMap<TrainGroupParticipant, TrainGroupParticipantAddDto>();
             CreateMap<TrainGroupParticipantAddDto, TrainGroupParticipant>();
 
+            // TrainGroupUnavailableDate mappings.
+            CreateMap<TrainGroupUnavailableDate, TrainGroupUnavailableDateDto>();
+            CreateMap<TrainGroupUnavailableDateDto, TrainGroupUnavailableDate>();
+
+            CreateMap<TrainGroupUnavailableDate, TrainGroupUnavailableDateAddDto>();
+            CreateMap<TrainGroupUnavailableDateAddDto, TrainGroupUnavailableDate>();
 
             // TrainGroupParticipantUnavailableDate mappings.
             CreateMap<TrainGroupParticipantUnavailableDate, TrainGroupParticipantUnavailableDateDto>();

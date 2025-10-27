@@ -12,6 +12,8 @@ export interface TimeSlotResponseDto {
   duration: string;
   startOn: string;
   spotsLeft: number;
+  isUnavailableTrainGroup: boolean;
+  unavailableTrainGroupId: number | undefined;
   recurrenceDates: TimeSlotRecurrenceDateDto[];
 }
 
@@ -26,5 +28,7 @@ export class TimeSlotResponseDto {
   duration: string = "";
   startOn: string = "";
   spotsLeft: number = -1;
+  isUnavailableTrainGroup: boolean = false;
+  unavailableTrainGroupId: number | undefined;
   recurrenceDates: TimeSlotRecurrenceDateDto[] = [];
 }

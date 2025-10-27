@@ -35,6 +35,7 @@ namespace DataAccess
         public DbSet<PhoneNumber> PhoneNumbers { get; set; }
         public DbSet<TrainGroupDate> TrainGroupDates { get; set; }
         public DbSet<TrainGroupParticipant> TrainGroupParticipants { get; set; }
+        public DbSet<TrainGroupUnavailableDate> TrainGroupUnavailableDates { get; set; }
         public DbSet<TrainGroupParticipantUnavailableDate> TrainGroupParticipantUnavailableDates { get; set; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
@@ -64,7 +65,7 @@ namespace DataAccess
             builder.ApplyConfiguration(new WorkoutPlanConfiguration());
             builder.ApplyConfiguration(new TrainGroupDateConfiguration());
             builder.ApplyConfiguration(new TrainGroupParticipantConfiguration());
-            //builder.ApplyConfiguration(new TrainGroupDateCancellationSubscriberConfiguration());
+            builder.ApplyConfiguration(new TrainGroupUnavailableDateConfiguration());
             builder.ApplyConfiguration(new TrainGroupParticipantUnavailableDateConfiguration());
         }
 
