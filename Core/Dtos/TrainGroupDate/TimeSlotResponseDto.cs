@@ -13,6 +13,9 @@ namespace Core.Dtos.TrainGroupDate
         public DateTime Duration { get; set; }
         public DateTime StartOn { get; set; }
         public int SpotsLeft { get; set; }
+        public bool IsUnavailableTrainGroup { get; set; }
+        public int? UnavailableTrainGroupId { get; set; }
+
         public List<TimeSlotRecurrenceDateDto> RecurrenceDates { get; set; } = new List<TimeSlotRecurrenceDateDto>();
 
     }

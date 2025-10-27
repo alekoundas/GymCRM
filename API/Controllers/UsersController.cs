@@ -343,6 +343,7 @@ namespace API.Controllers
                 .Include(x => x.TrainGroup.Trainer)
                 .Include(x => x.TrainGroupParticipants)
                 .Include(x => x.TrainGroup.TrainGroupDates)
+                .Include(x => x.TrainGroup.TrainGroupUnavailableDates)
                 .Include(x => x.TrainGroup.TrainGroupParticipants)
                 .ThenInclude<TrainGroupParticipant, IEnumerable<TrainGroupParticipantUnavailableDate>>(x => x.TrainGroupParticipantUnavailableDates)
                 .Where(x => x.TrainGroupParticipants.Any(y => y.UserId == new Guid(timeSlotRequestDto.UserId)))
@@ -372,6 +373,8 @@ namespace API.Controllers
                     TrainerId = x.Key.TrainerId,
                     Trainer = _mapper.Map<UserDto>(x.Key.Trainer),
                     TrainGroupId = x.Key.Id,
+                    IsUnavailableTrainGroup = x.Key.TrainGroupUnavailableDates.Any(y => y.UnavailableDate == timeSlotRequestDto.SelectedDate),
+                    UnavailableTrainGroupId = x.Key.TrainGroupUnavailableDates.FirstOrDefault(y => y.UnavailableDate == timeSlotRequestDto.SelectedDate)?.Id,
                     RecurrenceDates = x.Key.TrainGroupDates
                     .Where(y => y.RecurrenceDayOfMonth.HasValue || y.RecurrenceDayOfWeek.HasValue)
                     .Where(x =>

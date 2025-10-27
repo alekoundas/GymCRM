@@ -327,6 +327,39 @@ namespace DataAccess.Migrations
                     b.ToTable("TrainGroupParticipantUnavailableDates");
                 });
 
+            modelBuilder.Entity("Core.Models.TrainGroupUnavailableDate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TrainGroupId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UnavailableDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("TrainGroupId");
+
+                    b.ToTable("TrainGroupUnavailableDates");
+                });
+
             modelBuilder.Entity("Core.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -698,6 +731,17 @@ namespace DataAccess.Migrations
                     b.Navigation("TrainGroupParticipant");
                 });
 
+            modelBuilder.Entity("Core.Models.TrainGroupUnavailableDate", b =>
+                {
+                    b.HasOne("Core.Models.TrainGroup", "TrainGroup")
+                        .WithMany("TrainGroupUnavailableDates")
+                        .HasForeignKey("TrainGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TrainGroup");
+                });
+
             modelBuilder.Entity("Core.Models.User", b =>
                 {
                     b.HasOne("Core.Models.UserStatus", "UserStatus")
@@ -784,6 +828,8 @@ namespace DataAccess.Migrations
                     b.Navigation("TrainGroupDates");
 
                     b.Navigation("TrainGroupParticipants");
+
+                    b.Navigation("TrainGroupUnavailableDates");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroupDate", b =>

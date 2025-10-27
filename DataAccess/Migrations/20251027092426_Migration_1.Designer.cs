@@ -11,14 +11,89 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20250909213304_Migration14")]
-    partial class Migration14
+    [Migration("20251027092426_Migration_1")]
+    partial class Migration_1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.19");
+
+            modelBuilder.Entity("Core.Models.Exercise", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Reps")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Sets")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Weight")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("WorkoutPlanId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("WorkoutPlanId");
+
+                    b.ToTable("Exercises");
+                });
+
+            modelBuilder.Entity("Core.Models.Mail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Mails");
+                });
 
             modelBuilder.Entity("Core.Models.PhoneNumber", b =>
                 {
@@ -56,6 +131,36 @@ namespace DataAccess.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("PhoneNumbers");
+                });
+
+            modelBuilder.Entity("Core.Models.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles", (string)null);
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroup", b =>
@@ -126,11 +231,11 @@ namespace DataAccess.Migrations
                     b.Property<DateTime?>("FixedDay")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("RecurrenceDayOfMonth")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("RecurrenceDayOfMonth")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("RecurrenceDayOfWeek")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("RecurrenceDayOfWeek")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("TrainGroupDateType")
                         .IsRequired()
@@ -147,44 +252,6 @@ namespace DataAccess.Migrations
                     b.HasIndex("TrainGroupId");
 
                     b.ToTable("TrainGroupDates");
-                });
-
-            modelBuilder.Entity("Core.Models.TrainGroupDateCancellationSubscriber", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("CreatedBy_FullName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedBy_Id")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("SelectedDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TrainGroupDateId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("TrainGroupDateId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TrainGroupCancellationSubscribers");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
@@ -207,7 +274,7 @@ namespace DataAccess.Migrations
                     b.Property<DateTime?>("SelectedDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("TrainGroupDateId")
+                    b.Property<int>("TrainGroupDateId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("TrainGroupId")
@@ -230,6 +297,72 @@ namespace DataAccess.Migrations
                     b.ToTable("TrainGroupParticipants");
                 });
 
+            modelBuilder.Entity("Core.Models.TrainGroupParticipantUnavailableDate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TrainGroupParticipantId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UnavailableDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("TrainGroupParticipantId");
+
+                    b.ToTable("TrainGroupParticipantUnavailableDates");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupUnavailableDate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TrainGroupId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UnavailableDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("TrainGroupId");
+
+                    b.ToTable("TrainGroupUnavailableDates");
+                });
+
             modelBuilder.Entity("Core.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -243,7 +376,11 @@ namespace DataAccess.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
@@ -283,6 +420,9 @@ namespace DataAccess.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<byte[]>("ProfileImage")
+                        .HasColumnType("BLOB");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
 
@@ -290,8 +430,12 @@ namespace DataAccess.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("UserStatusId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -308,7 +452,92 @@ namespace DataAccess.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
+                    b.HasIndex("UserStatusId");
+
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Core.Models.UserRole", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Core.Models.UserStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("UserStatuses");
+                });
+
+            modelBuilder.Entity("Core.Models.WorkoutPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WorkoutPlans");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
@@ -326,33 +555,6 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DataProtectionKeys");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -420,21 +622,6 @@ namespace DataAccess.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -452,6 +639,28 @@ namespace DataAccess.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Core.Models.Exercise", b =>
+                {
+                    b.HasOne("Core.Models.WorkoutPlan", "WorkoutPlan")
+                        .WithMany("Exercises")
+                        .HasForeignKey("WorkoutPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkoutPlan");
+                });
+
+            modelBuilder.Entity("Core.Models.Mail", b =>
+                {
+                    b.HasOne("Core.Models.User", "User")
+                        .WithMany("Mails")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Core.Models.PhoneNumber", b =>
@@ -487,31 +696,13 @@ namespace DataAccess.Migrations
                     b.Navigation("TrainGroup");
                 });
 
-            modelBuilder.Entity("Core.Models.TrainGroupDateCancellationSubscriber", b =>
-                {
-                    b.HasOne("Core.Models.TrainGroupDate", "TrainGroupDate")
-                        .WithMany("TrainGroupDateCancellationSubscribers")
-                        .HasForeignKey("TrainGroupDateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Models.User", "User")
-                        .WithMany("TrainGroupDatesCancellationSubscriber")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TrainGroupDate");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
                 {
                     b.HasOne("Core.Models.TrainGroupDate", "TrainGroupDate")
                         .WithMany("TrainGroupParticipants")
                         .HasForeignKey("TrainGroupDateId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Core.Models.TrainGroup", "TrainGroup")
                         .WithMany("TrainGroupParticipants")
@@ -532,9 +723,71 @@ namespace DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Core.Models.TrainGroupParticipantUnavailableDate", b =>
+                {
+                    b.HasOne("Core.Models.TrainGroupParticipant", "TrainGroupParticipant")
+                        .WithMany("TrainGroupParticipantUnavailableDates")
+                        .HasForeignKey("TrainGroupParticipantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TrainGroupParticipant");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupUnavailableDate", b =>
+                {
+                    b.HasOne("Core.Models.TrainGroup", "TrainGroup")
+                        .WithMany("TrainGroupUnavailableDates")
+                        .HasForeignKey("TrainGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TrainGroup");
+                });
+
+            modelBuilder.Entity("Core.Models.User", b =>
+                {
+                    b.HasOne("Core.Models.UserStatus", "UserStatus")
+                        .WithMany("Users")
+                        .HasForeignKey("UserStatusId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("UserStatus");
+                });
+
+            modelBuilder.Entity("Core.Models.UserRole", b =>
+                {
+                    b.HasOne("Core.Models.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Models.User", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Core.Models.WorkoutPlan", b =>
+                {
+                    b.HasOne("Core.Models.User", "User")
+                        .WithMany("WorkoutPlans")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                    b.HasOne("Core.Models.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -559,21 +812,6 @@ namespace DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("Core.Models.User", null)
@@ -583,29 +821,53 @@ namespace DataAccess.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Core.Models.Role", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
             modelBuilder.Entity("Core.Models.TrainGroup", b =>
                 {
                     b.Navigation("TrainGroupDates");
 
                     b.Navigation("TrainGroupParticipants");
+
+                    b.Navigation("TrainGroupUnavailableDates");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroupDate", b =>
                 {
-                    b.Navigation("TrainGroupDateCancellationSubscribers");
-
                     b.Navigation("TrainGroupParticipants");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupParticipant", b =>
+                {
+                    b.Navigation("TrainGroupParticipantUnavailableDates");
                 });
 
             modelBuilder.Entity("Core.Models.User", b =>
                 {
-                    b.Navigation("PhoneNumbers");
+                    b.Navigation("Mails");
 
-                    b.Navigation("TrainGroupDatesCancellationSubscriber");
+                    b.Navigation("PhoneNumbers");
 
                     b.Navigation("TrainGroupParticipants");
 
                     b.Navigation("TrainGroups");
+
+                    b.Navigation("UserRoles");
+
+                    b.Navigation("WorkoutPlans");
+                });
+
+            modelBuilder.Entity("Core.Models.UserStatus", b =>
+                {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Core.Models.WorkoutPlan", b =>
+                {
+                    b.Navigation("Exercises");
                 });
 #pragma warning restore 612, 618
         }
