@@ -184,5 +184,7 @@
   "Login failed!": "登录失败！",
   "Login successful!": "登录成功！",
   "Registration successful!": "注册成功！",
-  "Logout successful!": "登出成功！"
+  "Logout successful!": "登出成功！",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

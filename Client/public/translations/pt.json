@@ -184,5 +184,7 @@
   "Login failed!": "Login falhou!",
   "Login successful!": "Login bem-sucedido!",
   "Registration successful!": "Registro bem-sucedido!",
-  "Logout successful!": "Logout bem-sucedido!"
+  "Logout successful!": "Logout bem-sucedido!",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

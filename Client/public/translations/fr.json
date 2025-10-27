@@ -184,5 +184,7 @@
   "Login failed!": "Connexion échouée !",
   "Login successful!": "Connexion réussie !",
   "Registration successful!": "Inscription réussie !",
-  "Logout successful!": "Déconnexion réussie !"
+  "Logout successful!": "Déconnexion réussie !",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

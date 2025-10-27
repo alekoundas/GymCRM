@@ -30,10 +30,13 @@ export default function TrainGroupAdminCalendarPage() {
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
 
   const handleChangeDate = (value: Date) => {
-    setSelectedDate(value);
+    const dateCleaned = new Date(
+      Date.UTC(value.getFullYear(), value.getMonth(), value.getDate(), 0, 0, 0)
+    );
+    setSelectedDate(dateCleaned);
 
     const timeSlotDto = new TimeSlotRequestDto();
-    timeSlotDto.selectedDate = value.toISOString();
+    timeSlotDto.selectedDate = dateCleaned.toISOString();
     timeSlotDto.userId = TokenService.getUserId() ?? "";
     apiService
       .timeslots("TrainGroupDates/TimeSlots", timeSlotDto)
@@ -177,6 +180,21 @@ export default function TrainGroupAdminCalendarPage() {
         control={dialogControlView}
       >
         <div className="w-full">
+          <div className="flex justify-content-between align-items-center p-3">
+            <div className="flex flex-column gap-1"></div>
+            <Button
+              label={t("Disable for this day")}
+              icon="pi pi-info-circle"
+              // onClick={() => onDateDisable(true)}
+              className="p-button-text"
+            />
+            <Button
+              label={t("Enable for this day")}
+              icon="pi pi-info-circle"
+              // onClick={() => onDateEnable(true)}
+              className="p-button-text"
+            />
+          </div>
           <TrainGroupFormComponent />
           {/* <TrainGroupDateAdminCalenndarGridComponent /> */}
           <TrainGroupParticipantGridComponent

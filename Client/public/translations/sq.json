@@ -184,5 +184,7 @@
   "Login failed!": "Identifikimi dështoi!",
   "Login successful!": "Identifikimi u krye me sukses!",
   "Registration successful!": "Regjistrimi u krye me sukses!",
-  "Logout successful!": "Dalja u krye me sukses!"
+  "Logout successful!": "Dalja u krye me sukses!",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

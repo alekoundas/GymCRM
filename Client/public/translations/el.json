@@ -184,5 +184,7 @@
   "Login failed!": "Η σύνδεση απέτυχε!",
   "Login successful!": "Η σύνδεση ήταν επιτυχής!",
   "Registration successful!": "Η εγγραφή ήταν επιτυχής!",
-  "Logout successful!": "Η αποσύνδεση ήταν επιτυχής!"
+  "Logout successful!": "Η αποσύνδεση ήταν επιτυχής!",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }
