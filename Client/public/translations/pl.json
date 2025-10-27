@@ -184,5 +184,7 @@
   "Login failed!": "Logowanie nie powiodło się!",
   "Login successful!": "Logowanie powiodło się!",
   "Registration successful!": "Rejestracja powiodła się!",
-  "Logout successful!": "Wylogowanie powiodło się!"
+  "Logout successful!": "Wylogowanie powiodło się!",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

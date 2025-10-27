@@ -184,5 +184,7 @@
   "Login failed!": "Anmeldung fehlgeschlagen!",
   "Login successful!": "Anmeldung erfolgreich!",
   "Registration successful!": "Registrierung erfolgreich!",
-  "Logout successful!": "Abmeldung erfolgreich!"
+  "Logout successful!": "Abmeldung erfolgreich!",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

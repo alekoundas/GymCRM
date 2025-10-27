@@ -184,5 +184,7 @@
   "Login failed!": "Вход не удался!",
   "Login successful!": "Вход успешен!",
   "Registration successful!": "Регистрация успешна!",
-  "Logout successful!": "Выход успешен!"
+  "Logout successful!": "Выход успешен!",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

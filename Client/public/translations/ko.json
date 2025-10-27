@@ -184,5 +184,7 @@
   "Login failed!": "로그인 실패!",
   "Login successful!": "로그인 성공!",
   "Registration successful!": "등록 성공!",
-  "Logout successful!": "로그아웃 성공!"
+  "Logout successful!": "로그아웃 성공!",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

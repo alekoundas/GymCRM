@@ -184,5 +184,7 @@
   "Login failed!": "¡Inicio de sesión fallido!",
   "Login successful!": "¡Inicio de sesión exitoso!",
   "Registration successful!": "¡Registro exitoso!",
-  "Logout successful!": "¡Cierre de sesión exitoso!"
+  "Logout successful!": "¡Cierre de sesión exitoso!",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

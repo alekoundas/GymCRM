@@ -92,33 +92,34 @@ namespace API.Controllers
 
 
             // Validate Participant Selected Date.
-            foreach (var trainGroupDate in entityDto.TrainGroupDates)
-            {
-                if (trainGroupDate.TrainGroupDateType != TrainGroupDateTypeEnum.FIXED_DAY)
+            if (entityDto.TrainGroupParticipants.Any())
+                foreach (var trainGroupDate in entityDto.TrainGroupDates)
                 {
-                    // Check for TrainGroup participant selected date validity
-                    bool isTrainGroupParticipantValid =
-                        !trainGroupDate
-                        .TrainGroupParticipants
-                        .Where(x => x.SelectedDate.HasValue)
-                        .Any(x =>
-                                x.SelectedDate!.Value.Day == trainGroupDate.RecurrenceDayOfMonth ||
-                                x.SelectedDate!.Value.DayOfWeek == trainGroupDate.RecurrenceDayOfWeek
-                        );
+                    if (trainGroupDate.TrainGroupDateType != TrainGroupDateTypeEnum.FIXED_DAY)
+                    {
+                        // Check for TrainGroup participant selected date validity
+                        bool isTrainGroupParticipantValid =
+                            !trainGroupDate
+                            .TrainGroupParticipants
+                            .Where(x => x.SelectedDate.HasValue)
+                            .Any(x =>
+                                    x.SelectedDate!.Value.Day == trainGroupDate.RecurrenceDayOfMonth ||
+                                    x.SelectedDate!.Value.DayOfWeek == trainGroupDate.RecurrenceDayOfWeek
+                            );
 
-                    if (isTrainGroupParticipantValid)
-                        errorList.Add(_localizer[TranslationKeys.Participant_selected_date_doesnt_match_any_of_the_train_group_dates]);
+                        if (isTrainGroupParticipantValid)
+                            errorList.Add(_localizer[TranslationKeys.Participant_selected_date_doesnt_match_any_of_the_train_group_dates]);
+                    }
+                    else
+                    {
+                        // Check for selected date NOT equal to fixed date.
+                        bool isTrainGroupParticipantValid = trainGroupDate.TrainGroupParticipants.Any(x => x.SelectedDate.HasValue);
+
+                        if (isTrainGroupParticipantValid)
+                            errorList.Add(_localizer[TranslationKeys.Fixed_date_doesnt_allow_one_off_participants]);
+                    }
+
                 }
-                else
-                {
-                    // Check for selected date NOT equal to fixed date.
-                    bool isTrainGroupParticipantValid = trainGroupDate.TrainGroupParticipants.Any(x => x.SelectedDate.HasValue);
-
-                    if (isTrainGroupParticipantValid)
-                        errorList.Add(_localizer[TranslationKeys.Fixed_date_doesnt_allow_one_off_participants]);
-                }
-
-            }
 
             errors = errorList.ToArray();
             return errors.Length > 0;

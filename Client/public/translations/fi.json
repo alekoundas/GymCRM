@@ -184,5 +184,7 @@
   "Login failed!": "Kirjautuminen epäonnistui!",
   "Login successful!": "Kirjautuminen onnistui!",
   "Registration successful!": "Rekisteröityminen onnistui!",
-  "Logout successful!": "Uloskirjautuminen onnistui!"
+  "Logout successful!": "Uloskirjautuminen onnistui!",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

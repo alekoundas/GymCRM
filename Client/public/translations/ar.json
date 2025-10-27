@@ -184,5 +184,7 @@
   "Login failed!": "فشل تسجيل الدخول!",
   "Login successful!": "تسجيل الدخول ناجح!",
   "Registration successful!": "التسجيل ناجح!",
-  "Logout successful!": "تسجيل الخروج ناجح!"
+  "Logout successful!": "تسجيل الخروج ناجح!",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

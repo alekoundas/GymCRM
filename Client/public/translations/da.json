@@ -184,5 +184,7 @@
   "Login failed!": "Login mislykkedes!",
   "Login successful!": "Login succesfuldt!",
   "Registration successful!": "Registrering succesfuld!",
-  "Logout successful!": "Logud succesfuld!"
+  "Logout successful!": "Logud succesfuld!",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

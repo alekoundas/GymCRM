@@ -184,5 +184,7 @@
   "Login failed!": "ログインに失敗しました！",
   "Login successful!": "ログイン成功！",
   "Registration successful!": "登録成功！",
-  "Logout successful!": "ログアウト成功！"
+  "Logout successful!": "ログアウト成功！",
+  "Disable for this day": "__STRING_NOT_TRANSLATED__",
+  "Enable for this day": "__STRING_NOT_TRANSLATED__"
 }

@@ -191,6 +191,8 @@
   'Login successful!': string;
   'Registration successful!': string;
   'Logout successful!': string;
+  'Disable for this day': string;
+  'Enable for this day': string;
     }
 
 
