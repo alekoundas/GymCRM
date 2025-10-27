@@ -16,7 +16,7 @@ COPY Client/ .
 RUN npm run build
 
 # Add the memory limit for Node.js
-ENV NODE_OPTIONS=--max-old-space-size=4096
+#ENV NODE_OPTIONS=--max-old-space-size=4096
 
 # Install serve to serve the build statically
 RUN npm install -g serve
