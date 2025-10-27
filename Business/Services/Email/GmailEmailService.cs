@@ -101,5 +101,104 @@ namespace Business.Services.Email
                 throw new InvalidOperationException($"Failed to send email: {ex.Message}", ex);
             }
         }
+
+        public async Task SendBookingEmailAsync(string userEmail, List<string> emailDatesAdd, List<string> emailDatesRemove)
+        {
+            // Initialize HTML body with professional styling
+            string emailBody = @"
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                h2 { color: #2c3e50; }
+                .section { margin-bottom: 20px; }
+                ul { list-style-type: none; padding: 0; }
+                li { padding: 5px 0; }
+                .added { color: #27ae60; }
+                .removed { color: #c0392b; }
+                .no-changes { font-style: italic; color: #7f8c8d; }
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <h2>Booking Information</h2>";
+
+            // Format added bookings
+            emailBody += "<div class='section'>";
+            emailBody += "<h3>Added Bookings</h3>";
+            if (emailDatesAdd == null || !emailDatesAdd.Any())
+            {
+                emailBody += "<p class='no-changes'>No bookings were added.</p>";
+            }
+            else
+            {
+                emailBody += "<ul>";
+                foreach (var date in emailDatesAdd)
+                {
+                    string formattedDate = FormatDate(date);
+                    emailBody += $"<li class='added'>{formattedDate}</li>";
+                }
+                emailBody += "</ul>";
+            }
+            emailBody += "</div>";
+
+            // Format removed bookings
+            emailBody += "<div class='section'>";
+            emailBody += "<h3>Removed Bookings</h3>";
+            if (emailDatesRemove == null || !emailDatesRemove.Any())
+            {
+                emailBody += "<p class='no-changes'>No bookings were removed.</p>";
+            }
+            else
+            {
+                emailBody += "<ul>";
+                foreach (var date in emailDatesRemove)
+                {
+                    string formattedDate = FormatDate(date);
+                    emailBody += $"<li class='removed'>{formattedDate}</li>";
+                }
+                emailBody += "</ul>";
+            }
+            emailBody += "</div>";
+
+            // Close HTML tags
+            emailBody += @"
+            </div>
+        </body>
+        </html>";
+
+            // Send the email
+            await SendEmailAsync(
+                userEmail,
+                "Booking Confirmation",
+                emailBody
+            );
+        }
+
+        // Helper method to format dates based on input
+        private string FormatDate(string dateInput)
+        {
+            // Check if the input is a day of the week (e.g., "Monday")
+            if (Enum.TryParse(typeof(DayOfWeek), dateInput, true, out _))
+            {
+                return dateInput; // Return as-is for day of the week
+            }
+
+            // Check if the input is a day of the month (e.g., "31")
+            if (int.TryParse(dateInput, out int day) && day >= 1 && day <= 31)
+            {
+                return $"Day {day}"; // Format as "Day 31"
+            }
+
+            // Check if the input is a parseable date (e.g., "2025-10-27")
+            if (DateTime.TryParse(dateInput, out DateTime date))
+            {
+                return date.ToString("MMMM dd, yyyy"); // Format as "October 27, 2025"
+            }
+
+            // Fallback for unrecognized formats
+            return dateInput;
+        }
     }
 }

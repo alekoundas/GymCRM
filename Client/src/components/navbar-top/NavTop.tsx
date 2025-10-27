@@ -153,6 +153,7 @@ export default function NavTop() {
       return (
         <Chip
           className="transition-colors transition-duration-300 surface-section hover:bg-primary hover:text-gray-900 cursor-pointer "
+          onClick={() => navigate("/users/profile")}
           label={fullName}
         />
       );

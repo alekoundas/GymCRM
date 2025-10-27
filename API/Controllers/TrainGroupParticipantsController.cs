@@ -1,17 +1,20 @@
 ﻿using AutoMapper;
 using Business.Repository;
 using Business.Services;
+using Business.Services.Email;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.Mail;
 using Core.Enums;
 using Core.Models;
+using Core.System;
 using Core.Translations;
 using DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using System.Linq.Dynamic.Core.Tokenizer;
 
 namespace API.Controllers
 {
@@ -22,17 +25,20 @@ namespace API.Controllers
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly IStringLocalizer _localizer;
+        private readonly IEmailService _emailService;
 
         //private readonly ILogger<TrainGroupDateController> _logger;
 
         public TrainGroupParticipantsController(
             IDataService dataService,
             IMapper mapper,
-            IStringLocalizer localizer) : base(dataService, mapper, localizer)
+            IStringLocalizer localizer,
+            IEmailService emailService) : base(dataService, mapper, localizer)
         {
             _dataService = dataService;
             _mapper = mapper;
             _localizer = localizer;
+            _emailService = emailService;
         }
 
 
@@ -43,6 +49,8 @@ namespace API.Controllers
         {
 
             ApiDbContext dbContext = _dataService.GetDbContext();
+            List<string> emailDatesAdd = new List<string>();
+            List<string> emailDatesRemove = new List<string>();
 
             // Load existing entity with related data
             TrainGroup? existingEntity = await dbContext.Set<TrainGroup>()
@@ -130,6 +138,13 @@ namespace API.Controllers
                 {
                     existingParticipants.Remove(existingParticipant);
                     dbContext.Remove(existingParticipant);
+
+                    string? dateString = existingParticipant.TrainGroupDate.RecurrenceDayOfMonth.ToString() ??
+                        existingParticipant.TrainGroupDate.RecurrenceDayOfWeek.ToString() ??
+                        existingParticipant.TrainGroupDate.FixedDay.ToString();
+
+                    if (dateString != null)
+                        emailDatesRemove.Add(dateString);
                 }
             }
 
@@ -214,11 +229,31 @@ namespace API.Controllers
                 // Add new Participant
                 incomingParticipant.Id = 0;
                 dbContext.Add(incomingParticipant);
+
+                string? dateString = incomingParticipant.TrainGroupDate.RecurrenceDayOfMonth.ToString() ??
+                        incomingParticipant.TrainGroupDate.RecurrenceDayOfWeek.ToString() ??
+                        incomingParticipant.TrainGroupDate.FixedDay.ToString();
+
+                if (dateString != null)
+                    emailDatesAdd.Add(dateString);
             }
 
 
             await dbContext.SaveChangesAsync();
             dbContext.Dispose();
+
+            User? user = _dataService.Users.Where(x => x.Id == new Guid(updateDto.UserId))
+                .FirstOrDefault();
+
+            if (user !=null)
+            {
+                await _emailService.SendBookingEmailAsync(
+                    user.Email,
+                    emailDatesAdd,
+                    emailDatesRemove
+                );
+            }
+
 
             //if (futureUnavailableDates.Count > 0)
             //    return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity, "warning", "Future unavailable dates that cannot be booked: " + futureUnavailableDates.Select(x => x.UnavailableDate.ToUniversalTime().ToString()).ToList().ToString());
