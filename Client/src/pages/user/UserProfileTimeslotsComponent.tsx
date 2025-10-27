@@ -92,71 +92,73 @@ export default function UserProfileTimeslotsComponent() {
     });
 
     if (response) {
-      const mappedEvents = response.flatMap((slot) =>
-        slot.recurrenceDates.map((x) => {
-          let startDate: Date | undefined;
+      const mappedEvents = response
+        .filter((x) => !x.isUnavailableTrainGroup)
+        .flatMap((slot) =>
+          slot.recurrenceDates.map((x) => {
+            let startDate: Date | undefined;
 
-          // Fixed Date
-          if (x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY)
-            startDate = new Date(x.date);
+            // Fixed Date
+            if (x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY)
+              startDate = new Date(x.date);
 
-          // Date Of Month
-          if (x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH) {
-            const dateOfWeek = calendarDates.find(
-              (y) => y.getDate() === new Date(x.date).getDate()
-            );
-            if (dateOfWeek) {
-              startDate = dateOfWeek;
+            // Date Of Month
+            if (x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH) {
+              const dateOfWeek = calendarDates.find(
+                (y) => y.getDate() === new Date(x.date).getDate()
+              );
+              if (dateOfWeek) {
+                startDate = dateOfWeek;
+              }
             }
-          }
 
-          // Date Of Week
-          if (x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK) {
-            const dateOfWeek = calendarDates.find(
-              (y) => y.getDay() === new Date(x.date).getDay()
-            );
-            if (dateOfWeek) {
-              startDate = dateOfWeek;
+            // Date Of Week
+            if (x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK) {
+              const dateOfWeek = calendarDates.find(
+                (y) => y.getDay() === new Date(x.date).getDay()
+              );
+              if (dateOfWeek) {
+                startDate = dateOfWeek;
+              }
             }
-          }
 
-          // One off participant
-          if (!x.trainGroupDateId) {
-            startDate = new Date(x.date);
-          }
+            // One off participant
+            if (!x.trainGroupDateId) {
+              startDate = new Date(x.date);
+            }
 
-          if (startDate) {
-            const startTime = getUTCTime(slot.startOn);
-            startDate = new Date(
-              startDate.getFullYear(),
-              startDate.getMonth(),
-              startDate.getDate(),
-              startTime.getHours(),
-              startTime.getMinutes(),
-              0
-            );
+            if (startDate) {
+              const startTime = getUTCTime(slot.startOn);
+              startDate = new Date(
+                startDate.getFullYear(),
+                startDate.getMonth(),
+                startDate.getDate(),
+                startTime.getHours(),
+                startTime.getMinutes(),
+                0
+              );
 
-            // Calculate endDate
-            const durationTime = getUTCTime(slot.duration);
-            const durationMinutes =
-              durationTime.getHours() * 60 + durationTime.getMinutes();
-            const endDate = new Date(
-              startDate.getTime() + durationMinutes * 60 * 1000
-            );
+              // Calculate endDate
+              const durationTime = getUTCTime(slot.duration);
+              const durationMinutes =
+                durationTime.getHours() * 60 + durationTime.getMinutes();
+              const endDate = new Date(
+                startDate.getTime() + durationMinutes * 60 * 1000
+              );
 
-            return {
-              id: x.trainGroupDateId,
-              title: slot.title,
-              start: startDate,
+              return {
+                id: x.trainGroupDateId,
+                title: slot.title,
+                start: startDate,
 
-              end: endDate,
-              backgroundColor: x.isUserJoined ? "#007ad9" : "#ced4da", // Joined: blue, not: gray
-              isUserJoined: x.isUserJoined,
-              extendedProps: { isUserJoined: x.isUserJoined },
-            };
-          }
-        })
-      );
+                end: endDate,
+                backgroundColor: x.isUserJoined ? "#007ad9" : "#ced4da", // Joined: blue, not: gray
+                isUserJoined: x.isUserJoined,
+                extendedProps: { isUserJoined: x.isUserJoined },
+              };
+            }
+          })
+        );
 
       const mappedEventsCleaned = mappedEvents.filter((x) => x !== undefined);
       setEvents(mappedEventsCleaned);
