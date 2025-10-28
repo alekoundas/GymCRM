@@ -58,7 +58,7 @@ Github secrets
 SSH_PRIVATE_KEY: Your SSH private key.
 SSH_HOST: Your Droplet’s IP (e.g., your-droplet-ip).
 SSH_USER: root
-DOMAIN: alexps.gr
+DOMAIN: rosacorelab.gr
 RCLONE_CONFIG: rclone configuration in base64 format.
 GMAIL_CLIENT_ID: Your Client ID.
 GMAIL_CLIENT_SECRET: Your Client Secret.
