@@ -86,6 +86,7 @@ jobs:
 
             # Clone DB file
             echo "[INFO]: Setting up rclone config"
+            mkdir -p ~/.config/rclone
             echo "${{ secrets.RCLONE_CONFIG }}" | base64 -d > ~/.config/rclone/rclone.conf
 
             # Check if local sqlite.db exists before renaming and uploading
