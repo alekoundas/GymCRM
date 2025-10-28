@@ -47,7 +47,7 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt
       - /root/app/API/Certbot/www:/var/www/certbot
     environment:
-        - NGINX_HOST=alexps.gr
+        - NGINX_HOST=rosacorelab.gr
     depends_on:
         - api
         - client
