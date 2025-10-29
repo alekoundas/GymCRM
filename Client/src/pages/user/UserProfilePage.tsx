@@ -120,7 +120,7 @@ export default function UserProfilePage() {
   };
 
   const renderProfileImage = () => {
-    if (userDto.id) {
+    if (userDto && userDto?.id) {
       const initials = `${userDto.firstName.charAt(0)}${userDto.lastName.charAt(
         0
       )}`.toUpperCase();
@@ -187,9 +187,9 @@ export default function UserProfilePage() {
                 <div className="mr-5">{renderProfileImage()}</div>
                 <div>
                   <h2 className="m-0">
-                    {userDto.firstName} {userDto.lastName}
+                    {userDto?.firstName} {userDto?.lastName}
                   </h2>
-                  <p className="text-color-secondary m-0">{userDto.email}</p>
+                  <p className="text-color-secondary m-0">{userDto?.email}</p>
                 </div>
               </div>
               <Button

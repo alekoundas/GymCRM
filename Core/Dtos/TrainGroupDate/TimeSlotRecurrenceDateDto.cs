@@ -12,6 +12,7 @@ namespace Core.Dtos.TrainGroupDate
         public TrainGroupDateTypeEnum? TrainGroupDateType { get; set; }
         public DateTime Date { get; set; }
         public bool IsUserJoined { get; set; }
+        public bool IsUnavailableTrainGroup { get; set; }
 
     }
 }

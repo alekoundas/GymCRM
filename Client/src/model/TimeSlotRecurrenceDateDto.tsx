@@ -8,6 +8,7 @@ export interface TimeSlotRecurrenceDateDto {
   trainGroupParticipantId: number | undefined; // used in Profile
   trainGroupParticipantUnavailableDateId: number | undefined; // used in Profile
   isOneOff: boolean; // used in Profile
+  isUnavailableTrainGroup: boolean; // used in Profile
 }
 
 export class TimeSlotRecurrenceDateDto {
@@ -18,4 +19,5 @@ export class TimeSlotRecurrenceDateDto {
   trainGroupParticipantId: number | undefined; // used in Profile
   trainGroupParticipantUnavailableDateId: number | undefined; // used in Profile
   isOneOff: boolean = false; // used in Profile
+  isUnavailableTrainGroup: boolean = false; // used in Profile
 }
