@@ -12,6 +12,45 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+
+
+
+      # asdasd
+      # Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Build and push API image (inject secrets during build)
+      - name: Build and push API image
+        run: |
+          # Create a temp copy for secret injection
+          cp -r . /tmp/build-api
+          cd /tmp/build-api
+          
+          # Inject secrets into appsettings.json (same as your sed logic)
+          sed -i "s|JWT_TOKEN_SECRET_KEY_PLACEHOLDER|${{ secrets.JWT_TOKEN_SECRET_KEY_PLACEHOLDER }}|g" API/appsettings.json
+          sed -i "s|GMAIL_EMAIL_PLACEHOLDER|${{ secrets.GMAIL_EMAIL_PLACEHOLDER }}|g" API/appsettings.json
+          sed -i "s|GMAIL_CLIENT_ID_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_ID_PLACEHOLDER }}|g" API/appsettings.json
+          sed -i "s|GMAIL_CLIENT_SECRET_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_SECRET_PLACEHOLDER }}|g" API/appsettings.json
+          sed -i "s|GMAIL_REFRESH_TOKEN_PLACEHOLDER|${{ secrets.GMAIL_REFRESH_TOKEN_PLACEHOLDER }}|g" API/appsettings.json
+          
+          # Build and tag
+          docker build -f API/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/myapp-api:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/myapp-api:${{ github.sha }}
+
+
+      # Build and push Client image (no secrets needed)
+      - name: Build and push Client image
+        run: |
+          docker build -f Client/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/myapp-client:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/myapp-client:${{ github.sha }}
+      # asdasd
+
+
+
   
       # Deploy to DigitalOcean Droplet using SSH
       - name: Deploy to DigitalOcean Droplet
@@ -20,8 +59,16 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}  
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
+          script: |       
+          
+            # asdasd
+            # Set image tag from GitHub SHA (passed via env)
+            TAG=${{ github.sha }}
+            DOCKER_USER=${{ secrets.DOCKER_USERNAME }}
+            # asdasd
 
+
+            
             
             # Update and install required packages
             echo "[INFO]: Updating system and installing dependencies..."
@@ -53,12 +100,31 @@ jobs:
               git reset --hard origin/master
             fi
 
+
+
+
+            
+            # asdasd
+
             echo "[INFO]: Replace placeholders in appsettings.json with secrets."
-            sed -i "s|JWT_TOKEN_SECRET_KEY_PLACEHOLDER|${{ secrets.JWT_TOKEN_SECRET_KEY_PLACEHOLDER }}|g" API/appsettings.json
-            sed -i "s|GMAIL_EMAIL_PLACEHOLDER|${{ secrets.GMAIL_EMAIL_PLACEHOLDER }}|g" API/appsettings.json
-            sed -i "s|GMAIL_CLIENT_ID_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_ID_PLACEHOLDER }}|g" API/appsettings.json
-            sed -i "s|GMAIL_CLIENT_SECRET_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_SECRET_PLACEHOLDER }}|g" API/appsettings.json
-            sed -i "s|GMAIL_REFRESH_TOKEN_PLACEHOLDER|${{ secrets.GMAIL_REFRESH_TOKEN_PLACEHOLDER }}|g" API/appsettings.json
+            #sed -i "s|JWT_TOKEN_SECRET_KEY_PLACEHOLDER|${{ secrets.JWT_TOKEN_SECRET_KEY_PLACEHOLDER }}|g" API/appsettings.json
+            #sed -i "s|GMAIL_EMAIL_PLACEHOLDER|${{ secrets.GMAIL_EMAIL_PLACEHOLDER }}|g" API/appsettings.json
+            #sed -i "s|GMAIL_CLIENT_ID_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_ID_PLACEHOLDER }}|g" API/appsettings.json
+            #sed -i "s|GMAIL_CLIENT_SECRET_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_SECRET_PLACEHOLDER }}|g" API/appsettings.json
+            #sed -i "s|GMAIL_REFRESH_TOKEN_PLACEHOLDER|${{ secrets.GMAIL_REFRESH_TOKEN_PLACEHOLDER }}|g" API/appsettings.json
+            
+            # Update docker-compose.yml with image tags (sed placeholders like IMAGE_API and IMAGE_CLIENT)
+            # Note: You'll need to add these placeholders to your docker-compose.yml (see below)
+            sed -i "s|IMAGE_API|${DOCKER_USER}/myapp-api:${TAG}|g" docker-compose.yml
+            sed -i "s|IMAGE_CLIENT|${DOCKER_USER}/myapp-client:${TAG}|g" docker-compose.yml
+            # asdasd
+
+
+
+
+
+
+
 
 
             # Close already running containers
@@ -124,15 +190,37 @@ jobs:
 
 
 
+
+
+            # asdasd
+
+            # Pull and start Docker Compose (NO --build!)
+            echo "[INFO]: Pulling and starting Docker Compose."
+            docker-compose -f docker-compose.yml down  # Redundant but safe
+            docker-compose -f docker-compose.yml pull
+            docker-compose -f docker-compose.yml up -d
+
            
 
             # Build and start Docker Compose
-            echo "[INFO]: Building and starting Docker Compose."
-            docker-compose -f docker-compose.yml down
-            docker-compose -f docker-compose.yml up -d --build
+            #echo "[INFO]: Building and starting Docker Compose."
+            #docker-compose -f docker-compose.yml down
+            #docker-compose -f docker-compose.yml up -d --build
 
             # Wait for services to start
             sleep 10  # Give time for containers to initialize
+
+            # asdasd
+
+
+
+
+
+
+
+
+
+
 
 
             # Verify containers are running
