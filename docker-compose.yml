@@ -3,11 +3,10 @@ services:
 
   api:
     container_name: Api
-    # image: ${DOCKER_REGISTRY-}api
-    image: IMAGE_API  # Placeholder: sed-replaced with e.g., yourusername/myapp-api:sha123
-    # build:
-    #   context: .
-    #   dockerfile: API/Dockerfile
+    image: ${docker_registry-}api
+    build:
+      context: .
+      dockerfile: API/Dockerfile
     ports:
       - "8080" # Internal HTTP port
     volumes:
