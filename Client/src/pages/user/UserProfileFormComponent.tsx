@@ -15,15 +15,15 @@ export default function UserProfileFormComponent() {
   ); // Track which field is being edited
   const [originalValues, setOriginalValues] = useState<Partial<UserDto>>({}); // Store original values per field
   const [formData, setFormData] = useState({
-    firstName: userDto.firstName,
-    lastName: userDto.lastName,
+    firstName: userDto?.firstName,
+    lastName: userDto?.lastName,
   });
 
   // Sync formData when userDto changes
   useEffect(() => {
     setFormData({
-      firstName: userDto.firstName,
-      lastName: userDto.lastName,
+      firstName: userDto?.firstName,
+      lastName: userDto?.lastName,
     });
   }, [userDto]);
 
@@ -166,7 +166,7 @@ export default function UserProfileFormComponent() {
             type="text"
             placeholder="Email address"
             className="w-full mb-3"
-            value={userDto.email}
+            value={userDto?.email}
             disabled={editingField !== "email"}
           />
         </div>
