@@ -38,15 +38,15 @@ jobs:
           sed -i "s|GMAIL_REFRESH_TOKEN_PLACEHOLDER|${{ secrets.GMAIL_REFRESH_TOKEN_PLACEHOLDER }}|g" API/appsettings.json
           
           # Build and tag
-          docker build -f API/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/myapp-api:${{ github.sha }} .
-          docker push ${{ secrets.DOCKER_USERNAME }}/myapp-api:${{ github.sha }}
+          docker build -f API/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/rosacorelab-api:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/rosacorelab-api:${{ github.sha }}
 
 
       # Build and push Client image (no secrets needed)
       - name: Build and push Client image
         run: |
-          docker build -f Client/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/myapp-client:${{ github.sha }} .
-          docker push ${{ secrets.DOCKER_USERNAME }}/myapp-client:${{ github.sha }}
+          docker build -f Client/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/rosacorelab-client:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/rosacorelab-client:${{ github.sha }}
       # asdasd
 
 
@@ -55,6 +55,9 @@ jobs:
       # Deploy to DigitalOcean Droplet using SSH
       - name: Deploy to DigitalOcean Droplet
         uses: appleboy/ssh-action@v1.0.3
+        env:  # NEW: Pass Docker creds as env vars (securely from secrets)
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}  
@@ -115,8 +118,8 @@ jobs:
             
             # Update docker-compose.yml with image tags (sed placeholders like IMAGE_API and IMAGE_CLIENT)
             # Note: You'll need to add these placeholders to your docker-compose.yml (see below)
-            sed -i "s|IMAGE_API|${DOCKER_USER}/myapp-api:${TAG}|g" docker-compose.yml
-            sed -i "s|IMAGE_CLIENT|${DOCKER_USER}/myapp-client:${TAG}|g" docker-compose.yml
+            sed -i "s|IMAGE_API|${DOCKER_USER}/rosacorelab-api:${TAG}|g" docker-compose.yml
+            sed -i "s|IMAGE_CLIENT|${DOCKER_USER}/rosacorelab-client:${TAG}|g" docker-compose.yml
             # asdasd
 
 
@@ -194,6 +197,10 @@ jobs:
 
             # asdasd
 
+            # NEW: Log in to Docker Hub for private repo pulls
+            echo "[INFO]: Logging in to Docker Hub for private image pulls."
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            
             # Pull and start Docker Compose (NO --build!)
             echo "[INFO]: Pulling and starting Docker Compose."
             docker-compose -f docker-compose.yml down  # Redundant but safe
