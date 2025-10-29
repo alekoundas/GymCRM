@@ -3,10 +3,11 @@ services:
 
   api:
     container_name: Api
-    image: ${DOCKER_REGISTRY-}api
-    build:
-      context: .
-      dockerfile: API/Dockerfile
+    # image: ${DOCKER_REGISTRY-}api
+    image: IMAGE_API  # Placeholder: sed-replaced with e.g., yourusername/myapp-api:sha123
+    # build:
+    #   context: .
+    #   dockerfile: API/Dockerfile
     ports:
       - "8080" # Internal HTTP port
     volumes:
@@ -19,9 +20,10 @@ services:
 
   client:
     container_name: Client
-    build:
-      context: .
-      dockerfile: Client/Dockerfile
+    image: IMAGE_CLIENT  # Placeholder: sed-replaced with e.g., yourusername/myapp-client:sha123
+    # build:
+    #   context: .
+    #   dockerfile: Client/Dockerfile
     ports:
       - "8080"  # Internal HTTP port
       # - "8081"  # Internal HTTPS port
@@ -69,7 +71,6 @@ services:
     image: certbot/certbot
     volumes: 
       - /etc/letsencrypt:/etc/letsencrypt/:rw
-      # - /root/app/API/Certbot/www:/usr/share/nginx/html/:rw
       - /root/app/API/Certbot/www:/var/www/certbot/:rw
 
                 # Runs Certbot in a loop to check for certificate renewals every 12 hours.
