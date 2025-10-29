@@ -28,7 +28,7 @@ export default function Home() {
           />
         </div>
         <div className="z-10 absolute top-0 left-0 flex align-items-center justify-content-center w-full h-full">
-          <div className="w-8 text-xs  lg:text-lg xl:text-lg font-bold">
+          <div className="max-h-full overflow-y-auto w-8 text-xs lg:text-lg xl:text-lg font-bold px-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
             <p className="text-center">
               {t(
                 "At ROSA CoreLab, we believe that true strength starts from within us."
