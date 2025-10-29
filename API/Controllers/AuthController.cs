@@ -253,7 +253,7 @@ namespace API.Controllers
                           $"state={state}&" +
                           $"access_type=offline&prompt=consent"; // 'offline' for refresh token, 'consent' forces token every time
 
-            return new ApiResponse<string>().SetSuccessResponse(authUrl, authUrl); // Or return { url: authUrl } for a frontend link
+            return new ApiResponse<string>().SetSuccessResponse(authUrl, ""); // Or return { url: authUrl } for a frontend link
         }
 
         // Step 2: Google redirects here with 'code' param
