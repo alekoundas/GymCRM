@@ -55,6 +55,13 @@ export default function NavTop() {
         navigate("/administrator");
       },
     },
+    {
+      label: t("Policy"),
+      icon: "pi pi-building-columns",
+      command: () => {
+        navigate("/policy");
+      },
+    },
   ];
 
   const start = (
