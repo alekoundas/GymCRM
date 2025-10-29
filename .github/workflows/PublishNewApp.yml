@@ -23,25 +23,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build and push API image (inject secrets during build)
-      - name: Build and push API image
-        run: |
-          # Create a temp copy for secret injection
-          cp -r . /tmp/build-api
-          cd /tmp/build-api
-          
-          # Inject secrets into appsettings.json (same as your sed logic)
-          sed -i "s|JWT_TOKEN_SECRET_KEY_PLACEHOLDER|${{ secrets.JWT_TOKEN_SECRET_KEY_PLACEHOLDER }}|g" API/appsettings.json
-          sed -i "s|GMAIL_EMAIL_PLACEHOLDER|${{ secrets.GMAIL_EMAIL_PLACEHOLDER }}|g" API/appsettings.json
-          sed -i "s|GMAIL_CLIENT_ID_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_ID_PLACEHOLDER }}|g" API/appsettings.json
-          sed -i "s|GMAIL_CLIENT_SECRET_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_SECRET_PLACEHOLDER }}|g" API/appsettings.json
-          sed -i "s|GMAIL_REFRESH_TOKEN_PLACEHOLDER|${{ secrets.GMAIL_REFRESH_TOKEN_PLACEHOLDER }}|g" API/appsettings.json
-          
-          # Build and tag
-          docker build -f API/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/rosacorelab-api:${{ github.sha }} .
-          docker push ${{ secrets.DOCKER_USERNAME }}/rosacorelab-api:${{ github.sha }}
-
-
       # Build and push Client image (no secrets needed)
       - name: Build and push Client image
         run: |
@@ -107,18 +88,16 @@ jobs:
 
 
             
-            # asdasd
 
             echo "[INFO]: Replace placeholders in appsettings.json with secrets."
-            #sed -i "s|JWT_TOKEN_SECRET_KEY_PLACEHOLDER|${{ secrets.JWT_TOKEN_SECRET_KEY_PLACEHOLDER }}|g" API/appsettings.json
-            #sed -i "s|GMAIL_EMAIL_PLACEHOLDER|${{ secrets.GMAIL_EMAIL_PLACEHOLDER }}|g" API/appsettings.json
-            #sed -i "s|GMAIL_CLIENT_ID_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_ID_PLACEHOLDER }}|g" API/appsettings.json
-            #sed -i "s|GMAIL_CLIENT_SECRET_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_SECRET_PLACEHOLDER }}|g" API/appsettings.json
-            #sed -i "s|GMAIL_REFRESH_TOKEN_PLACEHOLDER|${{ secrets.GMAIL_REFRESH_TOKEN_PLACEHOLDER }}|g" API/appsettings.json
+            sed -i "s|JWT_TOKEN_SECRET_KEY_PLACEHOLDER|${{ secrets.JWT_TOKEN_SECRET_KEY_PLACEHOLDER }}|g" API/appsettings.json
+            sed -i "s|GMAIL_EMAIL_PLACEHOLDER|${{ secrets.GMAIL_EMAIL_PLACEHOLDER }}|g" API/appsettings.json
+            sed -i "s|GMAIL_CLIENT_ID_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_ID_PLACEHOLDER }}|g" API/appsettings.json
+            sed -i "s|GMAIL_CLIENT_SECRET_PLACEHOLDER|${{ secrets.GMAIL_CLIENT_SECRET_PLACEHOLDER }}|g" API/appsettings.json
+            sed -i "s|GMAIL_REFRESH_TOKEN_PLACEHOLDER|${{ secrets.GMAIL_REFRESH_TOKEN_PLACEHOLDER }}|g" API/appsettings.json
             
-            # Update docker-compose.yml with image tags (sed placeholders like IMAGE_API and IMAGE_CLIENT)
-            # Note: You'll need to add these placeholders to your docker-compose.yml (see below)
-            sed -i "s|IMAGE_API|${DOCKER_USER}/rosacorelab-api:${TAG}|g" docker-compose.yml
+            # asdasd
+            # Update docker-compose.yml with image tags 
             sed -i "s|IMAGE_CLIENT|${DOCKER_USER}/rosacorelab-client:${TAG}|g" docker-compose.yml
             # asdasd
 
@@ -196,16 +175,14 @@ jobs:
 
 
             # asdasd
-
-            # NEW: Log in to Docker Hub for private repo pulls
+            
+            # Log in to Docker Hub for private Client pull
             echo "[INFO]: Logging in to Docker Hub for private image pulls."
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-            
-            # Pull and start Docker Compose (NO --build!)
-            echo "[INFO]: Pulling and starting Docker Compose."
-            docker-compose -f docker-compose.yml down  # Redundant but safe
-            docker-compose -f docker-compose.yml pull
-            docker-compose -f docker-compose.yml up -d
+
+            # Build API locally + pull Client + start (uses --build)
+            echo "[INFO]: Building API and pulling/starting services."
+            docker-compose -f docker-compose.yml up -d --build
 
            
 
