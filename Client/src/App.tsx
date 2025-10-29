@@ -24,6 +24,7 @@ import { useEffect } from "react";
 import { useTranslator } from "./services/TranslatorService.tsx";
 import { LocalStorageService } from "./services/LocalStorageService.tsx";
 import GooglePage from "./pages/google/GooglePage.tsx";
+import PolicyPage from "./pages/policy/PolicyPage.tsx";
 
 export default function App() {
   const { t, setLanguage } = useTranslator();
@@ -57,6 +58,11 @@ export default function App() {
               <Route
                 path="/workout-plans"
                 element={<WorkoutPlansPage />}
+              />
+
+              <Route
+                path="/policy"
+                element={<PolicyPage />}
               />
 
               <Route
