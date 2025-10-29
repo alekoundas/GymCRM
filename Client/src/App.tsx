@@ -20,8 +20,19 @@ import RegisterPage from "./pages/user/RegisterPage.tsx";
 import WorkoutPlansPage from "./pages/workout-plan/WorkoutPlansPage.tsx";
 import WorkoutPlanFormPage from "./pages/workout-plan/WorkoutPlanFormPage.tsx";
 import UserStatusesPage from "./pages/user-status/UserStatusesPage.tsx";
+import { useEffect } from "react";
+import { useTranslator } from "./services/TranslatorService.tsx";
+import { LocalStorageService } from "./services/LocalStorageService.tsx";
 
 export default function App() {
+  const { t, setLanguage } = useTranslator();
+
+  useEffect(() => {
+    const language = LocalStorageService.getLanguage();
+    if (!language) {
+      setLanguage("el");
+    }
+  }, []);
   return (
     <>
       <div className="flex flex-column p-0 m-0 h-full">

@@ -16,7 +16,7 @@ export default function NavSidebar({ isVisible, hideSidebar }: IField) {
   const { currentThemeScale, setTheme, setThemeScale } = useTheme();
   const { t, setLanguage } = useTranslator();
   const [selectedLang, setSelectedLang] = useState<string>(
-    LocalStorageService.getLanguage() ?? "en"
+    LocalStorageService.getLanguage() ?? "el"
   );
   const languages = [
     // Get those languages on top
@@ -231,7 +231,7 @@ export default function NavSidebar({ isVisible, hideSidebar }: IField) {
               severity={selectedLang === lang.code ? "success" : "secondary"}
               onClick={() => {
                 const selectedLanguageCode =
-                  selectedLang === lang.code ? "en" : lang.code;
+                  selectedLang === lang.code ? "el" : lang.code;
 
                 setLanguage(selectedLanguageCode);
                 setSelectedLang(selectedLanguageCode);
