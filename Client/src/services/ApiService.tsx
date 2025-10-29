@@ -221,6 +221,14 @@ export const useApiService = () => {
     [buildUrl, apiRequest]
   );
 
+  const getGoogle = useCallback(
+    async <TEntity,>(controller: string): Promise<TEntity | null> => {
+      const url = buildUrl(controller, "");
+      return apiRequest<TEntity, TEntity>(url, "GET");
+    },
+    [buildUrl, apiRequest]
+  );
+
   const getDataLookup = useCallback(
     async (controller: string, data: LookupDto): Promise<LookupDto | null> => {
       const url = buildUrl(controller, "Lookup");
@@ -455,6 +463,7 @@ export const useApiService = () => {
 
   return {
     get,
+    getGoogle,
     getDataLookup,
     getDataAutoComplete,
     getDataGrid,

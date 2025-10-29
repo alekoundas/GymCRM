@@ -23,6 +23,7 @@ import UserStatusesPage from "./pages/user-status/UserStatusesPage.tsx";
 import { useEffect } from "react";
 import { useTranslator } from "./services/TranslatorService.tsx";
 import { LocalStorageService } from "./services/LocalStorageService.tsx";
+import GooglePage from "./pages/google/GooglePage.tsx";
 
 export default function App() {
   const { t, setLanguage } = useTranslator();
@@ -58,6 +59,11 @@ export default function App() {
                 element={<WorkoutPlansPage />}
               />
 
+              <Route
+                path="/auth/google/callback"
+                element={<GooglePage />}
+              />
+
               {/* Administrator */}
               <Route
                 path="/administrator/*"
@@ -82,6 +88,11 @@ export default function App() {
                 <Route
                   path="train-groups/:id/view"
                   element={<TrainGroupAdminFormPage formMode={FormMode.VIEW} />}
+                />
+
+                <Route
+                  path="google"
+                  element={<GooglePage />}
                 />
 
                 <Route

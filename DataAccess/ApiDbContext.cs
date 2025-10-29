@@ -38,6 +38,7 @@ namespace DataAccess
         public DbSet<TrainGroupUnavailableDate> TrainGroupUnavailableDates { get; set; }
         public DbSet<TrainGroupParticipantUnavailableDate> TrainGroupParticipantUnavailableDates { get; set; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+        public DbSet<GoogleRefreshToken> GoogleRefreshTokens { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -67,6 +68,9 @@ namespace DataAccess
             builder.ApplyConfiguration(new TrainGroupParticipantConfiguration());
             builder.ApplyConfiguration(new TrainGroupUnavailableDateConfiguration());
             builder.ApplyConfiguration(new TrainGroupParticipantUnavailableDateConfiguration());
+
+
+            builder.ApplyConfiguration(new GoogleRefreshTokenConfiguration());
         }
 
         public void RunMigrations()

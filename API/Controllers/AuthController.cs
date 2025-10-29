@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System.Data;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.Json;
 
 namespace API.Controllers
 {
@@ -19,6 +19,7 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly ILogger<AuthController> _logger;
         private readonly IUserService _userService;
@@ -27,8 +28,11 @@ namespace API.Controllers
         private readonly IEmailService _emailService;
         private readonly TokenSettings _tokenSettings;
         private readonly IStringLocalizer _localizer;
+        private readonly IConfiguration _configuration;
+        private readonly HttpClient _httpClient;
 
         public AuthController(
+            IDataService dataService,
             IMapper mapper,
             ILogger<AuthController> logger,
             IUserService userService,
@@ -36,8 +40,11 @@ namespace API.Controllers
             RoleManager<Role> roleManager,
             IEmailService emailService,
             TokenSettings tokenSettings,
+            IConfiguration configuration,
+            IHttpClientFactory clientFactory,
             IStringLocalizer localizer)
         {
+            _dataService = dataService;
             _logger = logger;
             _userService = userService;
             _userManager = userManager;
@@ -45,7 +52,10 @@ namespace API.Controllers
             _mapper = mapper;
             _emailService = emailService;
             _tokenSettings = tokenSettings;
+            _configuration = configuration;
             _localizer = localizer;
+
+            _httpClient = clientFactory.CreateClient();
         }
 
 
@@ -222,5 +232,91 @@ namespace API.Controllers
             else
                 return new ApiResponse<bool>().SetErrorResponse(result);
         }
+
+
+
+
+        // Step 1: Admin clicks this to start auth (generates Google URL)
+        [HttpGet("google")]
+        public ApiResponse<string> StartGoogleAuth()
+        {
+            var clientId = _configuration["Gmail:ClientId"];
+            var redirectUri = _configuration["Gmail:RedirectUri"]; // e.g., "http://localhost:5000/auth/google/callback"
+            var scope = "https://www.googleapis.com/auth/gmail.send";
+            var state = "random-state-for-csrf"; // Add randomness in prod
+
+            var authUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
+                          $"client_id={Uri.EscapeDataString(clientId)}&" +
+                          $"redirect_uri={Uri.EscapeDataString(redirectUri)}&" +
+                          $"scope={Uri.EscapeDataString(scope)}&" +
+                          $"response_type=code&" +
+                          $"state={state}&" +
+                          $"access_type=offline&prompt=consent"; // 'offline' for refresh token, 'consent' forces token every time
+
+            return new ApiResponse<string>().SetSuccessResponse(authUrl, authUrl); // Or return { url: authUrl } for a frontend link
+        }
+
+        // Step 2: Google redirects here with 'code' param
+        [HttpGet("googlecallback")]
+        public async Task<ApiResponse<bool>> GoogleCallback([FromQuery]string code, [FromQuery]string state)
+        {
+
+            // Verify state for CSRF (simple check; enhance in prod)
+            if (state != "random-state-for-csrf") return new ApiResponse<bool>().SetErrorResponse("Invalid state");
+
+            var clientId = _configuration["Gmail:ClientId"];
+            var clientSecret = _configuration["Gmail:ClientSecret"];
+            var redirectUri = _configuration["Gmail:RedirectUri"];
+
+            // Exchange code for tokens
+            var content = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("client_secret", clientSecret),
+                new KeyValuePair<string, string>("code", code),
+                new KeyValuePair<string, string>("grant_type", "authorization_code"),
+                new KeyValuePair<string, string>("redirect_uri", redirectUri)
+            });
+
+            var tokenResponse = await _httpClient.PostAsync("https://oauth2.googleapis.com/token", content);
+            if (!tokenResponse.IsSuccessStatusCode)
+            {
+                var errorContent = await tokenResponse.Content.ReadAsStringAsync();
+                return new ApiResponse<bool>().SetErrorResponse($"Token exchange failed: {errorContent}");
+            }
+
+            var tokenJson = await tokenResponse.Content.ReadAsStringAsync();
+            var tokens = JsonSerializer.Deserialize<GoogleTokens>(tokenJson);
+
+            List<GoogleRefreshToken>  dbtokens = await _dataService.GoogleRefreshTokens.ToListAsync();
+            if(dbtokens.Count == 0)
+            {
+                GoogleRefreshToken newToken = new GoogleRefreshToken()
+                {
+                    RefreshToken = tokens?.refresh_token,
+                    ExpiresIn = tokens?.expires_in ?? 0
+                };
+                await _dataService.GoogleRefreshTokens.AddAsync(newToken);
+            }
+            else
+            {
+                GoogleRefreshToken existingToken = dbtokens[0];
+                existingToken.RefreshToken = tokens?.refresh_token;
+                existingToken.ExpiresIn = tokens?.expires_in ?? 0;
+                _dataService.Update(existingToken);
+
+            }
+            Console.WriteLine($"Refresh Token: {tokens?.refresh_token}");
+
+            return new ApiResponse<bool>().SetSuccessResponse("");
+        }
+    }
+
+    public class GoogleTokens
+    {
+        public string access_token { get; set; }
+        public string refresh_token { get; set; }
+        public int expires_in { get; set; }
+        public string token_type { get; set; }
     }
 }

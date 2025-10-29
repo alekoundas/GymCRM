@@ -139,9 +139,14 @@ namespace API.Controllers
                     existingParticipants.Remove(existingParticipant);
                     dbContext.Remove(existingParticipant);
 
-                    string? dateString = existingParticipant.TrainGroupDate.RecurrenceDayOfMonth.ToString() ??
-                        existingParticipant.TrainGroupDate.RecurrenceDayOfWeek.ToString() ??
-                        existingParticipant.TrainGroupDate.FixedDay.ToString();
+                    string? dateString = "";
+                    if (existingParticipant?.TrainGroupDate.RecurrenceDayOfMonth != null)
+                        dateString = existingParticipant.TrainGroupDate.RecurrenceDayOfMonth.ToString();
+                    if (existingParticipant?.TrainGroupDate.RecurrenceDayOfWeek != null)
+                        dateString = existingParticipant.TrainGroupDate.RecurrenceDayOfWeek.ToString();
+                    if (existingParticipant?.TrainGroupDate.FixedDay != null)
+                        dateString = existingParticipant.TrainGroupDate.FixedDay.ToString();
+
 
                     if (dateString != null)
                         emailDatesRemove.Add(dateString);
@@ -230,9 +235,17 @@ namespace API.Controllers
                 incomingParticipant.Id = 0;
                 dbContext.Add(incomingParticipant);
 
-                string? dateString = incomingParticipant.TrainGroupDate.RecurrenceDayOfMonth.ToString() ??
-                        incomingParticipant.TrainGroupDate.RecurrenceDayOfWeek.ToString() ??
-                        incomingParticipant.TrainGroupDate.FixedDay.ToString();
+
+
+
+                string dateString = "";
+
+                if (incomingParticipant.TrainGroupDate.RecurrenceDayOfMonth != null)
+                    dateString = incomingParticipant.TrainGroupDate.RecurrenceDayOfMonth.ToString();
+                if (incomingParticipant?.TrainGroupDate.RecurrenceDayOfWeek != null)
+                    dateString = incomingParticipant.TrainGroupDate.RecurrenceDayOfWeek.ToString();
+                if (incomingParticipant?.TrainGroupDate.FixedDay != null)
+                    dateString = incomingParticipant.TrainGroupDate.FixedDay.ToString();
 
                 if (dateString != null)
                     emailDatesAdd.Add(dateString);
