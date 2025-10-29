@@ -21,6 +21,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -151,7 +152,7 @@ builder.Services.AddAutoMapper(config =>
 
 
 
-
+builder.Services.AddHttpClient();
 
 
 

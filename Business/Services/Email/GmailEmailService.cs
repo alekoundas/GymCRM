@@ -24,9 +24,15 @@ namespace Business.Services.Email
 
         public async Task SendEmailAsync(string to, string subject, string htmlBody)
         {
+            List<GoogleRefreshToken> dbtokens = await _dataService.GoogleRefreshTokens.ToListAsync();
+            if (dbtokens.Count != 1)
+            {
+                return;
+            }
+
             var clientId = _configuration["Gmail:ClientId"];
             var clientSecret = _configuration["Gmail:ClientSecret"];
-            var refreshToken = _configuration["Gmail:RefreshToken"];
+            var refreshToken = dbtokens[0].RefreshToken;
             var username = _configuration["Gmail:Email"];
             var fromEmail = _configuration["Gmail:Email"];
             var fromName = _configuration["Gmail:FromName"];
@@ -55,7 +61,7 @@ namespace Business.Services.Email
                 var service = new GmailService(new BaseClientService.Initializer
                 {
                     HttpClientInitializer = credential,
-                    ApplicationName = "GymCRM"
+                    ApplicationName = "RosaCoreLab"
                 });
 
                 // Create email.

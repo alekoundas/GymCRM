@@ -78,6 +78,14 @@ export default function NavLeft() {
       visible: TokenService.isUserAllowed("Mails_View"),
       items: [
         {
+          label: "Google",
+          icon: "pi pi-key",
+          visible: TokenService.isUserAllowed("Roles_Edit"),
+          command: () => {
+            navigate("/administrator/google");
+          },
+        },
+        {
           label: "Emails",
           icon: "pi pi-envelope",
           visible: TokenService.isUserAllowed("Mails_View"),

@@ -109,7 +109,12 @@ export default function TrainGroupsBookingCalendarPage() {
           handleChangeDate(new Date(timeSlotRequestDto.selectedDate)); // Refresh time slots
         }
       })
-      .then(() => setLoading(false));
+      .then(() => {
+        resetSelectedTimeSlotResponseDto();
+        resetTimeSlotRequestDto();
+        resetTimeSlotResponseDto();
+        setLoading(false);
+      });
   };
 
   return (

@@ -1,6 +1,7 @@
 ﻿using Business.Repository;
 using Core.Models;
 using DataAccess;
+using DataAccess.Configurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ namespace Business.Services
 
 
         // Repositories.
+        public IGenericRepository<GoogleRefreshToken> GoogleRefreshTokens { get; }
         public IGenericRepository<Mail> Mails { get; }
         public IGenericRepository<Exercise> Exercises { get; }
         public IGenericRepository<TrainGroup> TrainGroups { get; }
@@ -46,7 +48,8 @@ namespace Business.Services
             IGenericRepository<User> userRepository,
             IGenericRepository<Role> roleRepository,
             IGenericRepository<UserRole> userRoleRepository,
-            IGenericRepository<IdentityRoleClaim<Guid>> roleClaimRepository)
+            IGenericRepository<IdentityRoleClaim<Guid>> roleClaimRepository,
+            IGenericRepository<GoogleRefreshToken> googleRefreshTokenRepositor)
         {
             _dbContextFactory = dbContextFactory;
 
@@ -69,6 +72,9 @@ namespace Business.Services
             Roles = roleRepository;
             RoleClaims = roleClaimRepository;
             UserRoles = userRoleRepository;
+
+            // Google Refresh Tokens
+            GoogleRefreshTokens = googleRefreshTokenRepositor;
         }
 
         public IGenericRepository<TEntity> GetGenericRepository<TEntity>() where TEntity : class
@@ -101,6 +107,9 @@ namespace Business.Services
                 return (IGenericRepository<TEntity>)UserRoles;
             if (typeof(TEntity) == typeof(IdentityRoleClaim<Guid>))
                 return (IGenericRepository<TEntity>)RoleClaims;
+            if (typeof(TEntity) == typeof(GoogleRefreshToken))
+                return (IGenericRepository<TEntity>)GoogleRefreshTokens;
+
 
             throw new InvalidOperationException($"No repository found for type {typeof(TEntity).Name}");
         }

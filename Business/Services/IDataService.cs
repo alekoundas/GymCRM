@@ -11,6 +11,7 @@ namespace Business.Services
         ApiDbContext GetDbContext();
 
         // Repositories.
+        IGenericRepository<GoogleRefreshToken> GoogleRefreshTokens { get; }
         IGenericRepository<User> Users { get; }
         IGenericRepository<Mail> Mails { get; }
         IGenericRepository<TrainGroup> TrainGroups { get; }

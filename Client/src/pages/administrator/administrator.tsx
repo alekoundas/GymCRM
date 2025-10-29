@@ -13,6 +13,7 @@ import NavLeft from "../../components/navbar-left/NavLeft";
 import WorkoutPlansPage from "../workout-plan/WorkoutPlansPage";
 import WorkoutPlanFormPage from "../workout-plan/WorkoutPlanFormPage";
 import UserStatusesPage from "../user-status/UserStatusesPage";
+import GooglePage from "../google/GooglePage";
 
 export default function Administrator() {
   return (
@@ -51,6 +52,14 @@ export default function Administrator() {
               element={<TrainGroupAdminFormPage formMode={FormMode.EDIT} />}
             />
 
+            <Route
+              path="google"
+              element={<GooglePage />}
+            />
+            <Route
+              path="google/callback/:state/:code/:scope"
+              element={<GooglePage />}
+            />
             <Route
               path="emails"
               element={<MailsPage />}
