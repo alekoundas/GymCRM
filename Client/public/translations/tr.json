@@ -185,6 +185,14 @@
   "Login successful!": "Giriş başarılı!",
   "Registration successful!": "Kayıt başarılı!",
   "Logout successful!": "Çıkış başarılı!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "Bu gün için devre dışı bırak",
+  "Enable for this day": "Bu gün için etkinleştir",
+  "Contact us": "Bize ulaşın",
+  "Policy": "Politika",
+  "Settings": "Ayarlar",
+  "Contact Us": "Bize ulaşın",
+  "Wed love to hear from you!": "Sizden haber almak isteriz!",
+  "Mobile Phone": "Cep telefonu",
+  "Landline": "Sabit hat",
+  "Address": "Adres"
 }

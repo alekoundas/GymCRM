@@ -185,6 +185,14 @@
   "Login successful!": "로그인 성공!",
   "Registration successful!": "등록 성공!",
   "Logout successful!": "로그아웃 성공!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "이 날짜 비활성화",
+  "Enable for this day": "이 날짜 활성화",
+  "Contact us": "문의하기",
+  "Policy": "정책",
+  "Settings": "설정",
+  "Contact Us": "문의하기",
+  "Wed love to hear from you!": "당신의 소식을 듣고 싶어요!",
+  "Mobile Phone": "휴대 전화",
+  "Landline": "유선 전화",
+  "Address": "주소"
 }

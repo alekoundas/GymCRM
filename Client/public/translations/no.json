@@ -185,6 +185,14 @@
   "Login successful!": "Innlogging vellykket!",
   "Registration successful!": "Registrering vellykket!",
   "Logout successful!": "Utmelding vellykket!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "Deaktiver for denne dagen",
+  "Enable for this day": "Aktiver for denne dagen",
+  "Contact us": "Kontakt oss",
+  "Policy": "Politikk",
+  "Settings": "Innstillinger",
+  "Contact Us": "Kontakt oss",
+  "Wed love to hear from you!": "Vi vil gjerne høre fra deg!",
+  "Mobile Phone": "Mobiltelefon",
+  "Landline": "Fasttelefon",
+  "Address": "Adresse"
 }

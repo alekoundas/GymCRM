@@ -185,6 +185,14 @@
   "Login successful!": "Logowanie powiodło się!",
   "Registration successful!": "Rejestracja powiodła się!",
   "Logout successful!": "Wylogowanie powiodło się!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "Wyłącz na ten dzień",
+  "Enable for this day": "Włącz na ten dzień",
+  "Contact us": "Skontaktuj się z nami",
+  "Policy": "Polityka",
+  "Settings": "Ustawienia",
+  "Contact Us": "Skontaktuj się z nami",
+  "Wed love to hear from you!": "Chcielibyśmy usłyszeć od Ciebie!",
+  "Mobile Phone": "Telefon komórkowy",
+  "Landline": "Telefon stacjonarny",
+  "Address": "Adres"
 }

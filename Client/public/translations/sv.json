@@ -185,6 +185,14 @@
   "Login successful!": "Inloggning lyckades!",
   "Registration successful!": "Registrering lyckades!",
   "Logout successful!": "Utloggning lyckades!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "Avaktivera för denna dag",
+  "Enable for this day": "Aktivera för denna dag",
+  "Contact us": "Kontakta oss",
+  "Policy": "Policy",
+  "Settings": "Inställningar",
+  "Contact Us": "Kontakta oss",
+  "Wed love to hear from you!": "Vi skulle gärna höra från dig!",
+  "Mobile Phone": "Mobiltelefon",
+  "Landline": "Fast telefon",
+  "Address": "Adress"
 }

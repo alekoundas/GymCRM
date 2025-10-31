@@ -25,6 +25,7 @@ import { useTranslator } from "./services/TranslatorService.tsx";
 import { LocalStorageService } from "./services/LocalStorageService.tsx";
 import GooglePage from "./pages/google/GooglePage.tsx";
 import PolicyPage from "./pages/policy/PolicyPage.tsx";
+import ContactUsPage from "./pages/contact-us/ContactUsPage.tsx";
 
 export default function App() {
   const { t, setLanguage } = useTranslator();
@@ -68,6 +69,11 @@ export default function App() {
               <Route
                 path="/auth/google/callback"
                 element={<GooglePage />}
+              />
+
+              <Route
+                path="/contact-us"
+                element={<ContactUsPage />}
               />
 
               {/* Administrator */}

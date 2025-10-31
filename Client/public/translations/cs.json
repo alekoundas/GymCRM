@@ -185,6 +185,14 @@
   "Login successful!": "Přihlášení úspěšné!",
   "Registration successful!": "Registrace úspěšná!",
   "Logout successful!": "Odhlášení úspěšné!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "Zakázat pro tento den",
+  "Enable for this day": "Povolit pro tento den",
+  "Contact us": "Kontaktujte nás",
+  "Policy": "Politika",
+  "Settings": "Nastavení",
+  "Contact Us": "Kontaktujte nás",
+  "Wed love to hear from you!": "Rádi vás slyšíme!",
+  "Mobile Phone": "Mobilní telefon",
+  "Landline": "Pevná linka",
+  "Address": "Adresa"
 }

@@ -56,6 +56,13 @@ export default function NavTop() {
       },
     },
     {
+      label: t("Contact us"),
+      icon: "pi pi-building-columns",
+      command: () => {
+        navigate("/contact-us");
+      },
+    },
+    {
       label: t("Policy"),
       icon: "pi pi-building-columns",
       command: () => {
@@ -79,8 +86,8 @@ export default function NavTop() {
         label: t("Options"),
         items: [
           {
-            label: t("Theme"),
-            icon: "pi pi-palette",
+            label: t("Settings"),
+            icon: "pi pi-cog",
             command: () => setNavRightVisibility(true),
           },
         ],

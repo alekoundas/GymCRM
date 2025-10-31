@@ -185,6 +185,14 @@
   "Login successful!": "ログイン成功！",
   "Registration successful!": "登録成功！",
   "Logout successful!": "ログアウト成功！",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "この日を無効にする",
+  "Enable for this day": "この日を有効にする",
+  "Contact us": "お問い合わせ",
+  "Policy": "ポリシー",
+  "Settings": "設定",
+  "Contact Us": "お問い合わせ",
+  "Wed love to hear from you!": "あなたからお聞かせいただければ幸いです！",
+  "Mobile Phone": "携帯電話",
+  "Landline": "固定電話",
+  "Address": "住所"
 }

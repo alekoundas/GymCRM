@@ -185,6 +185,14 @@
   "Login successful!": "Η σύνδεση ήταν επιτυχής!",
   "Registration successful!": "Η εγγραφή ήταν επιτυχής!",
   "Logout successful!": "Η αποσύνδεση ήταν επιτυχής!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "Απενεργοποίηση για αυτήν την ημέρα",
+  "Enable for this day": "Ενεργοποίηση για αυτήν την ημέρα",
+  "Contact us": "Επικοινωνήστε μαζί μας",
+  "Policy": "Πολιτική",
+  "Settings": "Ρυθμίσεις",
+  "Contact Us": "Επικοινωνήστε μαζί μας",
+  "Wed love to hear from you!": "Θα θέλαμε πολύ να σας ακούσουμε!",
+  "Mobile Phone": "Κινητό Τηλέφωνο",
+  "Landline": "Σταθερό Τηλέφωνο",
+  "Address": "Διεύθυνση"
 }

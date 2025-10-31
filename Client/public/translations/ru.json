@@ -185,6 +185,14 @@
   "Login successful!": "Вход успешен!",
   "Registration successful!": "Регистрация успешна!",
   "Logout successful!": "Выход успешен!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "Отключить на этот день",
+  "Enable for this day": "Включить на этот день",
+  "Contact us": "Свяжитесь с нами",
+  "Policy": "Политика",
+  "Settings": "Настройки",
+  "Contact Us": "Свяжитесь с нами",
+  "Wed love to hear from you!": "Мы будем рады услышать от вас!",
+  "Mobile Phone": "Мобильный телефон",
+  "Landline": "Стационарный телефон",
+  "Address": "Адрес"
 }

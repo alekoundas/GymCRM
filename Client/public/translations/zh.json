@@ -185,6 +185,14 @@
   "Login successful!": "登录成功！",
   "Registration successful!": "注册成功！",
   "Logout successful!": "登出成功！",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "为此日禁用",
+  "Enable for this day": "为此日启用",
+  "Contact us": "联系我们",
+  "Policy": "政策",
+  "Settings": "设置",
+  "Contact Us": "联系我们",
+  "Wed love to hear from you!": "我们很想听听你的消息！",
+  "Mobile Phone": "手机",
+  "Landline": "固定电话",
+  "Address": "地址"
 }

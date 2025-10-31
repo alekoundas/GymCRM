@@ -185,6 +185,14 @@
   "Login successful!": "Login bem-sucedido!",
   "Registration successful!": "Registro bem-sucedido!",
   "Logout successful!": "Logout bem-sucedido!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "Desativar para este dia",
+  "Enable for this day": "Ativar para este dia",
+  "Contact us": "Contatar-nos",
+  "Policy": "Política",
+  "Settings": "Configurações",
+  "Contact Us": "Contatar-nos",
+  "Wed love to hear from you!": "Adoraríamos ouvir você!",
+  "Mobile Phone": "Telefone móvel",
+  "Landline": "Telefone fixo",
+  "Address": "Endereço"
 }
