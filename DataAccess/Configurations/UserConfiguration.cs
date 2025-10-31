@@ -24,8 +24,12 @@ namespace DataAccess.Configurations
                 .IsRequired()
                 .HasMaxLength(100);
 
+            builder.Property(u => u.Address)
+                .IsRequired()
+                .HasMaxLength(300);
+
             builder.Property(u => u.Email)
-              .IsRequired();
+                .IsRequired();
 
 
             // Relationship with UserStatus (zero-to-many)

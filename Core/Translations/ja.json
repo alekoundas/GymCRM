@@ -16,6 +16,9 @@
   "Reps": "レップ",
   "Weight": "重量",
   "Color": "色",
+  "Address": "住所",
+  "LastName": "姓",
+  "FirstName": "名",
 
   "Title_cannot_exceed_100_characters": "タイトルは100文字を超えることはできません",
   "Description_cannot_exceed_500_characters": "説明は500文字を超えることはできません!",
@@ -30,6 +33,7 @@
   "FirstName_cannot_exceed_50_characters": "ファーストネームは50文字を超えることはできません!",
   "LastName_cannot_exceed_50_characters": "ラストネームは50文字を超えることはできません!",
   "Phone_number_is_required": "電話番号が必要です!",
+  "Address_cannot_exceed_200_characters": "住所は200文字を超えることはできません！",
 
   "User_is_not_authorized_to_perform_this_action": "ユーザーはこのアクションを実行する権限がありません。",
   "Requested_0_not_found": "要求された {0} が見つかりません!",

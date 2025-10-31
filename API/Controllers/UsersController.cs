@@ -100,6 +100,7 @@ namespace API.Controllers
             user.UserName = request.UserName;
             user.ProfileImage = request.ProfileImage;
             user.UserStatusId = request.UserStatusId;
+            user.Address = request.Address;
 
             UserDto userDto = _mapper.Map<UserDto>(user);
             IdentityResult response = await _userManager.UpdateAsync(user);

@@ -16,6 +16,9 @@
   "Reps": "Повторения",
   "Weight": "Вес",
   "Color": "Цвет",
+  "Address": "Адрес",
+  "LastName": "Фамилия",
+  "FirstName": "Имя",
 
   "Title_cannot_exceed_100_characters": "Заголовок не может превышать 100 символов",
   "Description_cannot_exceed_500_characters": "Описание не может превышать 500 символов!",
@@ -30,6 +33,7 @@
   "FirstName_cannot_exceed_50_characters": "Имя не может превышать 50 символов!",
   "LastName_cannot_exceed_50_characters": "Фамилия не может превышать 50 символов!",
   "Phone_number_is_required": "Номер телефона требуется!",
+  "Address_cannot_exceed_200_characters": "Адрес не может превышать 200 символов!",
 
   "User_is_not_authorized_to_perform_this_action": "Пользователь не авторизован для выполнения этого действия.",
   "Requested_0_not_found": "Запрошенный {0} не найден!",

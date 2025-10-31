@@ -16,6 +16,9 @@
   "Reps": "Repetitioner",
   "Weight": "Vikt",
   "Color": "Färg",
+  "Address": "Adress",
+  "LastName": "Efternamn",
+  "FirstName": "Förnamn",
 
   "Title_cannot_exceed_100_characters": "Titel får inte överskrida 100 tecken",
   "Description_cannot_exceed_500_characters": "Beskrivning får inte överskrida 500 tecken!",
@@ -30,6 +33,7 @@
   "FirstName_cannot_exceed_50_characters": "Förnamn får inte överskrida 50 tecken!",
   "LastName_cannot_exceed_50_characters": "Efternamn får inte överskrida 50 tecken!",
   "Phone_number_is_required": "Telefonnummer krävs!",
+  "Address_cannot_exceed_200_characters": "Adressen får inte överstiga 200 tecken!",
 
   "User_is_not_authorized_to_perform_this_action": "Användaren är inte behörig att utföra denna åtgärd.",
   "Requested_0_not_found": "Begärd {0} inte hittad!",

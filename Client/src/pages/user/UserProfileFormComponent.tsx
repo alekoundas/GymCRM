@@ -17,6 +17,7 @@ export default function UserProfileFormComponent() {
   const [formData, setFormData] = useState({
     firstName: userDto?.firstName,
     lastName: userDto?.lastName,
+    address: userDto?.address,
   });
 
   // Sync formData when userDto changes
@@ -24,6 +25,7 @@ export default function UserProfileFormComponent() {
     setFormData({
       firstName: userDto?.firstName,
       lastName: userDto?.lastName,
+      address: userDto?.address,
     });
   }, [userDto]);
 
@@ -147,6 +149,47 @@ export default function UserProfileFormComponent() {
                 icon="pi pi-check"
                 className="p-button-rounded p-button-text p-button-success"
                 onClick={() => handleSave("lastName")}
+              />
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="field">
+        <label
+          htmlFor="address"
+          className="block text-900 font-medium mb-2"
+        >
+          {t("Address")}
+        </label>
+        <div className="flex align-items-center gap-2">
+          <InputText
+            id="address"
+            type="text"
+            placeholder={t("Address")}
+            className="w-full mb-3"
+            value={formData.address}
+            onChange={(e) => handleChange("address", e.target.value)}
+            disabled={editingField !== "address"}
+          />
+          {editingField !== "address" ? (
+            <Button
+              icon="pi pi-pencil"
+              className="p-button-rounded p-button-text p-button-secondary"
+              onClick={() => handleEdit("address")}
+              visible={editingField === undefined}
+            />
+          ) : (
+            <>
+              <Button
+                icon="pi pi-times"
+                className="p-button-rounded p-button-text p-button-danger"
+                onClick={() => handleCancel("address")}
+              />
+              <Button
+                icon="pi pi-check"
+                className="p-button-rounded p-button-text p-button-success"
+                onClick={() => handleSave("address")}
               />
             </>
           )}
