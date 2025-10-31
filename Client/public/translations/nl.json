@@ -185,6 +185,14 @@
   "Login successful!": "Inloggen gelukt!",
   "Registration successful!": "Registratie gelukt!",
   "Logout successful!": "Uitloggen gelukt!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "Uitschakelen voor deze dag",
+  "Enable for this day": "Inschakelen voor deze dag",
+  "Contact us": "Neem contact op",
+  "Policy": "Beleid",
+  "Settings": "Instellingen",
+  "Contact Us": "Neem contact op",
+  "Wed love to hear from you!": "We horen graag van je!",
+  "Mobile Phone": "Mobiele telefoon",
+  "Landline": "Vaste lijn",
+  "Address": "Adres"
 }

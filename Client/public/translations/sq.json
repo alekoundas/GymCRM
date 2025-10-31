@@ -185,6 +185,14 @@
   "Login successful!": "Identifikimi u krye me sukses!",
   "Registration successful!": "Regjistrimi u krye me sukses!",
   "Logout successful!": "Dalja u krye me sukses!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "Çaktivizo për këtë ditë",
+  "Enable for this day": "Aktivizo për këtë ditë",
+  "Contact us": "Na kontaktoni",
+  "Policy": "Politika",
+  "Settings": "Cilësimet",
+  "Contact Us": "Na kontaktoni",
+  "Wed love to hear from you!": "Do të na pëlqente të dëgjojmë nga ju!",
+  "Mobile Phone": "Telefon celular",
+  "Landline": "Linjë telefonike",
+  "Address": "Adresë"
 }

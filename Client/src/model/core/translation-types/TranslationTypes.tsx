@@ -193,6 +193,14 @@
   'Logout successful!': string;
   'Disable for this day': string;
   'Enable for this day': string;
+  'Contact us': string;
+  'Policy': string;
+  'Settings': string;
+  'Contact Us': string;
+  'Wed love to hear from you!': string;
+  'Mobile Phone': string;
+  'Landline': string;
+  'Address': string;
     }
 
 

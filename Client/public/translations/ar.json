@@ -185,6 +185,14 @@
   "Login successful!": "تسجيل الدخول ناجح!",
   "Registration successful!": "التسجيل ناجح!",
   "Logout successful!": "تسجيل الخروج ناجح!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "تعطيل لهذا اليوم",
+  "Enable for this day": "تمكين لهذا اليوم",
+  "Contact us": "اتصل بنا",
+  "Policy": "السياسة",
+  "Settings": "الإعدادات",
+  "Contact Us": "اتصل بنا",
+  "Wed love to hear from you!": "نحن نحب أن نسمع منك!",
+  "Mobile Phone": "الهاتف المحمول",
+  "Landline": "الهاتف الثابت",
+  "Address": "العنوان"
 }

@@ -185,6 +185,14 @@
   "Login successful!": "Anmeldung erfolgreich!",
   "Registration successful!": "Registrierung erfolgreich!",
   "Logout successful!": "Abmeldung erfolgreich!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "Deaktivieren für diesen Tag",
+  "Enable for this day": "Aktivieren für diesen Tag",
+  "Contact us": "Kontaktieren Sie uns",
+  "Policy": "Richtlinie",
+  "Settings": "Einstellungen",
+  "Contact Us": "Kontaktieren Sie uns",
+  "Wed love to hear from you!": "Wir würden gerne von Ihnen hören!",
+  "Mobile Phone": "Mobiltelefon",
+  "Landline": "Festnetz",
+  "Address": "Adresse"
 }

@@ -185,6 +185,14 @@
   "Login successful!": "Kirjautuminen onnistui!",
   "Registration successful!": "Rekisteröityminen onnistui!",
   "Logout successful!": "Uloskirjautuminen onnistui!",
-  "Disable for this day": "__STRING_NOT_TRANSLATED__",
-  "Enable for this day": "__STRING_NOT_TRANSLATED__"
+  "Disable for this day": "Poista käytöstä tälle päivälle",
+  "Enable for this day": "Ota käyttöön tälle päivälle",
+  "Contact us": "Ota yhteyttä",
+  "Policy": "Käytäntö",
+  "Settings": "Asetukset",
+  "Contact Us": "Ota yhteyttä",
+  "Wed love to hear from you!": "Olisimme iloisia kuullessamme sinusta!",
+  "Mobile Phone": "Matkapuhelin",
+  "Landline": "Lankapuhelin",
+  "Address": "Osoite"
 }
