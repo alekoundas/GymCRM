@@ -25,6 +25,7 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string Reps = "Reps";
         public const string Weight = "Weight";
         public const string Color = "Color";
+        public const string Address = "Address";
         public const string Title_cannot_exceed_100_characters = "Title_cannot_exceed_100_characters";
         public const string Description_cannot_exceed_500_characters = "Description_cannot_exceed_500_characters";
         public const string At_least_1_Train_Group_Date_is_required = "At_least_1_Train_Group_Date_is_required";
@@ -38,6 +39,7 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string FirstName_cannot_exceed_50_characters = "FirstName_cannot_exceed_50_characters";
         public const string LastName_cannot_exceed_50_characters = "LastName_cannot_exceed_50_characters";
         public const string Phone_number_is_required = "Phone_number_is_required";
+        public const string Address_cannot_exceed_200_characters = "Address_cannot_exceed_200_characters";
         public const string User_is_not_authorized_to_perform_this_action = "User_is_not_authorized_to_perform_this_action";
         public const string Requested_0_not_found = "Requested_0_not_found";
         public const string Invalid_data_provided = "Invalid_data_provided";

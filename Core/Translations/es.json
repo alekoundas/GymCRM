@@ -16,6 +16,9 @@
   "Reps": "Repeticiones",
   "Weight": "Peso",
   "Color": "Color",
+  "Address": "Dirección",
+  "LastName": "Apellido",
+  "FirstName": "Nombre",
 
   "Title_cannot_exceed_100_characters": "El título no puede exceder 100 caracteres",
   "Description_cannot_exceed_500_characters": "La descripción no puede exceder 500 caracteres!",
@@ -30,6 +33,7 @@
   "FirstName_cannot_exceed_50_characters": "El nombre no puede exceder 50 caracteres!",
   "LastName_cannot_exceed_50_characters": "El apellido no puede exceder 50 caracteres!",
   "Phone_number_is_required": "El número de teléfono es requerido!",
+  "Address_cannot_exceed_200_characters": "¡La dirección no puede exceder los 200 caracteres!",
 
   "User_is_not_authorized_to_perform_this_action": "El usuario no está autorizado para realizar esta acción.",
   "Requested_0_not_found": "Solicitado {0} no encontrado!",

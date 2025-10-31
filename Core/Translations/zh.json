@@ -16,6 +16,9 @@
   "Reps": "次数",
   "Weight": "重量",
   "Color": "颜色",
+  "Address": "地址",
+  "LastName": "姓",
+  "FirstName": "名",
 
   "Title_cannot_exceed_100_characters": "标题不能超过100个字符",
   "Description_cannot_exceed_500_characters": "描述不能超过500个字符!",
@@ -30,6 +33,7 @@
   "FirstName_cannot_exceed_50_characters": "名字不能超过50个字符!",
   "LastName_cannot_exceed_50_characters": "姓氏不能超过50个字符!",
   "Phone_number_is_required": "电话号码是必需的!",
+  "Address_cannot_exceed_200_characters": "地址不能超过200个字符！",
 
   "User_is_not_authorized_to_perform_this_action": "用户无权执行此操作。",
   "Requested_0_not_found": "请求的 {0} 未找到!",

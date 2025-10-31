@@ -23,9 +23,11 @@ export default function RegisterPage() {
   };
 
   const onSave = () => {
+    // assing uuser id for required user id
     userRegisterDto.phoneNumbers.forEach(
       (x) => (x.userId = "00000000-0000-0000-0000-000000000000")
     );
+
     apiService.register(userRegisterDto, login).then((isSuccessful) => {
       if (isSuccessful) {
         navigate("/");
@@ -99,6 +101,22 @@ export default function RegisterPage() {
                 />
               </div>
             </div>
+
+            <label
+              htmlFor="address"
+              className="block text-900 font-medium mb-2"
+            >
+              {t("Address")}
+            </label>
+            <InputText
+              id="address"
+              name="address"
+              type="text"
+              placeholder={t("Address")}
+              className="w-full mb-3"
+              value={userRegisterDto.address}
+              onChange={handleChange}
+            />
 
             <label
               htmlFor="phoneNumber"

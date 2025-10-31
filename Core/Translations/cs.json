@@ -16,6 +16,9 @@
   "Reps": "Opakování",
   "Weight": "Váha",
   "Color": "Barva",
+  "Address": "Adresa",
+  "LastName": "Příjmení",
+  "FirstName": "Jméno",
 
   "Title_cannot_exceed_100_characters": "Nadpis nemůže překročit 100 znaků",
   "Description_cannot_exceed_500_characters": "Popis nemůže překročit 500 znaků!",
@@ -30,6 +33,7 @@
   "FirstName_cannot_exceed_50_characters": "Křestní jméno nemůže překročit 50 znaků!",
   "LastName_cannot_exceed_50_characters": "Příjmení nemůže překročit 50 znaků!",
   "Phone_number_is_required": "Telefonní číslo je vyžadováno!",
+  "Address_cannot_exceed_200_characters": "Adresa nemůže překročit 200 znaků!",
 
   "User_is_not_authorized_to_perform_this_action": "Uživatel není oprávněn provést tuto akci.",
   "Requested_0_not_found": "Požadovaný {0} nenalezen!",

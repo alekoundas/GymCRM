@@ -5,6 +5,7 @@ export interface UserRegisterDto {
   email: string;
   firstName: string;
   lastName: string;
+  address: string;
   password: string;
   phoneNumbers: PhoneNumberDto[];
 }
@@ -15,6 +16,7 @@ export class UserRegisterDto {
   email: string = "";
   firstName: string = "";
   lastName: string = "";
+  address: string = "";
   password: string = "";
   phoneNumbers: PhoneNumberDto[] = [];
 }

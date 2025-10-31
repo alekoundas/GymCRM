@@ -16,6 +16,10 @@
   "Reps": "Herhalingen",
   "Weight": "Gewicht",
   "Color": "Kleur",
+  "Address": "Adres",
+  "LastName": "Achternaam",
+  "FirstName": "Voornaam",
+
 
   "Title_cannot_exceed_100_characters": "Titel mag niet meer dan 100 tekens bevatten",
   "Description_cannot_exceed_500_characters": "Beschrijving mag niet meer dan 500 tekens bevatten!",
@@ -30,6 +34,7 @@
   "FirstName_cannot_exceed_50_characters": "Voornaam mag niet meer dan 50 tekens bevatten!",
   "LastName_cannot_exceed_50_characters": "Achternaam mag niet meer than 50 tekens bevatten!",
   "Phone_number_is_required": "Telefoonnummer is vereist!",
+  "Address_cannot_exceed_200_characters": "Adres mag niet meer dan 200 tekens bevatten!",
 
   "User_is_not_authorized_to_perform_this_action": "Gebruiker is niet geautoriseerd om deze actie uit te voeren.",
   "Requested_0_not_found": "Gevraagde {0} niet gevonden!",

@@ -16,6 +16,9 @@
   "Reps": "Toistot",
   "Weight": "Paino",
   "Color": "Väri",
+  "Address": "Osoite",
+  "LastName": "Sukunimi",
+  "FirstName": "Etunimi",
 
   "Title_cannot_exceed_100_characters": "Otsikko ei saa ylittää 100 merkkiä",
   "Description_cannot_exceed_500_characters": "Kuvaus ei saa ylittää 500 merkkiä!",
@@ -30,6 +33,7 @@
   "FirstName_cannot_exceed_50_characters": "Etunimi ei saa ylittää 50 merkkiä!",
   "LastName_cannot_exceed_50_characters": "Sukunimi ei saa ylittää 50 merkkiä!",
   "Phone_number_is_required": "Puhelinnumero vaaditaan!",
+  "Address_cannot_exceed_200_characters": "Osoite ei voi ylittää 200 merkkiä!",
 
   "User_is_not_authorized_to_perform_this_action": "Käyttäjällä ei ole oikeutta suorittaa tätä toimintoa.",
   "Requested_0_not_found": "Pyydetty {0} ei löytynyt!",

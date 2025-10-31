@@ -16,6 +16,9 @@
   "Reps": "Tekrarlar",
   "Weight": "Ağırlık",
   "Color": "Renk",
+  "Address": "Adres",
+  "LastName": "Soyad",
+  "FirstName": "Ad",
 
   "Title_cannot_exceed_100_characters": "Başlık 100 karakteri aşamaz",
   "Description_cannot_exceed_500_characters": "Açıklama 500 karakteri aşamaz!",
@@ -30,6 +33,7 @@
   "FirstName_cannot_exceed_50_characters": "Ad 50 karakteri aşamaz!",
   "LastName_cannot_exceed_50_characters": "Soyad 50 karakteri aşamaz!",
   "Phone_number_is_required": "Telefon numarası gereklidir!",
+  "Address_cannot_exceed_200_characters": "Adres 200 karakteri aşamaz!",
 
   "User_is_not_authorized_to_perform_this_action": "Kullanıcı bu işlemi gerçekleştirmeye yetkili değil.",
   "Requested_0_not_found": "İstenen {0} bulunamadı!",

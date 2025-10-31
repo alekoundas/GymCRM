@@ -16,6 +16,9 @@
   "Reps": "Επαναλήψεις",
   "Weight": "Βάρος",
   "Color": "Χρώμα",
+  "Address": "Διεύθυνση",
+  "LastName": "Επώνυμο",
+  "FirstName": "Όνομα",
 
   "Title_cannot_exceed_100_characters": "Ο τίτλος δεν μπορεί να υπερβαίνει τους 100 χαρακτήρες",
   "Description_cannot_exceed_500_characters": "Η περιγραφή δεν μπορεί να υπερβαίνει τους 500 χαρακτήρες!",
@@ -30,6 +33,7 @@
   "FirstName_cannot_exceed_50_characters": "Το όνομα δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες!",
   "LastName_cannot_exceed_50_characters": "Το επώνυμο δεν μπορεί να υπερβαίνει τους 50 χαρακτήρες!",
   "Phone_number_is_required": "Ο αριθμός τηλεφώνου απαιτείται!",
+  "Address_cannot_exceed_200_characters": "Η διεύθυνση δεν μπορεί να υπερβεί τους 200 χαρακτήρες!",
 
   "User_is_not_authorized_to_perform_this_action": "Ο χρήστης δεν είναι εξουσιοδοτημένος να εκτελέσει αυτή την ενέργεια.",
   "Requested_0_not_found": "Το ζητούμενο {0} δεν βρέθηκε!",
