@@ -8,7 +8,8 @@
         public int Sets { get; set; }
         public int Reps { get; set; }
         public int Weight { get; set; }
-
+        public int GroupNumber { get; set; }
+        public int GroupExerciseOrderNumber { get; set; }
 
         public int WorkoutPlanId { get; set; }
         public WorkoutPlan WorkoutPlan { get; set; } = null!;

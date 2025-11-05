@@ -188,7 +188,7 @@ export default function WorkoutPlansPage() {
 
   const onDelete = async (): Promise<void> => {
     const response = await apiService
-      .delete("trainGroups", workoutPlanDto.id)
+      .delete("WorkoutPlans", workoutPlanDto.id)
       .then(() => {
         dialogControlDelete.hideDialog();
         if (triggerRefreshDataTable.current)
