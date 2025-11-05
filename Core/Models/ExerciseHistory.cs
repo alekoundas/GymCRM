@@ -1,8 +1,6 @@
-﻿using System.Collections.ObjectModel;
-
-namespace Core.Models
+﻿namespace Core.Models
 {
-    public class Exercise : BaseModel
+    public class ExerciseHistory : BaseModel
     {
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
@@ -12,10 +10,8 @@ namespace Core.Models
         public int GroupNumber { get; set; }
         public int GroupExerciseOrderNumber { get; set; }
 
-        public int WorkoutPlanId { get; set; }
-        public WorkoutPlan WorkoutPlan { get; set; } = null!;
 
-        public virtual ICollection<ExerciseHistory> ExerciseHistories { get; set; } = new Collection<ExerciseHistory>();
-
+        public int ExerciseId { get; set; }
+        public Exercise Exercise { get; set; } = null!;
     }
 }

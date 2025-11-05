@@ -1,4 +1,4 @@
-export interface ExerciseDto {
+export interface ExerciseHistoryDto {
   id: number;
   name: string;
   description: string;
@@ -7,10 +7,11 @@ export interface ExerciseDto {
   weight: number;
   groupNumber: number;
   groupExerciseOrderNumber: number;
-  workoutPlanId: number;
+  exerciseId: number;
+  createdOn: string;
 }
 
-export class ExerciseDto {
+export class ExerciseHistoryDto {
   id: number = 0;
   name: string = "";
   description: string = "";
@@ -19,5 +20,6 @@ export class ExerciseDto {
   weight: number = 1;
   groupNumber: number = 0;
   groupExerciseOrderNumber: number = 0;
-  workoutPlanId: number = 0;
+  exerciseId: number = 0;
+  createdOn: string = "";
 }
