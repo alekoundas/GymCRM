@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Core.Dtos;
 using Core.Dtos.Exercise;
+using Core.Dtos.ExerciseHistory;
 using Core.Dtos.Identity;
 using Core.Dtos.Mail;
 using Core.Dtos.PhoneNumber;
@@ -102,12 +103,20 @@ namespace API.AutoMapper
             CreateMap<UserStatusAddDto, UserStatus>();
 
 
+            // ExerciseHistory mappings.
+            CreateMap<ExerciseHistory, ExerciseHistoryDto>();
+            CreateMap<ExerciseHistoryDto, ExerciseHistory>();
+
+
             // Mail mappings.
             CreateMap<Mail, MailDto>();
             CreateMap<MailDto, Mail>();
 
             CreateMap<Mail, MailAddDto>();
             CreateMap<MailAddDto, Mail>();
+
+
+
 
             // Identity mappings.
             CreateMap<User, UserDto>();

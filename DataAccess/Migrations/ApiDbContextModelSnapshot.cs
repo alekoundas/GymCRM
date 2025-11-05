@@ -23,6 +23,17 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -58,6 +69,60 @@ namespace DataAccess.Migrations
                     b.HasIndex("WorkoutPlanId");
 
                     b.ToTable("Exercises");
+                });
+
+            modelBuilder.Entity("Core.Models.ExerciseHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ExerciseId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GroupExerciseOrderNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GroupNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Reps")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Sets")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Weight")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExerciseId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("ExerciseHistories");
                 });
 
             modelBuilder.Entity("Core.Models.GoogleRefreshToken", b =>
@@ -692,6 +757,17 @@ namespace DataAccess.Migrations
                     b.Navigation("WorkoutPlan");
                 });
 
+            modelBuilder.Entity("Core.Models.ExerciseHistory", b =>
+                {
+                    b.HasOne("Core.Models.Exercise", "Exercise")
+                        .WithMany("ExerciseHistories")
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exercise");
+                });
+
             modelBuilder.Entity("Core.Models.Mail", b =>
                 {
                     b.HasOne("Core.Models.User", "User")
@@ -859,6 +935,11 @@ namespace DataAccess.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Core.Models.Exercise", b =>
+                {
+                    b.Navigation("ExerciseHistories");
                 });
 
             modelBuilder.Entity("Core.Models.Role", b =>

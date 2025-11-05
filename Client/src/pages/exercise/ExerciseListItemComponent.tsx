@@ -13,6 +13,7 @@ import GenericDialogComponent, {
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
 import ExerciseFormComponent from "./ExerciseFormComponent";
+import ExerciseHistoryGridComponent from "../exercise-history/ExerciseHistoryGridComponent";
 
 interface IField {
   formMode: FormMode;
@@ -33,6 +34,7 @@ export default function ExerciseListItemComponent({
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisibility] = useState(false); // Dialog visibility
   const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
+  const [isHistoryDialogVisible, setHistoryDialogVisibility] = useState(false); // Dialog visibility
   const dialogControlView: DialogControl = {
     showDialog: () => setViewDialogVisibility(true),
     hideDialog: () => setViewDialogVisibility(false),
@@ -44,6 +46,10 @@ export default function ExerciseListItemComponent({
   const dialogControlDelete: DialogControl = {
     showDialog: () => setDeleteDialogVisibility(true),
     hideDialog: () => setDeleteDialogVisibility(false),
+  };
+  const dialogControlHistory: DialogControl = {
+    showDialog: () => setHistoryDialogVisibility(true),
+    hideDialog: () => setHistoryDialogVisibility(false),
   };
 
   const { workoutPlanDto, setExercises, newExerciseDto, updateNewExerciseDto } =
@@ -365,6 +371,12 @@ export default function ExerciseListItemComponent({
       visible: isAdminPage && formMode !== FormMode.VIEW,
     });
     menuItems.push({
+      label: t("Updates history"),
+      icon: "pi pi-history",
+      command: () => dialogControlHistory.showDialog(),
+      visible: formMode !== FormMode.ADD,
+    });
+    menuItems.push({
       label: t("Delete"),
       icon: "pi pi-trash",
       command: () => dialogControlDelete.showDialog(),
@@ -554,6 +566,18 @@ export default function ExerciseListItemComponent({
         <div className="flex justify-content-center">
           <p>{t("Are you sure")}?</p>
         </div>
+      </GenericDialogComponent>
+
+      {/*                                    */}
+      {/*          Exercise History          */}
+      {/*                                    */}
+      <GenericDialogComponent
+        header=""
+        visible={isHistoryDialogVisible}
+        control={dialogControlHistory}
+        formMode={FormMode.VIEW}
+      >
+        <ExerciseHistoryGridComponent exerciseId={exerciseDto.id} />
       </GenericDialogComponent>
     </>
   );

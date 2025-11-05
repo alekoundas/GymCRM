@@ -1,7 +1,6 @@
 ﻿using Business.Repository;
 using Core.Models;
 using DataAccess;
-using DataAccess.Configurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +20,7 @@ namespace Business.Services
         public IGenericRepository<WorkoutPlan> WorkoutPlans { get; }
         public IGenericRepository<PhoneNumber> PhoneNumbers { get; }
         public IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
+        public IGenericRepository<ExerciseHistory> ExerciseHistories { get; }
         public IGenericRepository<TrainGroupParticipant> TrainGroupParticipants { get; }
         public IGenericRepository<TrainGroupUnavailableDate> TrainGroupUnavailableDates { get; }
         public IGenericRepository<TrainGroupParticipantUnavailableDate> TrainGroupParticipantUnavailableDates { get; }
@@ -42,6 +42,7 @@ namespace Business.Services
             IGenericRepository<WorkoutPlan> workoutPlanRepository,
             IGenericRepository<PhoneNumber> phoneNumberRepository,
             IGenericRepository<TrainGroupDate> trainGroupDateRepository,
+            IGenericRepository<ExerciseHistory> exerciseHistoriesRepository,
             IGenericRepository<TrainGroupParticipant> trainGroupParticipantRepository,
             IGenericRepository<TrainGroupUnavailableDate> trainGroupUnavailableDateRepository,
             IGenericRepository<TrainGroupParticipantUnavailableDate> trainGroupParticipantUnavailableDateRepository,
@@ -59,7 +60,8 @@ namespace Business.Services
             TrainGroups = trainGroupRepository;
             PhoneNumbers = phoneNumberRepository;
             WorkoutPlans = workoutPlanRepository;
-            UserStatuses = userStatusesRepository;  
+            UserStatuses = userStatusesRepository;
+            ExerciseHistories = exerciseHistoriesRepository;
 
             // TrainGroup.
             TrainGroupDates = trainGroupDateRepository;
@@ -93,6 +95,8 @@ namespace Business.Services
                 return (IGenericRepository<TEntity>)PhoneNumbers;
             if (typeof(TEntity) == typeof(TrainGroupDate))
                 return (IGenericRepository<TEntity>)TrainGroupDates;
+            if (typeof(TEntity) == typeof(ExerciseHistory))
+                return (IGenericRepository<TEntity>)ExerciseHistories;
             if (typeof(TEntity) == typeof(TrainGroupParticipant))
                 return (IGenericRepository<TEntity>)TrainGroupParticipants;
             if (typeof(TEntity) == typeof(TrainGroupUnavailableDate))

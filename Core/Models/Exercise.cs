@@ -1,8 +1,9 @@
-﻿namespace Core.Models
+﻿using System.Collections.ObjectModel;
+
+namespace Core.Models
 {
-    public class Exercise
+    public class Exercise : BaseModel
     {
-        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public int Sets { get; set; }
@@ -13,5 +14,8 @@
 
         public int WorkoutPlanId { get; set; }
         public WorkoutPlan WorkoutPlan { get; set; } = null!;
+
+        public virtual ICollection<ExerciseHistory> ExerciseHistories { get; set; } = new Collection<ExerciseHistory>();
+
     }
 }
