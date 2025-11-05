@@ -31,6 +31,14 @@ namespace Core.Dtos.Exercise
 
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
+        public int GroupNumber { get; set; }
+
+
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
+        public int GroupExerciseOrderNumber { get; set; }
+
+
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public int WorkoutPlanId { get; set; }
     }
 }

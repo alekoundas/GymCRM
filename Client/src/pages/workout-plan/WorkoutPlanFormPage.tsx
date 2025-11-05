@@ -83,32 +83,12 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
           />
         </div>
       </Card>
+
       <div className="pt-3">
-        <Card
-          header={
-            <div className="flex justify-content-between align-items-center p-3">
-              <div className="flex flex-column gap-1">
-                <h2 className="m-0">{t("Exercises")}</h2>
-                {/* <p className="m-0 text-gray-600">
-                          {t("Select a date to view Participants")}
-                        </p> */}
-              </div>
-              {/* <Button
-                        label=""
-                        icon="pi pi-info-circle"
-                        onClick={() => setInfoDateDialogVisible(true)}
-                        className="p-button-text"
-                      /> */}
-            </div>
-          }
-        >
-          <div className="card">
-            <ExerciseListComponent
-              formMode={formMode}
-              isAdminPage={isAdminPage}
-            />
-          </div>
-        </Card>
+        <ExerciseListComponent
+          formMode={formMode}
+          isAdminPage={isAdminPage}
+        />
       </div>
     </>
   );

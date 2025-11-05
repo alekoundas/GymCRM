@@ -25,6 +25,12 @@ namespace DataAccess.Configurations
             builder.Property(x => x.Weight)
                 .IsRequired(true);
 
+            builder.Property(x => x.GroupNumber)
+              .IsRequired(true);
+
+            builder.Property(x => x.GroupExerciseOrderNumber)
+              .IsRequired(true);
+
 
             // Relationship with User (one-to-many)
             builder.HasOne(x => x.WorkoutPlan)

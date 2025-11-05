@@ -128,6 +128,7 @@ export default function WorkoutPlanFormComponent({
           }
         />
         {formMode === FormMode.EDIT &&
+          isAdminPage &&
           (editingField !== "userId" ? (
             <Button
               icon="pi pi-pencil"

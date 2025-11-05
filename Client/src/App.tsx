@@ -60,6 +60,18 @@ export default function App() {
                 path="/workout-plans"
                 element={<WorkoutPlansPage />}
               />
+              <Route
+                path="workout-plans/add"
+                element={<WorkoutPlanFormPage formMode={FormMode.ADD} />}
+              />
+              <Route
+                path="workout-plans/:id/edit"
+                element={<WorkoutPlanFormPage formMode={FormMode.EDIT} />}
+              />
+              <Route
+                path="workout-plans/:id/view"
+                element={<WorkoutPlanFormPage formMode={FormMode.VIEW} />}
+              />
 
               <Route
                 path="/policy"

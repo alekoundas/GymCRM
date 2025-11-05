@@ -27,6 +27,12 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("GroupExerciseOrderNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GroupNumber")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(500)
