@@ -148,9 +148,10 @@ export default function UserProfilePage() {
               opacity: isImageHovered && imageSrc ? 0.7 : 1,
             }}
           />
-          {(isImageHovered || isImageUploadSelected) && (
+          {isImageHovered && (
             <FileUpload
               mode="basic"
+              auto
               name="image"
               accept="image/*"
               maxFileSize={5000000}
