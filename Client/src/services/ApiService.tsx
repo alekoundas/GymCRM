@@ -461,17 +461,9 @@ export const useApiService = () => {
     [buildUrl, apiRequest]
   );
 
-  const getGoogleTokenExpireDate = useCallback(async (): Promise<
-    string | null
-  > => {
-    const url = buildUrl("Auth", "GoogleTokenExpireDate");
-    return apiRequest<string, string | null>(url, "GET");
-  }, [buildUrl, apiRequest]);
-
   return {
     get,
     getGoogle,
-    getGoogleTokenExpireDate,
     getDataLookup,
     getDataAutoComplete,
     getDataGrid,
