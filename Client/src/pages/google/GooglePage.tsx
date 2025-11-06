@@ -9,8 +9,6 @@ export default function GooglePage() {
   const params = useParams();
   const [searchParams] = useSearchParams();
 
-  const [tokenDateExpireDate, setTokenDateExpireDate] = useState<string>();
-
   useEffect(() => {
     const state: string = searchParams.get("state") ?? "";
     const code: string = searchParams.get("code") ?? "";
@@ -29,13 +27,6 @@ export default function GooglePage() {
         )
         .then((response) => {});
     }
-
-    // Get expiration date
-    apiService.getGoogleTokenExpireDate().then((result) => {
-      if (result) {
-        setTokenDateExpireDate(result);
-      }
-    });
   }, []);
 
   const [loading, setLoading] = useState(false);
@@ -64,27 +55,6 @@ export default function GooglePage() {
   return (
     <>
       <Card>
-        <div className="w-full">
-          <div className="flex justify-content-between align-items-center">
-            <div></div>
-            <div>
-              <h2 className="m-0">
-                Expires on:{" "}
-                {new Date(tokenDateExpireDate).getDate() +
-                  "/" +
-                  (new Date(tokenDateExpireDate).getMonth() + 1) +
-                  "/" +
-                  new Date(tokenDateExpireDate).getFullYear() +
-                  " " +
-                  new Date(tokenDateExpireDate).getHours() +
-                  ":" +
-                  new Date(tokenDateExpireDate).getMinutes()}
-              </h2>
-            </div>
-            <div></div>
-          </div>
-        </div>
-
         <div className="w-full">
           <div className="flex justify-content-between align-items-center">
             <div></div>
