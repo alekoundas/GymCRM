@@ -310,6 +310,19 @@ namespace API.Controllers
 
             return new ApiResponse<bool>().SetSuccessResponse("");
         }
+
+        [HttpGet("GoogleTokenExpireDate")]
+        public async Task<ApiResponse<DateTime?>> GoogleTokenExpireDate()
+        {
+            GoogleRefreshToken? googleRefreshToken = await _dataService.GoogleRefreshTokens.FirstOrDefaultAsync(null);
+            if (googleRefreshToken != null)
+            {
+                DateTime expireDate = googleRefreshToken.CreatedOn.AddSeconds(googleRefreshToken.ExpiresIn);
+                return new ApiResponse<DateTime?>().SetSuccessResponse(expireDate);
+            }
+
+            return new ApiResponse<DateTime?>().SetErrorResponse("");
+        }
     }
 
     public class GoogleTokens

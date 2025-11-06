@@ -221,14 +221,6 @@ export const useApiService = () => {
     [buildUrl, apiRequest]
   );
 
-  const getGoogle = useCallback(
-    async <TEntity,>(controller: string): Promise<TEntity | null> => {
-      const url = buildUrl(controller, "");
-      return apiRequest<TEntity, TEntity>(url, "GET");
-    },
-    [buildUrl, apiRequest]
-  );
-
   const getDataLookup = useCallback(
     async (controller: string, data: LookupDto): Promise<LookupDto | null> => {
       const url = buildUrl(controller, "Lookup");
@@ -461,9 +453,25 @@ export const useApiService = () => {
     return apiRequest<null, ChartData>(url, "GET");
   }, [buildUrl, apiRequest]);
 
+  const getGoogle = useCallback(
+    async <TEntity,>(controller: string): Promise<TEntity | null> => {
+      const url = buildUrl(controller, "");
+      return apiRequest<TEntity, TEntity>(url, "GET");
+    },
+    [buildUrl, apiRequest]
+  );
+
+  const getGoogleTokenExpireDate = useCallback(async (): Promise<
+    string | null
+  > => {
+    const url = buildUrl("Auth", "GoogleTokenExpireDate");
+    return apiRequest<string, string | null>(url, "GET");
+  }, [buildUrl, apiRequest]);
+
   return {
     get,
     getGoogle,
+    getGoogleTokenExpireDate,
     getDataLookup,
     getDataAutoComplete,
     getDataGrid,
