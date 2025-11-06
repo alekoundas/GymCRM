@@ -2,11 +2,14 @@ import { Button } from "primereact/button";
 import { useApiService } from "../../services/ApiService";
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
+import { Card } from "primereact/card";
 
 export default function GooglePage() {
   const apiService = useApiService();
   const params = useParams();
   const [searchParams] = useSearchParams();
+
+  const [tokenDateExpireDate, setTokenDateExpireDate] = useState<string>();
 
   useEffect(() => {
     const state: string = searchParams.get("state") ?? "";
@@ -26,6 +29,13 @@ export default function GooglePage() {
         )
         .then((response) => {});
     }
+
+    // Get expiration date
+    apiService.getGoogleTokenExpireDate().then((result) => {
+      if (result) {
+        setTokenDateExpireDate(result);
+      }
+    });
   }, []);
 
   const [loading, setLoading] = useState(false);
@@ -53,10 +63,41 @@ export default function GooglePage() {
 
   return (
     <>
-      <Button
-        label="Google login"
-        onClick={handleAuth}
-      ></Button>
+      <Card>
+        <div className="w-full">
+          <div className="flex justify-content-between align-items-center">
+            <div></div>
+            <div>
+              <h2 className="m-0">
+                Expires on:{" "}
+                {new Date(tokenDateExpireDate).getDate() +
+                  "/" +
+                  (new Date(tokenDateExpireDate).getMonth() + 1) +
+                  "/" +
+                  new Date(tokenDateExpireDate).getFullYear() +
+                  " " +
+                  new Date(tokenDateExpireDate).getHours() +
+                  ":" +
+                  new Date(tokenDateExpireDate).getMinutes()}
+              </h2>
+            </div>
+            <div></div>
+          </div>
+        </div>
+
+        <div className="w-full">
+          <div className="flex justify-content-between align-items-center">
+            <div></div>
+            <div>
+              <Button
+                label="Google login"
+                onClick={handleAuth}
+              ></Button>
+            </div>
+            <div></div>
+          </div>
+        </div>
+      </Card>
     </>
   );
 }
