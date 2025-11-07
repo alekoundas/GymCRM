@@ -22,10 +22,16 @@ import { LocalStorageService } from "../../services/LocalStorageService";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
 import { useDateService } from "../../services/DateService";
+import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
 
 export default function UserProfileTimeslotsComponent() {
   const { t } = useTranslator();
-  const { getUTCDate, getUTCTime } = useDateService();
+  const {
+    getDayOfWeekFromDate,
+    getNextDayOfWeekDateUTC,
+    getNextDayOfMonthDateUTC,
+    getUTCTime,
+  } = useDateService();
   const apiService = useApiService();
 
   // const { userDto, updateUserDto } = useUserStore();
@@ -325,6 +331,46 @@ export default function UserProfileTimeslotsComponent() {
     }
   };
 
+  const isDateTwelveHoursFromNow = (
+    apiDate: string,
+    apiStartOnDate: string,
+    type: TrainGroupDateTypeEnum | undefined
+  ): boolean => {
+    let startOnDate = new Date(apiDate);
+    if (type === TrainGroupDateTypeEnum.DAY_OF_WEEK) {
+      const dayOfWeek: DayOfWeekEnum = getDayOfWeekFromDate(
+        new Date(apiDate)
+      )?.toUpperCase() as DayOfWeekEnum;
+
+      startOnDate = getNextDayOfWeekDateUTC(dayOfWeek, new Date());
+    }
+    if (type === TrainGroupDateTypeEnum.DAY_OF_MONTH) {
+      startOnDate = getNextDayOfMonthDateUTC(
+        new Date(apiDate).getUTCDate(),
+        new Date()
+      );
+    }
+
+    // Parse the time string as local (remove 'Z' if present to treat as local ISO)
+    const timeStr = apiStartOnDate;
+    const localTimeStr = timeStr.endsWith("Z") ? timeStr.slice(0, -1) : timeStr;
+    const timeDate = new Date(localTimeStr);
+
+    // Use local setHours and getHours to overlay local time
+    startOnDate.setHours(
+      timeDate.getHours(),
+      timeDate.getMinutes(),
+      timeDate.getSeconds(),
+      timeDate.getMilliseconds()
+    );
+
+    const isTwelveHoursFromNow =
+      startOnDate > new Date() &&
+      startOnDate <= new Date(new Date().getTime() + 12 * 60 * 60 * 1000);
+
+    return isTwelveHoursFromNow;
+  };
+
   return (
     <>
       <div className="p-4">
@@ -484,6 +530,19 @@ export default function UserProfileTimeslotsComponent() {
                   </p>
                 </div>
 
+                {isDateTwelveHoursFromNow(
+                  selectedTimeSlotRecurrenceDate.date,
+                  selectedTrainGroup.startOn,
+                  selectedTimeSlotRecurrenceDate.trainGroupDateType
+                ) && (
+                  <div className="flex justify-content-center pt-5">
+                    <p className="text-xl text-primary m-0 pt-4">
+                      {t("Already 12h away! You cant opt out.")}
+                    </p>
+                  </div>
+                )}
+
+                {/* Opt Out */}
                 <div>
                   {timeSlots.some((x) =>
                     x.recurrenceDates.some(
@@ -511,16 +570,21 @@ export default function UserProfileTimeslotsComponent() {
                               0
                             )
                           ) <
-                          new Date(
-                            Date.UTC(
-                              new Date().getFullYear(),
-                              new Date().getMonth(),
-                              new Date().getDate(),
-                              0,
-                              0,
-                              0,
-                              0
-                            )
+                            new Date(
+                              Date.UTC(
+                                new Date().getFullYear(),
+                                new Date().getMonth(),
+                                new Date().getDate(),
+                                0,
+                                0,
+                                0,
+                                0
+                              )
+                            ) ||
+                          isDateTwelveHoursFromNow(
+                            selectedTimeSlotRecurrenceDate.date,
+                            selectedTrainGroup.startOn,
+                            selectedTimeSlotRecurrenceDate.trainGroupDateType
                           )
                         }
                       ></Button>
@@ -548,16 +612,21 @@ export default function UserProfileTimeslotsComponent() {
                                 0
                               )
                             ) <
-                            new Date(
-                              Date.UTC(
-                                new Date().getFullYear(),
-                                new Date().getMonth(),
-                                new Date().getDate(),
-                                0,
-                                0,
-                                0,
-                                0
-                              )
+                              new Date(
+                                Date.UTC(
+                                  new Date().getFullYear(),
+                                  new Date().getMonth(),
+                                  new Date().getDate(),
+                                  0,
+                                  0,
+                                  0,
+                                  0
+                                )
+                              ) ||
+                            isDateTwelveHoursFromNow(
+                              selectedTimeSlotRecurrenceDate.date,
+                              selectedTrainGroup.startOn,
+                              selectedTimeSlotRecurrenceDate.trainGroupDateType
                             )
                           }
                         ></Button>
@@ -593,16 +662,21 @@ export default function UserProfileTimeslotsComponent() {
                               0
                             )
                           ) <
-                          new Date(
-                            Date.UTC(
-                              new Date().getFullYear(),
-                              new Date().getMonth(),
-                              new Date().getDate(),
-                              0,
-                              0,
-                              0,
-                              0
-                            )
+                            new Date(
+                              Date.UTC(
+                                new Date().getFullYear(),
+                                new Date().getMonth(),
+                                new Date().getDate(),
+                                0,
+                                0,
+                                0,
+                                0
+                              )
+                            ) ||
+                          isDateTwelveHoursFromNow(
+                            selectedTimeSlotRecurrenceDate.date,
+                            selectedTrainGroup.startOn,
+                            selectedTimeSlotRecurrenceDate.trainGroupDateType
                           )
                         }
                       ></Button>

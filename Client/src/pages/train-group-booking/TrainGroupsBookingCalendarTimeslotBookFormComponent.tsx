@@ -206,7 +206,7 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
               {isTwelveHoursFromNow && isChecked && (
                 <p className="text-sm text-gray-600 mt-0">
                   {t(
-                    "Already 12h away! (You wont be able to remove booking for this date.)"
+                    "Already 12h away! (You wont be able to opt out from this date.)"
                   )}
                 </p>
               )}
