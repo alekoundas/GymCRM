@@ -1,6 +1,6 @@
 import { Calendar } from "primereact/calendar";
 import { Card } from "primereact/card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GenericDialogComponent, {
   DialogControl,
 } from "../../components/core/dialog/GenericDialogComponent";
@@ -37,6 +37,13 @@ export default function TrainGroupsBookingCalendarPage() {
     showDialog: () => setDialogVisibility(true),
     hideDialog: () => setDialogVisibility(false),
   };
+
+  useEffect(() => {
+    resetTimeSlotRequestDto();
+    resetTimeSlotResponseDto();
+    resetSelectedTimeSlotResponseDto();
+    handleChangeDate(new Date());
+  }, []);
 
   const handleChangeDate = (value: Date) => {
     const dateCleaned = new Date(
