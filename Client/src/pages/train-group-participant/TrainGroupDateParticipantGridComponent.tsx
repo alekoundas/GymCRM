@@ -19,6 +19,7 @@ import { Avatar } from "primereact/avatar";
 import { TrainGroupParticipantDto } from "../../model/entities/train-group-participant/TrainGroupParticipantDto";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
+import { Tag } from "primereact/tag";
 
 interface IField extends DialogChildProps {}
 
@@ -123,12 +124,19 @@ export default function TrainGroupDateParticipantGridComponent({
             size="normal"
             className=" mr-2 "
           />
-          {" " +
-            user.firstName[0].toUpperCase() +
-            user.firstName.slice(1, user.firstName.length) +
-            " " +
-            user.lastName[0].toUpperCase() +
-            user.lastName.slice(1, user.lastName.length)}
+          <Tag
+            className="opacity-100"
+            style={{
+              backgroundColor: "#" + user.userColor,
+            }}
+          >
+            {" " +
+              user.firstName[0].toUpperCase() +
+              user.firstName.slice(1, user.firstName.length) +
+              " " +
+              user.lastName[0].toUpperCase() +
+              user.lastName.slice(1, user.lastName.length)}
+          </Tag>
         </div>
       );
     }
