@@ -449,17 +449,13 @@ export default function ExerciseListItemComponent({
         <div className="field col-12 md:col">
           <label htmlFor={`sets-${exerciseDto.id}`}>{t("Sets")}</label>
           <div className="w-full flex flex-nowrap">
-            <InputNumber
+            <InputText
               id={`sets-${exerciseDto.id}`}
               value={exerciseDto.sets}
-              onValueChange={(e) =>
-                updateExercise(exerciseDto.id, "sets", e.value ?? 0)
+              onChange={(e) =>
+                updateExercise(exerciseDto.id, "sets", e.target.value ?? 0)
               }
-              min={1}
               className="p-inputtext-sm w-full"
-              inputStyle={{
-                width: "100%",
-              }}
               disabled={true}
             />
           </div>

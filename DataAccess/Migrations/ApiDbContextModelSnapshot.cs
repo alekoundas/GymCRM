@@ -52,8 +52,13 @@ namespace DataAccess.Migrations
                     b.Property<int>("Reps")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Sets")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Sets")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VideoUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Weight")
                         .HasColumnType("INTEGER");
@@ -109,8 +114,9 @@ namespace DataAccess.Migrations
                     b.Property<int>("Reps")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Sets")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Sets")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Weight")
                         .HasColumnType("INTEGER");

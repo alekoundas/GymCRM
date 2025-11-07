@@ -2,7 +2,8 @@ export interface ExerciseDto {
   id: number;
   name: string;
   description: string;
-  sets: number;
+  sets: string;
+  videoUrl: string;
   reps: number;
   weight: number;
   groupNumber: number;
@@ -14,7 +15,8 @@ export class ExerciseDto {
   id: number = 0;
   name: string = "";
   description: string = "";
-  sets: number = 1;
+  sets: string = "";
+  videoUrl: string = "";
   reps: number = 1;
   weight: number = 1;
   groupNumber: number = 0;

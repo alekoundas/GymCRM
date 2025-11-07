@@ -75,17 +75,31 @@ export default function ExerciseFormComponent({
       <div className="field">
         <label htmlFor={`sets-${newExerciseDto.id}`}>{t("Sets")}</label>
         <div className="w-full flex flex-nowrap">
-          <InputNumber
+          <InputText
             id={`sets-${newExerciseDto.id}`}
             value={newExerciseDto.sets}
-            onValueChange={(e) =>
-              updateExercise(newExerciseDto.id, "sets", e.value ?? 0)
+            onChange={(e) =>
+              updateExercise(newExerciseDto.id, "sets", e.target.value ?? 0)
+            }
+            className="p-inputtext-sm w-full"
+            disabled={!isAdminPage || formMode === FormMode.VIEW}
+          />
+        </div>
+      </div>
+
+      <div className="field">
+        <label htmlFor={`videoUrl-${newExerciseDto.id}`}>
+          {t("Video Url")}
+        </label>
+        <div className="w-full flex flex-nowrap">
+          <InputText
+            id={`sets-${newExerciseDto.id}`}
+            value={newExerciseDto.videoUrl}
+            onChange={(e) =>
+              updateExercise(newExerciseDto.id, "videoUrl", e.target.value ?? 0)
             }
             min={1}
             className="p-inputtext-sm w-full"
-            inputStyle={{
-              width: "100%",
-            }}
             disabled={!isAdminPage || formMode === FormMode.VIEW}
           />
         </div>
