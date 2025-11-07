@@ -5,6 +5,7 @@ export interface TrainGroupParticipantUpdateDto {
   trainGroupId: number;
   selectedDate: string;
   trainGroupParticipantDtos: TrainGroupParticipantDto[];
+  clientTimezoneOffsetMinutes?: number;
 }
 
 export class TrainGroupParticipantUpdateDto {
@@ -12,4 +13,5 @@ export class TrainGroupParticipantUpdateDto {
   trainGroupId: number = -1;
   selectedDate: string = "";
   trainGroupParticipantDtos: TrainGroupParticipantDto[] = [];
+  clientTimezoneOffsetMinutes?: number = new Date().getTimezoneOffset();
 }

@@ -7,12 +7,17 @@ import { TrainGroupParticipantDto } from "../../model/entities/train-group-parti
 import { DividerComponent } from "../../components/core/divider/DividerComponent";
 import { JSX } from "react";
 import { useTranslator } from "../../services/TranslatorService";
+import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
 
 interface IField {}
 
 export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: IField) {
   const { t } = useTranslator();
-  const { getDayOfWeekFromDate } = useDateService();
+  const {
+    getDayOfWeekFromDate,
+    getNextDayOfWeekDateUTC,
+    getNextDayOfMonthDateUTC,
+  } = useDateService();
   const {
     timeSlotRequestDto,
     selectedTimeSlot,
@@ -115,6 +120,45 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
         return "";
     }
   };
+  const isDateTwelveHoursFromNow = (
+    apiDate: string,
+    apiStartOnDate: string,
+    type: TrainGroupDateTypeEnum | undefined
+  ): boolean => {
+    let startOnDate = new Date(apiDate);
+    if (type === TrainGroupDateTypeEnum.DAY_OF_WEEK) {
+      const dayOfWeek: DayOfWeekEnum = getDayOfWeekFromDate(
+        new Date(apiDate)
+      )?.toUpperCase() as DayOfWeekEnum;
+
+      startOnDate = getNextDayOfWeekDateUTC(dayOfWeek, new Date());
+    }
+    if (type === TrainGroupDateTypeEnum.DAY_OF_MONTH) {
+      startOnDate = getNextDayOfMonthDateUTC(
+        new Date(apiDate).getUTCDate(),
+        new Date()
+      );
+    }
+
+    // Parse the time string as local (remove 'Z' if present to treat as local ISO)
+    const timeStr = apiStartOnDate;
+    const localTimeStr = timeStr.endsWith("Z") ? timeStr.slice(0, -1) : timeStr;
+    const timeDate = new Date(localTimeStr);
+
+    // Use local setHours and getHours to overlay local time
+    startOnDate.setHours(
+      timeDate.getHours(),
+      timeDate.getMinutes(),
+      timeDate.getSeconds(),
+      timeDate.getMilliseconds()
+    );
+
+    const isTwelveHoursFromNow =
+      startOnDate > new Date() &&
+      startOnDate <= new Date(new Date().getTime() + 12 * 60 * 60 * 1000);
+
+    return isTwelveHoursFromNow;
+  };
 
   const renderDateCheckbox = (type: TrainGroupDateTypeEnum | undefined) => {
     if (!selectedTimeSlot) return;
@@ -131,24 +175,42 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
               x.selectedDate === undefined &&
               x.trainGroupDateId === date.trainGroupDateId
           );
+        const isChecked = hasParticipantForDateId(date.trainGroupDateId, type);
+        const isTwelveHoursFromNow = isDateTwelveHoursFromNow(
+          date.date,
+          selectedTimeSlot.startOn,
+          type
+        );
+        console.log("isTwelveHoursFromNow:", isTwelveHoursFromNow);
 
         htmlElements.push(
-          <div
-            key={type?.toString() + date.trainGroupDateId.toString()}
-            className="field-checkbox"
-          >
-            <Checkbox
-              inputId={date.trainGroupDateId.toString()}
-              checked={hasParticipantForDateId(date.trainGroupDateId, type)}
-              onChange={(e) => toggleParticipant(date.trainGroupDateId, type)}
-              disabled={isDisabled}
-            />
-            <label
-              htmlFor={type?.toString() + date.trainGroupDateId.toString()}
-              className="ml-2"
+          <div className="flex align-items-center">
+            <div
+              key={type?.toString() + date.trainGroupDateId.toString()}
+              className="field-checkbox "
             >
-              {label}
-            </label>
+              <Checkbox
+                inputId={date.trainGroupDateId.toString()}
+                checked={isChecked}
+                onChange={(e) => toggleParticipant(date.trainGroupDateId, type)}
+                disabled={isDisabled}
+              />
+              <label
+                htmlFor={type?.toString() + date.trainGroupDateId.toString()}
+                className="ml-2"
+              >
+                {label}
+              </label>
+            </div>
+            <div className="pl-3">
+              {isTwelveHoursFromNow && isChecked && (
+                <p className="text-sm text-gray-600 mt-0">
+                  {t(
+                    "Already 12h away! (You wont be able to remove booking for this date.)"
+                  )}
+                </p>
+              )}
+            </div>
           </div>
         );
       });
