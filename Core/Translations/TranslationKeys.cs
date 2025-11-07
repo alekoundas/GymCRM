@@ -26,6 +26,8 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string Weight = "Weight";
         public const string Color = "Color";
         public const string Address = "Address";
+        public const string LastName = "LastName";
+        public const string FirstName = "FirstName";
         public const string Title_cannot_exceed_100_characters = "Title_cannot_exceed_100_characters";
         public const string Description_cannot_exceed_500_characters = "Description_cannot_exceed_500_characters";
         public const string At_least_1_Train_Group_Date_is_required = "At_least_1_Train_Group_Date_is_required";
@@ -64,6 +66,13 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string Maximum_amount_of_participants_has_been_reached = "Maximum_amount_of_participants_has_been_reached";
         public const string Participant_selected_date_doesnt_match_any_of_the_train_group_dates = "Participant_selected_date_doesnt_match_any_of_the_train_group_dates";
         public const string Fixed_date_doesnt_allow_one_off_participants = "Fixed_date_doesnt_allow_one_off_participants";
+        public const string Booking_Information = "Booking_Information";
+        public const string Booking_Confirmation = "Booking_Confirmation";
+        public const string Added_Bookings = "Added_Bookings";
+        public const string Removed_Bookings = "Removed_Bookings";
+        public const string No_bookings_were_added = "No_bookings_were_added";
+        public const string No_bookings_were_removed = "No_bookings_were_removed";
+        public const string Every_0_of_the_month = "Every_0_of_the_month";
         public const string _0_is_required = "_0_is_required";
         public const string _0_already_exists = "_0_already_exists";
         public const string _0_not_found = "_0_not_found";
