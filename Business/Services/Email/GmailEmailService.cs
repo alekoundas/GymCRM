@@ -1,9 +1,11 @@
 ﻿using Core.Models;
+using Core.Translations;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Gmail.v1;
 using Google.Apis.Gmail.v1.Data;
 using Google.Apis.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using MimeKit;
 
@@ -13,12 +15,18 @@ namespace Business.Services.Email
     {
         private readonly IDataService _dataService;
         private readonly IConfiguration _configuration;
+        private readonly IStringLocalizer _localizer;
         private readonly ILogger<GmailEmailService> _logger;
 
-        public GmailEmailService(IDataService dataService, IConfiguration configuration, ILogger<GmailEmailService> logger)
+        public GmailEmailService(
+            IDataService dataService,
+            IConfiguration configuration,
+            IStringLocalizer localizer,
+            ILogger<GmailEmailService> logger)
         {
             _dataService = dataService;
             _configuration = configuration;
+            _localizer = localizer;
             _logger = logger;
         }
 
@@ -110,32 +118,34 @@ namespace Business.Services.Email
 
         public async Task SendBookingEmailAsync(string userEmail, List<string> emailDatesAdd, List<string> emailDatesRemove)
         {
+
+
             // Initialize HTML body with professional styling
             string emailBody = @"
-        <html>
-        <head>
-            <style>
-                body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                h2 { color: #2c3e50; }
-                .section { margin-bottom: 20px; }
-                ul { list-style-type: none; padding: 0; }
-                li { padding: 5px 0; }
-                .added { color: #27ae60; }
-                .removed { color: #c0392b; }
-                .no-changes { font-style: italic; color: #7f8c8d; }
-            </style>
-        </head>
-        <body>
-            <div class='container'>
-                <h2>Booking Information</h2>";
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        h2 { color: #2c3e50; }
+                        .section { margin-bottom: 20px; }
+                        ul { list-style-type: none; padding: 0; }
+                        li { padding: 5px 0; }
+                        .added { color: #27ae60; }
+                        .removed { color: #c0392b; }
+                        .no-changes { font-style: italic; color: #7f8c8d; }
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <h2>" + _localizer[TranslationKeys.Booking_Information] + "</h2>";
 
             // Format added bookings
             emailBody += "<div class='section'>";
-            emailBody += "<h3>Added Bookings</h3>";
+            emailBody += "<h3>" + _localizer[TranslationKeys.Added_Bookings] + "</h3>";
             if (emailDatesAdd == null || !emailDatesAdd.Any())
             {
-                emailBody += "<p class='no-changes'>No bookings were added.</p>";
+                emailBody += "<p class='no-changes'>" + _localizer[TranslationKeys.No_bookings_were_added] + "</p>";
             }
             else
             {
@@ -151,10 +161,10 @@ namespace Business.Services.Email
 
             // Format removed bookings
             emailBody += "<div class='section'>";
-            emailBody += "<h3>Removed Bookings</h3>";
+            emailBody += "<h3>" + _localizer[TranslationKeys.Removed_Bookings] + "</h3>";
             if (emailDatesRemove == null || !emailDatesRemove.Any())
             {
-                emailBody += "<p class='no-changes'>No bookings were removed.</p>";
+                emailBody += "<p class='no-changes'>" + _localizer[TranslationKeys.No_bookings_were_removed] + "</p>";
             }
             else
             {
@@ -177,7 +187,7 @@ namespace Business.Services.Email
             // Send the email
             await SendEmailAsync(
                 userEmail,
-                "Booking Confirmation",
+                _localizer[TranslationKeys.Booking_Confirmation],
                 emailBody
             );
         }
