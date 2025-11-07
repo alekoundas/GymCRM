@@ -167,7 +167,7 @@ namespace API.Controllers
                 string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.contains)
-                    query.FilterByColumnContains(filter.FieldName, filter.Value.ToLower());
+                    query.FilterByColumnContains(filter.FieldName, filter.Value);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.equals)
                     if (filter.FieldName == "UserId")
@@ -204,7 +204,7 @@ namespace API.Controllers
                 string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.contains)
-                    query.FilterByColumnContains(filter.FieldName, filter.Value.ToLower());
+                    query.FilterByColumnContains(filter.FieldName, filter.Value);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.equals)
                     if (filter.FieldName == "UserId")

@@ -125,10 +125,10 @@ namespace Business
             Expression constant = Expression.Constant(value, typeof(string));
 
             // Create Contains method call (e.g., 'item.Property.ToLower().Contains(value)')
-            MethodInfo toLowerMethod = typeof(string).GetMethod("ToLower", [])!;
-            Expression toLowerExpression = Expression.Call(member, toLowerMethod);
+            //MethodInfo toLowerMethod = typeof(string).GetMethod("ToLower", [])!;
+            //Expression toLowerExpression = Expression.Call(member, toLowerMethod);
             MethodInfo containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) })!;
-            Expression containsExpression = Expression.Call(toLowerExpression, containsMethod, constant);
+            Expression containsExpression = Expression.Call(member, containsMethod, constant);
 
             // Create lambda expression (e.g., 'item => item.Property.Contains(value)')
             LambdaExpression lambda = Expression.Lambda(containsExpression, parameter);
