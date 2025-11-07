@@ -1,7 +1,7 @@
 import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { Card } from "primereact/card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TokenService } from "../../services/TokenService";
 import { FormMode } from "../../enum/FormMode";
 import { TimeSlotRequestDto } from "../../model/TimeSlotRequestDto";
@@ -33,6 +33,12 @@ export default function TrainGroupAdminCalendarPage() {
   const [selectedTrainGroupDateId, setSelectedTrainGroupDateId] =
     useState<number>(0);
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
+
+  useEffect(() => {
+    resetTrainGroupDto();
+    resetSelectedTrainGroupDate();
+    handleChangeDate(new Date());
+  }, []);
 
   const handleChangeDate = (value: Date) => {
     const dateCleaned = new Date(
