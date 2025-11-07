@@ -91,6 +91,8 @@ export default function TrainGroupsBookingCalendarPage() {
     if (!timeSlotRequestDto.selectedDate || !selectedTimeSlot)
       return Promise.resolve();
 
+    trainGroupDateParticipantUpdateDto.clientTimezoneOffsetMinutes =
+      new Date().getTimezoneOffset();
     trainGroupDateParticipantUpdateDto.trainGroupId =
       selectedTimeSlot.trainGroupId;
 
@@ -107,13 +109,17 @@ export default function TrainGroupsBookingCalendarPage() {
         if (response) {
           dialogControl.hideDialog();
           handleChangeDate(new Date(timeSlotRequestDto.selectedDate)); // Refresh time slots
+          resetSelectedTimeSlotResponseDto();
+          resetTimeSlotRequestDto();
+          resetTimeSlotResponseDto();
+          setLoading(false);
         }
       })
       .then(() => {
-        resetSelectedTimeSlotResponseDto();
-        resetTimeSlotRequestDto();
-        resetTimeSlotResponseDto();
-        setLoading(false);
+        // resetSelectedTimeSlotResponseDto();
+        // resetTimeSlotRequestDto();
+        // resetTimeSlotResponseDto();
+        // setLoading(false);
       });
   };
 

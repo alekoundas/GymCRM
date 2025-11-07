@@ -14,6 +14,8 @@ namespace Core.Models
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public DateTime SelectedDate { get; set; }
 
+        public int ClientTimezoneOffsetMinutes { get; set; } = 0; 
+
         public List<TrainGroupParticipantDto> TrainGroupParticipantDtos { get; set; } = new List<TrainGroupParticipantDto>();
     }
 }

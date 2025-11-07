@@ -85,10 +85,77 @@ export const useDateService = () => {
     [t]
   );
 
+  const getNextDayOfWeekDateUTC = useCallback(
+    (dayOfWeek: DayOfWeekEnum, inputDate: Date): Date => {
+      const dayNumberMap: { [key in DayOfWeekEnum]: number } = {
+        [DayOfWeekEnum.SUNDAY]: 0,
+        [DayOfWeekEnum.MONDAY]: 1,
+        [DayOfWeekEnum.TUESDAY]: 2,
+        [DayOfWeekEnum.WEDNESDAY]: 3,
+        [DayOfWeekEnum.THURSDAY]: 4,
+        [DayOfWeekEnum.FRIDAY]: 5,
+        [DayOfWeekEnum.SATURDAY]: 6,
+      };
+
+      const targetDay = dayNumberMap[dayOfWeek];
+      const inputDay = inputDate.getUTCDay(); // <-- UTC
+
+      let daysToAdd = (targetDay - inputDay + 7) % 7;
+      const resultDate = new Date(
+        inputDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000
+      );
+
+      resultDate.setUTCHours(0, 0, 0, 0); // <-- Normalize to UTC midnight
+
+      return resultDate;
+    },
+    []
+  );
+
+  const getNextDayOfMonthDateUTC = useCallback(
+    (dayOfMonth: number, inputDate: Date): Date => {
+      if (dayOfMonth < 1 || dayOfMonth > 31) {
+        throw new Error("dayOfMonth must be between 1 and 31");
+      }
+
+      const inputDay = inputDate.getUTCDate(); // <-- UTC
+      let resultYear = inputDate.getUTCFullYear(); // <-- UTC
+      let resultMonth = inputDate.getUTCMonth(); // <-- UTC
+
+      if (inputDay <= dayOfMonth) {
+        // Same month
+      } else {
+        // Next month
+        resultMonth += 1;
+        if (resultMonth > 11) {
+          resultMonth = 0;
+          resultYear += 1;
+        }
+      }
+
+      // Use Date.UTC for precise UTC midnight
+      const resultTimestamp = Date.UTC(
+        resultYear,
+        resultMonth,
+        dayOfMonth,
+        0,
+        0,
+        0,
+        0
+      );
+      const resultDate = new Date(resultTimestamp);
+
+      return resultDate;
+    },
+    []
+  );
+
   return {
     getUTCDate,
     getUTCTime,
     getDayOfWeekFromDate,
     translateEnum,
+    getNextDayOfWeekDateUTC,
+    getNextDayOfMonthDateUTC,
   };
 };

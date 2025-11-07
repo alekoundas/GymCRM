@@ -153,6 +153,42 @@ namespace API.Controllers
                 }
             }
 
+            // 12-HOUR REMOVAL VALIDATION
+            // Check each removal before processing
+            foreach (TrainGroupParticipant existingParticipant in participantsToRemove) // ToList() to copy for safety
+            {
+                TrainGroupParticipant? incomingParticipant = _mapper.Map<List<TrainGroupParticipant>>(updateDto.TrainGroupParticipantDtos)
+                   .FirstOrDefault(x =>
+                       x.TrainGroupDateId == existingParticipant.TrainGroupDateId &&
+                       x.SelectedDate == existingParticipant.SelectedDate);
+
+                if (incomingParticipant == null)
+                {
+                    // Remove unchanged incoming Participants
+                    DateTime slotStartUtc;
+                    int offsetMin = updateDto.ClientTimezoneOffsetMinutes; // From client: new Date().getTimezoneOffset()
+                    double offsetH = -(offsetMin / 60.0);
+                    DateTime nowUtc = DateTime.UtcNow;
+
+                    if (existingParticipant.SelectedDate.HasValue)
+                    {
+                        // One-off: Use stored full UTC datetime (assumes time is set as in frontend)
+                        slotStartUtc = existingParticipant.SelectedDate.Value;
+                    }
+                    else
+                    {
+                        // Recurring: Compute next upcoming occurrence with local time overlaid
+                        slotStartUtc = CalculateNextOccurrenceDateTime(existingParticipant.TrainGroupDate, nowUtc);
+                    }
+
+                    if (slotStartUtc > nowUtc.AddHours(offsetH) && slotStartUtc <= nowUtc.AddHours(offsetH).AddHours(12))
+                    {
+                        dbContext.Dispose();
+                        return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer["Cannot_remove_a_session_starting_within_12_hours"]); // Add key to TranslationKeys
+                    }
+                }
+            }
+
             // Validate if any of the incoming participants is already joined.
             // Check if any of the incoming participants contains selected date, then check for recurring dates.
             bool isAlreadyParticipant = incomingParticipants.Any(x =>
@@ -258,7 +294,7 @@ namespace API.Controllers
             User? user = _dataService.Users.Where(x => x.Id == new Guid(updateDto.UserId))
                 .FirstOrDefault();
 
-            if (user !=null)
+            if (user != null)
             {
                 await _emailService.SendBookingEmailAsync(
                     user.Email,
@@ -274,6 +310,45 @@ namespace API.Controllers
             return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity);
         }
 
+        // Computes next occurrence datetime in UTC
+        private DateTime CalculateNextOccurrenceDateTime(TrainGroupDate trainGroupDate, DateTime nowUtc)
+        {
+            DateTime nextLocalDate;
+            switch (trainGroupDate.TrainGroupDateType)
+            {
+                case TrainGroupDateTypeEnum.DAY_OF_WEEK:
+                    // Assume RecurrenceDayOfWeek is DayOfWeek enum or convertible
+                    DayOfWeek targetDow = Enum.Parse<DayOfWeek>(trainGroupDate.RecurrenceDayOfWeek.ToString());
+                    int inputDowNum = (int)nowUtc.DayOfWeek;
+                    int targetDowNum = (int)targetDow;
+                    int daysToAdd = (targetDowNum - inputDowNum + 7) % 7;
+                    if (daysToAdd == 0) daysToAdd = 7; // Next occurrence if today (but adjust if same-day allowed; here next for safety)
+                    nextLocalDate = nowUtc.Date.AddDays(daysToAdd);
+                    break;
+                case TrainGroupDateTypeEnum.DAY_OF_MONTH:
+                    int targetDay = trainGroupDate.RecurrenceDayOfMonth ?? throw new ArgumentException("Missing RecurrenceDayOfMonth");
+                    int year = nowUtc.Year;
+                    int month = nowUtc.Month;
+                    if (nowUtc.Day > targetDay)
+                    {
+                        month++;
+                        if (month > 12) { month = 1; year++; }
+                    }
+                    nextLocalDate = new DateTime(year, month, targetDay, 0, 0, 0);
+                    // JS/.NET auto-rollover for invalid (e.g., Jan 31 -> Feb 3? Wait, new Date rolls to next month)
+                    break;
+                case TrainGroupDateTypeEnum.FIXED_DAY:
+                    nextLocalDate = trainGroupDate.FixedDay!.Value;
+                    break;
+                default:
+                    throw new ArgumentException($"Unsupported TrainGroupDateType: {trainGroupDate.TrainGroupDateType}");
+            }
+
+            DateTime localStart = nextLocalDate.AddHours(trainGroupDate.TrainGroup.StartOn.Hour);
+            localStart = localStart.AddMinutes(trainGroupDate.TrainGroup.StartOn.Minute);
+
+            return localStart;
+        }
 
         protected override bool CustomValidatePOST(TrainGroupParticipantAddDto entityDto, out string[] errors)
         {
