@@ -157,35 +157,44 @@ export default function TrainGroupAdminCalendarPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {timeSlots.map((slot) => (
-                    <Button
-                      key={slot.trainGroupDateId}
-                      label={
-                        new Date(slot.startOn)
-                          .getUTCHours()
-                          .toString()
-                          .padStart(2, "0") +
-                        ":" +
-                        new Date(slot.startOn)
-                          .getUTCMinutes()
-                          .toString()
-                          .padStart(2, "0") +
-                        " - " +
-                        slot.title
-                      }
-                      onClick={() => {
-                        apiService
-                          .get<TrainGroupDto>("TrainGroups", slot.trainGroupId)
-                          .then((x) => {
-                            if (x) {
-                              setTrainGroupDto(x);
-                              setViewModalVisibility(true);
-                              setSelectedTrainGroupDateId(slot.trainGroupId);
-                            }
-                          });
-                      }}
-                    />
-                  ))}
+                  {timeSlots
+                    ?.sort(
+                      (a, b) =>
+                        new Date(b.startOn).getTime() -
+                        new Date(a.startOn).getTime()
+                    )
+                    ?.map((slot) => (
+                      <Button
+                        key={slot.trainGroupDateId}
+                        label={
+                          new Date(slot.startOn)
+                            .getUTCHours()
+                            .toString()
+                            .padStart(2, "0") +
+                          ":" +
+                          new Date(slot.startOn)
+                            .getUTCMinutes()
+                            .toString()
+                            .padStart(2, "0") +
+                          " - " +
+                          slot.title
+                        }
+                        onClick={() => {
+                          apiService
+                            .get<TrainGroupDto>(
+                              "TrainGroups",
+                              slot.trainGroupId
+                            )
+                            .then((x) => {
+                              if (x) {
+                                setTrainGroupDto(x);
+                                setViewModalVisibility(true);
+                                setSelectedTrainGroupDateId(slot.trainGroupId);
+                              }
+                            });
+                        }}
+                      />
+                    ))}
                 </div>
               </div>
             )}
