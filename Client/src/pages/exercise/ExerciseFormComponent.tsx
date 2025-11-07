@@ -6,6 +6,8 @@ import { InputNumber } from "primereact/inputnumber";
 import { ExerciseDto } from "../../model/entities/exercise/ExerciseDto";
 import { InputTextarea } from "primereact/inputtextarea";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
+import { Button } from "primereact/button";
+import { useYouTubeService } from "../../services/YouTubeService";
 
 interface IField extends DialogChildProps {
   isAdminPage: boolean;
@@ -16,6 +18,7 @@ export default function ExerciseFormComponent({
   isAdminPage,
 }: IField) {
   const { t } = useTranslator();
+  const { openYouTubeVideo } = useYouTubeService();
 
   const { newExerciseDto, updateNewExerciseDto } = useWorkoutPlanStore();
 
@@ -101,6 +104,12 @@ export default function ExerciseFormComponent({
             min={1}
             className="p-inputtext-sm w-full"
             disabled={!isAdminPage || formMode === FormMode.VIEW}
+          />
+          <Button
+            label="YouTube"
+            className="ml-4 w-1"
+            icon="pi pi-youtube"
+            onClick={() => openYouTubeVideo(newExerciseDto.videoUrl)}
           />
         </div>
       </div>
