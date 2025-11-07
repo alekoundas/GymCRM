@@ -57,13 +57,10 @@ export default function ExerciseHistoryFormComponent({}: IField) {
       <div className="field">
         <label htmlFor={`sets-${exerciseHistoryDto.id}`}>{t("Sets")}</label>
         <div className="w-full flex flex-nowrap">
-          <InputNumber
+          <InputText
             id={`sets-${exerciseHistoryDto.id}`}
             value={exerciseHistoryDto.sets}
             className="p-inputtext-sm w-full"
-            inputStyle={{
-              width: "100%",
-            }}
             disabled={true}
           />
         </div>

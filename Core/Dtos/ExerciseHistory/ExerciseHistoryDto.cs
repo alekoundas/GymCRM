@@ -16,8 +16,10 @@ namespace Core.Dtos.ExerciseHistory
 
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
-        [Range(1, int.MaxValue, ErrorMessage = TranslationKeys._0_must_be_a_positive_number)]
-        public int Sets { get; set; }
+        public string Sets { get; set; }= string.Empty;
+
+
+        public string VideoUrl { get; set; } = string.Empty;
 
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]

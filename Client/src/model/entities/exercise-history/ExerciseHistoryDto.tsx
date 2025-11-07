@@ -2,7 +2,7 @@ export interface ExerciseHistoryDto {
   id: number;
   name: string;
   description: string;
-  sets: number;
+  sets: string;
   reps: number;
   weight: number;
   groupNumber: number;
@@ -15,7 +15,7 @@ export class ExerciseHistoryDto {
   id: number = 0;
   name: string = "";
   description: string = "";
-  sets: number = 1;
+  sets: string = "";
   reps: number = 1;
   weight: number = 1;
   groupNumber: number = 0;
