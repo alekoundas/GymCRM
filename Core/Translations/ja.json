@@ -71,7 +71,7 @@
   "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar": "上記の変更のための .ics ファイルが添付されています。Gmail で添付ファイルを表示するか、ダウンロードして Google カレンダーからイベントを追加/削除してください。",
   "Add_to_Calendar": "カレンダーに追加",
   "Remove_from_Calendar": "カレンダーから削除",
-  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar.": "添付の 'add-*.ics' ファイル をクリックし、「カレンダーに追加」を選択してください。",
+  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "添付の 'add-*.ics' ファイル をクリックし、「カレンダーに追加」を選択してください。",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "添付の 'cancel-*.ics' ファイル をクリックしてイベントを削除してください。",
 
   "_0_is_required": "{0} が必要です!",

@@ -257,16 +257,15 @@ namespace Business.Services.Email
                 {
                     emailBody += "<div class='section'>";
                     emailBody += "<div class='calendar-note'>";
-                    emailBody += "<h3>Calendar Integration</h3>";
-                    emailBody += "<p>Attached are .ics files for the changes above. Open the attachments in Gmail or download them to add/remove events from your Google Calendar.</p>";
+                    emailBody += "<h3>" + _localizer[TranslationKeys.Calendar_Integration] + "</h3>";
+                    emailBody += "<p>" + _localizer[TranslationKeys.Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar] + "</p>";
+
                     if (addIcsList?.Any() ?? false)
-                    {
-                        emailBody += "<p><strong>Add to Calendar:</strong> Click the attached 'add-*.ics' files and select 'Add to Calendar'.</p>";
-                    }
+                        emailBody += "<p><strong>" + _localizer[TranslationKeys.Add_to_Calendar] + ":</strong> " + _localizer[TranslationKeys.Click_the_attached_add_ics_files_and_select_Add_to_Calendar] + "</p>";
+
                     if (cancelIcsList?.Any() ?? false)
-                    {
-                        emailBody += "<p><strong>Remove from Calendar:</strong> Click the attached 'cancel-*.ics' files to remove the events.</p>";
-                    }
+                        emailBody += "<p><strong>" + _localizer[TranslationKeys.Remove_from_Calendar] + ":</strong> " + _localizer[TranslationKeys.Click_the_attached_cancel_ics_files_to_remove_the_events] + "</p>";
+
                     emailBody += "</div>";
                     emailBody += "</div>";
                 }

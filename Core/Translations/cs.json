@@ -71,7 +71,7 @@
   "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar": "Připojeny jsou soubory .ics pro změny výše. Otevřete přílohy v Gmailu nebo je stáhněte pro přidání/odebrání událostí z vašeho Google Kalendáře.",
   "Add_to_Calendar": "Přidat do kalendáře",
   "Remove_from_Calendar": "Odebrat z kalendáře",
-  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar.": "Klikněte na připojené soubory 'add-*.ics' a vyberte 'Přidat do kalendáře'.",
+  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "Klikněte na připojené soubory 'add-*.ics' a vyberte 'Přidat do kalendáře'.",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Klikněte na připojené soubory 'cancel-*.ics' pro odebrání událostí.",
 
   "_0_is_required": "{0} je vyžadováno!",

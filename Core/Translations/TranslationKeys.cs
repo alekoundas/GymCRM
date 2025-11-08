@@ -78,7 +78,7 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar = "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar";
         public const string Add_to_Calendar = "Add_to_Calendar";
         public const string Remove_from_Calendar = "Remove_from_Calendar";
-        public const string Click_the_attached_add_ics_files_and_select_Add_to_Calendar_ = "Click_the_attached_add_ics_files_and_select_Add_to_Calendar.";
+        public const string Click_the_attached_add_ics_files_and_select_Add_to_Calendar = "Click_the_attached_add_ics_files_and_select_Add_to_Calendar.";
         public const string Click_the_attached_cancel_ics_files_to_remove_the_events = "Click_the_attached_cancel_ics_files_to_remove_the_events";
         public const string _0_is_required = "_0_is_required";
         public const string _0_already_exists = "_0_already_exists";

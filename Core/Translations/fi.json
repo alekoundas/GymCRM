@@ -71,7 +71,7 @@
   "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar": "Liitteenä on .ics-tiedostoja yllä oleville muutoksille. Avaa liitteet Gmailissa tai lataa ne lisätäksesi/poistaaksesi tapahtumia Google Kalenteristasi.",
   "Add_to_Calendar": "Lisää kalenteriin",
   "Remove_from_Calendar": "Poista kalenterista",
-  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar.": "Napsauta liitettyjä 'add-*.ics'-tiedostoja ja valitse 'Lisää kalenteriin'.",
+  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "Napsauta liitettyjä 'add-*.ics'-tiedostoja ja valitse 'Lisää kalenteriin'.",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Napsauta liitettyjä 'cancel-*.ics'-tiedostoja poistaaksesi tapahtumat.",
 
   "_0_is_required": "{0} vaaditaan!",

@@ -71,7 +71,7 @@
   "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar": "Bifogade är .ics-filer för ändringarna ovan. Öppna bilagorna i Gmail eller ladda ner dem för att lägga till/ta bort händelser från din Google Kalender.",
   "Add_to_Calendar": "Lägg till i kalender",
   "Remove_from_Calendar": "Ta bort från kalender",
-  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar.": "Klicka på de bifogade 'add-*.ics'-filerna och välj 'Lägg till i kalender'.",
+  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "Klicka på de bifogade 'add-*.ics'-filerna och välj 'Lägg till i kalender'.",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Klicka på de bifogade 'cancel-*.ics'-filerna för att ta bort händelserna.",
 
   "_0_is_required": "{0} krävs!",

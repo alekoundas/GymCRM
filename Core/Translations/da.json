@@ -71,7 +71,7 @@
   "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar": "Vedhæftede er .ics-filer for ændringerne ovenfor. Åbn vedhæftningerne i Gmail eller download dem for at tilføje/fjerne begivenheder fra din Google Kalender.",
   "Add_to_Calendar": "Tilføj til kalender",
   "Remove_from_Calendar": "Fjern fra kalender",
-  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar.": "Klik på de vedhæftede 'add-*.ics'-filer og vælg 'Tilføj til kalender'.",
+  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "Klik på de vedhæftede 'add-*.ics'-filer og vælg 'Tilføj til kalender'.",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Klik på de vedhæftede 'cancel-*.ics'-filer for at fjerne begivenhederne.",
 
   "_0_is_required": "{0} er påkrævet!",

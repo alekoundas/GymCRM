@@ -71,7 +71,7 @@
   "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar": "Yukarıdaki değişiklikler için .ics dosyaları eklendi. Eklentileri Gmail'de açın veya indirin ve Google Takviminizden etkinlikleri ekleyin/kaldırın.",
   "Add_to_Calendar": "Takvime Ekle",
   "Remove_from_Calendar": "Takvimden Kaldır",
-  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar.": "Eklentideki 'add-*.ics' dosyalarına tıklayın ve 'Takvime Ekle' seçin.",
+  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "Eklentideki 'add-*.ics' dosyalarına tıklayın ve 'Takvime Ekle' seçin.",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Eklentideki 'cancel-*.ics' dosyalarına tıklayarak etkinlikleri kaldırın.",
 
   "_0_is_required": "{0} gereklidir!",

@@ -71,7 +71,7 @@
   "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar": "Të bashkangjitura janë skedarë .ics për ndryshimet e mësipërme. Hapni bashkëngjitjet në Gmail ose shkarkojini për të shtuar/hequr ngjarje nga Google Kalendari juaj.",
   "Add_to_Calendar": "Shto në Kalendar",
   "Remove_from_Calendar": "Heq nga Kalendari",
-  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar.": "Klikoni skedarët e bashkangjitur 'add-*.ics' dhe zgjidhni 'Shto në Kalendar'.",
+  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "Klikoni skedarët e bashkangjitur 'add-*.ics' dhe zgjidhni 'Shto në Kalendar'.",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Klikoni skedarët e bashkangjitur 'cancel-*.ics' për të hequr ngjarjet.",
 
   "_0_is_required": "{0} kërkohet!",
