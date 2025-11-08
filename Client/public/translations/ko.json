@@ -194,5 +194,12 @@
   "Wed love to hear from you!": "당신의 소식을 듣고 싶어요!",
   "Mobile Phone": "휴대 전화",
   "Landline": "유선 전화",
-  "Address": "주소"
+  "Address": "주소",
+  "Group": "그룹",
+  "Video Url": "비디오 URL",
+  "Move up": "위로 이동",
+  "Move down": "아래로 이동",
+  "Updates history": "업데이트 기록",
+  "Already 12h away! (You wont be able to opt out from this date.)": "이미 12시간 앞서 있습니다! (이 날짜부터 선택 사항을 취소할 수 없습니다.)",
+  "Already 12h away! You cant opt out.": "이미 12시간 앞서 있습니다! 선택 사항을 취소할 수 없습니다."
 }

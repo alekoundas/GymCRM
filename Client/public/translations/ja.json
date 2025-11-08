@@ -194,5 +194,12 @@
   "Wed love to hear from you!": "あなたからお聞かせいただければ幸いです！",
   "Mobile Phone": "携帯電話",
   "Landline": "固定電話",
-  "Address": "住所"
+  "Address": "住所",
+  "Group": "グループ",
+  "Video Url": "ビデオ URL",
+  "Move up": "上に移動",
+  "Move down": "下に移動",
+  "Updates history": "更新履歴",
+  "Already 12h away! (You wont be able to opt out from this date.)": "すでに12時間先です！（この日からオプトアウトできません。）",
+  "Already 12h away! You cant opt out.": "すでに12時間先です！オプトアウトできません。"
 }

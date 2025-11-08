@@ -194,5 +194,12 @@
   "Wed love to hear from you!": "نحن نحب أن نسمع منك!",
   "Mobile Phone": "الهاتف المحمول",
   "Landline": "الهاتف الثابت",
-  "Address": "العنوان"
+  "Address": "العنوان",
+  "Group": "المجموعة",
+  "Video Url": "رابط الفيديو",
+  "Move up": "نقل لأعلى",
+  "Move down": "نقل لأسفل",
+  "Updates history": "سجل التحديثات",
+  "Already 12h away! (You wont be able to opt out from this date.)": "بالفعل 12 ساعة بعيدة! (لن تتمكن من الانسحاب من هذا التاريخ.)",
+  "Already 12h away! You cant opt out.": "بالفعل 12 ساعة بعيدة! لا يمكنك الانسحاب."
 }

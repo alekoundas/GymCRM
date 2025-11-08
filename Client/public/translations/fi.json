@@ -194,5 +194,12 @@
   "Wed love to hear from you!": "Olisimme iloisia kuullessamme sinusta!",
   "Mobile Phone": "Matkapuhelin",
   "Landline": "Lankapuhelin",
-  "Address": "Osoite"
+  "Address": "Osoite",
+  "Group": "Ryhmä",
+  "Video Url": "Video URL",
+  "Move up": "Siirrä ylös",
+  "Move down": "Siirrä alas",
+  "Updates history": "Päivityshistoria",
+  "Already 12h away! (You wont be able to opt out from this date.)": "Jo 12 tunnin päässä! (Et voi peruuttaa tästä päivästä alkaen.)",
+  "Already 12h away! You cant opt out.": "Jo 12 tunnin päässä! Et voi peruuttaa."
 }

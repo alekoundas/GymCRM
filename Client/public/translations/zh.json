@@ -194,5 +194,12 @@
   "Wed love to hear from you!": "我们很想听听你的消息！",
   "Mobile Phone": "手机",
   "Landline": "固定电话",
-  "Address": "地址"
+  "Address": "地址",
+  "Group": "组",
+  "Video Url": "视频 URL",
+  "Move up": "上移",
+  "Move down": "下移",
+  "Updates history": "更新历史",
+  "Already 12h away! (You wont be able to opt out from this date.)": "已经12小时之遥！（从这个日期起，您将无法选择退出。）",
+  "Already 12h away! You cant opt out.": "已经12小时之遥！您无法选择退出。"
 }

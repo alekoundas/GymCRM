@@ -194,5 +194,12 @@
   "Wed love to hear from you!": "Θα θέλαμε πολύ να σας ακούσουμε!",
   "Mobile Phone": "Κινητό Τηλέφωνο",
   "Landline": "Σταθερό Τηλέφωνο",
-  "Address": "Διεύθυνση"
+  "Address": "Διεύθυνση",
+  "Group": "Ομάδα",
+  "Video Url": "Διεύθυνση URL Βίντεο",
+  "Move up": "Μετακίνηση πάνω",
+  "Move down": "Μετακίνηση κάτω",
+  "Updates history": "Ιστορικό ενημερώσεων",
+  "Already 12h away! (You wont be able to opt out from this date.)": "Ήδη 12 ώρες μακριά! (Δεν θα μπορείτε να αποχωρήσετε από αυτή την ημερομηνία.)",
+  "Already 12h away! You cant opt out.": "Ήδη 12 ώρες μακριά! Δεν μπορείτε να αποχωρήσετε."
 }
