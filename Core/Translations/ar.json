@@ -71,7 +71,7 @@
   "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar": "مرفقة ملفات .ics للتغييرات أعلاه. افتح المرفقات في Gmail أو قم بتنزيلها لإضافة/إزالة الأحداث من تقويم Google الخاص بك.",
   "Add_to_Calendar": "إضافة إلى التقويم",
   "Remove_from_Calendar": "إزالة من التقويم",
-  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar.": "انقر على ملفات 'add-*.ics' المرفقة وحدد 'إضافة إلى التقويم'.",
+  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "انقر على ملفات 'add-*.ics' المرفقة وحدد 'إضافة إلى التقويم'.",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "انقر على ملفات 'cancel-*.ics' المرفقة لإزالة الأحداث.",
 
   "_0_is_required": "{0} مطلوب!",

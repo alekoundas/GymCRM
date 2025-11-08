@@ -71,7 +71,7 @@
   "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar": "Adjuntos hay archivos .ics para los cambios anteriores. Abre los adjuntos en Gmail o descárgalos para agregar/eliminar eventos de tu Calendario de Google.",
   "Add_to_Calendar": "Agregar al calendario",
   "Remove_from_Calendar": "Eliminar del calendario",
-  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar.": "Haz clic en los archivos 'add-*.ics' adjuntos y selecciona 'Agregar al calendario'.",
+  "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "Haz clic en los archivos 'add-*.ics' adjuntos y selecciona 'Agregar al calendario'.",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Haz clic en los archivos 'cancel-*.ics' adjuntos para eliminar los eventos.",
 
   "_0_is_required": "{0} es requerido!",
