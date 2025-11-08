@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Repository;
 using Business.Services;
+using Business.Services.CalendarService;
 using Business.Services.Email;
 using Core.Dtos;
 using Core.Dtos.DataTable;
@@ -49,8 +50,8 @@ namespace API.Controllers
         {
 
             ApiDbContext dbContext = _dataService.GetDbContext();
-            List<string> emailDatesAdd = new List<string>();
-            List<string> emailDatesRemove = new List<string>();
+            List<TrainGroupParticipant> emailDatesAdd = new List<TrainGroupParticipant>();
+            List<TrainGroupParticipant> emailDatesRemove = new List<TrainGroupParticipant>();
 
             // Load existing entity with related data
             TrainGroup? existingEntity = await dbContext.Set<TrainGroup>()
@@ -139,27 +140,27 @@ namespace API.Controllers
                     existingParticipants.Remove(existingParticipant);
                     dbContext.Remove(existingParticipant);
 
-                    string? dateString = "";
-                    if (existingParticipant.TrainGroupDate.RecurrenceDayOfMonth != null)
-                    {
-                        if (existingParticipant.SelectedDate == null)
+                    //string? dateString = "";
+                    //if (existingParticipant.TrainGroupDate.RecurrenceDayOfMonth != null)
+                    //{
+                    //    if (existingParticipant.SelectedDate == null)
 
-                            dateString = _localizer[TranslationKeys.Every_0_of_the_month, existingParticipant.TrainGroupDate.RecurrenceDayOfMonth.ToString()];
-                        else
-                            dateString = existingParticipant.SelectedDate.Value.ToString("yyyy-MM-dd");
-                    }
-                    if (existingParticipant.TrainGroupDate.RecurrenceDayOfWeek != null)
-                    {
-                        if (existingParticipant.SelectedDate == null)
-                            dateString = existingParticipant.TrainGroupDate.RecurrenceDayOfWeek.ToString();
-                        else
-                            dateString = existingParticipant.SelectedDate.Value.ToString("yyyy-MM-dd");
-                    }
-                    if (existingParticipant.TrainGroupDate.FixedDay != null)
-                        dateString = existingParticipant.TrainGroupDate.FixedDay.Value.ToString("yyyy-MM-dd");
+                    //        dateString = _localizer[TranslationKeys.Every_0_of_the_month, existingParticipant.TrainGroupDate.RecurrenceDayOfMonth.ToString()];
+                    //    else
+                    //        dateString = existingParticipant.SelectedDate.Value.ToString("yyyy-MM-dd");
+                    //}
+                    //if (existingParticipant.TrainGroupDate.RecurrenceDayOfWeek != null)
+                    //{
+                    //    if (existingParticipant.SelectedDate == null)
+                    //        dateString = existingParticipant.TrainGroupDate.RecurrenceDayOfWeek.ToString();
+                    //    else
+                    //        dateString = existingParticipant.SelectedDate.Value.ToString("yyyy-MM-dd");
+                    //}
+                    //if (existingParticipant.TrainGroupDate.FixedDay != null)
+                    //    dateString = existingParticipant.TrainGroupDate.FixedDay.Value.ToString("yyyy-MM-dd");
 
-                    if (dateString != null)
-                        emailDatesRemove.Add(dateString);
+                    //if (dateString != null)
+                        emailDatesRemove.Add(existingParticipant);
                 }
             }
 
@@ -174,7 +175,6 @@ namespace API.Controllers
 
                 if (incomingParticipant == null)
                 {
-                    // Remove unchanged incoming Participants
                     DateTime slotStartUtc;
                     int offsetMin = updateDto.ClientTimezoneOffsetMinutes; // From client: new Date().getTimezoneOffset()
                     double offsetH = -(offsetMin / 60.0);
@@ -284,27 +284,28 @@ namespace API.Controllers
 
 
 
-                string dateString = "";
+                //string dateString = "";
 
-                if (incomingParticipant.TrainGroupDate.RecurrenceDayOfMonth != null)
-                {
-                    if (incomingParticipant.SelectedDate == null)
-                        dateString = _localizer[TranslationKeys.Every_0_of_the_month, incomingParticipant.TrainGroupDate.RecurrenceDayOfMonth.ToString()];
-                    else
-                        dateString = incomingParticipant.SelectedDate.Value.ToString("yyyy-MM-dd");
-                }
-                if (incomingParticipant.TrainGroupDate.RecurrenceDayOfWeek != null)
-                {
-                    if (incomingParticipant.SelectedDate == null)
-                        dateString = incomingParticipant.TrainGroupDate.RecurrenceDayOfWeek.ToString();
-                    else
-                        dateString = incomingParticipant.SelectedDate.Value.ToString("yyyy-MM-dd");
-                }
-                if (incomingParticipant.TrainGroupDate.FixedDay != null)
-                    dateString = incomingParticipant.TrainGroupDate.FixedDay.Value.ToString("yyyy-MM-dd");
+                //if (incomingParticipant.TrainGroupDate.RecurrenceDayOfMonth != null)
+                //{
+                //    if (incomingParticipant.SelectedDate == null)
+                //        dateString = _localizer[TranslationKeys.Every_0_of_the_month, incomingParticipant.TrainGroupDate.RecurrenceDayOfMonth.ToString()];
+                //    else
+                //        dateString = incomingParticipant.SelectedDate.Value.ToString("yyyy-MM-dd");
+                //}
+                //if (incomingParticipant.TrainGroupDate.RecurrenceDayOfWeek != null)
+                //{
+                //    if (incomingParticipant.SelectedDate == null)
+                //        dateString = incomingParticipant.TrainGroupDate.RecurrenceDayOfWeek.ToString();
+                //    else
+                //        dateString = incomingParticipant.SelectedDate.Value.ToString("yyyy-MM-dd");
+                //}
+                //if (incomingParticipant.TrainGroupDate.FixedDay != null)
+                //    dateString = incomingParticipant.TrainGroupDate.FixedDay.Value.ToString("yyyy-MM-dd");
 
-                if (dateString != null)
-                    emailDatesAdd.Add(dateString);
+                //if (dateString != null)
+                //    emailDatesAdd.Add(dateString);
+                emailDatesAdd.Add(incomingParticipant);
             }
 
 
@@ -317,7 +318,7 @@ namespace API.Controllers
             if (user != null)
             {
                 await _emailService.SendBookingEmailAsync(
-                    user.Email,
+                    user,
                     emailDatesAdd,
                     emailDatesRemove
                 );
