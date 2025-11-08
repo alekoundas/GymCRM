@@ -190,6 +190,15 @@ namespace Business.Services.CalendarService
 
                     return (dtstart, rrule);
                 }
+
+                if (participant.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY)
+                {
+                    if (participant.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY)
+                    {
+                        // FIXED_DAY is a single one-off entry, no recurrence
+                        return (dtstart, null);
+                    }
+                }
             }
 
             return (null, null);
