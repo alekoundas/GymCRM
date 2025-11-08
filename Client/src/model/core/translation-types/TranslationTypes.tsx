@@ -201,6 +201,13 @@
   'Mobile Phone': string;
   'Landline': string;
   'Address': string;
+  'Group': string;
+  'Video Url': string;
+  'Move up': string;
+  'Move down': string;
+  'Updates history': string;
+  'Already 12h away! (You wont be able to opt out from this date.)': string;
+  'Already 12h away! You cant opt out.': string;
     }
 
 

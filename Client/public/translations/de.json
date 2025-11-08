@@ -194,5 +194,12 @@
   "Wed love to hear from you!": "Wir würden gerne von Ihnen hören!",
   "Mobile Phone": "Mobiltelefon",
   "Landline": "Festnetz",
-  "Address": "Adresse"
+  "Address": "Adresse",
+  "Group": "Gruppe",
+  "Video Url": "Video-URL",
+  "Move up": "Nach oben verschieben",
+  "Move down": "Nach unten verschieben",
+  "Updates history": "Update-Verlauf",
+  "Already 12h away! (You wont be able to opt out from this date.)": "Bereits 12 Stunden entfernt! (Ab diesem Datum können Sie nicht mehr abmelden.)",
+  "Already 12h away! You cant opt out.": "Bereits 12 Stunden entfernt! Sie können nicht abmelden."
 }

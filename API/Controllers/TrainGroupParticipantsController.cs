@@ -194,7 +194,7 @@ namespace API.Controllers
                     if (slotStartUtc > nowUtc.AddHours(offsetH) && slotStartUtc <= nowUtc.AddHours(offsetH).AddHours(12))
                     {
                         dbContext.Dispose();
-                        return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer["Cannot_remove_a_session_starting_within_12_hours"]); // Add key to TranslationKeys
+                        return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]); // Add key to TranslationKeys
                     }
                 }
             }
