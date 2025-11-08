@@ -1,4 +1,5 @@
-﻿using Core.Models;
+﻿using Business.Services.CalendarService;
+using Core.Models;
 using Core.Translations;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Gmail.v1;
@@ -16,21 +17,24 @@ namespace Business.Services.Email
         private readonly IDataService _dataService;
         private readonly IConfiguration _configuration;
         private readonly IStringLocalizer _localizer;
+        private readonly ICalendarService _calendarService;
         private readonly ILogger<GmailEmailService> _logger;
 
         public GmailEmailService(
             IDataService dataService,
             IConfiguration configuration,
             IStringLocalizer localizer,
+            ICalendarService calendarService,
             ILogger<GmailEmailService> logger)
         {
             _dataService = dataService;
             _configuration = configuration;
             _localizer = localizer;
+            _calendarService = calendarService;
             _logger = logger;
         }
 
-        public async Task SendEmailAsync(string to, string subject, string htmlBody)
+        public async Task SendEmailAsync(string to, string subject, string htmlBody, List<(string Content, string FileName)>? attachments = null)
         {
             List<GoogleRefreshToken> dbtokens = await _dataService.GoogleRefreshTokens.ToListAsync();
             if (dbtokens.Count != 1)
@@ -82,6 +86,26 @@ namespace Business.Services.Email
                     TextBody = htmlBody,
                     HtmlBody = htmlBody
                 };
+
+                // Add attachments if provided
+                if (attachments != null && attachments.Any())
+                {
+                    foreach (var (content, fileName) in attachments)
+                    {
+                        // .ics is text/calendar MIME type
+                        var attachment = new MimePart("text", "calendar")
+                        {
+                            Content = new MimeContent(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(content))),
+                            ContentDisposition = new ContentDisposition(ContentDisposition.Attachment)
+                            {
+                                FileName = Path.GetFileName(fileName)
+                            },
+                            //FileName = Path.GetFileName(fileName)
+                        };
+                        bodyBuilder.Attachments.Add(attachment);
+                    }
+                }
+
                 mimeMessage.Body = bodyBuilder.ToMessageBody();
 
                 // Convert to raw base64.
@@ -116,8 +140,44 @@ namespace Business.Services.Email
             }
         }
 
-        public async Task SendBookingEmailAsync(string userEmail, List<string> emailDatesAdd, List<string> emailDatesRemove)
+        private List<string> GetDateStrings(List<TrainGroupParticipant> participants)
         {
+            List<string> stringDates = new List<string>();
+            string dateString = "";
+
+            foreach (TrainGroupParticipant participant in participants)
+            {
+
+                if (participant.TrainGroupDate.RecurrenceDayOfMonth != null)
+                {
+                    if (participant.SelectedDate == null)
+                        dateString = _localizer[TranslationKeys.Every_0_of_the_month, participant.TrainGroupDate.RecurrenceDayOfMonth.ToString()];
+                    else
+                        dateString = participant.SelectedDate.Value.ToString("yyyy-MM-dd");
+                }
+                if (participant.TrainGroupDate.RecurrenceDayOfWeek != null)
+                {
+                    if (participant.SelectedDate == null)
+                        dateString = participant.TrainGroupDate.RecurrenceDayOfWeek.ToString();
+                    else
+                        dateString = participant.SelectedDate.Value.ToString("yyyy-MM-dd");
+                }
+                if (participant.TrainGroupDate.FixedDay != null)
+                    dateString = participant.TrainGroupDate.FixedDay.Value.ToString("yyyy-MM-dd");
+
+                if (dateString != null)
+                    stringDates.Add(dateString);
+            }
+
+            return stringDates;
+        }
+
+        public async Task SendBookingEmailAsync(User user, List<TrainGroupParticipant> emailParticipantsAdd, List<TrainGroupParticipant> emailParticipantsRemove)
+        {
+
+
+            List<string> emailDatesAdd = GetDateStrings(emailParticipantsAdd);
+            List<string> emailDatesRemove = GetDateStrings(emailParticipantsRemove);
 
 
             // Initialize HTML body with professional styling
@@ -152,8 +212,8 @@ namespace Business.Services.Email
                 emailBody += "<ul>";
                 foreach (var date in emailDatesAdd)
                 {
-                    string formattedDate = FormatDate(date);
-                    emailBody += $"<li class='added'>{formattedDate}</li>";
+                    //string formattedDate = FormatDate(date);
+                    emailBody += $"<li class='added'>{date}</li>";
                 }
                 emailBody += "</ul>";
             }
@@ -171,12 +231,50 @@ namespace Business.Services.Email
                 emailBody += "<ul>";
                 foreach (var date in emailDatesRemove)
                 {
-                    string formattedDate = FormatDate(date);
-                    emailBody += $"<li class='removed'>{formattedDate}</li>";
+                    //string formattedDate = FormatDate(date);
+                    emailBody += $"<li class='removed'>{date}</li>";
                 }
                 emailBody += "</ul>";
             }
             emailBody += "</div>";
+
+
+            List<(string IcsContent, string FileName)> addIcsList = new List<(string IcsContent, string FileName)>();
+            List<(string IcsContent, string FileName)> cancelIcsList = new List<(string IcsContent, string FileName)>();
+            string? organizerEmail = _configuration["Gmail:Email"];
+            if (organizerEmail != null)
+            {
+
+                addIcsList = _calendarService.GenerateAddIcsContents(
+                    emailParticipantsAdd, organizerEmail, user.Email, user.Id);
+
+                cancelIcsList = _calendarService.GenerateCancelIcsContents(
+                    emailParticipantsRemove, organizerEmail, user.Email, user.Id);
+
+
+                // New section: Calendar instructions
+                if ((addIcsList?.Any() ?? false) || (cancelIcsList?.Any() ?? false))
+                {
+                    emailBody += "<div class='section'>";
+                    emailBody += "<div class='calendar-note'>";
+                    emailBody += "<h3>Calendar Integration</h3>";
+                    emailBody += "<p>Attached are .ics files for the changes above. Open the attachments in Gmail or download them to add/remove events from your Google Calendar.</p>";
+                    if (addIcsList?.Any() ?? false)
+                    {
+                        emailBody += "<p><strong>Add to Calendar:</strong> Click the attached 'add-*.ics' files and select 'Add to Calendar'.</p>";
+                    }
+                    if (cancelIcsList?.Any() ?? false)
+                    {
+                        emailBody += "<p><strong>Remove from Calendar:</strong> Click the attached 'cancel-*.ics' files to remove the events.</p>";
+                    }
+                    emailBody += "</div>";
+                    emailBody += "</div>";
+                }
+
+            }
+
+
+
 
             // Close HTML tags
             emailBody += @"
@@ -186,35 +284,36 @@ namespace Business.Services.Email
 
             // Send the email
             await SendEmailAsync(
-                userEmail,
+                user.Email,
                 _localizer[TranslationKeys.Booking_Confirmation],
-                emailBody
+                emailBody,
+                addIcsList.Concat(cancelIcsList).ToList()
             );
         }
 
         // Helper method to format dates based on input
-        private string FormatDate(string dateInput)
-        {
-            // Check if the input is a day of the week (e.g., "Monday")
-            if (Enum.TryParse(typeof(DayOfWeek), dateInput, true, out _))
-            {
-                return dateInput; // Return as-is for day of the week
-            }
+        //private string FormatDate(string dateInput)
+        //{
+        //    // Check if the input is a day of the week (e.g., "Monday")
+        //    if (Enum.TryParse(typeof(DayOfWeek), dateInput, true, out _))
+        //    {
+        //        return dateInput; // Return as-is for day of the week
+        //    }
 
-            // Check if the input is a day of the month (e.g., "31")
-            if (int.TryParse(dateInput, out int day) && day >= 1 && day <= 31)
-            {
-                return $"Day {day}"; // Format as "Day 31"
-            }
+        //    // Check if the input is a day of the month (e.g., "31")
+        //    if (int.TryParse(dateInput, out int day) && day >= 1 && day <= 31)
+        //    {
+        //        return $"Day {day}"; // Format as "Day 31"
+        //    }
 
-            // Check if the input is a parseable date (e.g., "2025-10-27")
-            if (DateTime.TryParse(dateInput, out DateTime date))
-            {
-                return date.ToString("MMMM dd, yyyy"); // Format as "October 27, 2025"
-            }
+        //    // Check if the input is a parseable date (e.g., "2025-10-27")
+        //    if (DateTime.TryParse(dateInput, out DateTime date))
+        //    {
+        //        return date.ToString("MMMM dd, yyyy"); // Format as "October 27, 2025"
+        //    }
 
-            // Fallback for unrecognized formats
-            return dateInput;
-        }
+        //    // Fallback for unrecognized formats
+        //    return dateInput;
+        //}
     }
 }

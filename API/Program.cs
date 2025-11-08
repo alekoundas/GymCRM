@@ -3,6 +3,7 @@ using API.Filters;
 using API.JsonConverter;
 using Business.Repository;
 using Business.Services;
+using Business.Services.CalendarService;
 using Business.Services.Email;
 using Business.Services.Translator;
 using Core.Dtos;
@@ -177,6 +178,7 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddSingleton(appSettings); // appsettings.json
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, GmailEmailService>();
+builder.Services.AddScoped<ICalendarService, CalendarService>();
 
 
 
