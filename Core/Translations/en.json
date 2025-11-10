@@ -82,6 +82,7 @@
   "_0_created_successfully": "{0} created successfully!",
   "_0_updated_successfully": "{0} updated successfully!",
   "_0_deleted_successfully": "{0} deleted successfully!",
+  "_0_cannot_exceed_50_characters": "{0} cannot exceed 50 characters!",
   "_0_cannot_exceed_100_characters": "{0} cannot exceed 100 characters!",
   "_0_cannot_exceed_200_characters": "{0} cannot exceed 200 characters!",
   "_0_cannot_exceed_500_characters": "{0} cannot exceed 500 characters!"

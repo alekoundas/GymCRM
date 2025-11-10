@@ -19,7 +19,7 @@
   "Address": "Adres",
   "LastName": "Achternaam",
   "FirstName": "Voornaam",
-
+  "IsCircular": "Cirkelvormig",
 
   "Title_cannot_exceed_100_characters": "Titel mag niet meer dan 100 tekens bevatten",
   "Description_cannot_exceed_500_characters": "Beschrijving mag niet meer dan 500 tekens bevatten!",
@@ -81,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} moet een positief getal zijn.",
   "_0_created_successfully": "{0} succesvol aangemaakt!",
   "_0_updated_successfully": "{0} succesvol bijgewerkt!",
-  "_0_deleted_successfully": "{0} succesvol verwijderd!"
+  "_0_deleted_successfully": "{0} succesvol verwijderd!",
+  "_0_cannot_exceed_50_characters": "{0} mag niet meer dan 50 tekens bevatten!",
+  "_0_cannot_exceed_100_characters": "{0} mag niet meer dan 100 tekens bevatten!",
+  "_0_cannot_exceed_200_characters": "{0} mag niet meer dan 200 tekens bevatten!",
+  "_0_cannot_exceed_500_characters": "{0} mag niet meer dan 500 tekens bevatten!"
 }

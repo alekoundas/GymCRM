@@ -19,6 +19,7 @@
   "Address": "Dirección",
   "LastName": "Apellido",
   "FirstName": "Nombre",
+  "IsCircular": "Circular",
 
   "Title_cannot_exceed_100_characters": "El título no puede exceder 100 caracteres",
   "Description_cannot_exceed_500_characters": "La descripción no puede exceder 500 caracteres!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} debe ser un número positivo.",
   "_0_created_successfully": "{0} creado con éxito!",
   "_0_updated_successfully": "{0} actualizado con éxito!",
-  "_0_deleted_successfully": "{0} eliminado con éxito!"
+  "_0_deleted_successfully": "{0} eliminado con éxito!",
+  "_0_cannot_exceed_50_characters": "{0} no puede exceder 50 caracteres!",
+  "_0_cannot_exceed_100_characters": "{0} no puede exceder 100 caracteres!",
+  "_0_cannot_exceed_200_characters": "{0} no puede exceder 200 caracteres!",
+  "_0_cannot_exceed_500_characters": "{0} no puede exceder 500 caracteres!"
 }

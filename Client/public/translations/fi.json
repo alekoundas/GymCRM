@@ -202,5 +202,6 @@
   "Updates history": "Päivityshistoria",
   "Already 12h away! (You wont be able to opt out from this date.)": "Jo 12 tunnin päässä! (Et voi peruuttaa tästä päivästä alkaen.)",
   "Already 12h away! You cant opt out.": "Jo 12 tunnin päässä! Et voi peruuttaa.",
-  "Circular": "__STRING_NOT_TRANSLATED__"
+  "Circular": "cirkulaarinen",
+  "Update description": "Päivitä kuvaus"
 }

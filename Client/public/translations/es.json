@@ -202,5 +202,6 @@
   "Updates history": "Historial de actualizaciones",
   "Already 12h away! (You wont be able to opt out from this date.)": "¡Ya está a 12 horas! (No podrás optar por no participar desde esta fecha.)",
   "Already 12h away! You cant opt out.": "¡Ya está a 12 horas! No puedes optar por no participar.",
-  "Circular": "__STRING_NOT_TRANSLATED__"
+  "Circular": "circular",
+  "Update description": "Actualizar descripción"
 }

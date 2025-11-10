@@ -7,6 +7,7 @@ interface WorkoutPlanStoreState {
   workoutPlanDto: WorkoutPlanDto;
   newExerciseDto: ExerciseDto;
   exerciseHistoryDto: ExerciseHistoryDto;
+  workoutPlanDescription: string;
 
   setWorkoutPlanDto: (data: WorkoutPlanDto) => void;
   updateWorkoutPlanDto: (updates: Partial<WorkoutPlanDto>) => void;
@@ -18,12 +19,16 @@ interface WorkoutPlanStoreState {
   resetNewExerciseDto: () => void;
 
   setExerciseHistoryDto: (data: ExerciseHistoryDto) => void;
+
+  setworkoutPlanDescription: (data: string) => void;
+  resetworkoutPlanDescription: () => void;
 }
 
 export const useWorkoutPlanStore = create<WorkoutPlanStoreState>((set) => ({
   workoutPlanDto: new WorkoutPlanDto(),
   newExerciseDto: new ExerciseDto(),
   exerciseHistoryDto: new ExerciseHistoryDto(),
+  workoutPlanDescription: "",
 
   // workoutPlanDto
   setWorkoutPlanDto: (data) => set({ workoutPlanDto: data }),
@@ -60,4 +65,8 @@ export const useWorkoutPlanStore = create<WorkoutPlanStoreState>((set) => ({
   // exerciseHistoryDtos
   setExerciseHistoryDto: (data: ExerciseHistoryDto) =>
     set({ exerciseHistoryDto: data }),
+
+  // workoutPlanDescription
+  setworkoutPlanDescription: (data) => set({ workoutPlanDescription: data }),
+  resetworkoutPlanDescription: () => set({ workoutPlanDescription: "" }),
 }));

@@ -19,6 +19,7 @@
   "Address": "Adresse",
   "LastName": "Efternavn",
   "FirstName": "Fornavn",
+  "IsCircular": "Cirkulær",
 
   "Title_cannot_exceed_100_characters": "Titel kan ikke overstige 100 tegn",
   "Description_cannot_exceed_500_characters": "Beskrivelse kan ikke overstige 500 tegn!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} skal være et positivt tal.",
   "_0_created_successfully": "{0} oprettet successfully!",
   "_0_updated_successfully": "{0} opdateret successfully!",
-  "_0_deleted_successfully": "{0} slettet successfully!"
+  "_0_deleted_successfully": "{0} slettet successfully!",
+  "_0_cannot_exceed_50_characters": "{0} kan ikke overstige 50 tegn!",
+  "_0_cannot_exceed_100_characters": "{0} kan ikke overstige 100 tegn!",
+  "_0_cannot_exceed_200_characters": "{0} kan ikke overstige 200 tegn!",
+  "_0_cannot_exceed_500_characters": "{0} kan ikke overstige 500 tegn!"
 }

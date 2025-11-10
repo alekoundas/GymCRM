@@ -19,6 +19,7 @@
   "Address": "주소",
   "LastName": "성",
   "FirstName": "이름",
+  "IsCircular": "원형",
 
   "Title_cannot_exceed_100_characters": "제목은 100자를 초과할 수 없습니다",
   "Description_cannot_exceed_500_characters": "설명은 500자를 초과할 수 없습니다!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0}은(는) 양수여야 합니다.",
   "_0_created_successfully": "{0}이(가) 성공적으로 생성되었습니다!",
   "_0_updated_successfully": "{0}이(가) 성공적으로 업데이트되었습니다!",
-  "_0_deleted_successfully": "{0}이(가) 성공적으로 삭제되었습니다!"
+  "_0_deleted_successfully": "{0}이(가) 성공적으로 삭제되었습니다!",
+  "_0_cannot_exceed_50_characters": "{0}은(는) 50자를 초과할 수 없습니다!",
+  "_0_cannot_exceed_100_characters": "{0}은(는) 100자를 초과할 수 없습니다!",
+  "_0_cannot_exceed_200_characters": "{0}은(는) 200자를 초과할 수 없습니다!",
+  "_0_cannot_exceed_500_characters": "{0}은(는) 500자를 초과할 수 없습니다!"
 }

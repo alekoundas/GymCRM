@@ -19,6 +19,7 @@
   "Address": "Адрес",
   "LastName": "Фамилия",
   "FirstName": "Имя",
+  "IsCircular": "Круговой",
 
   "Title_cannot_exceed_100_characters": "Заголовок не может превышать 100 символов",
   "Description_cannot_exceed_500_characters": "Описание не может превышать 500 символов!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} должно быть положительным числом.",
   "_0_created_successfully": "{0} создан успешно!",
   "_0_updated_successfully": "{0} обновлен успешно!",
-  "_0_deleted_successfully": "{0} удален успешно!"
+  "_0_deleted_successfully": "{0} удален успешно!",
+  "_0_cannot_exceed_50_characters": "{0} не может превышать 50 символов!",
+  "_0_cannot_exceed_100_characters": "{0} не может превышать 100 символов!",
+  "_0_cannot_exceed_200_characters": "{0} не может превышать 200 символов!",
+  "_0_cannot_exceed_500_characters": "{0} не может превышать 500 символов!"
 }

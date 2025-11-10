@@ -19,6 +19,7 @@
   "Address": "Adresa",
   "LastName": "Příjmení",
   "FirstName": "Jméno",
+  "IsCircular": "Kruhový",
 
   "Title_cannot_exceed_100_characters": "Nadpis nemůže překročit 100 znaků",
   "Description_cannot_exceed_500_characters": "Popis nemůže překročit 500 znaků!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} musí být kladné číslo.",
   "_0_created_successfully": "{0} vytvořeno úspěšně!",
   "_0_updated_successfully": "{0} aktualizováno úspěšně!",
-  "_0_deleted_successfully": "{0} smazáno úspěšně!"
+  "_0_deleted_successfully": "{0} smazáno úspěšně!",
+  "_0_cannot_exceed_50_characters": "{0} nemůže překročit 50 znaků!",
+  "_0_cannot_exceed_100_characters": "{0} nemůže překročit 100 znaků!",
+  "_0_cannot_exceed_200_characters": "{0} nemůže překročit 200 znaků!",
+  "_0_cannot_exceed_500_characters": "{0} nemůže překročit 500 znaků!"
 }

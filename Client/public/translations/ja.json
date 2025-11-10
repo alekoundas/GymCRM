@@ -202,5 +202,6 @@
   "Updates history": "更新履歴",
   "Already 12h away! (You wont be able to opt out from this date.)": "すでに12時間先です！（この日からオプトアウトできません。）",
   "Already 12h away! You cant opt out.": "すでに12時間先です！オプトアウトできません。",
-  "Circular": "__STRING_NOT_TRANSLATED__"
+  "Circular": "円形の",
+  "Update description": "説明を更新"
 }

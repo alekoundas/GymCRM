@@ -202,5 +202,6 @@
   "Updates history": "سجل التحديثات",
   "Already 12h away! (You wont be able to opt out from this date.)": "بالفعل 12 ساعة بعيدة! (لن تتمكن من الانسحاب من هذا التاريخ.)",
   "Already 12h away! You cant opt out.": "بالفعل 12 ساعة بعيدة! لا يمكنك الانسحاب.",
-  "Circular": "__STRING_NOT_TRANSLATED__"
+  "Circular": "دائري",
+  "Update description": "تحديث الوصف"
 }

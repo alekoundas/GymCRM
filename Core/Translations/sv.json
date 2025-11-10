@@ -19,6 +19,7 @@
   "Address": "Adress",
   "LastName": "Efternamn",
   "FirstName": "Förnamn",
+  "IsCircular": "Cirkulär",
 
   "Title_cannot_exceed_100_characters": "Titel får inte överskrida 100 tecken",
   "Description_cannot_exceed_500_characters": "Beskrivning får inte överskrida 500 tecken!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} måste vara ett positivt tal.",
   "_0_created_successfully": "{0} skapad framgångsrikt!",
   "_0_updated_successfully": "{0} uppdaterad framgångsrikt!",
-  "_0_deleted_successfully": "{0} raderad framgångsrikt!"
+  "_0_deleted_successfully": "{0} raderad framgångsrikt!",
+  "_0_cannot_exceed_50_characters": "{0} får inte överstiga 50 tecken!",
+  "_0_cannot_exceed_100_characters": "{0} får inte överstiga 100 tecken!",
+  "_0_cannot_exceed_200_characters": "{0} får inte överstiga 200 tecken!",
+  "_0_cannot_exceed_500_characters": "{0} får inte överstiga 500 tecken!"
 }

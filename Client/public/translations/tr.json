@@ -202,5 +202,6 @@
   "Updates history": "Güncelleme geçmişi",
   "Already 12h away! (You wont be able to opt out from this date.)": "Zaten 12 saat uzakta! (Bu tarihten itibaren vazgeçemezsiniz.)",
   "Already 12h away! You cant opt out.": "Zaten 12 saat uzakta! Vazgeçemezsiniz.",
-  "Circular": "__STRING_NOT_TRANSLATED__"
+  "Circular": "dairesel",
+  "Update description": "Açıklama güncelle"
 }

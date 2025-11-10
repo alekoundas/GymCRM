@@ -19,6 +19,7 @@
   "Address": "العنوان",
   "LastName": "اسم العائلة",
   "FirstName": "الاسم الأول",
+  "IsCircular": "دائري",
 
   "Title_cannot_exceed_100_characters": "العنوان لا يمكن أن يتجاوز 100 حرف",
   "Description_cannot_exceed_500_characters": "الوصف لا يمكن أن يتجاوز 500 حرف!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} يجب أن يكون رقمًا موجبًا.",
   "_0_created_successfully": "{0} تم إنشاؤه بنجاح!",
   "_0_updated_successfully": "{0} تم تحديثه بنجاح!",
-  "_0_deleted_successfully": "{0} تم حذفه بنجاح!"
+  "_0_deleted_successfully": "{0} تم حذفه بنجاح!",
+  "_0_cannot_exceed_50_characters": "{0} لا يمكن أن يتجاوز 50 حرفًا!",
+  "_0_cannot_exceed_100_characters": "{0} لا يمكن أن يتجاوز 100 حرفًا!",
+  "_0_cannot_exceed_200_characters": "{0} لا يمكن أن يتجاوز 200 حرفًا!",
+  "_0_cannot_exceed_500_characters": "{0} لا يمكن أن يتجاوز 500 حرفًا!"
 }
