@@ -69,13 +69,10 @@ export default function ExerciseHistoryFormComponent({}: IField) {
       <div className="field">
         <label htmlFor={`reps-${exerciseHistoryDto.id}`}>{t("Reps")}</label>
         <div className="w-full flex flex-nowrap">
-          <InputNumber
+          <InputText
             id={`reps-${exerciseHistoryDto.id}`}
             value={exerciseHistoryDto.reps}
             className="p-inputtext-sm w-full"
-            inputStyle={{
-              width: "100%",
-            }}
             disabled={true}
           />
         </div>
@@ -84,13 +81,10 @@ export default function ExerciseHistoryFormComponent({}: IField) {
       <div className="field">
         <label htmlFor={`weight-${exerciseHistoryDto.id}`}>{t("Weight")}</label>
         <div className="w-full flex flex-nowrap">
-          <InputNumber
+          <InputText
             id={`weight-${exerciseHistoryDto.id}`}
             value={exerciseHistoryDto.weight}
             className="p-inputtext-sm w-full"
-            inputStyle={{
-              width: "100%",
-            }}
             disabled={true}
           />
         </div>

@@ -404,7 +404,7 @@ export default function ExerciseListItemComponent({
           </div>
 
           <div className="formgrid grid p-2 mb-2 w-full">
-            <div className="field col-4">
+            <div className="field col-12 sm:col-3">
               <label htmlFor={`sets-${exerciseDto.id}`}>{t("Sets")}</label>
               <div className="w-full flex flex-nowrap">
                 <InputText
@@ -416,7 +416,7 @@ export default function ExerciseListItemComponent({
               </div>
             </div>
 
-            <div className="field col-4">
+            <div className="field col-12 sm:col-3">
               <label htmlFor={`reps-${exerciseDto.id}`}>{t("Reps")}</label>
               <div className="w-full flex flex-nowrap">
                 <InputText
@@ -428,7 +428,7 @@ export default function ExerciseListItemComponent({
               </div>
             </div>
 
-            <div className="field col-3">
+            <div className="field col-12 sm:col-3">
               <label htmlFor={`weight-${exerciseDto.id}`}>{t("Weight")}</label>
               <div className="w-full flex flex-nowrap">
                 <InputText
@@ -440,7 +440,7 @@ export default function ExerciseListItemComponent({
               </div>
             </div>
 
-            <div className="field col-1">
+            <div className="field col-12 sm:col-3">
               <label htmlFor={`isCircular-${exerciseDto.id}`}>
                 {t("Circular")}
               </label>
