@@ -85,12 +85,19 @@ export default function WorkoutPlansPage() {
             size="normal"
             className=" mr-2 "
           />
-          {" " +
-            user.firstName[0].toUpperCase() +
-            user.firstName.slice(1, user.firstName.length) +
-            " " +
-            user.lastName[0].toUpperCase() +
-            user.lastName.slice(1, user.lastName.length)}
+          <Tag
+            className="opacity-100"
+            style={{
+              backgroundColor: "#" + user.userColor,
+            }}
+          >
+            {" " +
+              user.firstName[0].toUpperCase() +
+              user.firstName.slice(1, user.firstName.length) +
+              " " +
+              user.lastName[0].toUpperCase() +
+              user.lastName.slice(1, user.lastName.length)}
+          </Tag>
         </div>
       );
     }
