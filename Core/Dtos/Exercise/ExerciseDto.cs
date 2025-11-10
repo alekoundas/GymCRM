@@ -12,25 +12,30 @@ namespace Core.Dtos.Exercise
         public string Name { get; set; } = string.Empty;
 
 
+        [StringLength(500, ErrorMessage = TranslationKeys._0_cannot_exceed_500_characters)]
         public string Description { get; set; } = string.Empty;
 
 
-
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
+        [StringLength(500, ErrorMessage = TranslationKeys._0_cannot_exceed_500_characters)]
         public string Sets { get; set; } = string.Empty;
 
 
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
+        [StringLength(500, ErrorMessage = TranslationKeys._0_cannot_exceed_500_characters)]
+        public string Reps { get; set; } = string.Empty;
+
+
+        [Required(ErrorMessage = TranslationKeys._0_is_required)]
+        [StringLength(500, ErrorMessage = TranslationKeys._0_cannot_exceed_500_characters)]
+        public string Weight { get; set; } = string.Empty;
+
+
+        [StringLength(500, ErrorMessage = TranslationKeys._0_cannot_exceed_500_characters)]
         public string VideoUrl { get; set; } = string.Empty;
 
 
-        [Required(ErrorMessage = TranslationKeys._0_is_required)]
-        [Range(1, int.MaxValue, ErrorMessage = TranslationKeys._0_must_be_a_positive_number)]
-        public int Reps { get; set; }
-
-
-        [Required(ErrorMessage = TranslationKeys._0_is_required)]
-        [Range(1, int.MaxValue, ErrorMessage = TranslationKeys._0_must_be_a_positive_number)]
-        public int Weight { get; set; }
+        public bool IsCircular { get; set; }
 
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]

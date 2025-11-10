@@ -16,14 +16,21 @@ namespace DataAccess.Configurations
                .IsRequired(true)
                .HasMaxLength(500);
 
+            builder.Property(x => x.Description)
+               .IsRequired(false)
+               .HasMaxLength(500);
+
             builder.Property(x => x.Sets)
-                .IsRequired(true);
+                .IsRequired(true)
+                .HasMaxLength(500);
 
             builder.Property(x => x.Reps)
-                .IsRequired(true);
+                .IsRequired(true)
+                .HasMaxLength(500);
 
             builder.Property(x => x.Weight)
-                .IsRequired(true);
+                .IsRequired(true)
+                .HasMaxLength(500);
 
             builder.Property(x => x.GroupNumber)
               .IsRequired(true);

@@ -201,5 +201,6 @@
   "Move down": "Flytta ner",
   "Updates history": "Uppdateringshistorik",
   "Already 12h away! (You wont be able to opt out from this date.)": "Redan 12 timmar bort! (Du kommer inte kunna avboka från det här datumet.)",
-  "Already 12h away! You cant opt out.": "Redan 12 timmar bort! Du kan inte avboka."
+  "Already 12h away! You cant opt out.": "Redan 12 timmar bort! Du kan inte avboka.",
+  "Circular": "__STRING_NOT_TRANSLATED__"
 }

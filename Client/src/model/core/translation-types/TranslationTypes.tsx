@@ -208,6 +208,7 @@
   'Updates history': string;
   'Already 12h away! (You wont be able to opt out from this date.)': string;
   'Already 12h away! You cant opt out.': string;
+  'Circular': string;
     }
 
 

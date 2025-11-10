@@ -201,5 +201,6 @@
   "Move down": "Move down",
   "Updates history": "Updates history",
   "Already 12h away! (You wont be able to opt out from this date.)": "Already 12h away! (You wont be able to opt out from this date.)",
-  "Already 12h away! You cant opt out.": "Already 12h away! You cant opt out."
+  "Already 12h away! You cant opt out.": "Already 12h away! You cant opt out.",
+  "Circular": "__STRING_NOT_TRANSLATED__"
 }

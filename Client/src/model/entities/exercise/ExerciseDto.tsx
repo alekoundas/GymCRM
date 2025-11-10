@@ -3,9 +3,10 @@ export interface ExerciseDto {
   name: string;
   description: string;
   sets: string;
+  reps: string;
+  weight: string;
+  isCircular: boolean;
   videoUrl: string;
-  reps: number;
-  weight: number;
   groupNumber: number;
   groupExerciseOrderNumber: number;
   workoutPlanId: number;
@@ -16,9 +17,10 @@ export class ExerciseDto {
   name: string = "";
   description: string = "";
   sets: string = "";
+  reps: string = "";
+  weight: string = "";
+  isCircular: boolean = false;
   videoUrl: string = "";
-  reps: number = 1;
-  weight: number = 1;
   groupNumber: number = 0;
   groupExerciseOrderNumber: number = 0;
   workoutPlanId: number = 0;

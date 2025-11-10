@@ -14,6 +14,7 @@ import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
 import ExerciseFormComponent from "./ExerciseFormComponent";
 import ExerciseHistoryGridComponent from "../exercise-history/ExerciseHistoryGridComponent";
+import { Checkbox } from "primereact/checkbox";
 
 interface IField {
   formMode: FormMode;
@@ -388,126 +389,80 @@ export default function ExerciseListItemComponent({
 
   return (
     <>
-      <div
-        key={exerciseDto.id}
-        className="formgrid grid p-mb-2"
-      >
-        <div className="field col-12 md:col-4">
-          <label htmlFor={`name-${exerciseDto.id}`}>{t("Name")}</label>
-          <div className="w-full flex flex-nowrap">
-            {/* <InputNumber
-              id={`groupNumber-${exerciseDto.id}`}
-              value={exerciseDto.groupNumber}
-              onValueChange={(e) =>
-                updateExercise(exerciseDto.id, "groupNumber", e.value)
-              }
-              className="p-inputtext-sm w-full"
-              disabled={!isAdminPage}
-            />
-            <InputNumber
-              id={`orderNumber-${exerciseDto.id}`}
-              value={exerciseDto.groupExerciseOrderNumber}
-              onValueChange={(e) =>
-                updateExercise(
-                  exerciseDto.id,
-                  "groupExerciseOrderNumber",
-                  e.value
-                )
-              }
-              className="p-inputtext-sm w-full"
-              disabled={!isAdminPage}
-            /> */}
-            <InputText
-              id={`name-${exerciseDto.id}`}
-              value={exerciseDto.name}
-              onChange={(e) =>
-                updateExercise(exerciseDto.id, "name", e.target.value)
-              }
-              className="p-inputtext-sm w-full"
-              disabled={true}
-            />
+      <div className="flex align-content-center justify-content-between align-items-center">
+        <div className="w-full">
+          <div className="field w-full">
+            <label htmlFor={`name-${exerciseDto.id}`}>{t("Name")}</label>
+            <div className="w-full flex flex-nowrap">
+              <InputText
+                id={`name-${exerciseDto.id}`}
+                value={exerciseDto.name}
+                className="p-inputtext-sm w-full"
+                disabled={true}
+              />
+            </div>
+          </div>
+
+          <div className="formgrid grid p-2 mb-2 w-full">
+            <div className="field col-4">
+              <label htmlFor={`sets-${exerciseDto.id}`}>{t("Sets")}</label>
+              <div className="w-full flex flex-nowrap">
+                <InputText
+                  id={`sets-${exerciseDto.id}`}
+                  value={exerciseDto.sets}
+                  className="p-inputtext-sm w-full"
+                  disabled={true}
+                />
+              </div>
+            </div>
+
+            <div className="field col-4">
+              <label htmlFor={`reps-${exerciseDto.id}`}>{t("Reps")}</label>
+              <div className="w-full flex flex-nowrap">
+                <InputText
+                  id={`reps-${exerciseDto.id}`}
+                  value={exerciseDto.reps}
+                  className="p-inputtext-sm w-full"
+                  disabled={true}
+                />
+              </div>
+            </div>
+
+            <div className="field col-3">
+              <label htmlFor={`weight-${exerciseDto.id}`}>{t("Weight")}</label>
+              <div className="w-full flex flex-nowrap">
+                <InputText
+                  id={`weight-${exerciseDto.id}`}
+                  value={exerciseDto.weight}
+                  className="p-inputtext-sm w-full"
+                  disabled={true}
+                />
+              </div>
+            </div>
+
+            <div className="field col-1">
+              <label htmlFor={`isCircular-${exerciseDto.id}`}>
+                {t("Circular")}
+              </label>
+              <div className="flex flex-nowrap">
+                <Checkbox
+                  id={`isCircular-${exerciseDto.id}`}
+                  checked={exerciseDto.isCircular}
+                  className="p-inputtext-sm w-full"
+                  disabled={true}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="field col-12 md:col-3">
-          <label htmlFor={`description-${exerciseDto.id}`}>
-            {t("Description")}
-          </label>
-          <div className="w-full flex flex-nowrap">
-            <InputText
-              id={`description-${exerciseDto.id}`}
-              value={exerciseDto.description}
-              onChange={(e) =>
-                updateExercise(exerciseDto.id, "description", e.target.value)
-              }
-              className="p-inputtext-sm w-full"
-              disabled={true}
-            />
-          </div>
-        </div>
-
-        <div className="field col-12 md:col">
-          <label htmlFor={`sets-${exerciseDto.id}`}>{t("Sets")}</label>
-          <div className="w-full flex flex-nowrap">
-            <InputText
-              id={`sets-${exerciseDto.id}`}
-              value={exerciseDto.sets}
-              onChange={(e) =>
-                updateExercise(exerciseDto.id, "sets", e.target.value ?? 0)
-              }
-              className="p-inputtext-sm w-full"
-              disabled={true}
-            />
-          </div>
-        </div>
-
-        <div className="field col-12 md:col">
-          <label htmlFor={`reps-${exerciseDto.id}`}>{t("Reps")}</label>
-          <div className="w-full flex flex-nowrap">
-            <InputNumber
-              id={`reps-${exerciseDto.id}`}
-              value={exerciseDto.reps}
-              onValueChange={(e) =>
-                updateExercise(exerciseDto.id, "reps", e.value ?? 0)
-              }
-              min={1}
-              className="p-inputtext-sm w-full"
-              inputStyle={{
-                width: "100%",
-              }}
-              disabled={true}
-            />
-          </div>
-        </div>
-
-        <div className="field col-12 md:col">
-          <label htmlFor={`weight-${exerciseDto.id}`}>{t("Weight")}</label>
-          <div className="w-full flex flex-nowrap">
-            <InputNumber
-              id={`weight-${exerciseDto.id}`}
-              value={exerciseDto.weight}
-              onValueChange={(e) =>
-                updateExercise(exerciseDto.id, "weight", e.value ?? 0)
-              }
-              min={1}
-              className="p-inputtext-sm w-full"
-              inputStyle={{
-                width: "100%",
-              }}
-              disabled={true}
-            />
-          </div>
-        </div>
-
-        <div className="field col-12 md:col-1">
-          <div className="flex justify-content-between align-items-end h-full">
+        <div className="w-1">
+          <div className="flex align-content-center  justify-content-between h-full">
             <div></div>
             <Button
               icon="pi pi-ellipsis-v"
               className="p-button-rounded p-button-info p-button-sm"
-              // onClick={() => dialogControlDelete.showDialog()}
               onClick={(e) => menuRef.current?.toggle(e)}
-              // visible={isAdminPage}
             />
             <Menu
               ref={menuRef}

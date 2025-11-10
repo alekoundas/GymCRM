@@ -16,6 +16,10 @@ namespace DataAccess.Configurations
                .IsRequired(true)
                .HasMaxLength(500);
 
+            builder.Property(x => x.Description)
+                .IsRequired(false)
+                .HasMaxLength(500);
+
 
             // Relationship with User (one-to-many)
             builder.HasOne(x => x.User)
