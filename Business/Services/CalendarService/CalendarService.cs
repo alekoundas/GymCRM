@@ -154,14 +154,14 @@ namespace Business.Services.CalendarService
             {
                 // One-off: Use stored full UTC datetime (assumes time is set as in frontend)
                 dtstart = participant.SelectedDate.Value;
-                dtstart = dtstart.Date.Add(startTimeOfDayUtc).ToUniversalTime();
+                dtstart = dtstart.Date.Add(startTimeOfDayUtc);
                 return (dtstart, null);
             }
             else
             {
                 // Recurring: Compute next upcoming occurrence with local time overlaid
                 dtstart = CalculateNextOccurrenceDateTime(participant.TrainGroupDate, DateTime.UtcNow);
-                dtstart = dtstart.Date.Add(startTimeOfDayUtc).ToUniversalTime();
+                dtstart = dtstart.Date.Add(startTimeOfDayUtc);
 
                 if (participant.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH)
                 {
