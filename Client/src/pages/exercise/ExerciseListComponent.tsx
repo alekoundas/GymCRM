@@ -11,6 +11,8 @@ import GenericDialogComponent, {
 import ExerciseFormComponent from "./ExerciseFormComponent";
 import ExerciseListItemComponent from "./ExerciseListItemComponent";
 import { Card } from "primereact/card";
+import { InputTextarea } from "primereact/inputtextarea";
+import { WorkoutPlanDto } from "../../model/entities/workout-plan/WorkoutPlanDto";
 
 interface IField {
   formMode: FormMode;
@@ -28,11 +30,25 @@ export default function ExerciseListComponent({
 }: IField) {
   const { t } = useTranslator();
   const apiService = useApiService();
-  const { workoutPlanDto, setExercises, newExerciseDto, setNewExerciseDto } =
-    useWorkoutPlanStore();
+  const {
+    workoutPlanDto,
+    setExercises,
+    newExerciseDto,
+    setNewExerciseDto,
+    workoutPlanDescription,
+    setworkoutPlanDescription,
+    setWorkoutPlanDto,
+    resetworkoutPlanDescription,
+  } = useWorkoutPlanStore();
 
   const [groups, setGroups] = useState<ExerciseGroup[]>([]);
+  const [isWorkoutPlanDialogVisible, setWorkoutPlanDialogVisibility] =
+    useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
+  const dialogControlWorkoutPlan: DialogControl = {
+    showDialog: () => setWorkoutPlanDialogVisibility(true),
+    hideDialog: () => setWorkoutPlanDialogVisibility(false),
+  };
   const dialogControlAdd: DialogControl = {
     showDialog: () => setAddDialogVisibility(true),
     hideDialog: () => setAddDialogVisibility(false),
@@ -61,6 +77,23 @@ export default function ExerciseListComponent({
         dialogControlAdd.hideDialog();
         setExercises([...workoutPlanDto.exercises, response[0]]);
       }
+    }
+  };
+
+  const OnDialogWorkoutPlanSave = async (): Promise<void> => {
+    const updatedDto = {
+      ...workoutPlanDto,
+      description: workoutPlanDescription,
+    };
+    const response = await apiService.update<WorkoutPlanDto>(
+      "WorkoutPlans",
+      updatedDto,
+      workoutPlanDto.id
+    );
+    if (response) {
+      setWorkoutPlanDto(response); // Update store with backend response
+      resetworkoutPlanDescription();
+      dialogControlWorkoutPlan.hideDialog();
     }
   };
 
@@ -100,7 +133,18 @@ export default function ExerciseListComponent({
       <Card>
         <div className="w-full">
           <div className="flex justify-content-between align-items-center">
-            <div></div>
+            <div>
+              <Button
+                label={t("Update description")}
+                icon="pi pi-pencil"
+                onClick={() => {
+                  setworkoutPlanDescription(workoutPlanDto.description);
+                  dialogControlWorkoutPlan.showDialog();
+                }}
+                className="p-button-sm"
+                visible={isAdminPage && formMode !== FormMode.VIEW}
+              />
+            </div>
             <div></div>
             <div>
               <h2 className="m-0">{t("Exercises")}</h2>
@@ -115,6 +159,13 @@ export default function ExerciseListComponent({
                 visible={isAdminPage && formMode !== FormMode.VIEW}
               />
             </div>
+          </div>
+
+          <div
+            className="flex justify-content-center pt-5 break-words " //text-center
+            style={{ whiteSpace: "pre-line" }}
+          >
+            {workoutPlanDto.description}
           </div>
         </div>
       </Card>
@@ -159,6 +210,30 @@ export default function ExerciseListComponent({
             formMode={formMode}
             isAdminPage={isAdminPage}
           />
+        </div>
+      </GenericDialogComponent>
+
+      {/*                                              */}
+      {/*       Update Workout Plan Description        */}
+      {/*                                              */}
+
+      <GenericDialogComponent
+        formMode={FormMode.EDIT}
+        visible={isWorkoutPlanDialogVisible}
+        control={dialogControlWorkoutPlan}
+        onSave={OnDialogWorkoutPlanSave}
+      >
+        <div className="field">
+          <label htmlFor={`description`}>{t("Description")}</label>
+          <div className="w-full flex flex-nowrap">
+            <InputTextarea
+              id={`description`}
+              value={workoutPlanDescription}
+              onChange={(e) => setworkoutPlanDescription(e.target.value)}
+              rows={10}
+              className="p-inputtext-sm w-full"
+            />
+          </div>
         </div>
       </GenericDialogComponent>
     </>

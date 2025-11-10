@@ -202,5 +202,6 @@
   "Updates history": "Histórico de atualizações",
   "Already 12h away! (You wont be able to opt out from this date.)": "Já está a 12 horas! (Não poderá desistir a partir desta data.)",
   "Already 12h away! You cant opt out.": "Já está a 12 horas! Não pode desistir.",
-  "Circular": "__STRING_NOT_TRANSLATED__"
+  "Circular": "circular",
+  "Update description": "Atualizar descrição"
 }

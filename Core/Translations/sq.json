@@ -19,6 +19,7 @@
   "Address": "Adresë",
   "LastName": "Mbiemri",
   "FirstName": "Emri",
+  "IsCircular": "Rrethor",
 
   "Title_cannot_exceed_100_characters": "Titulli nuk mund të kalojë 100 karaktere",
   "Description_cannot_exceed_500_characters": "Përshkrimi nuk mund të kalojë 500 karaktere!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} duhet të jetë një numër pozitiv.",
   "_0_created_successfully": "{0} u krijua me sukses!",
   "_0_updated_successfully": "{0} u përditësua me sukses!",
-  "_0_deleted_successfully": "{0} u fshi me sukses!"
+  "_0_deleted_successfully": "{0} u fshi me sukses!",
+  "_0_cannot_exceed_50_characters": "{0} nuk mund të tejkalojë 50 karaktere!",
+  "_0_cannot_exceed_100_characters": "{0} nuk mund të tejkalojë 100 karaktere!",
+  "_0_cannot_exceed_200_characters": "{0} nuk mund të tejkalojë 200 karaktere!",
+  "_0_cannot_exceed_500_characters": "{0} nuk mund të tejkalojë 500 karaktere!"
 }

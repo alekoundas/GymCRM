@@ -355,7 +355,7 @@ export default function ExerciseListItemComponent({
         }
         dialogControlEdit.showDialog();
       },
-      visible: formMode !== FormMode.VIEW,
+      // visible: formMode !== FormMode.VIEW,
     });
     menuItems.push({
       label: t("Move up"),

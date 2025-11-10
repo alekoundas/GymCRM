@@ -19,6 +19,7 @@
   "Address": "Adres",
   "LastName": "Soyad",
   "FirstName": "Ad",
+  "IsCircular": "Dairesel",
 
   "Title_cannot_exceed_100_characters": "Başlık 100 karakteri aşamaz",
   "Description_cannot_exceed_500_characters": "Açıklama 500 karakteri aşamaz!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} pozitif bir sayı olmalıdır.",
   "_0_created_successfully": "{0} başarıyla oluşturuldu!",
   "_0_updated_successfully": "{0} başarıyla güncellendi!",
-  "_0_deleted_successfully": "{0} başarıyla silindi!"
+  "_0_deleted_successfully": "{0} başarıyla silindi!",
+  "_0_cannot_exceed_50_characters": "{0} 50 karakteri aşamaz!",
+  "_0_cannot_exceed_100_characters": "{0} 100 karakteri aşamaz!",
+  "_0_cannot_exceed_200_characters": "{0} 200 karakteri aşamaz!",
+  "_0_cannot_exceed_500_characters": "{0} 500 karakteri aşamaz!"
 }

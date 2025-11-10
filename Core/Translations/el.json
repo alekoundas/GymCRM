@@ -19,6 +19,7 @@
   "Address": "Διεύθυνση",
   "LastName": "Επώνυμο",
   "FirstName": "Όνομα",
+  "IsCircular": "Κυκλικό",
 
   "Title_cannot_exceed_100_characters": "Ο τίτλος δεν μπορεί να υπερβαίνει τους 100 χαρακτήρες",
   "Description_cannot_exceed_500_characters": "Η περιγραφή δεν μπορεί να υπερβαίνει τους 500 χαρακτήρες!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} πρέπει να είναι θετικός αριθμός.",
   "_0_created_successfully": "{0} δημιουργήθηκε επιτυχώς!",
   "_0_updated_successfully": "{0} ενημερώθηκε επιτυχώς!",
-  "_0_deleted_successfully": "{0} διαγράφηκε επιτυχώς!"
+  "_0_deleted_successfully": "{0} διαγράφηκε επιτυχώς!",
+  "_0_cannot_exceed_50_characters": "{0} δεν μπορεί να υπερβεί τους 50 χαρακτήρες!",
+  "_0_cannot_exceed_100_characters": "{0} δεν μπορεί να υπερβεί τους 100 χαρακτήρες!",
+  "_0_cannot_exceed_200_characters": "{0} δεν μπορεί να υπερβεί τους 200 χαρακτήρες!",
+  "_0_cannot_exceed_500_characters": "{0} δεν μπορεί να υπερβεί τους 500 χαρακτήρες!"
 }

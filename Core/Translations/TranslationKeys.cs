@@ -88,6 +88,7 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string _0_created_successfully = "_0_created_successfully";
         public const string _0_updated_successfully = "_0_updated_successfully";
         public const string _0_deleted_successfully = "_0_deleted_successfully";
+        public const string _0_cannot_exceed_50_characters = "_0_cannot_exceed_50_characters";
         public const string _0_cannot_exceed_100_characters = "_0_cannot_exceed_100_characters";
         public const string _0_cannot_exceed_200_characters = "_0_cannot_exceed_200_characters";
         public const string _0_cannot_exceed_500_characters = "_0_cannot_exceed_500_characters";

@@ -19,6 +19,7 @@
   "Address": "住所",
   "LastName": "姓",
   "FirstName": "名",
+  "IsCircular": "円形",
 
   "Title_cannot_exceed_100_characters": "タイトルは100文字を超えることはできません",
   "Description_cannot_exceed_500_characters": "説明は500文字を超えることはできません!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0}は正の数でなければなりません。",
   "_0_created_successfully": "{0} が正常に作成されました!",
   "_0_updated_successfully": "{0} が正常に更新されました!",
-  "_0_deleted_successfully": "{0} が正常に削除されました!"
+  "_0_deleted_successfully": "{0} が正常に削除されました!",
+  "_0_cannot_exceed_50_characters": "{0} は 50 文字を超えることはできません！",
+  "_0_cannot_exceed_100_characters": "{0} は 100 文字を超えることはできません！",
+  "_0_cannot_exceed_200_characters": "{0} は 200 文字を超えることはできません！",
+  "_0_cannot_exceed_500_characters": "{0} は 500 文字を超えることはできません！"
 }

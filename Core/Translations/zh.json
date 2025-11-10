@@ -19,6 +19,7 @@
   "Address": "地址",
   "LastName": "姓",
   "FirstName": "名",
+  "IsCircular": "圆形的",
 
   "Title_cannot_exceed_100_characters": "标题不能超过100个字符",
   "Description_cannot_exceed_500_characters": "描述不能超过500个字符!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} 必须是正数。",
   "_0_created_successfully": "{0} 成功创建!",
   "_0_updated_successfully": "{0} 成功更新!",
-  "_0_deleted_successfully": "{0} 成功删除!"
+  "_0_deleted_successfully": "{0} 成功删除!",
+  "_0_cannot_exceed_50_characters": "{0} 不能超过 50 个字符！",
+  "_0_cannot_exceed_100_characters": "{0} 不能超过 100 个字符！",
+  "_0_cannot_exceed_200_characters": "{0} 不能超过 200 个字符！",
+  "_0_cannot_exceed_500_characters": "{0} 不能超过 500 个字符！"
 }

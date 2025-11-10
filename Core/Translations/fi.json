@@ -19,6 +19,7 @@
   "Address": "Osoite",
   "LastName": "Sukunimi",
   "FirstName": "Etunimi",
+  "IsCircular": "Pyöreä",
 
   "Title_cannot_exceed_100_characters": "Otsikko ei saa ylittää 100 merkkiä",
   "Description_cannot_exceed_500_characters": "Kuvaus ei saa ylittää 500 merkkiä!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} on oltava positiivinen luku.",
   "_0_created_successfully": "{0} luotu onnistuneesti!",
   "_0_updated_successfully": "{0} päivitetty onnistuneesti!",
-  "_0_deleted_successfully": "{0} poistettu onnistuneesti!"
+  "_0_deleted_successfully": "{0} poistettu onnistuneesti!",
+  "_0_cannot_exceed_50_characters": "{0} ei voi ylittää 50 merkkiä!",
+  "_0_cannot_exceed_100_characters": "{0} ei voi ylittää 100 merkkiä!",
+  "_0_cannot_exceed_200_characters": "{0} ei voi ylittää 200 merkkiä!",
+  "_0_cannot_exceed_500_characters": "{0} ei voi ylittää 500 merkkiä!"
 }

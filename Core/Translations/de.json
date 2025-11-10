@@ -19,6 +19,7 @@
   "Address": "Adresse",
   "LastName": "Nachname",
   "FirstName": "Vorname",
+  "IsCircular": "Kreisförmig",
 
   "Title_cannot_exceed_100_characters": "Titel darf 100 Zeichen nicht überschreiten",
   "Description_cannot_exceed_500_characters": "Beschreibung darf 500 Zeichen nicht überschreiten!",
@@ -80,5 +81,9 @@
   "_0_must_be_a_positive_number": "{0} muss eine positive Zahl sein.",
   "_0_created_successfully": "{0} erfolgreich erstellt!",
   "_0_updated_successfully": "{0} erfolgreich aktualisiert!",
-  "_0_deleted_successfully": "{0} erfolgreich gelöscht!"
+  "_0_deleted_successfully": "{0} erfolgreich gelöscht!",
+  "_0_cannot_exceed_50_characters": "{0} darf 50 Zeichen nicht überschreiten!",
+  "_0_cannot_exceed_100_characters": "{0} darf 100 Zeichen nicht überschreiten!",
+  "_0_cannot_exceed_200_characters": "{0} darf 200 Zeichen nicht überschreiten!",
+  "_0_cannot_exceed_500_characters": "{0} darf 500 Zeichen nicht überschreiten!"
 }
