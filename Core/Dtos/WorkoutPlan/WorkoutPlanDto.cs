@@ -28,5 +28,6 @@ namespace Core.Dtos.WorkoutPlan
 
 
         public ICollection<ExerciseDto> Exercises { get; set; } = new Collection<ExerciseDto>();
+        public DateTime CreatedOn { get; set; }
     }
 }

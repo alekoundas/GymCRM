@@ -129,7 +129,7 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
           <Tag
             className="opacity-100"
             style={{
-              backgroundColor: "#" + user.userColor,
+              backgroundColor: "#" + user.userStatus?.color,
             }}
           >
             {" " +

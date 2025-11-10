@@ -428,7 +428,7 @@ namespace API.Controllers
 
         protected override void DataTableQueryUpdate(IGenericRepository<TrainGroupParticipant> query, DataTableDto<TrainGroupParticipantDto> dataTable)
         {
-            query = query.Include(x => x.User);
+            query = query.Include(x => x.User).ThenInclude<User, UserStatus>(x => x.UserStatus!);
 
 
             List<DataTableFilterDto> customFilters = dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.custom).ToList();

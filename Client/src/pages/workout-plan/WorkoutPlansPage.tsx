@@ -20,6 +20,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Card } from "primereact/card";
 import { Tag } from "primereact/tag";
 import { ColumnFilterElementTemplateOptions } from "primereact/column";
+import DataTableFilterDateComponent from "../../components/core/datatable/DataTableFilterDateComponent";
 
 export default function WorkoutPlansPage() {
   const { t } = useTranslator();
@@ -88,7 +89,7 @@ export default function WorkoutPlansPage() {
           <Tag
             className="opacity-100"
             style={{
-              backgroundColor: "#" + user.userColor,
+              backgroundColor: "#" + user.userStatus?.color,
             }}
           >
             {" " +
@@ -128,39 +129,31 @@ export default function WorkoutPlansPage() {
         chipTemplate(rowData.user),
       style: { width: "10%" },
     },
-  ].concat(
-    isAdminPage
-      ? [
-          {
-            field: "userStatusId",
-            header: t("User Statuses"),
-            sortable: true,
-            filter: true,
-            filterPlaceholder: t("Search"),
-            filterTemplate: (options) => (
-              <DataTableFilterIdComponent
-                options={options}
-                controller="UserStatuses"
-              />
-            ),
-            body: (rowData, options) => {
-              if (rowData?.user?.userStatus)
-                return (
-                  <Tag
-                    className="p-2 opacity-100 w-full"
-                    style={{
-                      backgroundColor: "#" + rowData.user.userStatus.color,
-                    }}
-                  >
-                    {rowData.user.userStatus.name}
-                  </Tag>
-                );
-            },
-            style: { width: "20%" },
-          },
-        ]
-      : []
-  );
+    {
+      field: "createdOn",
+      header: t("CreatedOn"),
+      sortable: true,
+      filter: true,
+      filterTemplate: (options) => (
+        <DataTableFilterDateComponent options={options} />
+      ),
+      body: (rowData, options) => (
+        <>
+          {new Date(rowData.createdOn).getDate() +
+            "/" +
+            (new Date(rowData.createdOn).getMonth() + 1) +
+            "/" +
+            new Date(rowData.createdOn).getFullYear() +
+            " " +
+            new Date(rowData.createdOn).getHours() +
+            ":" +
+            new Date(rowData.createdOn).getMinutes()}
+        </>
+      ),
+      filterPlaceholder: t("Search"),
+      style: { width: "10%" },
+    },
+  ];
 
   const onDataTableClick = (
     buttonType: ButtonTypeEnum,
