@@ -8,6 +8,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { Button } from "primereact/button";
 import { useYouTubeService } from "../../services/YouTubeService";
+import { Checkbox } from "primereact/checkbox";
 
 interface IField extends DialogChildProps {
   isAdminPage: boolean;
@@ -44,13 +45,15 @@ export default function ExerciseFormComponent({
       </div>
 
       <div className="field">
-        <label htmlFor={`name-${newExerciseDto.id}`}>{t("Name")}</label>
+        <label htmlFor={`isCircular-${newExerciseDto.id}`}>
+          {t("Circular")}
+        </label>
         <div className="w-full flex flex-nowrap">
-          <InputText
-            id={`name-${newExerciseDto.id}`}
-            value={newExerciseDto.name}
+          <Checkbox
+            id={`isCircular-${newExerciseDto.id}`}
+            checked={newExerciseDto.isCircular}
             onChange={(e) =>
-              updateExercise(newExerciseDto.id, "name", e.target.value)
+              updateExercise(newExerciseDto.id, "isCircular", e.checked)
             }
             className="p-inputtext-sm w-full"
             disabled={!isAdminPage || formMode === FormMode.VIEW}
@@ -59,15 +62,13 @@ export default function ExerciseFormComponent({
       </div>
 
       <div className="field">
-        <label htmlFor={`description-${newExerciseDto.id}`}>
-          {t("Description")}
-        </label>
+        <label htmlFor={`name-${newExerciseDto.id}`}>{t("Name")}</label>
         <div className="w-full flex flex-nowrap">
-          <InputTextarea
-            id={`description-${newExerciseDto.id}`}
-            value={newExerciseDto.description}
+          <InputText
+            id={`name-${newExerciseDto.id}`}
+            value={newExerciseDto.name}
             onChange={(e) =>
-              updateExercise(newExerciseDto.id, "description", e.target.value)
+              updateExercise(newExerciseDto.id, "name", e.target.value)
             }
             className="p-inputtext-sm w-full"
             disabled={!isAdminPage || formMode === FormMode.VIEW}
@@ -91,6 +92,36 @@ export default function ExerciseFormComponent({
       </div>
 
       <div className="field">
+        <label htmlFor={`reps-${newExerciseDto.id}`}>{t("Reps")}</label>
+        <div className="w-full flex flex-nowrap">
+          <InputText
+            id={`reps-${newExerciseDto.id}`}
+            value={newExerciseDto.reps}
+            onChange={(e) =>
+              updateExercise(newExerciseDto.id, "reps", e.target.value ?? 0)
+            }
+            className="p-inputtext-sm w-full"
+            disabled={!isAdminPage || formMode === FormMode.VIEW}
+          />
+        </div>
+      </div>
+
+      <div className="field">
+        <label htmlFor={`weight-${newExerciseDto.id}`}>{t("Weight")}</label>
+        <div className="w-full flex flex-nowrap">
+          <InputText
+            id={`weight-${newExerciseDto.id}`}
+            value={newExerciseDto.weight}
+            onChange={(e) =>
+              updateExercise(newExerciseDto.id, "weight", e.target.value ?? 0)
+            }
+            className="p-inputtext-sm w-full"
+            disabled={formMode === FormMode.VIEW}
+          />
+        </div>
+      </div>
+
+      <div className="field">
         <label htmlFor={`videoUrl-${newExerciseDto.id}`}>
           {t("Video Url")}
         </label>
@@ -101,13 +132,12 @@ export default function ExerciseFormComponent({
             onChange={(e) =>
               updateExercise(newExerciseDto.id, "videoUrl", e.target.value ?? 0)
             }
-            min={1}
             className="p-inputtext-sm w-full"
             disabled={!isAdminPage || formMode === FormMode.VIEW}
           />
           <Button
             label="YouTube"
-            className="ml-4 w-1"
+            className="ml-4 w-2"
             icon="pi pi-youtube"
             onClick={() => openYouTubeVideo(newExerciseDto.videoUrl)}
           />
@@ -115,39 +145,19 @@ export default function ExerciseFormComponent({
       </div>
 
       <div className="field">
-        <label htmlFor={`reps-${newExerciseDto.id}`}>{t("Reps")}</label>
+        <label htmlFor={`description-${newExerciseDto.id}`}>
+          {t("Description")}
+        </label>
         <div className="w-full flex flex-nowrap">
-          <InputNumber
-            id={`reps-${newExerciseDto.id}`}
-            value={newExerciseDto.reps}
-            onValueChange={(e) =>
-              updateExercise(newExerciseDto.id, "reps", e.value ?? 0)
+          <InputTextarea
+            id={`description-${newExerciseDto.id}`}
+            value={newExerciseDto.description}
+            onChange={(e) =>
+              updateExercise(newExerciseDto.id, "description", e.target.value)
             }
-            min={1}
+            rows={5}
             className="p-inputtext-sm w-full"
-            inputStyle={{
-              width: "100%",
-            }}
-            disabled={!isAdminPage || formMode === FormMode.VIEW}
-          />
-        </div>
-      </div>
-
-      <div className="field">
-        <label htmlFor={`weight-${newExerciseDto.id}`}>{t("Weight")}</label>
-        <div className="w-full flex flex-nowrap">
-          <InputNumber
-            id={`weight-${newExerciseDto.id}`}
-            value={newExerciseDto.weight}
-            onValueChange={(e) =>
-              updateExercise(newExerciseDto.id, "weight", e.value ?? 0)
-            }
-            min={1}
-            className="p-inputtext-sm w-full"
-            inputStyle={{
-              width: "100%",
-            }}
-            disabled={formMode === FormMode.VIEW}
+            readOnly={!isAdminPage || formMode === FormMode.VIEW}
           />
         </div>
       </div>

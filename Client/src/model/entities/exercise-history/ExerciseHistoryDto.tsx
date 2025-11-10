@@ -3,8 +3,8 @@ export interface ExerciseHistoryDto {
   name: string;
   description: string;
   sets: string;
-  reps: number;
-  weight: number;
+  reps: string;
+  weight: string;
   groupNumber: number;
   groupExerciseOrderNumber: number;
   exerciseId: number;
@@ -16,8 +16,8 @@ export class ExerciseHistoryDto {
   name: string = "";
   description: string = "";
   sets: string = "";
-  reps: number = 1;
-  weight: number = 1;
+  reps: string = "";
+  weight: string = "";
   groupNumber: number = 0;
   groupExerciseOrderNumber: number = 0;
   exerciseId: number = 0;

@@ -201,5 +201,6 @@
   "Move down": "아래로 이동",
   "Updates history": "업데이트 기록",
   "Already 12h away! (You wont be able to opt out from this date.)": "이미 12시간 앞서 있습니다! (이 날짜부터 선택 사항을 취소할 수 없습니다.)",
-  "Already 12h away! You cant opt out.": "이미 12시간 앞서 있습니다! 선택 사항을 취소할 수 없습니다."
+  "Already 12h away! You cant opt out.": "이미 12시간 앞서 있습니다! 선택 사항을 취소할 수 없습니다.",
+  "Circular": "__STRING_NOT_TRANSLATED__"
 }

@@ -201,5 +201,6 @@
   "Move down": "Flyt ned",
   "Updates history": "Opdateringshistorik",
   "Already 12h away! (You wont be able to opt out from this date.)": "Allerede 12 timer væk! (Du kan ikke framelde dig fra denne dato.)",
-  "Already 12h away! You cant opt out.": "Allerede 12 timer væk! Du kan ikke framelde dig."
+  "Already 12h away! You cant opt out.": "Allerede 12 timer væk! Du kan ikke framelde dig.",
+  "Circular": "__STRING_NOT_TRANSLATED__"
 }

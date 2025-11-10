@@ -15,6 +15,12 @@ namespace Core.Dtos.WorkoutPlan
         public string Title { get; set; } = string.Empty;
 
 
+
+        [StringLength(500, ErrorMessage = TranslationKeys._0_cannot_exceed_500_characters)]
+        public string Description { get; set; } = string.Empty;
+
+
+
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string UserId { get; set; } = "";
         public UserDto? User { get; set; }

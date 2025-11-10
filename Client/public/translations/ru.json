@@ -201,5 +201,6 @@
   "Move down": "Переместить вниз",
   "Updates history": "История обновлений",
   "Already 12h away! (You wont be able to opt out from this date.)": "Уже в 12 часах! (Вы не сможете отказаться с этой даты.)",
-  "Already 12h away! You cant opt out.": "Уже в 12 часах! Вы не можете отказаться."
+  "Already 12h away! You cant opt out.": "Уже в 12 часах! Вы не можете отказаться.",
+  "Circular": "__STRING_NOT_TRANSLATED__"
 }
