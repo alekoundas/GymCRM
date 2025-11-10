@@ -8,6 +8,7 @@ export interface WorkoutPlanDto {
   userId: string;
   user: UserDto;
   exercises: ExerciseDto[];
+  createdOn: string;
 }
 
 export class WorkoutPlanDto {
@@ -17,4 +18,5 @@ export class WorkoutPlanDto {
   userId: string = "";
   user: UserDto = new UserDto();
   exercises: ExerciseDto[] = [];
+  createdOn: string = "";
 }
