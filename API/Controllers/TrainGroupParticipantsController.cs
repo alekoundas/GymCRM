@@ -1,21 +1,17 @@
 ﻿using AutoMapper;
 using Business.Repository;
 using Business.Services;
-using Business.Services.CalendarService;
 using Business.Services.Email;
 using Core.Dtos;
 using Core.Dtos.DataTable;
-using Core.Dtos.Mail;
 using Core.Enums;
 using Core.Models;
-using Core.System;
 using Core.Translations;
 using DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
-using System.Linq.Dynamic.Core.Tokenizer;
 
 namespace API.Controllers
 {
@@ -134,33 +130,43 @@ namespace API.Controllers
                 // Remove unchanged incoming Participants
                 if (incomingParticipant != null)
                     incomingParticipants.Remove(incomingParticipant);
+
+                // Remove deleted existing Participants except if selected date is not existant in reccuring date.
+                else if (existingParticipant.SelectedDate != null && existingParticipant.SelectedDate.Value != updateDto.SelectedDate)
+                {
+                    List<TrainGroupParticipant> tempIncomingParticipants = _mapper.Map<List<TrainGroupParticipant>>(updateDto.TrainGroupParticipantDtos);
+
+                    bool hasAddedReccuringDate = tempIncomingParticipants
+                        .Where(x => x.TrainGroupDateId == existingParticipant.TrainGroupDateId)
+                        .Any(x => x.SelectedDate == null);
+
+                    var incomingDateIds = _mapper.Map<List<TrainGroupParticipant>>(updateDto.TrainGroupParticipantDtos).Select(y => y.TrainGroupDateId).ToList();
+
+                    bool hasReccuringDayOfWeek = existingEntity.TrainGroupDates
+                        .Where(x => incomingDateIds.Contains(x.Id))
+                        .Where(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
+                        .Where(x => x.RecurrenceDayOfWeek == existingParticipant.SelectedDate.Value.DayOfWeek)
+                        .Any(x => x.TrainGroupParticipants.Any(y => y.UserId.ToString() == updateDto.UserId && y.SelectedDate == null));
+
+                    bool hasReccuringDayOfMonth = existingEntity.TrainGroupDates
+                        .Where(x => incomingDateIds.Contains(x.Id))
+                        .Where(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH)
+                        .Where(x => x.RecurrenceDayOfMonth == existingParticipant.SelectedDate.Value.Day)
+                        .Any(x => x.TrainGroupParticipants.Any(y => y.UserId.ToString() == updateDto.UserId && y.SelectedDate == null));
+
+                    if (hasReccuringDayOfWeek || hasReccuringDayOfMonth || hasAddedReccuringDate)
+                    {
+                        existingParticipants.Remove(existingParticipant);
+                        dbContext.Remove(existingParticipant);
+                        emailDatesRemove.Add(existingParticipant);
+                    }
+                }
                 // Remove deleted existing Participants
                 else
                 {
                     existingParticipants.Remove(existingParticipant);
                     dbContext.Remove(existingParticipant);
-
-                    //string? dateString = "";
-                    //if (existingParticipant.TrainGroupDate.RecurrenceDayOfMonth != null)
-                    //{
-                    //    if (existingParticipant.SelectedDate == null)
-
-                    //        dateString = _localizer[TranslationKeys.Every_0_of_the_month, existingParticipant.TrainGroupDate.RecurrenceDayOfMonth.ToString()];
-                    //    else
-                    //        dateString = existingParticipant.SelectedDate.Value.ToString("yyyy-MM-dd");
-                    //}
-                    //if (existingParticipant.TrainGroupDate.RecurrenceDayOfWeek != null)
-                    //{
-                    //    if (existingParticipant.SelectedDate == null)
-                    //        dateString = existingParticipant.TrainGroupDate.RecurrenceDayOfWeek.ToString();
-                    //    else
-                    //        dateString = existingParticipant.SelectedDate.Value.ToString("yyyy-MM-dd");
-                    //}
-                    //if (existingParticipant.TrainGroupDate.FixedDay != null)
-                    //    dateString = existingParticipant.TrainGroupDate.FixedDay.Value.ToString("yyyy-MM-dd");
-
-                    //if (dateString != null)
-                        emailDatesRemove.Add(existingParticipant);
+                    emailDatesRemove.Add(existingParticipant);
                 }
             }
 
@@ -201,17 +207,17 @@ namespace API.Controllers
 
             // Validate if any of the incoming participants is already joined.
             // Check if any of the incoming participants contains selected date, then check for recurring dates.
-            bool isAlreadyParticipant = incomingParticipants.Any(x =>
-                existingParticipants
-                    .Where(x => x.UserId == new Guid(updateDto.UserId))
-                    .Any(y => x.TrainGroupDateId == y.TrainGroupDateId)
-            );
+            //bool isAlreadyParticipant = incomingParticipants.Any(x =>
+            //    existingParticipants
+            //        .Where(x => x.UserId == new Guid(updateDto.UserId))
+            //        .Any(y => x.TrainGroupDateId == y.TrainGroupDateId)
+            //);
 
-            if (isAlreadyParticipant)
-            {
-                dbContext.Dispose();
-                return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer[TranslationKeys.Participant_already_joined]);
-            }
+            //if (isAlreadyParticipant)
+            //{
+            //    dbContext.Dispose();
+            //    return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer[TranslationKeys.Participant_already_joined]);
+            //}
 
 
             // Validate max participants
@@ -219,26 +225,38 @@ namespace API.Controllers
             {
                 int numberOfParticipants = 0;
 
-                if (incomingParticipant.SelectedDate == null)
-                    numberOfParticipants = existingParticipants
-                    .Where(x => incomingParticipant.TrainGroupDateId == x.TrainGroupDateId)
-                    //.Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y =>
-                    //    y.UnavailableDate == x.TrainGroupDate.FixedDay ||
-                    //    y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth ||
-                    //    y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfWeek))
-                    .ToList()
+
+                numberOfParticipants = existingParticipants
+                    .Where(x => x.Id == incomingParticipant.TrainGroupDateId)
+                    .Where(x => x.SelectedDate == null || x.SelectedDate == updateDto.SelectedDate)
+                    .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y =>
+                        y.UnavailableDate == x.TrainGroupDate.FixedDay
+                        || y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth
+                        || y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfWeek))
                     .Count();
 
-                else
-                    numberOfParticipants = existingParticipants
-                    .Where(x => incomingParticipant.TrainGroupDateId == x.TrainGroupDateId)
-                    //.Where(x => incomingParticipant.SelectedDate == null ?  true: false) // If SelectedDate is not set, check only for non one-off participants
-                    .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y =>
-                        y.UnavailableDate == x.TrainGroupDate.FixedDay ||
-                        y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth ||
-                        y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfWeek))
-                    .ToList()
-                    .Count();
+
+                //if (incomingParticipant.SelectedDate == null)
+                //    numberOfParticipants = existingParticipants
+                //    .Where(x => incomingParticipant.TrainGroupDateId == x.TrainGroupDateId)
+                //    //.Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y =>
+                //    //    y.UnavailableDate == x.TrainGroupDate.FixedDay ||
+                //    //    y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth ||
+                //    //    y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfWeek))
+                //    .ToList()
+                //    .Count();
+
+                //else
+                //    numberOfParticipants = existingParticipants
+                //    .Where(x => incomingParticipant.TrainGroupDateId == x.TrainGroupDateId)
+                //    //.Where(x => incomingParticipant.SelectedDate == null ?  true: false) // If SelectedDate is not set, check only for non one-off participants
+                //    .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y =>
+                //        y.UnavailableDate == x.TrainGroupDate.FixedDay 
+                //        || y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth 
+                //        || y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfWeek))
+                //    .ToList()
+                //    .Count();
+
 
                 if (numberOfParticipants >= existingEntity.MaxParticipants)
                 {

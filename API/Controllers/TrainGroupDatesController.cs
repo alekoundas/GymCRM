@@ -131,6 +131,8 @@ namespace API.Controllers
                                     || y.TrainGroupDate?.RecurrenceDayOfMonth == selectedDate.Day
                                     || y.TrainGroupDate?.RecurrenceDayOfWeek == selectedDate.DayOfWeek
                                 )
+                                .Select(y=>y.UserId)
+                                .Distinct()
                                 .Count()
                         )
                     ),
