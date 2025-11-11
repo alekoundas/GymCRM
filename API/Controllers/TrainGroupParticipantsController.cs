@@ -458,10 +458,14 @@ namespace API.Controllers
                 {
                     DateTime selectedDate = DateTime.Parse(filter?.Value!);
                     query = query.Where(x =>
-                        x.SelectedDate == selectedDate ||
-                        x.TrainGroupDate.FixedDay == selectedDate ||
-                        x.TrainGroupDate.RecurrenceDayOfWeek == selectedDate.DayOfWeek ||
-                        x.TrainGroupDate.RecurrenceDayOfMonth == selectedDate.Month);
+                        x.SelectedDate!=null?
+                            (x.SelectedDate == selectedDate)
+                        :
+                            (x.TrainGroupDate.FixedDay == selectedDate 
+                            ||x.TrainGroupDate.RecurrenceDayOfWeek == selectedDate.DayOfWeek 
+                            ||x.TrainGroupDate.RecurrenceDayOfMonth == selectedDate.Month
+                            )
+                    );
                 }
             }
         }
