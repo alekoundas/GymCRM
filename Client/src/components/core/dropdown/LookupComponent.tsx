@@ -6,6 +6,8 @@ import { LookupOptionDto } from "../../../model/lookup/LookupOptionDto";
 import { useApiService } from "../../../services/ApiService";
 import { useTranslator } from "../../../services/TranslatorService";
 import { Tag } from "primereact/tag";
+import { UserDto } from "../../../model/entities/user/UserDto";
+import { Avatar } from "primereact/avatar";
 
 interface IField {
   controller: string;
@@ -96,21 +98,55 @@ export default function LookupComponent({
 
   const template = (data: LookupOptionDto, props?: any): JSX.Element => {
     if (data)
-      if (data.userColor)
-        return (
-          <Tag
-            className="p-2 opacity-100 w-full"
-            style={{
-              backgroundColor: "#" + data.userColor,
-            }}
-          >
-            {data.value}
-          </Tag>
-        );
-      else {
+      if (data.firstName != undefined && data.lastName != undefined) {
+        const userDto = new UserDto();
+        userDto.firstName = data.firstName;
+        userDto.lastName = data.lastName;
+        userDto.profileImage = data.profileImage;
+        userDto.userColor = data.userColor;
+        const template = userTemplate(userDto);
+        if (template) {
+          return template;
+        } else {
+          return <span>{data.value}</span>;
+        }
+      } else {
         return <span>{data.value}</span>;
       }
     return <span>{props.placeholder}</span>;
+  };
+
+  const userTemplate = (user: UserDto | undefined): JSX.Element | undefined => {
+    if (user) {
+      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
+        0
+      )}`.toUpperCase();
+      const imageSrc = "data:image/png;base64," + user.profileImage;
+      return (
+        <div className="flex m-0 p-0 align-items-center">
+          <Avatar
+            image={user.profileImage ? imageSrc : ""}
+            label={user.profileImage ? undefined : initials}
+            shape="circle"
+            size="normal"
+            className=" mr-2 "
+          />
+          <Tag
+            className="opacity-100"
+            style={{
+              backgroundColor: "#" + user.userStatus?.color,
+            }}
+          >
+            {" " +
+              user.firstName[0].toUpperCase() +
+              user.firstName.slice(1, user.firstName.length) +
+              " " +
+              user.lastName[0].toUpperCase() +
+              user.lastName.slice(1, user.lastName.length)}
+          </Tag>
+        </div>
+      );
+    }
   };
   return (
     <>

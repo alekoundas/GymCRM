@@ -9,6 +9,7 @@ import { useWorkoutPlanStore } from "../../stores/WorkoutPlanStore";
 import { useApiService } from "../../services/ApiService";
 import { Button } from "primereact/button";
 import LookupComponent from "../../components/core/dropdown/LookupComponent";
+import { Checkbox } from "primereact/checkbox";
 
 interface IField extends DialogChildProps {
   isAdminPage: boolean;
@@ -64,7 +65,7 @@ export default function WorkoutPlanFormComponent({
   };
 
   return (
-    <div className="flex flex-column md:flex-row justify-content-center ">
+    <div className="flex flex-column  align-items-center ">
       <div className="field">
         <label
           htmlFor="title"
@@ -111,7 +112,7 @@ export default function WorkoutPlanFormComponent({
           ))}
       </div>
 
-      <div className="field">
+      <div className="field" >
         <label
           htmlFor="userId"
           className="block text-900 font-medium mb-2"
@@ -147,6 +148,46 @@ export default function WorkoutPlanFormComponent({
                 icon="pi pi-check"
                 className="p-button-rounded p-button-text p-button-success"
                 onClick={() => handleSave("userId")}
+              />
+            </>
+          ))}
+      </div>
+
+      <div className="field">
+        <label
+          htmlFor="isCircular"
+          className="block text-900 font-medium mb-2"
+        >
+          {t("Circular")}
+        </label>
+        <Checkbox
+          checked={workoutPlanDto.isCircular}
+          onChange={(e) => updateWorkoutPlanDto({ isCircular: e.checked })}
+          disabled={
+            formMode === FormMode.VIEW ||
+            (formMode === FormMode.EDIT && editingField !== "isCircular")
+          }
+        />
+        {formMode === FormMode.EDIT &&
+          isAdminPage &&
+          (editingField !== "isCircular" ? (
+            <Button
+              icon="pi pi-pencil"
+              className="p-button-rounded p-button-text p-button-secondary"
+              onClick={() => handleEdit("isCircular")}
+              visible={editingField === undefined}
+            />
+          ) : (
+            <>
+              <Button
+                icon="pi pi-times"
+                className="p-button-rounded p-button-text p-button-danger"
+                onClick={() => handleCancel("isCircular")}
+              />
+              <Button
+                icon="pi pi-check"
+                className="p-button-rounded p-button-text p-button-success"
+                onClick={() => handleSave("isCircular")}
               />
             </>
           ))}

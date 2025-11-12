@@ -447,7 +447,7 @@ export default function ExerciseListItemComponent({
               <div className="flex flex-nowrap">
                 <Checkbox
                   id={`isCircular-${exerciseDto.id}`}
-                  checked={exerciseDto.isCircular}
+                  checked={workoutPlanDto.isCircular}
                   className="p-inputtext-sm w-full"
                   disabled={true}
                 />

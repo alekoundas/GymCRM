@@ -15,6 +15,9 @@ namespace Core.Dtos.WorkoutPlan
         [StringLength(500, ErrorMessage = TranslationKeys._0_cannot_exceed_500_characters)]
         public string Description { get; set; } = string.Empty;
 
+        public bool IsCircular { get; set; }
+
+
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string UserId { get; set; } = "";
