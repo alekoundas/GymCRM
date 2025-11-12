@@ -93,6 +93,7 @@ export const useApiService = () => {
       } catch (error) {
         console.error("Unexpected error during token refresh:", error);
         showError(t("Failed to refresh token. Please log in again."));
+        TokenService.logout();
         return false;
       } finally {
         refreshPromiseRef.current = null;
