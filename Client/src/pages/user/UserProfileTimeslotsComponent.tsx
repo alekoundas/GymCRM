@@ -94,7 +94,7 @@ export default function UserProfileTimeslotsComponent() {
     if (id !== undefined) {
       timeSlotDto.userId = id;
     }
-    
+
     const response = await apiService.timeslots("Users/TimeSlots", timeSlotDto); // Replace with your API endpoint
 
     // Generate 7 days starting from sunday of current week
@@ -109,7 +109,7 @@ export default function UserProfileTimeslotsComponent() {
         // .filter((x) => !x.isUnavailableTrainGroup)
         .flatMap((slot) =>
           slot.recurrenceDates
-            .filter((x) => !x.isUnavailableTrainGroup)
+            // .filter((x) => !x.isUnavailableTrainGroup)
             .map((x) => {
               let startDate: Date | undefined;
 
@@ -457,100 +457,67 @@ export default function UserProfileTimeslotsComponent() {
             return () => clearTimeout(timer);
           }} // Callback after dates render (modern equivalent for post-render DOM manipulation)
         />
+      </div>
 
-        {/*                                      */}
-        {/*           View TrainGroup            */}
-        {/*                                      */}
+      {/*                                      */}
+      {/*           View TrainGroup            */}
+      {/*                                      */}
 
-        <GenericDialogComponent
-          formMode={FormMode.VIEW}
-          visible={isTimeSlotDialogVisible}
-          control={timeSlotDialogControl}
-        >
-          <div>
-            {selectedTrainGroup?.startOn && (
-              <>
-                <div>
-                  <p>
-                    <strong> {t("Start On")}:</strong>{" "}
-                    {new Date(selectedTrainGroup.startOn)
-                      .getUTCHours()
+      <GenericDialogComponent
+        formMode={FormMode.VIEW}
+        visible={isTimeSlotDialogVisible}
+        control={timeSlotDialogControl}
+      >
+        <div>
+          {selectedTrainGroup?.startOn && (
+            <>
+              <div>
+                <p>
+                  <strong> {t("Start On")}:</strong>{" "}
+                  {new Date(selectedTrainGroup.startOn)
+                    .getUTCHours()
+                    .toString()
+                    .padStart(2, "0") +
+                    ":" +
+                    new Date(selectedTrainGroup.startOn)
+                      .getUTCMinutes()
                       .toString()
-                      .padStart(2, "0") +
-                      ":" +
-                      new Date(selectedTrainGroup.startOn)
-                        .getUTCMinutes()
-                        .toString()
-                        .padStart(2, "0")}
-                  </p>
-                  <p>
-                    <strong>{t("Duration")}:</strong>{" "}
-                    {new Date(selectedTrainGroup.duration)
-                      .getUTCHours()
+                      .padStart(2, "0")}
+                </p>
+                <p>
+                  <strong>{t("Duration")}:</strong>{" "}
+                  {new Date(selectedTrainGroup.duration)
+                    .getUTCHours()
+                    .toString()
+                    .padStart(2, "0") +
+                    ":" +
+                    new Date(selectedTrainGroup.duration)
+                      .getUTCMinutes()
                       .toString()
-                      .padStart(2, "0") +
-                      ":" +
-                      new Date(selectedTrainGroup.duration)
-                        .getUTCMinutes()
-                        .toString()
-                        .padStart(2, "0")}
-                  </p>
-                  <p className="mb-0">
-                    <strong>{t("Group Name")}:</strong>{" "}
-                    {selectedTrainGroup.title || "N/A"}
-                  </p>
-                  <div className="flex p-0 m-0">
-                    <p>
-                      <strong>{t("Trainer")}:</strong>
-                    </p>
-                    {chipTemplate(selectedTrainGroup.trainer)}
-                  </div>
-
-                  <p className="flex align-items-center mt-0">
-                    <strong>{t("Book Type")}:</strong>
-                    {selectedTimeSlotRecurrenceDate.isOneOff ? (
-                      <Tag>{t("One-off")}</Tag>
-                    ) : (
-                      <Tag>{t("Recurring")}</Tag>
-                    )}
-                  </p>
-
-                  <p className="flex align-items-center ">
-                    <strong>{t("Joined")}:</strong>{" "}
-                    {timeSlots.some((x) =>
-                      x.recurrenceDates.some(
-                        (y) =>
-                          y.trainGroupDateId ===
-                            selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-                          y.isUserJoined
-                      )
-                    ) ? (
-                      <Tag severity={"success"}>Yes</Tag>
-                    ) : (
-                      <Tag severity={"secondary"}>No</Tag>
-                    )}
-                  </p>
+                      .padStart(2, "0")}
+                </p>
+                <p className="mb-0">
+                  <strong>{t("Group Name")}:</strong>{" "}
+                  {selectedTrainGroup.title || "N/A"}
+                </p>
+                <div className="flex p-0 m-0">
                   <p>
-                    <strong>Description:</strong>{" "}
-                    {selectedTrainGroup.description ||
-                      t("No description available.")}
+                    <strong>{t("Trainer")}:</strong>
                   </p>
+                  {chipTemplate(selectedTrainGroup.trainer)}
                 </div>
 
-                {isDateTwelveHoursFromNow(
-                  selectedTimeSlotRecurrenceDate.date,
-                  selectedTrainGroup.startOn,
-                  selectedTimeSlotRecurrenceDate.trainGroupDateType
-                ) && (
-                  <div className="flex justify-content-center pt-5">
-                    <p className="text-xl text-primary m-0 pt-4">
-                      {t("Already 12h away! You cant opt out.")}
-                    </p>
-                  </div>
-                )}
+                <p className="flex align-items-center mt-0">
+                  <strong>{t("Book Type")}:</strong>
+                  {selectedTimeSlotRecurrenceDate.isOneOff ? (
+                    <Tag>{t("One-off")}</Tag>
+                  ) : (
+                    <Tag>{t("Recurring")}</Tag>
+                  )}
+                </p>
 
-                {/* Opt Out */}
-                <div>
+                <p className="flex align-items-center ">
+                  <strong>{t("Joined")}:</strong>{" "}
                   {timeSlots.some((x) =>
                     x.recurrenceDates.some(
                       (y) =>
@@ -558,196 +525,191 @@ export default function UserProfileTimeslotsComponent() {
                           selectedTimeSlotRecurrenceDate.trainGroupDateId &&
                         y.isUserJoined
                     )
-                  ) && (
-                    <div className="flex justify-content-between pt-5">
-                      <div></div>
-                      <Button
-                        label={t("Opt out")}
-                        severity="danger"
-                        onClick={optOutTimeSlotDialogControl.showDialog}
-                        disabled={
-                          new Date(
-                            Date.UTC(
-                              selectedDate.getFullYear(),
-                              selectedDate.getMonth(),
-                              selectedDate.getDate(),
-                              0,
-                              0,
-                              0,
-                              0
-                            )
-                          ) <
-                            new Date(
-                              Date.UTC(
-                                new Date().getFullYear(),
-                                new Date().getMonth(),
-                                new Date().getDate(),
-                                0,
-                                0,
-                                0,
-                                0
-                              )
-                            ) ||
-                          isDateTwelveHoursFromNow(
-                            selectedTimeSlotRecurrenceDate.date,
-                            selectedTrainGroup.startOn,
-                            selectedTimeSlotRecurrenceDate.trainGroupDateType
-                          )
-                        }
-                      ></Button>
-                      {timeSlots.some((x) =>
-                        x.recurrenceDates.some(
-                          (y) =>
-                            y.trainGroupDateId ===
-                              selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-                            !y.isOneOff
-                        )
-                      ) && (
-                        <Button
-                          label={t("Opt out for this date")}
-                          severity="info"
-                          onClick={optOutDateTimeSlotDialogControl.showDialog}
-                          disabled={
-                            new Date(
-                              Date.UTC(
-                                selectedDate.getFullYear(),
-                                selectedDate.getMonth(),
-                                selectedDate.getDate(),
-                                0,
-                                0,
-                                0,
-                                0
-                              )
-                            ) <
-                              new Date(
-                                Date.UTC(
-                                  new Date().getFullYear(),
-                                  new Date().getMonth(),
-                                  new Date().getDate(),
-                                  0,
-                                  0,
-                                  0,
-                                  0
-                                )
-                              ) ||
-                            isDateTwelveHoursFromNow(
-                              selectedTimeSlotRecurrenceDate.date,
-                              selectedTrainGroup.startOn,
-                              selectedTimeSlotRecurrenceDate.trainGroupDateType
-                            )
-                          }
-                        ></Button>
-                      )}
-                      <div></div>
-                    </div>
+                  ) ? (
+                    <Tag severity={"success"}>Yes</Tag>
+                  ) : (
+                    <Tag severity={"secondary"}>No</Tag>
                   )}
+                </p>
+                <p>
+                  <strong>Description:</strong>{" "}
+                  {selectedTrainGroup.description ||
+                    t("No description available.")}
+                </p>
+              </div>
 
-                  {timeSlots.some((x) =>
-                    x.recurrenceDates.some(
-                      (y) =>
-                        y.trainGroupDateId ===
-                          selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-                        !y.isUserJoined &&
-                        y.trainGroupParticipantUnavailableDateId
-                    )
-                  ) && (
-                    <div className="flex justify-content-between pt-5">
-                      <div></div>
-                      <Button
-                        label={t("Opt out")}
-                        severity="danger"
-                        onClick={optOutTimeSlotDialogControl.showDialog}
-                        disabled={
-                          new Date(
-                            Date.UTC(
-                              selectedDate.getFullYear(),
-                              selectedDate.getMonth(),
-                              selectedDate.getDate(),
-                              0,
-                              0,
-                              0,
-                              0
-                            )
-                          ) <
-                            new Date(
-                              Date.UTC(
-                                new Date().getFullYear(),
-                                new Date().getMonth(),
-                                new Date().getDate(),
-                                0,
-                                0,
-                                0,
-                                0
-                              )
-                            ) ||
-                          isDateTwelveHoursFromNow(
-                            selectedTimeSlotRecurrenceDate.date,
-                            selectedTrainGroup.startOn,
-                            selectedTimeSlotRecurrenceDate.trainGroupDateType
-                          )
-                        }
-                      ></Button>
-                      <Button
-                        label={t("Opt in again for this date")}
-                        severity="info"
-                        onClick={optInDateTimeSlotDialogControl.showDialog}
-                        disabled={
-                          new Date(
-                            Date.UTC(
-                              selectedDate.getFullYear(),
-                              selectedDate.getMonth(),
-                              selectedDate.getDate(),
-                              0,
-                              0,
-                              0,
-                              0
-                            )
-                          ) <
-                          new Date(
-                            Date.UTC(
-                              new Date().getFullYear(),
-                              new Date().getMonth(),
-                              new Date().getDate(),
-                              0,
-                              0,
-                              0,
-                              0
-                            )
-                          )
-                        }
-                      ></Button>
-                      <div></div>
-                    </div>
-                  )}
-
-                  {timeSlots.some((x) =>
-                    x.recurrenceDates.some(
-                      (y) =>
-                        y.trainGroupDateId ===
-                          selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-                        !y.isUserJoined &&
-                        !y.trainGroupParticipantId &&
-                        !y.trainGroupParticipantUnavailableDateId
-                    )
-                  ) && (
-                    <div className="flex justify-content-between pt-5">
-                      <div></div>
-                      <div>
-                        <p className="text-xl text-primary m-0 pt-4">
-                          {t(
-                            "You havent joined this date. Please join via apointment tab."
-                          )}
-                        </p>
-                      </div>
-                      <div></div>
-                    </div>
-                  )}
+              {isDateTwelveHoursFromNow(
+                selectedTimeSlotRecurrenceDate.date,
+                selectedTrainGroup.startOn,
+                selectedTimeSlotRecurrenceDate.trainGroupDateType
+              ) && (
+                <div className="flex justify-content-center pt-5">
+                  <p className="text-xl text-primary m-0 pt-4">
+                    {t("Already 12h away! You cant opt out.")}
+                  </p>
                 </div>
-              </>
-            )}
-          </div>
-        </GenericDialogComponent>
-      </div>
+              )}
+
+              {/* Opt Out */}
+              <div>
+                <div className="flex justify-content-between pt-5">
+                  <div></div>
+                  <Button
+                    label={t("Opt out")}
+                    severity="danger"
+                    onClick={optOutTimeSlotDialogControl.showDialog}
+                    visible={timeSlots.some((x) =>
+                      x.recurrenceDates.some(
+                        (y) =>
+                          y.trainGroupDateId ===
+                            selectedTimeSlotRecurrenceDate.trainGroupDateId &&
+                          y.isUserJoined
+                      )
+                    )}
+                    disabled={
+                      new Date(
+                        Date.UTC(
+                          selectedDate.getFullYear(),
+                          selectedDate.getMonth(),
+                          selectedDate.getDate(),
+                          0,
+                          0,
+                          0,
+                          0
+                        )
+                      ) <
+                        new Date(
+                          Date.UTC(
+                            new Date().getFullYear(),
+                            new Date().getMonth(),
+                            new Date().getDate(),
+                            0,
+                            0,
+                            0,
+                            0
+                          )
+                        ) ||
+                      isDateTwelveHoursFromNow(
+                        selectedTimeSlotRecurrenceDate.date,
+                        selectedTrainGroup.startOn,
+                        selectedTimeSlotRecurrenceDate.trainGroupDateType
+                      )
+                    }
+                  ></Button>
+
+                  <Button
+                    label={t("Opt out for this date")}
+                    severity="info"
+                    onClick={optOutDateTimeSlotDialogControl.showDialog}
+                    visible={timeSlots.some((x) =>
+                      x.recurrenceDates.some(
+                        (y) =>
+                          y.trainGroupDateId ===
+                            selectedTimeSlotRecurrenceDate.trainGroupDateId &&
+                          !y.isOneOff &&
+                          !y.trainGroupParticipantUnavailableDateId
+                      )
+                    )}
+                    disabled={
+                      new Date(
+                        Date.UTC(
+                          selectedDate.getFullYear(),
+                          selectedDate.getMonth(),
+                          selectedDate.getDate(),
+                          0,
+                          0,
+                          0,
+                          0
+                        )
+                      ) <
+                        new Date(
+                          Date.UTC(
+                            new Date().getFullYear(),
+                            new Date().getMonth(),
+                            new Date().getDate(),
+                            0,
+                            0,
+                            0,
+                            0
+                          )
+                        ) ||
+                      isDateTwelveHoursFromNow(
+                        selectedTimeSlotRecurrenceDate.date,
+                        selectedTrainGroup.startOn,
+                        selectedTimeSlotRecurrenceDate.trainGroupDateType
+                      )
+                    }
+                  ></Button>
+
+                  <Button
+                    label={t("Opt in again for this date")}
+                    severity="info"
+                    onClick={optInDateTimeSlotDialogControl.showDialog}
+                    visible={timeSlots.some((x) =>
+                      x.recurrenceDates.some(
+                        (y) =>
+                          y.trainGroupDateId ===
+                            selectedTimeSlotRecurrenceDate.trainGroupDateId &&
+                          !y.isOneOff &&
+                          y.trainGroupParticipantUnavailableDateId
+                      )
+                    )}
+                    disabled={
+                      new Date(
+                        Date.UTC(
+                          selectedDate.getFullYear(),
+                          selectedDate.getMonth(),
+                          selectedDate.getDate(),
+                          0,
+                          0,
+                          0,
+                          0
+                        )
+                      ) <
+                      new Date(
+                        Date.UTC(
+                          new Date().getFullYear(),
+                          new Date().getMonth(),
+                          new Date().getDate(),
+                          0,
+                          0,
+                          0,
+                          0
+                        )
+                      )
+                    }
+                  ></Button>
+
+                  <div></div>
+                </div>
+
+                {timeSlots.some((x) =>
+                  x.recurrenceDates.some(
+                    (y) =>
+                      y.trainGroupDateId ===
+                        selectedTimeSlotRecurrenceDate.trainGroupDateId &&
+                      !y.isUserJoined &&
+                      !y.trainGroupParticipantId &&
+                      !y.trainGroupParticipantUnavailableDateId
+                  )
+                ) && (
+                  <div className="flex justify-content-between pt-5">
+                    <div></div>
+                    <div>
+                      <p className="text-xl text-primary m-0 pt-4">
+                        {t(
+                          "You havent joined this date. Please join via apointment tab."
+                        )}
+                      </p>
+                    </div>
+                    <div></div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </GenericDialogComponent>
 
       {/*                                                */}
       {/*         Delete Train Group Participant         */}
