@@ -33,8 +33,6 @@ namespace Core.Dtos.Exercise
         public string VideoUrl { get; set; } = string.Empty;
 
 
-        public bool IsCircular { get; set; }
-
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public int GroupNumber { get; set; }

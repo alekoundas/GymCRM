@@ -21,7 +21,8 @@ export default function ExerciseFormComponent({
   const { t } = useTranslator();
   const { openYouTubeVideo } = useYouTubeService();
 
-  const { newExerciseDto, updateNewExerciseDto } = useWorkoutPlanStore();
+  const { workoutPlanDto, newExerciseDto, updateNewExerciseDto } =
+    useWorkoutPlanStore();
 
   const updateExercise = (id: number, field: keyof ExerciseDto, value: any) => {
     updateNewExerciseDto({ ...newExerciseDto, [field]: value });
@@ -51,12 +52,9 @@ export default function ExerciseFormComponent({
         <div className="w-full flex flex-nowrap">
           <Checkbox
             id={`isCircular-${newExerciseDto.id}`}
-            checked={newExerciseDto.isCircular}
-            onChange={(e) =>
-              updateExercise(newExerciseDto.id, "isCircular", e.checked)
-            }
+            checked={workoutPlanDto.isCircular}
             className="p-inputtext-sm w-full"
-            disabled={!isAdminPage || formMode === FormMode.VIEW}
+            disabled={true}
           />
         </div>
       </div>

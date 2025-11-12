@@ -44,9 +44,6 @@ namespace DataAccess.Migrations
                     b.Property<int>("GroupNumber")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsCircular")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -649,6 +646,9 @@ namespace DataAccess.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsCircular")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
                         .IsRequired()

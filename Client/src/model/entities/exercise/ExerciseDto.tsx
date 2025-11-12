@@ -5,7 +5,6 @@ export interface ExerciseDto {
   sets: string;
   reps: string;
   weight: string;
-  isCircular: boolean;
   videoUrl: string;
   groupNumber: number;
   groupExerciseOrderNumber: number;
@@ -19,7 +18,6 @@ export class ExerciseDto {
   sets: string = "";
   reps: string = "";
   weight: string = "";
-  isCircular: boolean = false;
   videoUrl: string = "";
   groupNumber: number = 0;
   groupExerciseOrderNumber: number = 0;

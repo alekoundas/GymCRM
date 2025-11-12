@@ -10,7 +10,6 @@ namespace Core.Models
         public string Reps { get; set; } = string.Empty;
         public string Weight { get; set; } = string.Empty;
         public string VideoUrl { get; set; } = string.Empty;
-        public bool IsCircular { get; set; }
         public int GroupNumber { get; set; }
         public int GroupExerciseOrderNumber { get; set; }
 
