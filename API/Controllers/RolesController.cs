@@ -62,16 +62,16 @@ namespace API.Controllers
                     foreach (var claim in role.Claims)
                     {
                         if (claim.View)
-                            await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, claim.Controller + "_View"));
+                            await _roleManager.AddClaimAsync(identityRole, new Claim("Permission", claim.Controller + "_View"));
 
                         if (claim.Add)
-                            await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, claim.Controller + "_Add"));
+                            await _roleManager.AddClaimAsync(identityRole, new Claim("Permission", claim.Controller + "_Add"));
 
                         if (claim.Edit)
-                            await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, claim.Controller + "_Edit"));
+                            await _roleManager.AddClaimAsync(identityRole, new Claim("Permission", claim.Controller + "_Edit"));
 
                         if (claim.Delete)
-                            await _roleManager.AddClaimAsync(identityRole, new Claim(ClaimTypes.Role, claim.Controller + "_Delete"));
+                            await _roleManager.AddClaimAsync(identityRole, new Claim("Permission", claim.Controller + "_Delete"));
                     }
                 else
                     return new ApiResponse<List<Role>>().SetErrorResponse(response.Errors.ToString() ?? "");
