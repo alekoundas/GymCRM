@@ -88,8 +88,10 @@ export default function UserProfilePage() {
           userDto.id
         );
         if (response) {
-          // Prefix response for display (API returns plain base64)
-          LocalStorageService.setProfileImage(updateDto.profileImage ?? "");
+          const id = params["id"];
+          if (id === undefined) {
+            LocalStorageService.setProfileImage(updateDto.profileImage ?? "");
+          }
 
           if (
             response.profileImage &&
