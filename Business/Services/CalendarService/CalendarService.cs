@@ -233,26 +233,31 @@ namespace Business.Services.CalendarService
 
             var evt = new CalendarEvent
             {
-                Start = new CalDateTime(dtstart),
-                End = dtend.HasValue ? new CalDateTime(dtend.Value) : null, // Handle nullable dtend
+                Start = new CalDateTime(DateTime.SpecifyKind(dtstart, DateTimeKind.Unspecified)),  // Floating time
+                End = dtend.HasValue ? new CalDateTime(DateTime.SpecifyKind(dtend.Value, DateTimeKind.Unspecified)) : null,  // Floating time
                 Summary = summary,
                 Uid = uid,
                 Organizer = new Organizer($"MAILTO:{organizerEmail}"),
-                Created = new CalDateTime(DateTime.UtcNow), // Fixed: CalDateTime type
-                LastModified = new CalDateTime(DateTime.UtcNow) // Fixed: CalDateTime type
+                Created = new CalDateTime(DateTime.UtcNow),
+                LastModified = new CalDateTime(DateTime.UtcNow)
             };
 
-            // Fixed: Initialize and add attendee via Attendees collection
+            // Initialize and add attendee via Attendees collection
             evt.Attendees = new List<Attendee>(); // Initialize the list
             var attendee = new Attendee
             {
-                Value = new Uri($"mailto:{attendeeEmail}"), // Fixed: Uri for Value
+                Value = new Uri($"mailto:{attendeeEmail}"), // Uri for Value
                 Rsvp = true
             };
             evt.Attendees.Add(attendee);
 
             if (rrule != null)
             {
+                // Also make rrule.Until floating if set
+                if (rrule.Until != null)
+                {
+                    rrule.Until = new CalDateTime(DateTime.SpecifyKind(rrule.Until.Value, DateTimeKind.Unspecified));
+                }
                 evt.RecurrenceRules.Add(rrule);
             }
 
