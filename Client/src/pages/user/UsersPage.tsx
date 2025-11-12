@@ -127,7 +127,7 @@ export default function UsersPage() {
             <Tag
               className="p-2 opacity-100 w-full"
               style={{
-                backgroundColor: "#" + rowData?.color,
+                backgroundColor: "#" + rowData?.userStatus.color,
               }}
             >
               {rowData.userStatus?.name}
