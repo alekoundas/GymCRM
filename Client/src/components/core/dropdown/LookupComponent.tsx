@@ -98,7 +98,12 @@ export default function LookupComponent({
 
   const template = (data: LookupOptionDto, props?: any): JSX.Element => {
     if (data)
-      if (data.firstName != undefined && data.lastName != undefined) {
+      if (
+        data.firstName &&
+        data.lastName &&
+        data.firstName?.length > 0 &&
+        data.lastName?.length > 0
+      ) {
         const userDto = new UserDto();
         userDto.firstName = data.firstName;
         userDto.lastName = data.lastName;
@@ -134,7 +139,7 @@ export default function LookupComponent({
           <Tag
             className="opacity-100"
             style={{
-              backgroundColor: "#" + user.userStatus?.color,
+              backgroundColor: "#" + user.userColor,
             }}
           >
             {" " +
