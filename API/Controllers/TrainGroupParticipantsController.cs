@@ -4,6 +4,7 @@ using Business.Services;
 using Business.Services.Email;
 using Core.Dtos;
 using Core.Dtos.DataTable;
+using Core.Dtos.TrainGroup;
 using Core.Enums;
 using Core.Models;
 using Core.Translations;
@@ -116,11 +117,11 @@ namespace API.Controllers
 
 
             // Handle Deletions and Unchanged participants.
-            var participantsToRemove = existingParticipants
+            var customerParticipants = existingParticipants
                 .Where(x => x.UserId == new Guid(updateDto.UserId))
                 .ToList(); // Create a copy to avoid modifying collection during iteration
 
-            foreach (TrainGroupParticipant existingParticipant in participantsToRemove)
+            foreach (TrainGroupParticipant existingParticipant in customerParticipants.ToList())
             {
                 TrainGroupParticipant? incomingParticipant = incomingParticipants
                     .FirstOrDefault(x =>
@@ -172,7 +173,8 @@ namespace API.Controllers
 
             // 12-HOUR REMOVAL VALIDATION
             // Check each removal before processing
-            foreach (TrainGroupParticipant existingParticipant in participantsToRemove) // ToList() to copy for safety
+            var tempParticipants = customerParticipants.Where(x => x.SelectedDate == null ? true : x.SelectedDate == updateDto.SelectedDate).ToList();
+            foreach (TrainGroupParticipant existingParticipant in tempParticipants) // ToList() to copy for safety
             {
                 TrainGroupParticipant? incomingParticipant = _mapper.Map<List<TrainGroupParticipant>>(updateDto.TrainGroupParticipantDtos)
                    .FirstOrDefault(x =>
@@ -190,6 +192,8 @@ namespace API.Controllers
                     {
                         // One-off: Use stored full UTC datetime (assumes time is set as in frontend)
                         slotStartUtc = existingParticipant.SelectedDate.Value;
+                        slotStartUtc = slotStartUtc.AddHours(existingParticipant.TrainGroup.StartOn.Hour);
+                        slotStartUtc = slotStartUtc.AddMinutes(existingParticipant.TrainGroup.StartOn.Minute);
                     }
                     else
                     {
@@ -227,36 +231,13 @@ namespace API.Controllers
 
 
                 numberOfParticipants = existingParticipants
-                    .Where(x => x.Id == incomingParticipant.TrainGroupDateId)
+                    .Where(x => x.TrainGroupDateId == incomingParticipant.TrainGroupDateId)
                     .Where(x => x.SelectedDate == null || x.SelectedDate == updateDto.SelectedDate)
                     .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y =>
                         y.UnavailableDate == x.TrainGroupDate.FixedDay
                         || y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth
                         || y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfWeek))
                     .Count();
-
-
-                //if (incomingParticipant.SelectedDate == null)
-                //    numberOfParticipants = existingParticipants
-                //    .Where(x => incomingParticipant.TrainGroupDateId == x.TrainGroupDateId)
-                //    //.Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y =>
-                //    //    y.UnavailableDate == x.TrainGroupDate.FixedDay ||
-                //    //    y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth ||
-                //    //    y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfWeek))
-                //    .ToList()
-                //    .Count();
-
-                //else
-                //    numberOfParticipants = existingParticipants
-                //    .Where(x => incomingParticipant.TrainGroupDateId == x.TrainGroupDateId)
-                //    //.Where(x => incomingParticipant.SelectedDate == null ?  true: false) // If SelectedDate is not set, check only for non one-off participants
-                //    .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y =>
-                //        y.UnavailableDate == x.TrainGroupDate.FixedDay 
-                //        || y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth 
-                //        || y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfWeek))
-                //    .ToList()
-                //    .Count();
-
 
                 if (numberOfParticipants >= existingEntity.MaxParticipants)
                 {
@@ -298,31 +279,6 @@ namespace API.Controllers
                 // Add new Participant
                 incomingParticipant.Id = 0;
                 dbContext.Add(incomingParticipant);
-
-
-
-
-                //string dateString = "";
-
-                //if (incomingParticipant.TrainGroupDate.RecurrenceDayOfMonth != null)
-                //{
-                //    if (incomingParticipant.SelectedDate == null)
-                //        dateString = _localizer[TranslationKeys.Every_0_of_the_month, incomingParticipant.TrainGroupDate.RecurrenceDayOfMonth.ToString()];
-                //    else
-                //        dateString = incomingParticipant.SelectedDate.Value.ToString("yyyy-MM-dd");
-                //}
-                //if (incomingParticipant.TrainGroupDate.RecurrenceDayOfWeek != null)
-                //{
-                //    if (incomingParticipant.SelectedDate == null)
-                //        dateString = incomingParticipant.TrainGroupDate.RecurrenceDayOfWeek.ToString();
-                //    else
-                //        dateString = incomingParticipant.SelectedDate.Value.ToString("yyyy-MM-dd");
-                //}
-                //if (incomingParticipant.TrainGroupDate.FixedDay != null)
-                //    dateString = incomingParticipant.TrainGroupDate.FixedDay.Value.ToString("yyyy-MM-dd");
-
-                //if (dateString != null)
-                //    emailDatesAdd.Add(dateString);
                 emailDatesAdd.Add(incomingParticipant);
             }
 
