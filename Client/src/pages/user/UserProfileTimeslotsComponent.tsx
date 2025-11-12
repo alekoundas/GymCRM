@@ -23,6 +23,7 @@ import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
 import { useDateService } from "../../services/DateService";
 import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
+import { useParams, useSearchParams } from "react-router-dom";
 
 export default function UserProfileTimeslotsComponent() {
   const { t } = useTranslator();
@@ -33,6 +34,7 @@ export default function UserProfileTimeslotsComponent() {
     getUTCTime,
   } = useDateService();
   const apiService = useApiService();
+  const params = useParams();
 
   // const { userDto, updateUserDto } = useUserStore();
   const calendarRef = useRef<FullCalendar>(null);
@@ -88,6 +90,11 @@ export default function UserProfileTimeslotsComponent() {
     );
 
     timeSlotDto.selectedDate = dateCleaned.toISOString();
+    const id = params["id"];
+    if (id !== undefined) {
+      timeSlotDto.userId = id;
+    }
+    
     const response = await apiService.timeslots("Users/TimeSlots", timeSlotDto); // Replace with your API endpoint
 
     // Generate 7 days starting from sunday of current week
