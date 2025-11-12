@@ -78,7 +78,7 @@ namespace API.Controllers
             }
 
             List<Role> roles = _mapper.Map<List<Role>>(roleDto);
-            return new ApiResponse<List<Role>>().SetSuccessResponse(roles,_localizer[TranslationKeys._0_updated_successfully, $"Role"]);
+            return new ApiResponse<List<Role>>().SetSuccessResponse(roles, _localizer[TranslationKeys._0_updated_successfully, $"Role"]);
         }
 
         // PUT: api/Roles
@@ -89,7 +89,7 @@ namespace API.Controllers
             if (id == null)
                 return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys._0_is_required, "RoleId"]);
 
-            Role? identityRole = await _dataService.Roles.FindAsync(id);
+            Role? identityRole = await _roleManager.FindByIdAsync(id);
             if (identityRole == null)
                 return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "Role name "]);
 
