@@ -102,16 +102,16 @@ namespace API.Controllers
             identityRoleDto.Claims.ForEach(identityClaimDto =>
             {
                 if (identityClaimDto.View)
-                    formClaims.Add(new Claim(ClaimTypes.Role, identityClaimDto.Controller + "_View"));
+                    formClaims.Add(new Claim("Permission", identityClaimDto.Controller + "_View"));
 
                 if (identityClaimDto.Add)
-                    formClaims.Add(new Claim(ClaimTypes.Role, identityClaimDto.Controller + "_Add"));
+                    formClaims.Add(new Claim("Permission", identityClaimDto.Controller + "_Add"));
 
                 if (identityClaimDto.Edit)
-                    formClaims.Add(new Claim(ClaimTypes.Role, identityClaimDto.Controller + "_Edit"));
+                    formClaims.Add(new Claim("Permission", identityClaimDto.Controller + "_Edit"));
 
                 if (identityClaimDto.Delete)
-                    formClaims.Add(new Claim(ClaimTypes.Role, identityClaimDto.Controller + "_Delete"));
+                    formClaims.Add(new Claim("Permission", identityClaimDto.Controller + "_Delete"));
             });
 
             // Get claims to delete from role, and remove them.
