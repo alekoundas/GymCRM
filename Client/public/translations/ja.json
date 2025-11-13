@@ -142,9 +142,6 @@
   "Book Type": "予約タイプ",
   "Recurring": "定期",
   "Joined": "参加済み",
-  "Opt out": "オプトアウト",
-  "Opt out for this date": "この日付のオプトアウト",
-  "Opt in again for this date": "この日付のオプトインを再度",
   "You havent joined this date. Please join via apointment tab.": "この日付に参加していません。アポイントメントタブから参加してください。",
   "This action will cancel your booking for this date.": "このアクションはこの日付の予約をキャンセルします。",
   "This action will cancel your booking ONLY for this date.": "このアクションはこの日付の予約のみをキャンセルします。",
@@ -174,9 +171,6 @@
   "Color": "色",
   "User Statuses": "ユーザーのステータス",
   "Status": "ステータス",
-  "Invalid or missing token. Please log in again.": "無効または欠落しているtoken。もう一度ログインしてください。",
-  "Failed to refresh token. Please log in again.": "Tokenのリフレッシュに失敗しました。もう一度ログインしてください。",
-  "Token expired. Login required.": "Tokenが期限切れです。ログインが必要です。",
   "Token refresh failed.": "Tokenのリフレッシュに失敗しました。",
   "API call failed with status ": "API呼び出しがステータスで失敗しました ",
   "Request timed out.": "リクエストがタイムアウトしました。",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "すでに12時間先です！（この日からオプトアウトできません。）",
   "Already 12h away! You cant opt out.": "すでに12時間先です！オプトアウトできません。",
   "Circular": "円形の",
-  "Update description": "説明を更新"
+  "Update description": "説明を更新",
+  "Delete recurring appointment": "繰り返し予定を削除",
+  "Delete specific appointment": "特定の予定を削除",
+  "Rejoin specific appointment": "特定の予定に再参加",
+  "Please log in again.": "もう一度ログインしてください。"
 }

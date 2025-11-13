@@ -148,9 +148,6 @@
   'Book Type': string;
   'Recurring': string;
   'Joined': string;
-  'Opt out': string;
-  'Opt out for this date': string;
-  'Opt in again for this date': string;
   'You havent joined this date. Please join via apointment tab.': string;
   'This action will cancel your booking for this date.': string;
   'This action will cancel your booking ONLY for this date.': string;
@@ -180,9 +177,6 @@
   'Color': string;
   'User Statuses': string;
   'Status': string;
-  'Invalid or missing token. Please log in again.': string;
-  'Failed to refresh token. Please log in again.': string;
-  'Token expired. Login required.': string;
   'Token refresh failed.': string;
   'API call failed with status ': string;
   'Request timed out.': string;
@@ -210,6 +204,10 @@
   'Already 12h away! You cant opt out.': string;
   'Circular': string;
   'Update description': string;
+  'Delete recurring appointment': string;
+  'Delete specific appointment': string;
+  'Rejoin specific appointment': string;
+  'Please log in again.': string;
     }
 
 

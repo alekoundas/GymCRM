@@ -10,6 +10,7 @@ import { useRoleStore } from "../../stores/RoleStore";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { useState } from "react";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
+import { Checkbox } from "primereact/checkbox";
 
 interface IField extends DialogChildProps {}
 
@@ -32,7 +33,7 @@ export default function ClaimGridComponent({
 
   const cellBody = (value: boolean) => {
     return (
-      <InputSwitch
+      <Checkbox
         checked={value}
         disabled
       />
@@ -41,10 +42,11 @@ export default function ClaimGridComponent({
 
   const cellEditor = (options: ColumnEditorOptions) => {
     return (
-      <InputSwitch
+      <Checkbox
         checked={options.value}
+        color="red"
         onChange={(e) =>
-          options.editorCallback ? options.editorCallback(e.value) : null
+          options.editorCallback ? options.editorCallback(e.checked) : null
         }
       />
     );

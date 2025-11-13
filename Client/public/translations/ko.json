@@ -142,9 +142,6 @@
   "Book Type": "예약 유형",
   "Recurring": "반복",
   "Joined": "참여함",
-  "Opt out": "옵트아웃",
-  "Opt out for this date": "이 날짜 옵트아웃",
-  "Opt in again for this date": "이 날짜 다시 옵트인",
   "You havent joined this date. Please join via apointment tab.": "이 날짜에 참여하지 않았습니다. 약속 탭을 통해 참여하세요.",
   "This action will cancel your booking for this date.": "이 작업은 이 날짜의 예약을 취소합니다.",
   "This action will cancel your booking ONLY for this date.": "이 작업은 이 날짜의 예약만 취소합니다.",
@@ -174,9 +171,6 @@
   "Color": "색상",
   "User Statuses": "사용자 상태",
   "Status": "상태",
-  "Invalid or missing token. Please log in again.": "잘못된 또는 누락된 token. 다시 로그인하십시오.",
-  "Failed to refresh token. Please log in again.": "Token 새로 고침에 실패했습니다. 다시 로그인하십시오.",
-  "Token expired. Login required.": "Token이 만료되었습니다. 로그인이 필요합니다.",
   "Token refresh failed.": "Token 새로 고침에 실패했습니다.",
   "API call failed with status ": "API 호출이 상태로 실패했습니다 ",
   "Request timed out.": "요청 시간이 초과되었습니다.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "이미 12시간 앞서 있습니다! (이 날짜부터 선택 사항을 취소할 수 없습니다.)",
   "Already 12h away! You cant opt out.": "이미 12시간 앞서 있습니다! 선택 사항을 취소할 수 없습니다.",
   "Circular": "원형의",
-  "Update description": "설명 업데이트"
+  "Update description": "설명 업데이트",
+  "Delete recurring appointment": "반복 약속 삭제",
+  "Delete specific appointment": "특정 약속 삭제",
+  "Rejoin specific appointment": "특정 약속에 다시 참여",
+  "Please log in again.": "다시 로그인하십시오."
 }

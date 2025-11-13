@@ -555,7 +555,7 @@ export default function UserProfileTimeslotsComponent() {
                 <div className="flex justify-content-between pt-5">
                   <div></div>
                   <Button
-                    label={t("Opt out")}
+                    label={t("Delete recurring appointment")}
                     severity="danger"
                     onClick={optOutTimeSlotDialogControl.showDialog}
                     visible={timeSlots.some((x) =>
@@ -598,7 +598,7 @@ export default function UserProfileTimeslotsComponent() {
                   ></Button>
 
                   <Button
-                    label={t("Opt out for this date")}
+                    label={t("Delete specific appointment")}
                     severity="info"
                     onClick={optOutDateTimeSlotDialogControl.showDialog}
                     visible={timeSlots.some((x) =>
@@ -642,7 +642,7 @@ export default function UserProfileTimeslotsComponent() {
                   ></Button>
 
                   <Button
-                    label={t("Opt in again for this date")}
+                    label={t("Rejoin specific appointment")}
                     severity="info"
                     onClick={optInDateTimeSlotDialogControl.showDialog}
                     visible={timeSlots.some((x) =>

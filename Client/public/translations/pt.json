@@ -142,9 +142,6 @@
   "Book Type": "Tipo de reserva",
   "Recurring": "Recorrente",
   "Joined": "Ingressado",
-  "Opt out": "Opt out",
-  "Opt out for this date": "Opt out para esta data",
-  "Opt in again for this date": "Opt in novamente para esta data",
   "You havent joined this date. Please join via apointment tab.": "Você não ingressou nesta data. Por favor, ingresse via aba de compromissos.",
   "This action will cancel your booking for this date.": "Esta ação cancelará sua reserva para esta data.",
   "This action will cancel your booking ONLY for this date.": "Esta ação cancelará sua reserva APENAS para esta data.",
@@ -174,9 +171,6 @@
   "Color": "Cor",
   "User Statuses": "Estados do usuário",
   "Status": "Estado",
-  "Invalid or missing token. Please log in again.": "Token inválido ou ausente. Faça login novamente.",
-  "Failed to refresh token. Please log in again.": "Falha ao atualizar o token. Faça login novamente.",
-  "Token expired. Login required.": "Token expirado. Login necessário.",
   "Token refresh failed.": "A atualização do token falhou.",
   "API call failed with status ": "Chamada de API falhou com status ",
   "Request timed out.": "A solicitação expirou.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "Já está a 12 horas! (Não poderá desistir a partir desta data.)",
   "Already 12h away! You cant opt out.": "Já está a 12 horas! Não pode desistir.",
   "Circular": "circular",
-  "Update description": "Atualizar descrição"
+  "Update description": "Atualizar descrição",
+  "Delete recurring appointment": "Excluir agendamento recorrente",
+  "Delete specific appointment": "Excluir agendamento específico",
+  "Rejoin specific appointment": "Reingresse no agendamento específico",
+  "Please log in again.": "Faça login novamente."
 }

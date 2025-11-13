@@ -142,9 +142,6 @@
   "Book Type": "Τύπος Κράτησης",
   "Recurring": "Επαναλαμβανόμενο",
   "Joined": "Συμμετείχε",
-  "Opt out": "Αποχώρηση",
-  "Opt out for this date": "Αποχώρηση για αυτή την ημερομηνία",
-  "Opt in again for this date": "Επανεισδοχή για αυτή την ημερομηνία",
   "You havent joined this date. Please join via apointment tab.": "Δεν έχετε συμμετάσχει σε αυτή την ημερομηνία. Παρακαλώ συμμετάσχετε μέσω καρτέλας ραντεβού.",
   "This action will cancel your booking for this date.": "Αυτή η ενέργεια θα ακυρώσει την κράτησή σας για αυτή την ημερομηνία.",
   "This action will cancel your booking ONLY for this date.": "Αυτή η ενέργεια θα ακυρώσει την κράτησή σας ΜΟΝΟ για αυτή την ημερομηνία.",
@@ -174,9 +171,6 @@
   "Color": "Χρώμα",
   "User Statuses": "Καταστάσεις χρηστών",
   "Status": "Κατάσταση",
-  "Invalid or missing token. Please log in again.": "Μη έγκυρο ή ελλιπές token. Παρακαλώ συνδεθείτε ξανά.",
-  "Failed to refresh token. Please log in again.": "Αποτυχία ανανέωσης του token. Παρακαλώ συνδεθείτε ξανά.",
-  "Token expired. Login required.": "Το token έληξε. Απαιτείται σύνδεση.",
   "Token refresh failed.": "Η ανανέωση του token απέτυχε.",
   "API call failed with status ": "Η κλήση API απέτυχε με κατάσταση ",
   "Request timed out.": "Το αίτημα έληξε.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "Ήδη 12 ώρες μακριά! (Δεν θα μπορείτε να αποχωρήσετε από αυτή την ημερομηνία.)",
   "Already 12h away! You cant opt out.": "Ήδη 12 ώρες μακριά! Δεν μπορείτε να αποχωρήσετε.",
   "Circular": "Κυκλικό",
-  "Update description": "Ενημέρωση περιγραφής"
+  "Update description": "Ενημέρωση περιγραφής",
+  "Delete recurring appointment": "Διαγραφή επαναλαμβανόμενου ραντεβού",
+  "Delete specific appointment": "Διαγραφή συγκεκριμένου ραντεβού",
+  "Rejoin specific appointment": "Επανεγγραφή συγκεκριμένου ραντεβού",
+  "Please log in again.": "Παρακαλούμε συνδεθείτε ξανά."
 }
