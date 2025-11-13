@@ -50,11 +50,11 @@ export default function UsersPage() {
   const [datatableDto, setDatatableDto] = useState<DataTableDto<UserDto>>({
     ...new DataTableDto(),
     filters: [
-      // { fieldName: "id", filterType: "equals" },
-      { fieldName: "subject", filterType: "contains" },
-      { fieldName: "userId", filterType: "in" },
+      { fieldName: "firstName", filterType: "contains" },
+      { fieldName: "lastName", filterType: "contains" },
+      { fieldName: "email", filterType: "contains" },
       { fieldName: "roleId", filterType: "custom" },
-      { fieldName: "createdOn", filterType: "between" },
+      { fieldName: "userStatusId", filterType: "in" },
     ],
   });
 
@@ -69,16 +69,16 @@ export default function UsersPage() {
 
   const dataTableColumns: DataTableColumns<UserDto>[] = [
     {
-      field: "id",
-      header: "Id",
+      field: "firstName",
+      header: t("First Name"),
       sortable: true,
-      filter: false,
+      filter: true,
       filterPlaceholder: t("Search"),
       style: { width: "20%" },
     },
     {
-      field: "userName",
-      header: t("User Name"),
+      field: "lastName",
+      header: t("Last Name"),
       sortable: true,
       filter: true,
       filterPlaceholder: t("Search"),
