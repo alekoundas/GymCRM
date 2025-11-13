@@ -60,14 +60,9 @@ export default function WorkoutPlansPage() {
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
     if (isAdminPage)
-      return [
-        ButtonTypeEnum.VIEW,
-        ButtonTypeEnum.ADD,
-        ButtonTypeEnum.EDIT,
-        ButtonTypeEnum.DELETE,
-      ];
+      return [ButtonTypeEnum.ADD, ButtonTypeEnum.EDIT, ButtonTypeEnum.DELETE];
 
-    return [ButtonTypeEnum.VIEW, ButtonTypeEnum.EDIT];
+    return [ButtonTypeEnum.EDIT];
   };
 
   // Custom chip template for selected users
