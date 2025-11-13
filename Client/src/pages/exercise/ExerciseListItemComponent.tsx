@@ -334,17 +334,17 @@ export default function ExerciseListItemComponent({
   const getMenuItems: (id: number) => MenuItem[] = (id) => {
     const menuItems: MenuItem[] = [];
 
-    menuItems.push({
-      label: t("View"),
-      icon: "pi pi-eye",
-      command: () => {
-        const exercise = workoutPlanDto.exercises.find((x) => x.id === id);
-        if (exercise) {
-          updateNewExerciseDto({ ...exercise });
-        }
-        dialogControlView.showDialog();
-      },
-    });
+    // menuItems.push({
+    //   label: t("View"),
+    //   icon: "pi pi-eye",
+    //   command: () => {
+    //     const exercise = workoutPlanDto.exercises.find((x) => x.id === id);
+    //     if (exercise) {
+    //       updateNewExerciseDto({ ...exercise });
+    //     }
+    //     dialogControlView.showDialog();
+    //   },
+    // });
     menuItems.push({
       label: t("Edit"),
       icon: "pi pi-pencil",
