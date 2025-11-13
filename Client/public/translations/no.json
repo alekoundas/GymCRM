@@ -142,9 +142,6 @@
   "Book Type": "Book type",
   "Recurring": "Gjentakende",
   "Joined": "Deltatt",
-  "Opt out": "Meld av",
-  "Opt out for this date": "Meld av for denne datoen",
-  "Opt in again for this date": "Meld på igjen for denne datoen",
   "You havent joined this date. Please join via apointment tab.": "Du har ikke blitt med på denne datoen. Bli med via avtale-fanen.",
   "This action will cancel your booking for this date.": "Denne handlingen vil kansellere bookingen din for denne datoen.",
   "This action will cancel your booking ONLY for this date.": "Denne handlingen vil kansellere bookingen din BARE for denne datoen.",
@@ -174,9 +171,6 @@
   "Color": "Farge",
   "User Statuses": "Brukerstatuser",
   "Status": "Status",
-  "Invalid or missing token. Please log in again.": "Ugyldig eller manglende token. Logg inn igjen.",
-  "Failed to refresh token. Please log in again.": "Kunne ikke oppdatere token. Logg inn igjen.",
-  "Token expired. Login required.": "Token utløpt. Innlogging kreves.",
   "Token refresh failed.": "Oppdatering av token mislyktes.",
   "API call failed with status ": "API-kall mislyktes med status ",
   "Request timed out.": "Forespørselen tok for lang tid.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "Allerede 12 timer unna! (Du vil ikke kunne melde deg ut fra denne datoen.)",
   "Already 12h away! You cant opt out.": "Allerede 12 timer unna! Du kan ikke melde deg ut.",
   "Circular": "sirkulær",
-  "Update description": "Oppdater beskrivelse"
+  "Update description": "Oppdater beskrivelse",
+  "Delete recurring appointment": "Slett gjentakende avtale",
+  "Delete specific appointment": "Slett spesifikk avtale",
+  "Rejoin specific appointment": "Bli med på spesifikk avtale igjen",
+  "Please log in again.": "Logg på igjen."
 }

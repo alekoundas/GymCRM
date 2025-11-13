@@ -142,9 +142,6 @@
   "Book Type": "Тип бронирования",
   "Recurring": "Повторяющийся",
   "Joined": "Присоединился",
-  "Opt out": "Отказаться",
-  "Opt out for this date": "Отказаться от этой даты",
-  "Opt in again for this date": "Снова присоединиться к этой дате",
   "You havent joined this date. Please join via apointment tab.": "Вы не присоединились к этой дате. Присоединитесь через вкладку назначений.",
   "This action will cancel your booking for this date.": "Это действие отменит вашу бронь на эту дату.",
   "This action will cancel your booking ONLY for this date.": "Это действие отменит вашу бронь ТОЛЬКО на эту дату.",
@@ -174,9 +171,6 @@
   "Color": "Цвет",
   "User Statuses": "Статусы пользователя",
   "Status": "Статус",
-  "Invalid or missing token. Please log in again.": "Недействительный или отсутствующий token. Пожалуйста, войдите снова.",
-  "Failed to refresh token. Please log in again.": "Не удалось обновить token. Пожалуйста, войдите снова.",
-  "Token expired. Login required.": "Token истек. Требуется вход.",
   "Token refresh failed.": "Обновление token не удалось.",
   "API call failed with status ": "Вызов API не удался с статусом ",
   "Request timed out.": "Время ожидания запроса истекло.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "Уже в 12 часах! (Вы не сможете отказаться с этой даты.)",
   "Already 12h away! You cant opt out.": "Уже в 12 часах! Вы не можете отказаться.",
   "Circular": "Круговой",
-  "Update description": "Обновить описание"
+  "Update description": "Обновить описание",
+  "Delete recurring appointment": "Удалить повторяющееся назначение",
+  "Delete specific appointment": "Удалить конкретное назначение",
+  "Rejoin specific appointment": "Повторно присоединиться к конкретному назначению",
+  "Please log in again.": "Пожалуйста, войдите снова."
 }

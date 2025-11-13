@@ -142,9 +142,6 @@
   "Book Type": "Lloji i Rezervimit",
   "Recurring": "Përsëritur",
   "Joined": "Bashkuar",
-  "Opt out": "Dalje",
-  "Opt out for this date": "Dalje për këtë datë",
-  "Opt in again for this date": "Bashkohu përsëri për këtë datë",
   "You havent joined this date. Please join via apointment tab.": "Ju nuk jeni bashkuar në këtë datë. Ju lutemi bashkohuni nëpërmjet skedës së takimeve.",
   "This action will cancel your booking for this date.": "Kjo veprim do të anulojë rezervimin tuaj për këtë datë.",
   "This action will cancel your booking ONLY for this date.": "Kjo veprim do të anulojë rezervimin tuaj VETËM për këtë datë.",
@@ -174,9 +171,6 @@
   "Color": "Ngjyrë",
   "User Statuses": "Statuset e përdoruesit",
   "Status": "Status",
-  "Invalid or missing token. Please log in again.": "Token i pavlefshëm ose i munguar. Ju lutemi të identifikoheni përsëri.",
-  "Failed to refresh token. Please log in again.": "Dështoi rifreskimi i token. Ju lutemi të identifikoheni përsëri.",
-  "Token expired. Login required.": "Token ka skaduar. Kërkohet identifikimi.",
   "Token refresh failed.": "Rifreskimi i token dështoi.",
   "API call failed with status ": "Thirrja e API dështoi me status ",
   "Request timed out.": "Kërkesa skadoi.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "Tashmë 12 orë larg! (Nuk do të jeni në gjendje të refuzoni nga kjo datë.)",
   "Already 12h away! You cant opt out.": "Tashmë 12 orë larg! Nuk mund të refuzoni.",
   "Circular": "qarkor",
-  "Update description": "Përditëso përshkrimin"
+  "Update description": "Përditëso përshkrimin",
+  "Delete recurring appointment": "Fshij takim të përsëritur",
+  "Delete specific appointment": "Fshij takim specifik",
+  "Rejoin specific appointment": "Bashkohu përsëri në takim specifik",
+  "Please log in again.": "Ju lutemi të identifikoheni përsëri."
 }

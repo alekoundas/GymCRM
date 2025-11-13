@@ -142,9 +142,6 @@
   "Book Type": "Boekingstype",
   "Recurring": "Terugkerend",
   "Joined": "Deelgenomen",
-  "Opt out": "Afmelden",
-  "Opt out for this date": "Afmelden voor deze datum",
-  "Opt in again for this date": "Opnieuw aanmelden voor deze datum",
   "You havent joined this date. Please join via apointment tab.": "Je bent niet aangesloten bij deze datum. Sluit aan via de afspraak tab.",
   "This action will cancel your booking for this date.": "Deze actie annuleert je boeking voor deze datum.",
   "This action will cancel your booking ONLY for this date.": "Deze actie annuleert je boeking ALLEEN voor deze datum.",
@@ -174,9 +171,6 @@
   "Color": "Kleur",
   "User Statuses": "Gebruikersstatussen",
   "Status": "Status",
-  "Invalid or missing token. Please log in again.": "Ongeldig of ontbrekend token. Log opnieuw in.",
-  "Failed to refresh token. Please log in again.": "Kon token niet vernieuwen. Log opnieuw in.",
-  "Token expired. Login required.": "Token verlopen. Inloggen vereist.",
   "Token refresh failed.": "Vernieuwen van token mislukt.",
   "API call failed with status ": "API-aanroep mislukt met status ",
   "Request timed out.": "Verzoek verlopen.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "Al 12 uur verwijderd! (Je kunt vanaf deze datum niet meer afmelden.)",
   "Already 12h away! You cant opt out.": "Al 12 uur verwijderd! Je kunt niet afmelden.",
   "Circular": "Circulaire",
-  "Update description": "Beschrijving bijwerken"
+  "Update description": "Beschrijving bijwerken",
+  "Delete recurring appointment": "Terugkerende afspraak verwijderen",
+  "Delete specific appointment": "Specifieke afspraak verwijderen",
+  "Rejoin specific appointment": "Specifieke afspraak opnieuw deelnemen",
+  "Please log in again.": "Log alstublieft opnieuw in."
 }

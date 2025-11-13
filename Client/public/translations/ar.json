@@ -142,9 +142,6 @@
   "Book Type": "نوع الحجز",
   "Recurring": "متكرر",
   "Joined": "انضم",
-  "Opt out": "الانسحاب",
-  "Opt out for this date": "الانسحاب لهذا التاريخ",
-  "Opt in again for this date": "الانضمام مرة أخرى لهذا التاريخ",
   "You havent joined this date. Please join via apointment tab.": "لم تنضم إلى هذا التاريخ. يرجى الانضمام عبر علامة التبويب المواعيد.",
   "This action will cancel your booking for this date.": "سيؤدي هذا الإجراء إلى إلغاء حجزك لهذا التاريخ.",
   "This action will cancel your booking ONLY for this date.": "سيؤدي هذا الإجراء إلى إلغاء حجزك فقط لهذا التاريخ.",
@@ -174,9 +171,6 @@
   "Color": "لون",
   "User Statuses": "حالات المستخدم",
   "Status": "حالة",
-  "Invalid or missing token. Please log in again.": "Token غير صالح أو مفقود. الرجاء تسجيل الدخول مرة أخرى.",
-  "Failed to refresh token. Please log in again.": "فشل في تحديث token. الرجاء تسجيل الدخول مرة أخرى.",
-  "Token expired. Login required.": "Token منتهي الصلاحية. تسجيل الدخول مطلوب.",
   "Token refresh failed.": "فشل تحديث token.",
   "API call failed with status ": "فشل استدعاء API مع الحالة ",
   "Request timed out.": "انتهت مهلة الطلب.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "بالفعل 12 ساعة بعيدة! (لن تتمكن من الانسحاب من هذا التاريخ.)",
   "Already 12h away! You cant opt out.": "بالفعل 12 ساعة بعيدة! لا يمكنك الانسحاب.",
   "Circular": "دائري",
-  "Update description": "تحديث الوصف"
+  "Update description": "تحديث الوصف",
+  "Delete recurring appointment": "حذف الموعد المتكرر",
+  "Delete specific appointment": "حذف موعد محدد",
+  "Rejoin specific appointment": "إعادة الانضمام إلى موعد محدد",
+  "Please log in again.": "يرجى تسجيل الدخول مرة أخرى."
 }

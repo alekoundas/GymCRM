@@ -142,9 +142,6 @@
   "Book Type": "Rezervasyon Türü",
   "Recurring": "Tekrar Eden",
   "Joined": "Katıldı",
-  "Opt out": "Çık",
-  "Opt out for this date": "Bu tarih için çık",
-  "Opt in again for this date": "Bu tarih için tekrar gir",
   "You havent joined this date. Please join via apointment tab.": "Bu tarihe katılmadınız. Lütfen randevu sekmesi aracılığıyla katılın.",
   "This action will cancel your booking for this date.": "Bu eylem bu tarih için rezervasyonunuzu iptal edecek.",
   "This action will cancel your booking ONLY for this date.": "Bu eylem rezervasyonunuzu SADECE bu tarih için iptal edecek.",
@@ -174,9 +171,6 @@
   "Color": "Renk",
   "User Statuses": "Kullanıcı Durumları",
   "Status": "Durum",
-  "Invalid or missing token. Please log in again.": "Geçersiz veya eksik token. Lütfen tekrar giriş yapın.",
-  "Failed to refresh token. Please log in again.": "Token yenileme başarısız. Lütfen tekrar giriş yapın.",
-  "Token expired. Login required.": "Token süresi doldu. Giriş yapmanız gerekiyor.",
   "Token refresh failed.": "Token yenileme başarısız oldu.",
   "API call failed with status ": "API çağrısı durum ile başarısız oldu ",
   "Request timed out.": "İstek zaman aşımına uğradı.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "Zaten 12 saat uzakta! (Bu tarihten itibaren vazgeçemezsiniz.)",
   "Already 12h away! You cant opt out.": "Zaten 12 saat uzakta! Vazgeçemezsiniz.",
   "Circular": "dairesel",
-  "Update description": "Açıklama güncelle"
+  "Update description": "Açıklama güncelle",
+  "Delete recurring appointment": "Tekrarlanan randevuyu sil",
+  "Delete specific appointment": "Belirli randevuyu sil",
+  "Rejoin specific appointment": "Belirli randevuya yeniden katıl",
+  "Please log in again.": "Lütfen tekrar giriş yapın."
 }

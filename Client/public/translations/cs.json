@@ -142,9 +142,6 @@
   "Book Type": "Typ rezervace",
   "Recurring": "Opakující se",
   "Joined": "Připojeno",
-  "Opt out": "Odhlásit se",
-  "Opt out for this date": "Odhlásit se pro toto datum",
-  "Opt in again for this date": "Znovu se přihlásit pro toto datum",
   "You havent joined this date. Please join via apointment tab.": "K tomuto datu jste se nepřipojili. Připojte se prosím přes záložku schůzek.",
   "This action will cancel your booking for this date.": "Tato akce zruší vaši rezervaci pro toto datum.",
   "This action will cancel your booking ONLY for this date.": "Tato akce zruší vaši rezervaci POUZE pro toto datum.",
@@ -174,9 +171,6 @@
   "Color": "Barva",
   "User Statuses": "Stavy uživatele",
   "Status": "Stav",
-  "Invalid or missing token. Please log in again.": "Neplatný nebo chybějící token. Přihlaste se znovu.",
-  "Failed to refresh token. Please log in again.": "Nepodařilo se obnovit token. Přihlaste se znovu.",
-  "Token expired. Login required.": "Token vypršel. Je vyžadováno přihlášení.",
   "Token refresh failed.": "Obnovení token selhalo.",
   "API call failed with status ": "Volání API selhalo se stavem ",
   "Request timed out.": "Vypršel časový limit požadavku.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "Už je to 12 hodin pryč! (Od tohoto data se nebudete moci odhlásit.)",
   "Already 12h away! You cant opt out.": "Už je to 12 hodin pryč! Nemůžete se odhlásit.",
   "Circular": "kruhový",
-  "Update description": "Aktualizovat popis"
+  "Update description": "Aktualizovat popis",
+  "Delete recurring appointment": "Smazat opakující se schůzku",
+  "Delete specific appointment": "Smazat konkrétní schůzku",
+  "Rejoin specific appointment": "Znovu připojit k konkrétní schůzce",
+  "Please log in again.": "Přihlaste se prosím znovu."
 }

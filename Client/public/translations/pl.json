@@ -142,9 +142,6 @@
   "Book Type": "Typ rezerwacji",
   "Recurring": "Powtarzający się",
   "Joined": "Dołączono",
-  "Opt out": "Wypisz się",
-  "Opt out for this date": "Wypisz się z tej daty",
-  "Opt in again for this date": "Zapisz się ponownie na tę datę",
   "You havent joined this date. Please join via apointment tab.": "Nie dołączyłeś do tej daty. Dołącz poprzez zakładkę spotkania.",
   "This action will cancel your booking for this date.": "Ta akcja anuluje twoją rezerwację na tę datę.",
   "This action will cancel your booking ONLY for this date.": "Ta akcja anuluje twoją rezerwację TYLKO na tę datę.",
@@ -174,9 +171,6 @@
   "Color": "Kolor",
   "User Statuses": "Statusy użytkownika",
   "Status": "Status",
-  "Invalid or missing token. Please log in again.": "Nieprawidłowy lub brakujący token. Zaloguj się ponownie.",
-  "Failed to refresh token. Please log in again.": "Nie udało się odświeżyć token. Zaloguj się ponownie.",
-  "Token expired. Login required.": "Token wygasł. Wymagane logowanie.",
   "Token refresh failed.": "Odświeżanie token nie powiodło się.",
   "API call failed with status ": "Wywołanie API nie powiodło się z statusem ",
   "Request timed out.": "Żądanie przekroczyło limit czasu.",
@@ -202,6 +196,10 @@
   "Updates history": "Historia aktualizacji",
   "Already 12h away! (You wont be able to opt out from this date.)": "Już 12 godzin stąd! (Nie będziesz mógł zrezygnować od tej daty.)",
   "Already 12h away! You cant opt out.": "Już 12 godzin stąd! Nie możesz zrezygnować.",
- "Circular": "okrągły",
-  "Update description": "Aktualizuj opis"
+  "Circular": "okrągły",
+  "Update description": "Aktualizuj opis",
+  "Delete recurring appointment": "Usuń powtarzające się spotkanie",
+  "Delete specific appointment": "Usuń konkretne spotkanie",
+  "Rejoin specific appointment": "Dołącz ponownie do konkretnego spotkania",
+  "Please log in again.": "Zaloguj się ponownie."
 }

@@ -142,9 +142,6 @@
   "Book Type": "预订类型",
   "Recurring": "重复",
   "Joined": "已加入",
-  "Opt out": "退出",
-  "Opt out for this date": "为此日期退出",
-  "Opt in again for this date": "为此日期再次加入",
   "You havent joined this date. Please join via apointment tab.": "您尚未加入此日期。请通过预约选项卡加入。",
   "This action will cancel your booking for this date.": "此操作将取消您对此日期的预订。",
   "This action will cancel your booking ONLY for this date.": "此操作仅取消您对此日期的预订。",
@@ -174,9 +171,6 @@
   "Color": "颜色",
   "User Statuses": "用户状态",
   "Status": "状态",
-  "Invalid or missing token. Please log in again.": "无效或缺失的token。请重新登录。",
-  "Failed to refresh token. Please log in again.": "刷新token失败。请重新登录。",
-  "Token expired. Login required.": "Token已过期。需要登录。",
   "Token refresh failed.": "Token刷新失败。",
   "API call failed with status ": "API调用失败，状态为 ",
   "Request timed out.": "请求超时。",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "已经12小时之遥！（从这个日期起，您将无法选择退出。）",
   "Already 12h away! You cant opt out.": "已经12小时之遥！您无法选择退出。",
   "Circular": "圆形的",
-  "Update description": "更新描述"
+  "Update description": "更新描述",
+  "Delete recurring appointment": "删除重复预约",
+  "Delete specific appointment": "删除特定预约",
+  "Rejoin specific appointment": "重新加入特定预约",
+  "Please log in again.": "请再次登录。"
 }

@@ -142,9 +142,6 @@
   "Book Type": "Bokningstyp",
   "Recurring": "Återkommande",
   "Joined": "Ansluten",
-  "Opt out": "Avanmäl",
-  "Opt out for this date": "Avanmäl för detta datum",
-  "Opt in again for this date": "Anmäl igen för detta datum",
   "You havent joined this date. Please join via apointment tab.": "Du har inte anslutit till detta datum. Anslut via mötestabben.",
   "This action will cancel your booking for this date.": "Denna åtgärd avbryter din bokning för detta datum.",
   "This action will cancel your booking ONLY for this date.": "Denna åtgärd avbryter din bokning ENDAST för detta datum.",
@@ -174,9 +171,6 @@
   "Color": "Färg",
   "User Statuses": "Användarstatusar",
   "Status": "Status",
-  "Invalid or missing token. Please log in again.": "Ogiltigt eller saknat token. Logga in igen.",
-  "Failed to refresh token. Please log in again.": "Misslyckades med att uppdatera token. Logga in igen.",
-  "Token expired. Login required.": "Token har gått ut. Inloggning krävs.",
   "Token refresh failed.": "Uppdatering av token misslyckades.",
   "API call failed with status ": "API-anrop misslyckades med status ",
   "Request timed out.": "Begäran tog för lång tid.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "Redan 12 timmar bort! (Du kommer inte kunna avboka från det här datumet.)",
   "Already 12h away! You cant opt out.": "Redan 12 timmar bort! Du kan inte avboka.",
   "Circular": "cirkulär",
-  "Update description": "Uppdatera beskrivning"
+  "Update description": "Uppdatera beskrivning",
+  "Delete recurring appointment": "Ta bort återkommande möte",
+  "Delete specific appointment": "Ta bort specifikt möte",
+  "Rejoin specific appointment": "Gå med i specifikt möte igen",
+  "Please log in again.": "Logga in igen."
 }

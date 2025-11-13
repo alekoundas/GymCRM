@@ -142,9 +142,6 @@
   "Book Type": "Book type",
   "Recurring": "Gentagne",
   "Joined": "Deltaget",
-  "Opt out": "Fravælg",
-  "Opt out for this date": "Fravælg for denne dato",
-  "Opt in again for this date": "Tilmeld igen for denne dato",
   "You havent joined this date. Please join via apointment tab.": "Du har ikke tilmeldt dig denne dato. Tilmeld dig via aftale fanen.",
   "This action will cancel your booking for this date.": "Denne handling vil annullere din booking for denne dato.",
   "This action will cancel your booking ONLY for this date.": "Denne handling vil annullere din booking KUN for denne dato.",
@@ -174,9 +171,6 @@
   "Color": "Farve",
   "User Statuses": "Brugerstatusser",
   "Status": "Status",
-  "Invalid or missing token. Please log in again.": "Ugyldigt eller manglende token. Log ind igen.",
-  "Failed to refresh token. Please log in again.": "Kunne ikke opdatere token. Log ind igen.",
-  "Token expired. Login required.": "Token udløbet. Login påkrævet.",
   "Token refresh failed.": "Opdatering af token mislykkedes.",
   "API call failed with status ": "API-kald mislykkedes med status ",
   "Request timed out.": "Anmodningen udløb.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "Allerede 12 timer væk! (Du kan ikke framelde dig fra denne dato.)",
   "Already 12h away! You cant opt out.": "Allerede 12 timer væk! Du kan ikke framelde dig.",
   "Circular": "cirkulær",
-  "Update description": "Opdater beskrivelse"
+  "Update description": "Opdater beskrivelse",
+  "Delete recurring appointment": "Slet tilbagevendende aftale",
+  "Delete specific appointment": "Slet specifik aftale",
+  "Rejoin specific appointment": "Genindmeld specifik aftale",
+  "Please log in again.": "Log på igen."
 }

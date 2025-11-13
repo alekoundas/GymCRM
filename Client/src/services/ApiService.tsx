@@ -66,7 +66,7 @@ export const useApiService = () => {
         const refreshToken = refreshTokenDto.refreshToken;
 
         if (!token || !refreshToken) {
-          showError(t("Invalid or missing token. Please log in again."));
+          showError(t("Please log in again."));
           TokenService.logout();
           return false;
         }
@@ -92,7 +92,7 @@ export const useApiService = () => {
         return true;
       } catch (error) {
         console.error("Unexpected error during token refresh:", error);
-        showError(t("Failed to refresh token. Please log in again."));
+        showError(t("Please log in again."));
         TokenService.logout();
         return false;
       } finally {
@@ -111,7 +111,7 @@ export const useApiService = () => {
       data?: TRequest
     ): Promise<ApiResponseDto<TResponse> | null> => {
       if (TokenService.isRefreshTokenExpired()) {
-        showWarn(t("Token expired. Login required."));
+        showWarn(t("Please log in again."));
         TokenService.logout();
         return null;
       }

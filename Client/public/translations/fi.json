@@ -142,9 +142,6 @@
   "Book Type": "Varaustyyppi",
   "Recurring": "Toistuva",
   "Joined": "Liittynyt",
-  "Opt out": "Poistu",
-  "Opt out for this date": "Poistu tälle päivämäärälle",
-  "Opt in again for this date": "Liity uudelleen tälle päivämäärälle",
   "You havent joined this date. Please join via apointment tab.": "Et ole liittynyt tälle päivämäärälle. Liity ajanvarausvälilehden kautta.",
   "This action will cancel your booking for this date.": "Tämä toiminto peruuttaa varauksesi tälle päivämäärälle.",
   "This action will cancel your booking ONLY for this date.": "Tämä toiminto peruuttaa varauksesi VAIN tälle päivämäärälle.",
@@ -174,9 +171,6 @@
   "Color": "Väri",
   "User Statuses": "Käyttäjän tilat",
   "Status": "Tila",
-  "Invalid or missing token. Please log in again.": "Virheellinen tai puuttuva token. Kirjaudu sisään uudelleen.",
-  "Failed to refresh token. Please log in again.": "Tokenin päivitys epäonnistui. Kirjaudu sisään uudelleen.",
-  "Token expired. Login required.": "Token vanhentunut. Kirjautuminen vaaditaan.",
   "Token refresh failed.": "Tokenin päivitys epäonnistui.",
   "API call failed with status ": "API-kutsu epäonnistui tilalla ",
   "Request timed out.": "Pyyntö aikakatkaistiin.",
@@ -203,5 +197,9 @@
   "Already 12h away! (You wont be able to opt out from this date.)": "Jo 12 tunnin päässä! (Et voi peruuttaa tästä päivästä alkaen.)",
   "Already 12h away! You cant opt out.": "Jo 12 tunnin päässä! Et voi peruuttaa.",
   "Circular": "cirkulaarinen",
-  "Update description": "Päivitä kuvaus"
+  "Update description": "Päivitä kuvaus",
+  "Delete recurring appointment": "Poista toistuva varaus",
+  "Delete specific appointment": "Poista tietty varaus",
+  "Rejoin specific appointment": "Liity uudelleen tiettyyn varaukseen",
+  "Please log in again.": "Kirjaudu uudelleen sisään."
 }
