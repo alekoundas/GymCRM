@@ -147,35 +147,39 @@ namespace API.Controllers
             {
                 // Create the first OrderBy().
                 DataTableSortDto? dataTableSort = dataTable.Sorts.First();
+                string fieldName = dataTableSort.FieldName.Substring(0, 1).ToUpper() + dataTableSort.FieldName.Substring(1, dataTableSort.FieldName.Length - 1);
+
                 if (dataTableSort.Order > 0)
-                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.ASCENDING);
+                    query.OrderBy(fieldName, OrderDirectionEnum.ASCENDING);
                 else if (dataTableSort.Order < 0)
-                    query.OrderBy(dataTableSort.FieldName, OrderDirectionEnum.DESCENDING);
+                    query.OrderBy(fieldName, OrderDirectionEnum.DESCENDING);
 
                 // Create the rest OrderBy methods as ThenBy() if any.
                 foreach (var sortInfo in dataTable.Sorts.Skip(1))
                 {
+                    fieldName = sortInfo.FieldName.Substring(0, 1).ToUpper() + sortInfo.FieldName.Substring(1, sortInfo.FieldName.Length - 1);
                     if (dataTableSort.Order > 0)
-                        query.ThenBy(sortInfo.FieldName, OrderDirectionEnum.ASCENDING);
+                        query.ThenBy(fieldName, OrderDirectionEnum.ASCENDING);
                     else if (dataTableSort.Order < 0)
-                        query.ThenBy(sortInfo.FieldName, OrderDirectionEnum.DESCENDING);
+                        query.ThenBy(fieldName, OrderDirectionEnum.DESCENDING);
                 }
             }
 
-
-            // Handle Filtering of DataTable.
-            foreach (DataTableFilterDto filter in dataTable.Filters)
+            foreach (var filter in dataTable.Filters)
             {
                 string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.contains)
-                    query.FilterByColumnContains(filter.FieldName, filter.Value.ToLower());
+                    query.FilterByColumnContains(filter.FieldName, filter.Value);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.equals)
-                    query.FilterByColumnEquals(filter.FieldName, filter.Value);
+                    if (filter.FieldName == "UserId")
+                        query.FilterByColumnEquals(filter.FieldName, new Guid(filter.Value));
+                    else
+                        query.FilterByColumnEquals(filter.FieldName, filter.Value != "null" ? filter.Value : null);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.notEquals)
-                    query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
+                    query.FilterByColumnNotEquals(filter.FieldName, filter.Value != "null" ? filter.Value : null);
 
                 if (filter.Values?.Count() > 0 && filter.FilterType == DataTableFiltersEnum.@in)
                     query.FilterByColumnIn(filter.FieldName, filter.Values);
@@ -184,9 +188,12 @@ namespace API.Controllers
                     query.FilterByColumnDateBetween(filter.FieldName, filter.Values[0], filter.Values[1]);
 
                 if (filter.FilterType == DataTableFiltersEnum.custom)
-                    if (fieldName == "RoleId" && filter.Values?.Count() > 0)
-                        query.Where(x => x.UserRoles.Any(y => filter.Values.Any(z => z == y.RoleId.ToString())));
+                {
+                    if (filter.FieldName == "roleId" && filter.Values!.Count>0)
+                        query.Where(x => x.UserRoles.Any(y => filter.Values!.Contains(y.RoleId.ToString().ToLower())));
+                }
             }
+
 
 
             // Handle pagination.
@@ -205,13 +212,16 @@ namespace API.Controllers
                 string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.contains)
-                    query.FilterByColumnContains(filter.FieldName, filter.Value.ToLower());
+                    query.FilterByColumnContains(filter.FieldName, filter.Value);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.equals)
-                    query.FilterByColumnEquals(filter.FieldName, filter.Value);
+                    if (filter.FieldName == "UserId")
+                        query.FilterByColumnEquals(filter.FieldName, new Guid(filter.Value));
+                    else
+                        query.FilterByColumnEquals(filter.FieldName, filter.Value != "null" ? filter.Value : null);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.notEquals)
-                    query.FilterByColumnNotEquals(filter.FieldName, filter.Value);
+                    query.FilterByColumnNotEquals(filter.FieldName, filter.Value != "null" ? filter.Value : null);
 
                 if (filter.Values?.Count() > 0 && filter.FilterType == DataTableFiltersEnum.@in)
                     query.FilterByColumnIn(filter.FieldName, filter.Values);
@@ -220,8 +230,10 @@ namespace API.Controllers
                     query.FilterByColumnDateBetween(filter.FieldName, filter.Values[0], filter.Values[1]);
 
                 if (filter.FilterType == DataTableFiltersEnum.custom)
-                    if (fieldName == "RoleId" && filter.Values?.Count > 0)
-                        query.Where(x => x.UserRoles.Any(y => filter.Values.Any(z => z == y.RoleId.ToString())));
+                {
+                    if (filter.FieldName == "roleId" && filter.Values!.Count>0)
+                        query.Where(x => x.UserRoles.Any(y => filter.Values!.Contains(y.RoleId.ToString().ToLower())));
+                }
             }
 
 
