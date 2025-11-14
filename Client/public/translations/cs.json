@@ -198,8 +198,8 @@
   "Already 12h away! You cant opt out.": "Už je to 12 hodin pryč! Nemůžete se odhlásit.",
   "Circular": "kruhový",
   "Update description": "Aktualizovat popis",
-  "Delete recurring appointment": "Smazat opakující se schůzku",
   "Delete specific appointment": "Smazat konkrétní schůzku",
   "Rejoin specific appointment": "Znovu připojit k konkrétní schůzce",
-  "Please log in again.": "Přihlaste se prosím znovu."
+  "Please log in again.": "Přihlaste se prosím znovu.",
+  "Permanent deletion": "Trvalé odstranění"
 }

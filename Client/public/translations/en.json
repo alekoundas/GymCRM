@@ -198,8 +198,8 @@
   "Already 12h away! You cant opt out.": "Already 12h away! You cant opt out.",
   "Circular": "Circular",
   "Update description": "Update description",
-  "Delete recurring appointment": "Delete recurring appointment",
   "Delete specific appointment": "Delete specific appointment",
   "Rejoin specific appointment": "Rejoin specific appointment",
-  "Please log in again.": "Please log in again."
+  "Please log in again.": "Please log in again.",
+  "Permanent deletion": "Permanent deletion"
 }

@@ -198,8 +198,8 @@
   "Already 12h away! You cant opt out.": "Уже в 12 часах! Вы не можете отказаться.",
   "Circular": "Круговой",
   "Update description": "Обновить описание",
-  "Delete recurring appointment": "Удалить повторяющееся назначение",
   "Delete specific appointment": "Удалить конкретное назначение",
   "Rejoin specific appointment": "Повторно присоединиться к конкретному назначению",
-  "Please log in again.": "Пожалуйста, войдите снова."
+  "Please log in again.": "Пожалуйста, войдите снова.",
+  "Permanent deletion": "Постоянное удаление"
 }

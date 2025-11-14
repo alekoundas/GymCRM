@@ -198,8 +198,8 @@
   "Already 12h away! You cant opt out.": "Zaten 12 saat uzakta! Vazgeçemezsiniz.",
   "Circular": "dairesel",
   "Update description": "Açıklama güncelle",
-  "Delete recurring appointment": "Tekrarlanan randevuyu sil",
   "Delete specific appointment": "Belirli randevuyu sil",
   "Rejoin specific appointment": "Belirli randevuya yeniden katıl",
-  "Please log in again.": "Lütfen tekrar giriş yapın."
+  "Please log in again.": "Lütfen tekrar giriş yapın.",
+  "Permanent deletion": "Kalıcı silme"
 }

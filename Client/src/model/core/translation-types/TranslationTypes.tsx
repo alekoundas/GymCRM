@@ -204,10 +204,10 @@
   'Already 12h away! You cant opt out.': string;
   'Circular': string;
   'Update description': string;
-  'Delete recurring appointment': string;
   'Delete specific appointment': string;
   'Rejoin specific appointment': string;
   'Please log in again.': string;
+  'Permanent deletion': string;
     }
 
 

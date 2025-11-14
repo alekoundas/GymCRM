@@ -126,7 +126,7 @@ namespace Business.Services
                 else
                 {
                     if (!await _userManager.VerifyUserTokenAsync(user, "REFRESHTOKENPROVIDER", "RefreshToken", request.RefreshToken))
-                        return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("Refresh token expired. Please Login again.");
+                        return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("Please Login again.");
 
                     var token = await GenerateUserToken(user);
                     return new ApiResponse<UserRefreshResponseDto>()

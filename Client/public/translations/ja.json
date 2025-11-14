@@ -198,8 +198,8 @@
   "Already 12h away! You cant opt out.": "すでに12時間先です！オプトアウトできません。",
   "Circular": "円形の",
   "Update description": "説明を更新",
-  "Delete recurring appointment": "繰り返し予定を削除",
   "Delete specific appointment": "特定の予定を削除",
   "Rejoin specific appointment": "特定の予定に再参加",
-  "Please log in again.": "もう一度ログインしてください。"
+  "Please log in again.": "もう一度ログインしてください。",
+  "Permanent deletion": "永久削除"
 }

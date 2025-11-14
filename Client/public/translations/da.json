@@ -198,8 +198,8 @@
   "Already 12h away! You cant opt out.": "Allerede 12 timer væk! Du kan ikke framelde dig.",
   "Circular": "cirkulær",
   "Update description": "Opdater beskrivelse",
-  "Delete recurring appointment": "Slet tilbagevendende aftale",
   "Delete specific appointment": "Slet specifik aftale",
   "Rejoin specific appointment": "Genindmeld specifik aftale",
-  "Please log in again.": "Log på igen."
+  "Please log in again.": "Log på igen.",
+  "Permanent deletion": "Permanent sletning"
 }
