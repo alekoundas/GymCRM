@@ -414,14 +414,16 @@ namespace API.Controllers
                 {
                     DateTime selectedDate = DateTime.Parse(filter?.Value!);
                     query = query.Where(x =>
-                        x.SelectedDate!=null?
+                        x.SelectedDate != null ?
                             (x.SelectedDate == selectedDate)
                         :
-                            (x.TrainGroupDate.FixedDay == selectedDate 
-                            ||x.TrainGroupDate.RecurrenceDayOfWeek == selectedDate.DayOfWeek 
-                            ||x.TrainGroupDate.RecurrenceDayOfMonth == selectedDate.Month
+                            (x.TrainGroupDate.FixedDay == selectedDate
+                            || x.TrainGroupDate.RecurrenceDayOfWeek == selectedDate.DayOfWeek
+                            || x.TrainGroupDate.RecurrenceDayOfMonth == selectedDate.Month
                             )
                     );
+
+                    query.Where(y => !y.TrainGroupParticipantUnavailableDates.Any(z => z.TrainGroupParticipantId == y.Id && z.UnavailableDate == selectedDate));
                 }
             }
         }

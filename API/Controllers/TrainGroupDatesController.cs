@@ -128,13 +128,15 @@ namespace API.Controllers
                             x.Key.TrainGroupParticipants
                                 .Where(y => !y.TrainGroupParticipantUnavailableDates.Any(z => z.TrainGroupParticipantId == y.Id && z.UnavailableDate == selectedDate))
                                 .Where(y =>
-                                    y.SelectedDate == selectedDate
-                                    || y.TrainGroupDate?.FixedDay == selectedDate
-                                    || y.TrainGroupDate?.RecurrenceDayOfMonth == selectedDate.Day
-                                    || y.TrainGroupDate?.RecurrenceDayOfWeek == selectedDate.DayOfWeek
+                                  y.SelectedDate != null ?
+                                        (y.SelectedDate == selectedDate)
+                                    :
+                                        (y.TrainGroupDate.FixedDay == selectedDate
+                                        || y.TrainGroupDate.RecurrenceDayOfWeek == selectedDate.DayOfWeek
+                                        || y.TrainGroupDate.RecurrenceDayOfMonth == selectedDate.Month)
                                 )
-                                .Select(y=>y.UserId)
-                                .Distinct()
+                                //.Select(y => y.UserId)
+                                //.Distinct()
                                 .Count()
                         )
                     ),
