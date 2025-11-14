@@ -408,7 +408,16 @@ namespace API.Controllers
                             Date = y.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
                                 ? new DateTime(2000, 1, 2 + (int)y.TrainGroupDate.RecurrenceDayOfWeek!.Value)
                                 : new DateTime(2000, 1, y.TrainGroupDate.RecurrenceDayOfMonth!.Value),
-                            IsUserJoined = true,
+                            IsUserJoined = y.TrainGroupParticipantUnavailableDates
+                                .Where(z =>
+                                    z.UnavailableDate >= selectedDateStart &&
+                                    z.UnavailableDate <= selectedDateEnd
+                                )
+                                .Where(z =>
+                                    y.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
+                                    ? z.UnavailableDate.DayOfWeek == y.TrainGroupDate.RecurrenceDayOfWeek
+                                    : z.UnavailableDate.Day == y.TrainGroupDate.RecurrenceDayOfMonth)
+                                .FirstOrDefault() == null,
                             IsOneOff = false,
                             IsUnavailableTrainGroup = y.TrainGroupParticipantUnavailableDates
                                 .Where(z => z.UnavailableDate >= selectedDateStart && z.UnavailableDate <= selectedDateEnd)
