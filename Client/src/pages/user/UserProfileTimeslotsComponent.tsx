@@ -558,14 +558,14 @@ export default function UserProfileTimeslotsComponent() {
                     label={t("Permanent deletion")}
                     severity="danger"
                     onClick={optOutTimeSlotDialogControl.showDialog}
-                    visible={timeSlots.some((x) =>
-                      x.recurrenceDates.some(
-                        (y) =>
-                          y.trainGroupDateId ===
-                            selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-                          y.isUserJoined
-                      )
-                    )}
+                    // visible={timeSlots.some((x) =>
+                    //   x.recurrenceDates.some(
+                    //     (y) =>
+                    //       y.trainGroupDateId ===
+                    //         selectedTimeSlotRecurrenceDate.trainGroupDateId &&
+                    //       y.isUserJoined
+                    //   )
+                    // )}
                     disabled={
                       new Date(
                         Date.UTC(
