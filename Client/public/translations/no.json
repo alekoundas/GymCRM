@@ -198,8 +198,9 @@
   "Already 12h away! You cant opt out.": "Allerede 12 timer unna! Du kan ikke melde deg ut.",
   "Circular": "sirkulær",
   "Update description": "Oppdater beskrivelse",
-  "Delete recurring appointment": "Slett gjentakende avtale",
+  "Delete recurring ": "Slett gjentakende avtale",
   "Delete specific appointment": "Slett spesifikk avtale",
   "Rejoin specific appointment": "Bli med på spesifikk avtale igjen",
-  "Please log in again.": "Logg på igjen."
+  "Please log in again.": "Logg på igjen.",
+  "Permanent deletion": "Permanent sletting"
 }

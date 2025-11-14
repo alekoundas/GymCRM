@@ -198,8 +198,8 @@
   "Already 12h away! You cant opt out.": "بالفعل 12 ساعة بعيدة! لا يمكنك الانسحاب.",
   "Circular": "دائري",
   "Update description": "تحديث الوصف",
-  "Delete recurring appointment": "حذف الموعد المتكرر",
   "Delete specific appointment": "حذف موعد محدد",
   "Rejoin specific appointment": "إعادة الانضمام إلى موعد محدد",
-  "Please log in again.": "يرجى تسجيل الدخول مرة أخرى."
+  "Please log in again.": "يرجى تسجيل الدخول مرة أخرى.",
+  "Permanent deletion": "الحذف الدائم"
 }

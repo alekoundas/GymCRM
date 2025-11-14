@@ -198,8 +198,8 @@
   "Already 12h away! You cant opt out.": "已经12小时之遥！您无法选择退出。",
   "Circular": "圆形的",
   "Update description": "更新描述",
-  "Delete recurring appointment": "删除重复预约",
   "Delete specific appointment": "删除特定预约",
   "Rejoin specific appointment": "重新加入特定预约",
-  "Please log in again.": "请再次登录。"
+  "Please log in again.": "请再次登录。",
+  "Permanent deletion": "永久删除"
 }

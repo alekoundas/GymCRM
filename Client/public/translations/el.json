@@ -198,8 +198,8 @@
   "Already 12h away! You cant opt out.": "Ήδη 12 ώρες μακριά! Δεν μπορείτε να αποχωρήσετε.",
   "Circular": "Κυκλικό",
   "Update description": "Ενημέρωση περιγραφής",
-  "Delete recurring appointment": "Διαγραφή επαναλαμβανόμενου ραντεβού",
   "Delete specific appointment": "Διαγραφή συγκεκριμένου ραντεβού",
   "Rejoin specific appointment": "Επανεγγραφή συγκεκριμένου ραντεβού",
-  "Please log in again.": "Παρακαλούμε συνδεθείτε ξανά."
+  "Please log in again.": "Παρακαλούμε συνδεθείτε ξανά.",
+  "Permanent deletion": "Οριστική διαγραφή"
 }

@@ -198,8 +198,8 @@
   "Already 12h away! You cant opt out.": "이미 12시간 앞서 있습니다! 선택 사항을 취소할 수 없습니다.",
   "Circular": "원형의",
   "Update description": "설명 업데이트",
-  "Delete recurring appointment": "반복 약속 삭제",
   "Delete specific appointment": "특정 약속 삭제",
   "Rejoin specific appointment": "특정 약속에 다시 참여",
-  "Please log in again.": "다시 로그인하십시오."
+  "Please log in again.": "다시 로그인하십시오.",
+  "Permanent deletion": "영구 삭제"
 }

@@ -198,8 +198,8 @@
   "Already 12h away! You cant opt out.": "Já está a 12 horas! Não pode desistir.",
   "Circular": "circular",
   "Update description": "Atualizar descrição",
-  "Delete recurring appointment": "Excluir agendamento recorrente",
   "Delete specific appointment": "Excluir agendamento específico",
   "Rejoin specific appointment": "Reingresse no agendamento específico",
-  "Please log in again.": "Faça login novamente."
+  "Please log in again.": "Faça login novamente.",
+  "Permanent deletion": "Exclusão permanente"
 }
