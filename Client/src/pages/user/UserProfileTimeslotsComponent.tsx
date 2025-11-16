@@ -106,7 +106,7 @@ export default function UserProfileTimeslotsComponent() {
 
     if (response) {
       const mappedEvents = response
-        // .filter((x) => !x.isUnavailableTrainGroup)
+        .filter((x) => !x.isUnavailableTrainGroup)
         .flatMap((slot) =>
           slot.recurrenceDates
             // .filter((x) => !x.isUnavailableTrainGroup)
