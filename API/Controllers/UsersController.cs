@@ -189,7 +189,7 @@ namespace API.Controllers
 
                 if (filter.FilterType == DataTableFiltersEnum.custom)
                 {
-                    if (filter.FieldName == "roleId" && filter.Values!.Count>0)
+                    if (filter.FieldName == "roleId" && filter.Values!.Count > 0)
                         query.Where(x => x.UserRoles.Any(y => filter.Values!.Contains(y.RoleId.ToString().ToLower())));
                 }
             }
@@ -231,7 +231,7 @@ namespace API.Controllers
 
                 if (filter.FilterType == DataTableFiltersEnum.custom)
                 {
-                    if (filter.FieldName == "roleId" && filter.Values!.Count>0)
+                    if (filter.FieldName == "roleId" && filter.Values!.Count > 0)
                         query.Where(x => x.UserRoles.Any(y => filter.Values!.Contains(y.RoleId.ToString().ToLower())));
                 }
             }
@@ -391,6 +391,12 @@ namespace API.Controllers
                     RecurrenceDates = x.Key.TrainGroupDates
                     .SelectMany(y => y.TrainGroupParticipants.Where(z => z.UserId == new Guid(timeSlotRequestDto.UserId) && z.SelectedDate == null))
                     .Where(y => y.TrainGroupDate.RecurrenceDayOfMonth.HasValue || y.TrainGroupDate.RecurrenceDayOfWeek.HasValue)
+                    .Where(y =>
+                        y.RecurringStartOnDate == null ?
+                        true :
+                        (y.RecurringStartOnDate.Value <= selectedDateStart) ||
+                        (y.RecurringStartOnDate.Value >= selectedDateStart && y.RecurringStartOnDate.Value <= selectedDateEnd)
+                    )
                     .Where(y =>
                         (y.TrainGroupDate.RecurrenceDayOfWeek >= selectedDateStart.DayOfWeek && y.TrainGroupDate.RecurrenceDayOfWeek <= selectedDateEnd.DayOfWeek)
                         ||

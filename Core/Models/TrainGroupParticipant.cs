@@ -6,6 +6,7 @@ namespace Core.Models
         TrainGroupParticipant : BaseModel
     {
         public DateTime? SelectedDate { get; set; } // If null repeating subscriber,if not specific date participant
+        public DateTime? RecurringStartOnDate { get; set; } // Set only for recurring participants.
 
         public int TrainGroupDateId { get; set; }
         public TrainGroupDate TrainGroupDate { get; set; } = null!;

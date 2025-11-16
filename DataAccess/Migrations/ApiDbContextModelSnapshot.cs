@@ -387,6 +387,9 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("RecurringStartOnDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("SelectedDate")
                         .HasColumnType("TEXT");
 
