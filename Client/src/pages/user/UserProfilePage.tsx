@@ -221,15 +221,17 @@ export default function UserProfilePage() {
       </div>
 
       <div className="col-12">
-        <Card
-          className="p-4"
-          title={t("Upcoming Train Groups")}
-          style={{
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <UserProfileTimeslotsComponent />
-        </Card>
+        <div style={{ minWidth: "700px" }}>
+          <Card
+            className="p-4"
+            title={t("Upcoming Train Groups")}
+            style={{
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <UserProfileTimeslotsComponent />
+          </Card>
+        </div>
       </div>
 
       {/* Change Password Dialog */}
