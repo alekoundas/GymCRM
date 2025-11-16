@@ -83,12 +83,21 @@ export default function TrainGroupsBookingCalendarTimeslotBookFormComponent({}: 
             (x) => x.selectedDate === undefined
           );
 
+      let recurringStartOnDate: string | undefined = undefined;
+      if (
+        type === TrainGroupDateTypeEnum.DAY_OF_MONTH ||
+        type === TrainGroupDateTypeEnum.DAY_OF_WEEK
+      ) {
+        recurringStartOnDate = timeSlotRequestDto.selectedDate;
+      }
+
       newParticipants = [
         ...filteredParticipants,
         {
           id: 0,
           selectedDate:
             type === undefined ? timeSlotRequestDto.selectedDate : undefined,
+          recurringStartOnDate: recurringStartOnDate,
           trainGroupId: selectedTimeSlot!.trainGroupId,
           trainGroupDateId: trainGroupDateId,
           userId: TokenService.getUserId() ?? "",
