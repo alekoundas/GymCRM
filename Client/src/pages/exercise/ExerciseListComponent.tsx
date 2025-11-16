@@ -32,6 +32,7 @@ export default function ExerciseListComponent({
   const apiService = useApiService();
   const {
     workoutPlanDto,
+    updateWorkoutPlanDto,
     setExercises,
     newExerciseDto,
     setNewExerciseDto,
@@ -81,19 +82,25 @@ export default function ExerciseListComponent({
   };
 
   const OnDialogWorkoutPlanSave = async (): Promise<void> => {
-    const updatedDto = {
-      ...workoutPlanDto,
-      description: workoutPlanDescription,
-    };
-    const response = await apiService.update<WorkoutPlanDto>(
-      "WorkoutPlans",
-      updatedDto,
-      workoutPlanDto.id
-    );
-    if (response) {
-      setWorkoutPlanDto(response); // Update store with backend response
+    if (formMode === FormMode.ADD) {
+      updateWorkoutPlanDto({ description: workoutPlanDescription });
       resetworkoutPlanDescription();
       dialogControlWorkoutPlan.hideDialog();
+    }
+
+    if (formMode === FormMode.EDIT) {
+      const updatedDto = {
+        ...workoutPlanDto,
+        description: workoutPlanDescription,
+      };
+      const response = await apiService.update<WorkoutPlanDto>(
+        "WorkoutPlans",
+        updatedDto,
+        workoutPlanDto.id
+      );
+      if (response) {
+        setWorkoutPlanDto(response); // Update store with backend response
+      }
     }
   };
 
