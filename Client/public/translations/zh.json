@@ -201,5 +201,8 @@
   "Delete specific appointment": "删除特定预约",
   "Rejoin specific appointment": "重新加入特定预约",
   "Please log in again.": "请再次登录。",
-  "Permanent deletion": "永久删除"
+  "Permanent deletion": "永久删除",
+  "Attendances": "考勤",
+  "Take attendances": "点名",
+  "Attendance date": "考勤日期"
 }

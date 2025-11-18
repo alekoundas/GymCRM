@@ -201,5 +201,8 @@
   "Delete specific appointment": "特定の予定を削除",
   "Rejoin specific appointment": "特定の予定に再参加",
   "Please log in again.": "もう一度ログインしてください。",
-  "Permanent deletion": "永久削除"
+  "Permanent deletion": "永久削除",
+  "Attendances": "出席",
+  "Take attendances": "出席を取る",
+  "Attendance date": "出席日"
 }

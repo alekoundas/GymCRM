@@ -201,5 +201,8 @@
   "Delete specific appointment": "Διαγραφή συγκεκριμένου ραντεβού",
   "Rejoin specific appointment": "Επανεγγραφή συγκεκριμένου ραντεβού",
   "Please log in again.": "Παρακαλούμε συνδεθείτε ξανά.",
-  "Permanent deletion": "Οριστική διαγραφή"
+  "Permanent deletion": "Οριστική διαγραφή",
+  "Attendances": "Παρουσίες",
+  "Take attendances": "Πάρε παρουσίες",
+  "Attendance date": "Ημέρα παρουσίας"
 }

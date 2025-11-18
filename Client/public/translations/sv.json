@@ -201,5 +201,8 @@
   "Delete specific appointment": "Ta bort specifikt möte",
   "Rejoin specific appointment": "Gå med i specifikt möte igen",
   "Please log in again.": "Logga in igen.",
-  "Permanent deletion": "Permanent radering"
+  "Permanent deletion": "Permanent radering",
+  "Attendances": "Närvaro",
+  "Take attendances": "Ta närvaro",
+  "Attendance date": "Närvarodatum"
 }

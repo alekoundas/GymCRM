@@ -201,5 +201,8 @@
   "Delete specific appointment": "특정 약속 삭제",
   "Rejoin specific appointment": "특정 약속에 다시 참여",
   "Please log in again.": "다시 로그인하십시오.",
-  "Permanent deletion": "영구 삭제"
+  "Permanent deletion": "영구 삭제",
+  "Attendances": "출석",
+  "Take attendances": "출석 부르기",
+  "Attendance date": "출석 날짜"
 }

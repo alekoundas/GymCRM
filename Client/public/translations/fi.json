@@ -201,5 +201,8 @@
   "Delete specific appointment": "Poista tietty varaus",
   "Rejoin specific appointment": "Liity uudelleen tiettyyn varaukseen",
   "Please log in again.": "Kirjaudu uudelleen sisään.",
-  "Permanent deletion": "Pysyvä poisto"
+  "Permanent deletion": "Pysyvä poisto",
+  "Attendances": "Läsnäolot",
+  "Take attendances": "Merkitse läsnäolot",
+  "Attendance date": "Läsnäolopäivä"
 }

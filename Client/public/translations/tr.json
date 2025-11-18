@@ -201,5 +201,8 @@
   "Delete specific appointment": "Belirli randevuyu sil",
   "Rejoin specific appointment": "Belirli randevuya yeniden katıl",
   "Please log in again.": "Lütfen tekrar giriş yapın.",
-  "Permanent deletion": "Kalıcı silme"
+  "Permanent deletion": "Kalıcı silme",
+  "Attendances": "Devam",
+  "Take attendances": "Yoklama al",
+  "Attendance date": "Yoklama tarihi"
 }

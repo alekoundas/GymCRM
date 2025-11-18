@@ -201,5 +201,8 @@
   "Delete specific appointment": "Delete specific appointment",
   "Rejoin specific appointment": "Rejoin specific appointment",
   "Please log in again.": "Please log in again.",
-  "Permanent deletion": "Permanent deletion"
+  "Permanent deletion": "Permanent deletion",
+  "Attendances": "Attendances",
+  "Take attendances": "Take attendances",
+  "Attendance date": "Attendance date"
 }

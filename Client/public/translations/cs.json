@@ -201,5 +201,8 @@
   "Delete specific appointment": "Smazat konkrétní schůzku",
   "Rejoin specific appointment": "Znovu připojit k konkrétní schůzce",
   "Please log in again.": "Přihlaste se prosím znovu.",
-  "Permanent deletion": "Trvalé odstranění"
+  "Permanent deletion": "Trvalé odstranění",
+  "Attendances": "Docházka",
+  "Take attendances": "Zaznamenat docházku",
+  "Attendance date": "Datum docházky"
 }
