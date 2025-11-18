@@ -9,6 +9,7 @@ using Core.Dtos.TrainGroup;
 using Core.Dtos.TrainGroupDate;
 using Core.Dtos.TrainGroupParticipantUnavailableDate;
 using Core.Dtos.TrainGroupUnavailableDate;
+using Core.Dtos.TrainGroupΑttendance;
 using Core.Dtos.User;
 using Core.Dtos.UserRole;
 using Core.Dtos.UserStatus;
@@ -42,6 +43,13 @@ namespace API.AutoMapper
             CreateMap<TrainGroupDate, TrainGroupDateAddDto>();
             CreateMap<TrainGroupDateAddDto, TrainGroupDate>();
           
+
+            // TrainGroupPresence mappings.
+            CreateMap<TrainGroupΑttendance, TrainGroupΑttendanceDto>();
+            CreateMap<TrainGroupΑttendanceDto, TrainGroupΑttendance>();
+
+            CreateMap<TrainGroupΑttendance, TrainGroupΑttendanceAddDto>();
+            CreateMap<TrainGroupΑttendanceAddDto, TrainGroupΑttendance>();
 
             // TrainGroupParticipant mappings.
             CreateMap<TrainGroupParticipant, TrainGroupParticipantDto>();

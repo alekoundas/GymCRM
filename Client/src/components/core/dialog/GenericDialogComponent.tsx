@@ -31,7 +31,8 @@ interface DialogComponentProps {
 }
 
 const DialogComponent: React.FC<DialogComponentProps> = ({
-  header = "Dialog",
+  // header = "Dialog",
+  header = "",
   formMode = FormMode.EDIT,
   visible,
   control,

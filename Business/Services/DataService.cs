@@ -21,6 +21,7 @@ namespace Business.Services
         public IGenericRepository<PhoneNumber> PhoneNumbers { get; }
         public IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
         public IGenericRepository<ExerciseHistory> ExerciseHistories { get; }
+        public IGenericRepository<TrainGroupΑttendance> TrainGroupΑttendances { get; }
         public IGenericRepository<TrainGroupParticipant> TrainGroupParticipants { get; }
         public IGenericRepository<TrainGroupUnavailableDate> TrainGroupUnavailableDates { get; }
         public IGenericRepository<TrainGroupParticipantUnavailableDate> TrainGroupParticipantUnavailableDates { get; }
@@ -43,6 +44,7 @@ namespace Business.Services
             IGenericRepository<PhoneNumber> phoneNumberRepository,
             IGenericRepository<TrainGroupDate> trainGroupDateRepository,
             IGenericRepository<ExerciseHistory> exerciseHistoriesRepository,
+            IGenericRepository<TrainGroupΑttendance> trainGroupΑttendanceRepository,
             IGenericRepository<TrainGroupParticipant> trainGroupParticipantRepository,
             IGenericRepository<TrainGroupUnavailableDate> trainGroupUnavailableDateRepository,
             IGenericRepository<TrainGroupParticipantUnavailableDate> trainGroupParticipantUnavailableDateRepository,
@@ -68,6 +70,7 @@ namespace Business.Services
             TrainGroupParticipants = trainGroupParticipantRepository;
             TrainGroupParticipantUnavailableDates = trainGroupParticipantUnavailableDateRepository;
             TrainGroupUnavailableDates = trainGroupUnavailableDateRepository;
+            TrainGroupΑttendances = trainGroupΑttendanceRepository;
 
             // Identity.
             Users = userRepository;
@@ -97,6 +100,8 @@ namespace Business.Services
                 return (IGenericRepository<TEntity>)TrainGroupDates;
             if (typeof(TEntity) == typeof(ExerciseHistory))
                 return (IGenericRepository<TEntity>)ExerciseHistories;
+            if (typeof(TEntity) == typeof(TrainGroupΑttendance))
+                return (IGenericRepository<TEntity>)TrainGroupΑttendances;
             if (typeof(TEntity) == typeof(TrainGroupParticipant))
                 return (IGenericRepository<TEntity>)TrainGroupParticipants;
             if (typeof(TEntity) == typeof(TrainGroupUnavailableDate))

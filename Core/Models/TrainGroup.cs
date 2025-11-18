@@ -4,19 +4,20 @@ namespace Core.Models
 {
     public class TrainGroup : BaseModel
     {
-        public string Title { get; set; } = "";    
-        public string Description { get; set; } = "";    
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
         public DateTime Duration { get; set; }
         public DateTime StartOn { get; set; }
         public int MaxParticipants { get; set; }
 
 
-        public Guid TrainerId { get; set; } 
-        public User Trainer { get; set; } = null!; 
+        public Guid TrainerId { get; set; }
+        public User Trainer { get; set; } = null!;
 
         public virtual ICollection<TrainGroupDate> TrainGroupDates { get; set; } = new Collection<TrainGroupDate>();
         public virtual ICollection<TrainGroupParticipant> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipant>();
         public virtual ICollection<TrainGroupUnavailableDate> TrainGroupUnavailableDates { get; set; } = new Collection<TrainGroupUnavailableDate>();
+        public virtual ICollection<TrainGroupΑttendance> TrainGroupΑttendances { get; set; } = new Collection<TrainGroupΑttendance>();
 
     }
 }

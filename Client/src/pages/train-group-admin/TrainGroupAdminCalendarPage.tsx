@@ -16,6 +16,9 @@ import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
 import { useTranslator } from "../../services/TranslatorService";
 import TrainGroupParticipantGridComponent from "../train-group-participant/TrainGroupParticipantGridComponent";
 import { TrainGroupUnavailableDateDto } from "../../model/entities/train-group-unavailable-date/TrainGroupUnavailableDateDto";
+import TrainGroupAttendanceFormComponent from "../train-group-attendance/TrainGroupAttendanceFormComponent";
+import { useTrainGroupAttendanceStore } from "../../stores/TrainGroupAttendanceStore";
+import { TrainGroupAttendanceDto } from "../../model/entities/train-group-attendance/TrainGroupAttendanceDto";
 
 export default function TrainGroupAdminCalendarPage() {
   const { t } = useTranslator();
@@ -27,6 +30,11 @@ export default function TrainGroupAdminCalendarPage() {
     setTrainGroupDto,
     resetSelectedTrainGroupDate,
   } = useTrainGroupStore();
+  const { selectedUserIds, resetSelectedUserIds } =
+    useTrainGroupAttendanceStore();
+
+  const [isTakeAttendancesModalVisible, setTakeAttendancesModalVisibility] =
+    useState(false); // Dialog visibility
   const [isViewModalVisible, setViewModalVisibility] = useState(false); // Dialog visibility
   const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -57,6 +65,10 @@ export default function TrainGroupAdminCalendarPage() {
       });
   };
 
+  const dialogControlTakeAttendances: DialogControl = {
+    showDialog: () => setTakeAttendancesModalVisibility(true),
+    hideDialog: () => setTakeAttendancesModalVisibility(false),
+  };
   const dialogControlDelete: DialogControl = {
     showDialog: () => setDeleteDialogVisibility(true),
     hideDialog: () => setDeleteDialogVisibility(false),
@@ -66,6 +78,23 @@ export default function TrainGroupAdminCalendarPage() {
     hideDialog: () => setViewModalVisibility(false),
   };
 
+  const onSaveAttendances = async (): Promise<void> => {
+    const AddData = selectedUserIds.map((id) => {
+      const dto = new TrainGroupAttendanceDto();
+      dto.attendanceDate = selectedDate?.toISOString() ?? "";
+      dto.trainGroupId = selectedTrainGroupId;
+      dto.userId = id;
+      return dto;
+    });
+    apiService
+      .createRange("TrainGroupAttendances", AddData)
+      .then((response) => {
+        if (response) {
+          dialogControlTakeAttendances.hideDialog();
+          resetSelectedUserIds();
+        }
+      });
+  };
   const onDateDisable = async (): Promise<void> => {
     if (selectedTrainGroupId) {
       const trainGroupUnavailableDateDto: TrainGroupUnavailableDateDto = {
@@ -224,7 +253,12 @@ export default function TrainGroupAdminCalendarPage() {
       >
         <div className="w-full">
           <div className="flex justify-content-between align-items-center p-3">
-            <div className="flex flex-column gap-1"></div>
+            <Button
+              label={t("Take attendances")}
+              onClick={() => dialogControlTakeAttendances.showDialog()}
+              severity="info"
+            />
+            <div></div>
             <Button
               label={t("Disable for this day")}
               onClick={() => dialogControlDelete.showDialog()}
@@ -265,6 +299,20 @@ export default function TrainGroupAdminCalendarPage() {
       >
         <div className="flex justify-content-center">
           <p>{t("Are you sure")}?</p>
+        </div>
+      </GenericDialogComponent>
+
+      {/*                                       */}
+      {/*          Take attendances             */}
+      {/*                                       */}
+      <GenericDialogComponent
+        visible={isTakeAttendancesModalVisible}
+        control={dialogControlTakeAttendances}
+        onSave={onSaveAttendances}
+        formMode={FormMode.ADD}
+      >
+        <div className="flex justify-content-center">
+          <TrainGroupAttendanceFormComponent />
         </div>
       </GenericDialogComponent>
     </>
