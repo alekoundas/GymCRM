@@ -47,8 +47,13 @@ export default function WorkoutPlansPage() {
   >({
     ...new DataTableDto(),
     filters: isAdminPage // If Admin see everything
-      ? []
+      ? [
+          { fieldName: "createdOn", filterType: "between" },
+          { fieldName: "title", filterType: "contains" },
+        ]
       : [
+          { fieldName: "createdOn", filterType: "between" },
+          { fieldName: "title", filterType: "contains" },
           {
             fieldName: "UserId",
             value: TokenService.getUserId(),

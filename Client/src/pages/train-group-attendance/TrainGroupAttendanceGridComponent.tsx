@@ -75,7 +75,10 @@ export default function TrainGroupAttendanceGridComponent({
     DataTableDto<TrainGroupAttendanceDto>
   >({
     ...new DataTableDto(),
-    filters: getFilters(),
+    filters: [
+      ...getFilters(),
+      { fieldName: "attendanceDate", filterType: "between" },
+    ],
     dataTableSorts: [],
   });
 

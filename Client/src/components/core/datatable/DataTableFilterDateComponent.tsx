@@ -21,28 +21,14 @@ export default function DataTableFilterDateComponent({ options }: IField) {
     const result: string[] = [];
 
     if (dates.every((x) => x !== null) && dates.length === 2) {
-      let dateCleaned = new Date(
-        dates[0].getFullYear(),
-        dates[0].getMonth(),
-        dates[0].getDate(),
-        0,
-        0,
-        0,
-        0
-      );
-      result.push(dateCleaned.toISOString());
+      const start = new Date(dates[0]);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(dates[1]);
+      end.setHours(23, 59, 59, 999);
 
-      dateCleaned = new Date(
-        dates[1].getFullYear(),
-        dates[1].getMonth(),
-        dates[1].getDate(),
-        23,
-        59,
-        59,
-        999
-      );
+      result.push(start.toISOString());
 
-      result.push(dateCleaned.toISOString());
+      result.push(end.toISOString());
       options.filterApplyCallback(result);
     } else {
       setDates([]);
