@@ -100,6 +100,7 @@ export default function ExerciseListComponent({
       );
       if (response) {
         setWorkoutPlanDto(response); // Update store with backend response
+        dialogControlWorkoutPlan.hideDialog();
       }
     }
   };
