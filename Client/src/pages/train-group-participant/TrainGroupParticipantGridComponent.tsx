@@ -167,7 +167,7 @@ export default function TrainGroupParticipantGridComponent({
       sortable: true,
       filter: false,
       filterPlaceholder: t("Search"),
-      style: { width: "30%" },
+      style: { width: "10%" },
       body: (rowData: TrainGroupParticipantDto) => {
         if (rowData.selectedDate) {
           const date = new Date(rowData.selectedDate);
@@ -182,19 +182,21 @@ export default function TrainGroupParticipantGridComponent({
       },
     },
     {
-      field: "trainGroupId",
-      header: "TrainGroupId",
+      field: "recurringStartOnDate",
+      header: "Visible in profile after",
       sortable: true,
       filter: false,
       filterPlaceholder: t("Search"),
-      style: { width: "10%" },
-    },
-    {
-      field: "trainGroupDateId",
-      header: "TrainGroupDateId",
-      sortable: true,
-      filter: false,
-      filterPlaceholder: t("Search"),
+      body: (rowData, options) => (
+        <>
+          {rowData.recurringStartOnDate !== undefined &&
+            new Date(rowData.recurringStartOnDate).getDate() +
+              "/" +
+              (new Date(rowData.recurringStartOnDate).getMonth() + 1) +
+              "/" +
+              new Date(rowData.recurringStartOnDate).getFullYear()}
+        </>
+      ),
       style: { width: "10%" },
     },
     {
