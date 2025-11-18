@@ -28,10 +28,9 @@ export default function TrainGroupAdminCalendarPage() {
     resetSelectedTrainGroupDate,
   } = useTrainGroupStore();
   const [isViewModalVisible, setViewModalVisibility] = useState(false); // Dialog visibility
-  const [isAddModalVisible, setAddModalVisibility] = useState(false); // Dialog visibility
+  const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const [selectedTrainGroupDateId, setSelectedTrainGroupDateId] =
-    useState<number>(0);
+  const [selectedTrainGroupId, setSelectedTrainGroupId] = useState<number>(0);
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
 
   useEffect(() => {
@@ -58,17 +57,19 @@ export default function TrainGroupAdminCalendarPage() {
       });
   };
 
+  const dialogControlDelete: DialogControl = {
+    showDialog: () => setDeleteDialogVisibility(true),
+    hideDialog: () => setDeleteDialogVisibility(false),
+  };
   const dialogControlView: DialogControl = {
     showDialog: () => setViewModalVisibility(true),
     hideDialog: () => setViewModalVisibility(false),
   };
 
-  const onDateDisable = async (
-    trainGroupId: number | undefined
-  ): Promise<void> => {
-    if (trainGroupId) {
+  const onDateDisable = async (): Promise<void> => {
+    if (selectedTrainGroupId) {
       const trainGroupUnavailableDateDto: TrainGroupUnavailableDateDto = {
-        trainGroupId: trainGroupId,
+        trainGroupId: selectedTrainGroupId,
         unavailableDate: selectedDate?.toISOString() ?? "",
         id: 0,
       };
@@ -79,17 +80,21 @@ export default function TrainGroupAdminCalendarPage() {
       );
 
       if (response) {
+        dialogControlDelete.hideDialog();
         dialogControlView.hideDialog();
         resetTrainGroupDto();
         resetSelectedTrainGroupDate();
         setTimeSlots([]);
+        handleChangeDate(new Date());
       }
     }
   };
 
-  const onDateEnable = async (
-    unavailableTrainGroupId: number | undefined
-  ): Promise<void> => {
+  const onDateEnable = async (): Promise<void> => {
+    const unavailableTrainGroupId = timeSlots.find(
+      (x) => x.trainGroupId === selectedTrainGroupId
+    )?.unavailableTrainGroupId;
+
     if (unavailableTrainGroupId) {
       const response = await apiService.delete(
         "trainGroupUnavailableDates",
@@ -101,6 +106,7 @@ export default function TrainGroupAdminCalendarPage() {
         resetTrainGroupDto();
         resetSelectedTrainGroupDate();
         setTimeSlots([]);
+        handleChangeDate(new Date());
       }
     }
   };
@@ -195,7 +201,7 @@ export default function TrainGroupAdminCalendarPage() {
                               if (x) {
                                 setTrainGroupDto(x);
                                 setViewModalVisibility(true);
-                                setSelectedTrainGroupDateId(slot.trainGroupId);
+                                setSelectedTrainGroupId(slot.trainGroupId);
                               }
                             });
                         }}
@@ -221,45 +227,44 @@ export default function TrainGroupAdminCalendarPage() {
             <div className="flex flex-column gap-1"></div>
             <Button
               label={t("Disable for this day")}
-              // icon="pi pi-info-circle"
-              onClick={() =>
-                onDateDisable(
-                  timeSlots.find(
-                    (x) => x.trainGroupId === selectedTrainGroupDateId
-                  )?.trainGroupId
-                )
-              }
-              className="p-button-text"
+              onClick={() => dialogControlDelete.showDialog()}
+              severity="danger"
               visible={
-                !timeSlots.find(
-                  (x) => x.trainGroupId === selectedTrainGroupDateId
-                )?.isUnavailableTrainGroup
+                !timeSlots.find((x) => x.trainGroupId === selectedTrainGroupId)
+                  ?.isUnavailableTrainGroup
               }
             />
             <Button
               label={t("Enable for this day")}
-              // icon="pi pi-info-circle"
-              onClick={() =>
-                onDateEnable(
-                  timeSlots.find(
-                    (x) => x.trainGroupId === selectedTrainGroupDateId
-                  )?.unavailableTrainGroupId
-                )
-              }
-              className="p-button-text"
+              onClick={() => onDateEnable()}
+              severity="success"
               visible={
-                timeSlots.find(
-                  (x) => x.trainGroupId === selectedTrainGroupDateId
-                )?.isUnavailableTrainGroup
+                timeSlots.find((x) => x.trainGroupId === selectedTrainGroupId)
+                  ?.isUnavailableTrainGroup
               }
             />
           </div>
+
           <TrainGroupFormComponent />
-          {/* <TrainGroupDateAdminCalenndarGridComponent /> */}
+
           <TrainGroupParticipantGridComponent
-            trainGroupId={selectedTrainGroupDateId}
+            trainGroupId={selectedTrainGroupId}
             selectedDate={selectedDate ?? new Date()}
           />
+        </div>
+      </GenericDialogComponent>
+
+      {/*                                       */}
+      {/*          Delete Warning               */}
+      {/*                                       */}
+      <GenericDialogComponent
+        visible={isDeleteDialogVisible}
+        control={dialogControlDelete}
+        onDelete={onDateDisable}
+        formMode={FormMode.DELETE}
+      >
+        <div className="flex justify-content-center">
+          <p>{t("Are you sure")}?</p>
         </div>
       </GenericDialogComponent>
     </>
