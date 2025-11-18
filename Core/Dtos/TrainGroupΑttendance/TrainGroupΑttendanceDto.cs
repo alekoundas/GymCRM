@@ -10,7 +10,7 @@ namespace Core.Dtos.TrainGroupΑttendance
 
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
-        public DateTime ΑttendanceDate { get; set; }
+        public DateTime AttendanceDate { get; set; }
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public int TrainGroupId { get; set; }

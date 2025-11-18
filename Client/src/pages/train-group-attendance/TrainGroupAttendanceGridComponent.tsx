@@ -20,9 +20,10 @@ import DataTableFilterDateComponent from "../../components/core/datatable/DataTa
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
+import { DataTableFilterDto } from "../../model/datatable/DataTableFilterDto";
 
 interface IField extends DialogChildProps {
-  userId?: number;
+  userId?: string;
   trainGroupId?: number;
 }
 
@@ -40,47 +41,26 @@ export default function TrainGroupAttendanceGridComponent({
     ((dto: DataTableDto<TrainGroupAttendanceDto>) => void) | undefined
   >(undefined);
 
-  // const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
-  // const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
-  // const [isEditDialogVisible, setEditDialogVisibility] = useState(false); // Dialog visibility
   const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
 
-  // const dialogControlView: DialogControl = {
-  //   showDialog: () => setViewDialogVisibility(true),
-  //   hideDialog: () => setViewDialogVisibility(false),
-  // };
-  // const dialogControlAdd: DialogControl = {
-  //   showDialog: () => setAddDialogVisibility(true),
-  //   hideDialog: () => setAddDialogVisibility(false),
-  // };
-  // const dialogControlEdit: DialogControl = {
-  //   showDialog: () => setEditDialogVisibility(true),
-  //   hideDialog: () => setEditDialogVisibility(false),
-  // };
   const dialogControlDelete: DialogControl = {
     showDialog: () => setDeleteDialogVisibility(true),
     hideDialog: () => setDeleteDialogVisibility(false),
   };
-  const [datatableDto, setDatatableDto] = useState<
-    DataTableDto<TrainGroupAttendanceDto>
-  >({
-    ...new DataTableDto(),
-    filters: [],
-    dataTableSorts: [],
-  });
 
-  useEffect(() => {
+  const getFilters = () => {
+    let filters: DataTableFilterDto[] = [];
     if (userId !== undefined)
-      datatableDto.filters = [
+      filters = [
         {
           fieldName: "UserId",
-          value: userId.toString(),
+          value: userId,
           filterType: "equals",
         },
       ];
 
     if (trainGroupId !== undefined)
-      datatableDto.filters = [
+      filters = [
         {
           fieldName: "TrainGroupId",
           value: trainGroupId.toString(),
@@ -88,16 +68,19 @@ export default function TrainGroupAttendanceGridComponent({
         },
       ];
 
-    setDatatableDto(datatableDto);
-  }, []);
+    return filters;
+  };
+
+  const [datatableDto, setDatatableDto] = useState<
+    DataTableDto<TrainGroupAttendanceDto>
+  >({
+    ...new DataTableDto(),
+    filters: getFilters(),
+    dataTableSorts: [],
+  });
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
-    return [
-      ButtonTypeEnum.VIEW,
-      ButtonTypeEnum.ADD,
-      ButtonTypeEnum.EDIT,
-      ButtonTypeEnum.DELETE,
-    ];
+    return [ButtonTypeEnum.DELETE];
   };
 
   const dataTableColumns: DataTableColumns<TrainGroupAttendanceDto>[] = [
@@ -115,11 +98,7 @@ export default function TrainGroupAttendanceGridComponent({
             "/" +
             (new Date(rowData.attendanceDate).getMonth() + 1) +
             "/" +
-            new Date(rowData.attendanceDate).getFullYear() +
-            " " +
-            new Date(rowData.attendanceDate).getHours() +
-            ":" +
-            new Date(rowData.attendanceDate).getMinutes()}
+            new Date(rowData.attendanceDate).getFullYear()}
         </>
       ),
       filterPlaceholder: t("Search"),
@@ -169,39 +148,6 @@ export default function TrainGroupAttendanceGridComponent({
     }
   };
 
-  // const OnSaveAdd = async (): Promise<void> => {
-  //   const response = await apiService.create(
-  //     "TrainGroupAttendances",
-  //     trainGroupAttendanceDto
-  //   );
-
-  //   if (response) {
-  //     dialogControlAdd.hideDialog();
-  //     resetTrainGroupAttendanceDto();
-
-  //     if (triggerRefreshDataTable.current)
-  //       triggerRefreshDataTable.current(datatableDto);
-  //   }
-  // };
-
-  // const OnSaveEdit = async (): Promise<void> => {
-  //   if (trainGroupAttendanceDto.id) {
-  //     const response = await apiService.update(
-  //       "TrainGroupAttendances",
-  //       trainGroupAttendanceDto,
-  //       trainGroupAttendanceDto.id
-  //     );
-
-  //     if (response) {
-  //       dialogControlEdit.hideDialog();
-  //       setTrainGroupAttendanceDto(new TrainGroupAttendanceDto());
-
-  //       if (triggerRefreshDataTable.current)
-  //         triggerRefreshDataTable.current(datatableDto);
-  //     }
-  //   }
-  // };
-
   const onDelete = async (): Promise<void> => {
     if (trainGroupAttendanceDto.id) {
       const response = await apiService.delete(
@@ -221,20 +167,10 @@ export default function TrainGroupAttendanceGridComponent({
   ) => {
     switch (buttonType) {
       case ButtonTypeEnum.VIEW:
-        if (rowData) {
-          // setTrainGroupAttendanceDto(rowData);
-          // dialogControlView.showDialog();
-        }
         break;
       case ButtonTypeEnum.ADD:
-        // resetTrainGroupAttendanceDto();
-        // dialogControlAdd.showDialog();
         break;
       case ButtonTypeEnum.EDIT:
-        if (rowData) {
-          // setTrainGroupAttendanceDto(rowData);
-          // dialogControlEdit.showDialog();
-        }
         break;
       case ButtonTypeEnum.DELETE:
         if (rowData) {
@@ -261,48 +197,6 @@ export default function TrainGroupAttendanceGridComponent({
         triggerRefreshData={triggerRefreshDataTable}
         availableGridRowButtons={availableGridRowButtons()}
       />
-
-      {/*           View Train Group           */}
-      {/*                                      */}
-
-      {/* <GenericDialogComponent
-        formMode={FormMode.VIEW}
-        visible={isViewDialogVisible}
-        control={dialogControlView}
-      >
-        <div className="w-full">
-          <TrainGroupAttendanceFormComponent />
-        </div>
-      </GenericDialogComponent> */}
-
-      {/*                                     */}
-      {/*           Add Train Group           */}
-      {/*                                     */}
-
-      {/* <GenericDialogComponent
-        formMode={FormMode.ADD}
-        visible={isAddDialogVisible}
-        control={dialogControlAdd}
-        onSave={OnSaveAdd}
-      >
-        <div className="w-full">
-          <TrainGroupAttendanceFormComponent />
-        </div>
-      </GenericDialogComponent> */}
-
-      {/*                                     */}
-      {/*          Edit Train Group           */}
-      {/*                                     */}
-      {/* <GenericDialogComponent
-        formMode={FormMode.EDIT}
-        visible={isEditDialogVisible}
-        control={dialogControlEdit}
-        onSave={OnSaveEdit}
-      >
-        <div className="w-full">
-          <TrainGroupAttendanceFormComponent />
-        </div>
-      </GenericDialogComponent> */}
 
       {/*                                       */}
       {/*          Delete Train Group           */}

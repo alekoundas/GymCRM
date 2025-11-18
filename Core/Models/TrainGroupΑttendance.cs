@@ -2,7 +2,7 @@
 {
     public class TrainGroupΑttendance : BaseModel
     {
-        public DateTime ΑttendanceDate { get; set; }
+        public DateTime AttendanceDate { get; set; }
 
         public int TrainGroupId { get; set; }
         public TrainGroup TrainGroup { get; set; } = null!;

@@ -20,6 +20,7 @@ import { Avatar } from "primereact/avatar";
 import { TrainGroupDto } from "../../model/entities/train-group/TrainGroupDto";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
+import TrainGroupAttendanceGridComponent from "../train-group-attendance/TrainGroupAttendanceGridComponent";
 
 export default function TrainGroupAdminPage() {
   const { t } = useTranslator();
@@ -36,8 +37,14 @@ export default function TrainGroupAdminPage() {
     ((dto: DataTableDto<TrainGroupDto>) => void) | undefined
   >(undefined);
 
+  const [isAttendancesDialogVisible, setAttendancesDialogVisibility] =
+    useState(false); // Dialog visibility
   const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
 
+  const dialogControlAttendances: DialogControl = {
+    showDialog: () => setAttendancesDialogVisibility(true),
+    hideDialog: () => setAttendancesDialogVisibility(false),
+  };
   const dialogControlDelete: DialogControl = {
     showDialog: () => setDeleteDialogVisibility(true),
     hideDialog: () => setDeleteDialogVisibility(false),
@@ -87,6 +94,7 @@ export default function TrainGroupAdminPage() {
       ButtonTypeEnum.ADD,
       ButtonTypeEnum.EDIT,
       ButtonTypeEnum.DELETE,
+      ButtonTypeEnum.ATTENDANCES,
     ];
   };
 
@@ -190,6 +198,7 @@ export default function TrainGroupAdminPage() {
   ) => {
     resetSelectedTrainGroupDate();
     resetTrainGroupParticipant();
+
     switch (buttonType) {
       case ButtonTypeEnum.VIEW:
         if (rowData) {
@@ -211,6 +220,13 @@ export default function TrainGroupAdminPage() {
         if (rowData) {
           setTrainGroupDto(rowData);
           dialogControlDelete.showDialog();
+        }
+        break;
+
+      case ButtonTypeEnum.ATTENDANCES:
+        if (rowData) {
+          setTrainGroupDto(rowData);
+          dialogControlAttendances.showDialog();
         }
         break;
 
@@ -248,6 +264,19 @@ export default function TrainGroupAdminPage() {
       >
         <div className="flex justify-content-center">
           <p>{t("Are you sure")}?</p>
+        </div>
+      </GenericDialogComponent>
+
+      {/*                                     */}
+      {/*           Edit Attendances          */}
+      {/*                                     */}
+      <GenericDialogComponent
+        visible={isAttendancesDialogVisible}
+        control={dialogControlAttendances}
+        formMode={FormMode.EDIT}
+      >
+        <div className="w-full">
+          <TrainGroupAttendanceGridComponent trainGroupId={trainGroupDto.id} />
         </div>
       </GenericDialogComponent>
     </>
