@@ -39,6 +39,7 @@ export default function LookupComponent({
   };
 
   const setSelectedOptionById = async (id: string) => {
+    lookupDto.skip = 0;
     lookupDto.filter.id = id;
     const result = await fetchData(lookupDto);
     lookupDto.filter.id = undefined;
