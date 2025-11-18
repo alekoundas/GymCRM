@@ -17,12 +17,16 @@ import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
 import { useNavigate } from "react-router-dom";
 import { Tag } from "primereact/tag";
+import TrainGroupAttendanceGridComponent from "../train-group-attendance/TrainGroupAttendanceGridComponent";
 
 export default function UsersPage() {
   const { t } = useTranslator();
   const navigate = useNavigate();
   const apiService = useApiService();
   const { userDto, setUserDto, resetUserDto } = useUserStore();
+
+  const [isAttendancesDialogVisible, setAttendancesDialogVisibility] =
+    useState(false); // Dialog visibility
   const [isViewDialogVisible, setViewDialogVisibility] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisibility] = useState(false); // Dialog visibility
@@ -31,6 +35,10 @@ export default function UsersPage() {
     ((dto: DataTableDto<UserDto>) => void) | undefined
   >(undefined);
 
+  const dialogControlAttendances: DialogControl = {
+    showDialog: () => setAttendancesDialogVisibility(true),
+    hideDialog: () => setAttendancesDialogVisibility(false),
+  };
   const dialogControlView: DialogControl = {
     showDialog: () => setViewDialogVisibility(true),
     hideDialog: () => setViewDialogVisibility(false),
@@ -64,6 +72,7 @@ export default function UsersPage() {
       ButtonTypeEnum.VIEW,
       ButtonTypeEnum.EDIT,
       ButtonTypeEnum.DELETE,
+      ButtonTypeEnum.ATTENDANCES,
     ];
   };
 
@@ -157,6 +166,9 @@ export default function UsersPage() {
         break;
       case ButtonTypeEnum.PROFILE:
         navigate("/administrator/users/" + rowData?.id + "/profile");
+        break;
+      case ButtonTypeEnum.ATTENDANCES:
+        dialogControlAttendances.showDialog();
         break;
 
       default:
@@ -264,6 +276,19 @@ export default function UsersPage() {
       >
         <div className="flex justify-content-center">
           <p>{t("Are you sure")}?</p>
+        </div>
+      </GenericDialogComponent>
+
+      {/*                                     */}
+      {/*           Edit Attendances          */}
+      {/*                                     */}
+      <GenericDialogComponent
+        visible={isAttendancesDialogVisible}
+        control={dialogControlAttendances}
+        formMode={FormMode.EDIT}
+      >
+        <div className="w-full">
+          <TrainGroupAttendanceGridComponent userId={userDto.id} />
         </div>
       </GenericDialogComponent>
     </>

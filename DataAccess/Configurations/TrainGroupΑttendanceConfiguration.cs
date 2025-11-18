@@ -12,7 +12,7 @@ namespace DataAccess.Configurations
             builder.HasKey(x => x.Id);
 
             // Properties
-            builder.Property(x => x.ΑttendanceDate)
+            builder.Property(x => x.AttendanceDate)
                .IsRequired(true);
 
             // Relationship with TrainGroup (one-to-many)

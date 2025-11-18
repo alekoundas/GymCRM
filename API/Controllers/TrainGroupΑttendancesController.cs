@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Business.Repository;
 using Business.Services;
 using Business.Services.Email;
+using Core.Dtos.DataTable;
 using Core.Dtos.TrainGroupΑttendance;
+using Core.Enums;
 using Core.Models;
 using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
@@ -49,7 +52,7 @@ namespace API.Controllers
             bool isAlreadyParticipating = _dataService.TrainGroupΑttendances
                 .Where(x => x.TrainGroupId == entity.TrainGroupId)
                 .Where(x => x.UserId == new Guid(entity.UserId))
-                .Any(x => x.ΑttendanceDate == entity.ΑttendanceDate);
+                .Any(x => x.AttendanceDate == entity.AttendanceDate);
 
             if (isAlreadyParticipating)
             {
@@ -59,5 +62,30 @@ namespace API.Controllers
 
             return false;
         }
+
+
+        //protected override void DataTableQueryUpdate(IGenericRepository<TEntity> query, DataTableDto<TEntityDto> dataTable)
+        //{
+        //    if (dataTable.Filters != null)
+        //    {
+        //        foreach (var filter in dataTable.Filters)
+        //        {
+        //            if (filter.FilterType == DataTableFiltersEnum.custom)
+        //                if (filter.Field == "TrainGroupId" && Guid.TryParse(filter.Value.ToString(), out Guid trainGroupId))
+        //            {
+        //                query = query.Where(x => ((TrainGroupΑttendance)(object)x).TrainGroupId == trainGroupId);
+        //            }
+        //            else if (filter.Field == "UserId" && Guid.TryParse(filter.Value.ToString(), out Guid userId))
+        //            {
+        //                query = query.Where(x => ((TrainGroupΑttendance)(object)x).UserId == userId);
+        //            }
+        //            else if (filter.Field == "AttendanceDate" && DateTime.TryParse(filter.Value.ToString(), out DateTime attendanceDate))
+        //            {
+        //                query = query.Where(x => ((TrainGroupΑttendance)(object)x).ΑttendanceDate.Date == attendanceDate.Date);
+        //            }
+        //        }
+        //    }
+        //}
+
     }
 }

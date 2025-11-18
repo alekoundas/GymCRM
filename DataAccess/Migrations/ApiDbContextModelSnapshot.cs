@@ -488,6 +488,9 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("AttendanceDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy_FullName")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -503,9 +506,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("ΑttendanceDate")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
