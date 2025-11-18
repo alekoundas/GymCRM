@@ -64,28 +64,10 @@ namespace API.Controllers
         }
 
 
-        //protected override void DataTableQueryUpdate(IGenericRepository<TEntity> query, DataTableDto<TEntityDto> dataTable)
-        //{
-        //    if (dataTable.Filters != null)
-        //    {
-        //        foreach (var filter in dataTable.Filters)
-        //        {
-        //            if (filter.FilterType == DataTableFiltersEnum.custom)
-        //                if (filter.Field == "TrainGroupId" && Guid.TryParse(filter.Value.ToString(), out Guid trainGroupId))
-        //            {
-        //                query = query.Where(x => ((TrainGroupΑttendance)(object)x).TrainGroupId == trainGroupId);
-        //            }
-        //            else if (filter.Field == "UserId" && Guid.TryParse(filter.Value.ToString(), out Guid userId))
-        //            {
-        //                query = query.Where(x => ((TrainGroupΑttendance)(object)x).UserId == userId);
-        //            }
-        //            else if (filter.Field == "AttendanceDate" && DateTime.TryParse(filter.Value.ToString(), out DateTime attendanceDate))
-        //            {
-        //                query = query.Where(x => ((TrainGroupΑttendance)(object)x).ΑttendanceDate.Date == attendanceDate.Date);
-        //            }
-        //        }
-        //    }
-        //}
+        protected override void DataTableQueryUpdate(IGenericRepository<TrainGroupΑttendance> query, DataTableDto<TrainGroupΑttendanceDto> dataTable)
+        {
+            query = query.Include(x => x.User);
+        }
 
     }
 }
