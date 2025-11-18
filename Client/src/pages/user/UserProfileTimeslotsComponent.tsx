@@ -260,10 +260,10 @@ export default function UserProfileTimeslotsComponent() {
   const onOptOut = async () => {
     if (selectedTimeSlotRecurrenceDate.trainGroupParticipantId)
       apiService
-        .delete(
-          "TrainGroupParticipants",
-          selectedTimeSlotRecurrenceDate.trainGroupParticipantId
-        )
+        .post("TrainGroupParticipants/CustomDelete", {
+          id: selectedTimeSlotRecurrenceDate.trainGroupParticipantId,
+          clientTimezoneOffsetMinutes: new Date().getTimezoneOffset(),
+        })
         .then(async () => {
           optOutTimeSlotDialogControl.hideDialog();
           timeSlotDialogControl.hideDialog();

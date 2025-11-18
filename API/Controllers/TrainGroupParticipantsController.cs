@@ -40,6 +40,66 @@ namespace API.Controllers
         }
 
 
+        // POST: api/controller
+        [HttpPost("CustomDelete")]
+        public virtual async Task<ActionResult<ApiResponse<TrainGroupParticipant>>> CustomDelete([FromBody] List<TrainGroupParticipantDeleteDto> entityDtos)
+        {
+            TrainGroupParticipantDeleteDto? entityDto = entityDtos.FirstOrDefault();
+            if (!IsUserAuthorized("Delete"))
+                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            string className = typeof(TrainGroupParticipant).Name;
+            TrainGroupParticipant? entity = await _dataService.TrainGroupParticipants
+                .Include(x => x.TrainGroupDate.TrainGroup)
+                .FilterByColumnEquals("Id", entityDto?.Id)
+                .FirstOrDefaultAsync();
+
+            if (entity == null || entityDto == null)
+                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, className]);
+
+            if (ValidateDELETE(entityDto, entity, out string[] errors))
+                return BadRequest(new ApiResponse<TrainGroupParticipant>().SetErrorResponse(errors));
+
+
+            int result = await _dataService.GetGenericRepository<TrainGroupParticipant>().RemoveAsync(entity);
+            if (result != 1)
+                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.An_error_occurred_while_deleting_the_entity]);
+
+            return new ApiResponse<TrainGroupParticipant>().SetSuccessResponse(entity, _localizer[TranslationKeys._0_deleted_successfully, className]);
+        }
+
+
+        protected virtual bool ValidateDELETE(TrainGroupParticipantDeleteDto entityDto, TrainGroupParticipant entity, out string[] errors)
+        {
+            errors = Array.Empty<string>();
+            DateTime slotStartUtc;
+            int offsetMin = entityDto.ClientTimezoneOffsetMinutes; // From client: new Date().getTimezoneOffset()
+            double offsetH = -(offsetMin / 60.0);
+            DateTime nowUtc = DateTime.UtcNow;
+
+            if (entity.SelectedDate.HasValue)
+            {
+                // One-off: Use stored full UTC datetime (assumes time is set as in frontend)
+                slotStartUtc = entity.SelectedDate.Value;
+                slotStartUtc = slotStartUtc.AddHours(entity.TrainGroup.StartOn.Hour);
+                slotStartUtc = slotStartUtc.AddMinutes(entity.TrainGroup.StartOn.Minute);
+            }
+            else
+            {
+                // Recurring: Compute next upcoming occurrence with local time overlaid
+                slotStartUtc = CalculateNextOccurrenceDateTime(entity.TrainGroupDate, nowUtc);
+            }
+
+            if (slotStartUtc > nowUtc.AddHours(offsetH) && slotStartUtc <= nowUtc.AddHours(offsetH).AddHours(12))
+            {
+                errors = [_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]];
+                return true;
+            }
+
+            return false;
+        }
+
+
         // Handle Booking. 
         // PUT: api/controller/5
         [HttpPost("UpdateParticipants")]
@@ -317,7 +377,7 @@ namespace API.Controllers
                     int inputDowNum = (int)nowUtc.DayOfWeek;
                     int targetDowNum = (int)targetDow;
                     int daysToAdd = (targetDowNum - inputDowNum + 7) % 7;
-                    if (daysToAdd == 0) daysToAdd = 7; // Next occurrence if today (but adjust if same-day allowed; here next for safety)
+                    //if (daysToAdd == 0) daysToAdd = 7; // Next occurrence if today (but adjust if same-day allowed; here next for safety)
                     nextLocalDate = nowUtc.Date.AddDays(daysToAdd);
                     break;
                 case TrainGroupDateTypeEnum.DAY_OF_MONTH:
