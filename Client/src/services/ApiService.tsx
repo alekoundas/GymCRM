@@ -271,6 +271,17 @@ export const useApiService = () => {
     [buildUrl, apiRequest]
   );
 
+  const post = useCallback(
+    async <TEntity,>(
+      controller: string,
+      data: TEntity
+    ): Promise<TEntity[] | null> => {
+      const url = buildUrl(controller);
+      return apiRequest<TEntity[], TEntity[]>(url, "POST", [data]);
+    },
+    [buildUrl, apiRequest]
+  );
+
   const createRange = useCallback(
     async <TEntity,>(
       controller: string,
@@ -468,6 +479,7 @@ export const useApiService = () => {
     getDataLookup,
     getDataAutoComplete,
     getDataGrid,
+    post,
     create,
     createRange,
     update,
