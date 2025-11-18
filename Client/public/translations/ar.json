@@ -201,5 +201,8 @@
   "Delete specific appointment": "حذف موعد محدد",
   "Rejoin specific appointment": "إعادة الانضمام إلى موعد محدد",
   "Please log in again.": "يرجى تسجيل الدخول مرة أخرى.",
-  "Permanent deletion": "الحذف الدائم"
+  "Permanent deletion": "الحذف الدائم",
+  "Attendances": "الحضور",
+  "Take attendances": "أخذ الحضور",
+  "Attendance date": "تاريخ الحضور"
 }

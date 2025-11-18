@@ -201,5 +201,8 @@
   "Delete specific appointment": "Excluir agendamento específico",
   "Rejoin specific appointment": "Reingresse no agendamento específico",
   "Please log in again.": "Faça login novamente.",
-  "Permanent deletion": "Exclusão permanente"
+  "Permanent deletion": "Exclusão permanente",
+  "Attendances": "Presenças",
+  "Take attendances": "Passar chamada",
+  "Attendance date": "Data da presença"
 }

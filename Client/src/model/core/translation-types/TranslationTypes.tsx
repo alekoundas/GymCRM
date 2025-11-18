@@ -208,6 +208,9 @@
   'Rejoin specific appointment': string;
   'Please log in again.': string;
   'Permanent deletion': string;
+  'Attendances': string;
+  'Take attendances': string;
+  'Attendance date': string;
     }
 
 

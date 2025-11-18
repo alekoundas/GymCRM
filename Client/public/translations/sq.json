@@ -201,5 +201,8 @@
   "Delete specific appointment": "Fshij takim specifik",
   "Rejoin specific appointment": "Bashkohu përsëri në takim specifik",
   "Please log in again.": "Ju lutemi të identifikoheni përsëri.",
-  "Permanent deletion": "Fshirje e përhershme"
+  "Permanent deletion": "Fshirje e përhershme",
+  "Attendances": "Pjesëmarrjet",
+  "Take attendances": "Merre pjesëmarrjen",
+  "Attendance date": "Data e pjesëmarrjes"
 }

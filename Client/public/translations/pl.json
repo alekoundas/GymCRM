@@ -201,5 +201,8 @@
   "Delete specific appointment": "Usuń konkretne spotkanie",
   "Rejoin specific appointment": "Dołącz ponownie do konkretnego spotkania",
   "Please log in again.": "Zaloguj się ponownie.",
-  "Permanent deletion": "Trwałe usunięcie"
+  "Permanent deletion": "Trwałe usunięcie",
+  "Attendances": "Obecności",
+  "Take attendances": "Sprawdź obecność",
+  "Attendance date": "Data obecności"
 }

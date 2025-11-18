@@ -201,5 +201,8 @@
   "Delete specific appointment": "Удалить конкретное назначение",
   "Rejoin specific appointment": "Повторно присоединиться к конкретному назначению",
   "Please log in again.": "Пожалуйста, войдите снова.",
-  "Permanent deletion": "Постоянное удаление"
+  "Permanent deletion": "Постоянное удаление",
+  "Attendances": "Посещаемость",
+  "Take attendances": "Отметить посещаемость",
+  "Attendance date": "Дата посещаемости"
 }

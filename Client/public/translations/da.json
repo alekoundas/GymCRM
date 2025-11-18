@@ -201,5 +201,8 @@
   "Delete specific appointment": "Slet specifik aftale",
   "Rejoin specific appointment": "Genindmeld specifik aftale",
   "Please log in again.": "Log på igen.",
-  "Permanent deletion": "Permanent sletning"
+  "Permanent deletion": "Permanent sletning",
+  "Attendances": "Fremmøde",
+  "Take attendances": "Registrer fremmøde",
+  "Attendance date": "Fremmødedato"
 }

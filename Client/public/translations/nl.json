@@ -201,5 +201,8 @@
   "Delete specific appointment": "Specifieke afspraak verwijderen",
   "Rejoin specific appointment": "Specifieke afspraak opnieuw deelnemen",
   "Please log in again.": "Log alstublieft opnieuw in.",
-  "Permanent deletion": "Definitieve verwijdering"
+  "Permanent deletion": "Definitieve verwijdering",
+  "Attendances": "Aanwezigheden",
+  "Take attendances": "Aanwezigheid opnemen",
+  "Attendance date": "Aanwezigheidsdatum"
 }

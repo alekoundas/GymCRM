@@ -201,5 +201,8 @@
   "Delete specific appointment": "Supprimer le rendez-vous spécifique",
   "Rejoin specific appointment": "Rejoindre à nouveau le rendez-vous spécifique",
   "Please log in again.": "Veuillez vous reconnecter.",
-  "Permanent deletion": "Suppression permanente"
+  "Permanent deletion": "Suppression permanente",
+  "Attendances": "Présences",
+  "Take attendances": "Faire l'appel",
+  "Attendance date": "Date de présence"
 }

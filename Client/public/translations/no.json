@@ -202,5 +202,8 @@
   "Delete specific appointment": "Slett spesifikk avtale",
   "Rejoin specific appointment": "Bli med på spesifikk avtale igjen",
   "Please log in again.": "Logg på igjen.",
-  "Permanent deletion": "Permanent sletting"
+  "Permanent deletion": "Permanent sletting",
+  "Attendances": "Oppmøte",
+  "Take attendances": "Ta oppmøte",
+  "Attendance date": "Oppmøtedato"
 }
