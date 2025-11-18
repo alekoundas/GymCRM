@@ -19,6 +19,7 @@ import { useDateService } from "../../services/DateService";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
 import { Tag } from "primereact/tag";
+import { useTrainGroupAttendanceStore } from "../../stores/TrainGroupAttendanceStore";
 
 interface IField extends DialogChildProps {
   trainGroupId: number;
@@ -41,6 +42,8 @@ export default function TrainGroupParticipantGridComponent({
     updateTrainGroupDto,
     resetTrainGroupParticipant,
   } = useTrainGroupStore();
+
+  const { setTrainGroupParticipants } = useTrainGroupAttendanceStore();
 
   const [isViewDialogVisible, setViewDialogVisible] = useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisible] = useState(false); // Dialog visibility
@@ -211,6 +214,7 @@ export default function TrainGroupParticipantGridComponent({
   ) => {
     if (data) {
       updateTrainGroupDto({ trainGroupParticipants: data.data });
+      setTrainGroupParticipants(data.data);
       data.data = [];
     }
     return data;

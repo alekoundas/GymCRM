@@ -25,7 +25,7 @@ namespace Core.Models
         public virtual ICollection<UserRole> UserRoles { get; set; } = new Collection<UserRole>();
         public virtual ICollection<TrainGroup> TrainGroups { get; set; } = new Collection<TrainGroup>();
         public virtual ICollection<TrainGroupParticipant> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipant>();
-        //public virtual ICollection<TrainGroupDateCancellationSubscriber> TrainGroupDatesCancellationSubscriber { get; set; } = new Collection<TrainGroupDateCancellationSubscriber>();
+        public virtual ICollection<TrainGroupΑttendance> TrainGroupΑttendances { get; set; } = new Collection<TrainGroupΑttendance>();
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
     }
 }
