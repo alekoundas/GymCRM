@@ -129,7 +129,7 @@ export default function LookupComponent({
       )}`.toUpperCase();
       const imageSrc = "data:image/png;base64," + user.profileImage;
       return (
-        <div className="flex m-0 p-0 align-items-center">
+        <div className="flex m-0 p-0 align-items-center ">
           <Avatar
             image={user.profileImage ? imageSrc : ""}
             label={user.profileImage ? undefined : initials}
@@ -165,9 +165,10 @@ export default function LookupComponent({
         itemTemplate={template}
         valueTemplate={template}
         placeholder={t("Select a value")}
-        className="w-full md:w-14rem"
         disabled={!isEnabled}
         showClear
+        className="w-full"
+        panelStyle={{ minWidth: "100%" }}
         virtualScrollerOptions={{
           lazy: true,
           onLazyLoad: onLazyLoad,
