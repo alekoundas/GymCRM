@@ -65,133 +65,138 @@ export default function WorkoutPlanFormComponent({
   };
 
   return (
-    <div className="flex flex-column  align-items-center ">
-      <div className="field">
-        <label
-          htmlFor="title"
-          className="block text-900 font-medium mb-2"
-        >
-          {t("Title")}
-        </label>
-        <InputText
-          id="title"
-          name="title"
-          type="text"
-          placeholder={t("Title")}
-          value={workoutPlanDto.title}
-          onChange={(e) =>
-            updateWorkoutPlanDto({ [e.target.name]: e.target.value })
-          }
-          disabled={
-            formMode === FormMode.VIEW ||
-            (formMode === FormMode.EDIT && editingField !== "title")
-          }
-        />
-        {formMode === FormMode.EDIT &&
-          isAdminPage &&
-          (editingField !== "title" ? (
-            <Button
-              icon="pi pi-pencil"
-              className="p-button-rounded p-button-text p-button-secondary"
-              onClick={() => handleEdit("title")}
-              visible={editingField === undefined}
-            />
-          ) : (
-            <>
+    <div className="flex justify-content-between ">
+      <div className="w-full"></div>
+      <div className="align-items-left w-full">
+        <div className="field w-full">
+          <label
+            htmlFor="title"
+            className="block text-900 font-medium mb-2"
+          >
+            {t("Title")}
+          </label>
+          <InputText
+            id="title"
+            name="title"
+            type="text"
+            placeholder={t("Title")}
+            value={workoutPlanDto.title}
+            className="w-full"
+            onChange={(e) =>
+              updateWorkoutPlanDto({ [e.target.name]: e.target.value })
+            }
+            disabled={
+              formMode === FormMode.VIEW ||
+              (formMode === FormMode.EDIT && editingField !== "title")
+            }
+          />
+          {formMode === FormMode.EDIT &&
+            isAdminPage &&
+            (editingField !== "title" ? (
               <Button
-                icon="pi pi-times"
-                className="p-button-rounded p-button-text p-button-danger"
-                onClick={() => handleCancel("title")}
+                icon="pi pi-pencil"
+                className="p-button-rounded p-button-text p-button-secondary"
+                onClick={() => handleEdit("title")}
+                visible={editingField === undefined}
               />
-              <Button
-                icon="pi pi-check"
-                className="p-button-rounded p-button-text p-button-success"
-                onClick={() => handleSave("title")}
-              />
-            </>
-          ))}
-      </div>
+            ) : (
+              <>
+                <Button
+                  icon="pi pi-times"
+                  className="p-button-rounded p-button-text p-button-danger"
+                  onClick={() => handleCancel("title")}
+                />
+                <Button
+                  icon="pi pi-check"
+                  className="p-button-rounded p-button-text p-button-success"
+                  onClick={() => handleSave("title")}
+                />
+              </>
+            ))}
+        </div>
 
-      <div className="field" >
-        <label
-          htmlFor="userId"
-          className="block text-900 font-medium mb-2"
-        >
-          {t("User")}
-        </label>
-        <LookupComponent
-          controller="users"
-          selectedEntityId={workoutPlanDto.userId}
-          onChange={(e) => updateWorkoutPlanDto({ userId: e?.id })}
-          isEnabled={
-            (formMode === FormMode.EDIT && editingField === "userId") ||
-            formMode === FormMode.ADD
-          }
-        />
-        {formMode === FormMode.EDIT &&
-          isAdminPage &&
-          (editingField !== "userId" ? (
-            <Button
-              icon="pi pi-pencil"
-              className="p-button-rounded p-button-text p-button-secondary"
-              onClick={() => handleEdit("userId")}
-              visible={editingField === undefined}
-            />
-          ) : (
-            <>
+        <div className="field w-full">
+          <label
+            htmlFor="userId"
+            className="block text-900 font-medium mb-2"
+          >
+            {t("User")}
+          </label>
+          <LookupComponent
+            controller="users"
+            selectedEntityId={workoutPlanDto.userId}
+            onChange={(e) => updateWorkoutPlanDto({ userId: e?.id })}
+            isEnabled={
+              (formMode === FormMode.EDIT && editingField === "userId") ||
+              formMode === FormMode.ADD
+            }
+          />
+          {formMode === FormMode.EDIT &&
+            isAdminPage &&
+            (editingField !== "userId" ? (
               <Button
-                icon="pi pi-times"
-                className="p-button-rounded p-button-text p-button-danger"
-                onClick={() => handleCancel("userId")}
+                icon="pi pi-pencil"
+                className="p-button-rounded p-button-text p-button-secondary"
+                onClick={() => handleEdit("userId")}
+                visible={editingField === undefined}
               />
-              <Button
-                icon="pi pi-check"
-                className="p-button-rounded p-button-text p-button-success"
-                onClick={() => handleSave("userId")}
-              />
-            </>
-          ))}
-      </div>
+            ) : (
+              <>
+                <Button
+                  icon="pi pi-times"
+                  className="p-button-rounded p-button-text p-button-danger"
+                  onClick={() => handleCancel("userId")}
+                />
+                <Button
+                  icon="pi pi-check"
+                  className="p-button-rounded p-button-text p-button-success"
+                  onClick={() => handleSave("userId")}
+                />
+              </>
+            ))}
+        </div>
 
-      <div className="field">
-        <label
-          htmlFor="isCircular"
-          className="block text-900 font-medium mb-2"
-        >
-          {t("Circular")}
-        </label>
-        <Checkbox
-          checked={workoutPlanDto.isCircular}
-          onChange={(e) => updateWorkoutPlanDto({ isCircular: e.checked })}
-          disabled={
-            formMode === FormMode.VIEW ||
-            (formMode === FormMode.EDIT && editingField !== "isCircular")
-          }
-        />
-        {formMode === FormMode.EDIT &&
-          isAdminPage &&
-          (editingField !== "isCircular" ? (
-            <Button
-              icon="pi pi-pencil"
-              className="p-button-rounded p-button-text p-button-secondary"
-              onClick={() => handleEdit("isCircular")}
-              visible={editingField === undefined}
-            />
-          ) : (
-            <>
+        <div className="field">
+          <label
+            htmlFor="isCircular"
+            className="block text-900 font-medium mb-2"
+          >
+            {t("Circular")}
+          </label>
+          <Checkbox
+            checked={workoutPlanDto.isCircular}
+            onChange={(e) => updateWorkoutPlanDto({ isCircular: e.checked })}
+            disabled={
+              formMode === FormMode.VIEW ||
+              (formMode === FormMode.EDIT && editingField !== "isCircular")
+            }
+          />
+          {formMode === FormMode.EDIT &&
+            isAdminPage &&
+            (editingField !== "isCircular" ? (
               <Button
-                icon="pi pi-times"
-                className="p-button-rounded p-button-text p-button-danger"
-                onClick={() => handleCancel("isCircular")}
+                icon="pi pi-pencil"
+                className="p-button-rounded p-button-text p-button-secondary"
+                onClick={() => handleEdit("isCircular")}
+                visible={editingField === undefined}
               />
-              <Button
-                icon="pi pi-check"
-                className="p-button-rounded p-button-text p-button-success"
-                onClick={() => handleSave("isCircular")}
-              />
-            </>
-          ))}
+            ) : (
+              <>
+                <Button
+                  icon="pi pi-times"
+                  className="p-button-rounded p-button-text p-button-danger"
+                  onClick={() => handleCancel("isCircular")}
+                />
+                <Button
+                  icon="pi pi-check"
+                  className="p-button-rounded p-button-text p-button-success"
+                  onClick={() => handleSave("isCircular")}
+                />
+              </>
+            ))}
+        </div>
       </div>
+      <div className="w-full"></div>
     </div>
   );
 }
