@@ -97,7 +97,20 @@ export const useDateService = () => {
         [DayOfWeekEnum.SATURDAY]: 6,
       };
 
-      const targetDay = dayNumberMap[dayOfWeek];
+      const dayNumberMapTranslated: { [key in string]: number } = {
+        [t("SUNDAY").toLocaleUpperCase()]: 0,
+        [t("MONDAY").toLocaleUpperCase()]: 1,
+        [t("TUESDAY").toLocaleUpperCase()]: 2,
+        [t("WEDNESDAY").toLocaleUpperCase()]: 3,
+        [t("THURSDAY").toLocaleUpperCase()]: 4,
+        [t("FRIDAY").toLocaleUpperCase()]: 5,
+        [t("SATURDAY").toLocaleUpperCase()]: 6,
+      };
+
+      let targetDay = dayNumberMap[dayOfWeek];
+      if (targetDay === undefined)
+        targetDay = dayNumberMapTranslated[dayOfWeek];
+
       const inputDay = inputDate.getUTCDay(); // <-- UTC
 
       let daysToAdd = (targetDay - inputDay + 7) % 7;

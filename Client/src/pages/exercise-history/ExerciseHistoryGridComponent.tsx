@@ -43,27 +43,22 @@ export default function ExerciseHistoryGridComponent({ exerciseId }: IField) {
       },
       {
         fieldName: "name",
-        value: exerciseId.toString(),
         filterType: "contains",
       },
       {
         fieldName: "description",
-        value: exerciseId.toString(),
         filterType: "contains",
       },
       {
         fieldName: "sets",
-        value: exerciseId.toString(),
         filterType: "contains",
       },
       {
         fieldName: "reps",
-        value: exerciseId.toString(),
         filterType: "contains",
       },
       {
         fieldName: "weight",
-        value: exerciseId.toString(),
         filterType: "contains",
       },
       { fieldName: "createdOn", filterType: "between" },
