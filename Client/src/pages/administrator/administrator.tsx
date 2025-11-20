@@ -18,11 +18,14 @@ import GooglePage from "../google/GooglePage";
 export default function Administrator() {
   return (
     <>
-      <div className="grid h-full">
-        <div className="col-2 ">
+      <div className="flex h-full">
+        <div className="pr-2">
           <NavLeft />
         </div>
-        <div className="col-10">
+        <div
+          className="w-full"
+          style={{ minWidth: "400px" }}
+        >
           {/* <ScrollPanel className="custombar2 h-full w-full"> */}
           <Routes>
             <Route
