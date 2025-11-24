@@ -51,6 +51,7 @@ namespace API.Controllers
             string className = typeof(TrainGroupParticipant).Name;
             TrainGroupParticipant? entity = await _dataService.TrainGroupParticipants
                 .Include(x => x.TrainGroupDate.TrainGroup)
+                .Include(x => x.TrainGroup)
                 .FilterByColumnEquals("Id", entityDto?.Id)
                 .FirstOrDefaultAsync();
 
@@ -60,6 +61,9 @@ namespace API.Controllers
             if (ValidateDELETE(entityDto, entity, out string[] errors))
                 return BadRequest(new ApiResponse<TrainGroupParticipant>().SetErrorResponse(errors));
 
+            entity = await _dataService.TrainGroupParticipants.FindAsync(entityDto?.Id); // call here to track object
+            if (entity == null || entityDto == null)
+                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, className]);
 
             int result = await _dataService.GetGenericRepository<TrainGroupParticipant>().RemoveAsync(entity);
             if (result != 1)
