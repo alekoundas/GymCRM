@@ -41,6 +41,9 @@ export default function ExerciseFormComponent({
             }
             className="p-inputtext-sm w-full"
             disabled={!isAdminPage || formMode === FormMode.VIEW}
+            // brave + android backspace fix
+            // mode="decimal"
+            useGrouping={false} // This disables the internal InputMask → fixes backspace
           />
         </div>
       </div>
