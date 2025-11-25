@@ -58,8 +58,9 @@ namespace API.Controllers
             if (entity == null || entityDto == null)
                 return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, className]);
 
-            if (ValidateDELETE(entityDto, entity, out string[] errors))
-                return BadRequest(new ApiResponse<TrainGroupParticipant>().SetErrorResponse(errors));
+            if (!entityDto.IsAdminPage)
+                if (ValidateDELETE(entityDto, entity, out string[] errors))
+                    return BadRequest(new ApiResponse<TrainGroupParticipant>().SetErrorResponse(errors));
 
             entity = await _dataService.TrainGroupParticipants.FindAsync(entityDto?.Id); // call here to track object
             if (entity == null || entityDto == null)

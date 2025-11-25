@@ -15,5 +15,6 @@ namespace Core.Dtos.TrainGroupParticipantUnavailableDate
 
         public int ClientTimezoneOffsetMinutes { get; set; } = 0;
 
+        public bool IsAdminPage { get; set; }
     }
 }
