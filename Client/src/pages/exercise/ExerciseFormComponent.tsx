@@ -33,7 +33,7 @@ export default function ExerciseFormComponent({
       <div className="field">
         <label htmlFor={`groupNumber-${newExerciseDto.id}`}>{t("Group")}</label>
         <div className="w-full flex flex-nowrap">
-          <InputNumber
+          {/* <InputNumber
             id={`groupNumber-${newExerciseDto.id}`}
             value={newExerciseDto.groupNumber}
             onValueChange={(e) =>
@@ -48,6 +48,22 @@ export default function ExerciseFormComponent({
             maxFractionDigits={0}
             min={0} // or whatever your minimum is
             allowEmpty={false} // ← now safe to use
+          /> */}
+          <InputText
+            type="tel" // tel > number on mobile (shows numeric keyboard)
+            inputMode="numeric"
+            pattern="[0-9]*"
+            className="p-inputtext-sm w-full"
+            value={newExerciseDto.groupNumber?.toString() ?? ""}
+            onChange={(e) => {
+              const val = e.target.value.replace(/[^0-9]/g, "");
+              updateExercise(
+                newExerciseDto.id,
+                "groupNumber",
+                val === "" ? 0 : Number(val)
+              );
+            }}
+            disabled={!isAdminPage || formMode === FormMode.VIEW}
           />
         </div>
       </div>
