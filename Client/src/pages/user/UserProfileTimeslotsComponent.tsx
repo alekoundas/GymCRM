@@ -35,6 +35,7 @@ export default function UserProfileTimeslotsComponent() {
   } = useDateService();
   const apiService = useApiService();
   const params = useParams();
+  const isAdminPage = location.pathname.includes("/administrator");
 
   // const { userDto, updateUserDto } = useUserStore();
   const calendarRef = useRef<FullCalendar>(null);
@@ -263,6 +264,7 @@ export default function UserProfileTimeslotsComponent() {
         .post("TrainGroupParticipants/CustomDelete", {
           id: selectedTimeSlotRecurrenceDate.trainGroupParticipantId,
           clientTimezoneOffsetMinutes: new Date().getTimezoneOffset(),
+          isAdminPage: isAdminPage,
         })
         .then(async () => {
           optOutTimeSlotDialogControl.hideDialog();
@@ -281,6 +283,7 @@ export default function UserProfileTimeslotsComponent() {
         trainGroupParticipantId:
           selectedTimeSlotRecurrenceDate.trainGroupParticipantId,
         unavailableDate: selectedDate.toISOString(),
+        isAdminPage: isAdminPage,
       } as TrainGroupParticipantUnavailableDateDto)
       .then(async () => {
         optOutDateTimeSlotDialogControl.hideDialog();
@@ -349,6 +352,7 @@ export default function UserProfileTimeslotsComponent() {
         new Date(apiDate)
       )?.toUpperCase() as DayOfWeekEnum;
 
+      // startOnDate = getNextDayOfWeekDateUTC(dayOfWeek, selectedDate);
       startOnDate = getNextDayOfWeekDateUTC(dayOfWeek, new Date());
     }
     if (type === TrainGroupDateTypeEnum.DAY_OF_MONTH) {
@@ -558,42 +562,36 @@ export default function UserProfileTimeslotsComponent() {
                     label={t("Permanent deletion")}
                     severity="danger"
                     onClick={optOutTimeSlotDialogControl.showDialog}
-                    // visible={timeSlots.some((x) =>
-                    //   x.recurrenceDates.some(
-                    //     (y) =>
-                    //       y.trainGroupDateId ===
-                    //         selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-                    //       y.isUserJoined
-                    //   )
-                    // )}
                     disabled={
-                      new Date(
-                        Date.UTC(
-                          selectedDate.getFullYear(),
-                          selectedDate.getMonth(),
-                          selectedDate.getDate(),
-                          0,
-                          0,
-                          0,
-                          0
-                        )
-                      ) <
-                        new Date(
-                          Date.UTC(
-                            new Date().getFullYear(),
-                            new Date().getMonth(),
-                            new Date().getDate(),
-                            0,
-                            0,
-                            0,
-                            0
+                      isAdminPage === true
+                        ? false
+                        : new Date(
+                            Date.UTC(
+                              selectedDate.getFullYear(),
+                              selectedDate.getMonth(),
+                              selectedDate.getDate(),
+                              0,
+                              0,
+                              0,
+                              0
+                            )
+                          ) <
+                            new Date(
+                              Date.UTC(
+                                new Date().getFullYear(),
+                                new Date().getMonth(),
+                                new Date().getDate(),
+                                0,
+                                0,
+                                0,
+                                0
+                              )
+                            ) ||
+                          isDateTwelveHoursFromNow(
+                            selectedTimeSlotRecurrenceDate.date,
+                            selectedTrainGroup.startOn,
+                            selectedTimeSlotRecurrenceDate.trainGroupDateType
                           )
-                        ) ||
-                      isDateTwelveHoursFromNow(
-                        selectedTimeSlotRecurrenceDate.date,
-                        selectedTrainGroup.startOn,
-                        selectedTimeSlotRecurrenceDate.trainGroupDateType
-                      )
                     }
                   ></Button>
 
@@ -611,33 +609,35 @@ export default function UserProfileTimeslotsComponent() {
                       )
                     )}
                     disabled={
-                      new Date(
-                        Date.UTC(
-                          selectedDate.getFullYear(),
-                          selectedDate.getMonth(),
-                          selectedDate.getDate(),
-                          0,
-                          0,
-                          0,
-                          0
-                        )
-                      ) <
-                        new Date(
-                          Date.UTC(
-                            new Date().getFullYear(),
-                            new Date().getMonth(),
-                            new Date().getDate(),
-                            0,
-                            0,
-                            0,
-                            0
+                      isAdminPage === true
+                        ? false
+                        : new Date(
+                            Date.UTC(
+                              selectedDate.getFullYear(),
+                              selectedDate.getMonth(),
+                              selectedDate.getDate(),
+                              0,
+                              0,
+                              0,
+                              0
+                            )
+                          ) <
+                            new Date(
+                              Date.UTC(
+                                new Date().getFullYear(),
+                                new Date().getMonth(),
+                                new Date().getDate(),
+                                0,
+                                0,
+                                0,
+                                0
+                              )
+                            ) ||
+                          isDateTwelveHoursFromNow(
+                            selectedTimeSlotRecurrenceDate.date,
+                            selectedTrainGroup.startOn,
+                            selectedTimeSlotRecurrenceDate.trainGroupDateType
                           )
-                        ) ||
-                      isDateTwelveHoursFromNow(
-                        selectedTimeSlotRecurrenceDate.date,
-                        selectedTrainGroup.startOn,
-                        selectedTimeSlotRecurrenceDate.trainGroupDateType
-                      )
                     }
                   ></Button>
 

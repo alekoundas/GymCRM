@@ -49,23 +49,26 @@ namespace API.Controllers
             if (trainGroupParticipant == null)
                 return true;
 
-            if (trainGroupParticipant?.SelectedDate != null)
+            if (!entityDto.IsAdminPage)
             {
-                // One-off: Use stored full UTC datetime (assumes time is set as in frontend)
-                slotStartUtc = trainGroupParticipant.SelectedDate.Value;
-                slotStartUtc = slotStartUtc.AddHours(trainGroupParticipant.TrainGroup.StartOn.Hour);
-                slotStartUtc = slotStartUtc.AddMinutes(trainGroupParticipant.TrainGroup.StartOn.Minute);
-            }
-            else
-            {
-                // Recurring: Compute next upcoming occurrence with local time overlaid
-                slotStartUtc = CalculateNextOccurrenceDateTime(trainGroupParticipant!.TrainGroupDate, nowUtc);
-            }
+                if (trainGroupParticipant?.SelectedDate != null)
+                {
+                    // One-off: Use stored full UTC datetime (assumes time is set as in frontend)
+                    slotStartUtc = trainGroupParticipant.SelectedDate.Value;
+                    slotStartUtc = slotStartUtc.AddHours(trainGroupParticipant.TrainGroup.StartOn.Hour);
+                    slotStartUtc = slotStartUtc.AddMinutes(trainGroupParticipant.TrainGroup.StartOn.Minute);
+                }
+                else
+                {
+                    // Recurring: Compute next upcoming occurrence with local time overlaid
+                    slotStartUtc = CalculateNextOccurrenceDateTime(trainGroupParticipant!.TrainGroupDate, nowUtc);
+                }
 
-            if (slotStartUtc > nowUtc.AddHours(offsetH) && slotStartUtc <= nowUtc.AddHours(offsetH).AddHours(12))
-            {
-                errors = [_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]];
-                return true;
+                if (slotStartUtc > nowUtc.AddHours(offsetH) && slotStartUtc <= nowUtc.AddHours(offsetH).AddHours(12))
+                {
+                    errors = [_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]];
+                    return true;
+                }
             }
 
             return false;

@@ -11,5 +11,6 @@ namespace Core.Dtos.TrainGroupParticipantUnavailableDate
 
         [Required(ErrorMessage = "TrainGroupParticipantId is required")]
         public int TrainGroupParticipantId { get; set; }
+
     }
 }

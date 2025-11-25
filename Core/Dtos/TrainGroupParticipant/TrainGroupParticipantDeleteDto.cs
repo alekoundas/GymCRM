@@ -10,5 +10,6 @@ namespace Core.Models
         public int Id { get; set; }
 
         public int ClientTimezoneOffsetMinutes { get; set; } = 0;
+        public bool IsAdminPage { get; set; }
     }
 }
