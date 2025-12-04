@@ -204,5 +204,8 @@
   "Permanent deletion": "Οριστική διαγραφή",
   "Attendances": "Παρουσίες",
   "Take attendances": "Πάρε παρουσίες",
-  "Attendance date": "Ημέρα παρουσίας"
+  "Attendance date": "Ημέρα παρουσίας",
+  "The following dates have reached the maximum participants and could not be booked": "__STRING_NOT_TRANSLATED__",
+  "If any of those dates become available, you can join from Profile page.": "__STRING_NOT_TRANSLATED__",
+  "Visible in profile after": "__STRING_NOT_TRANSLATED__"
 }

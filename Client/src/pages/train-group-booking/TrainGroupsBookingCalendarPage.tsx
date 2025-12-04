@@ -14,6 +14,7 @@ import { TrainGroupParticipantDto } from "../../model/entities/train-group-parti
 import { useToast } from "../../contexts/ToastContext";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
+import { TrainGroupParticipantUnavailableDateDto } from "../../model/entities/train-group-participant-unavailable-date/TrainGroupParticipantUnavailableDateDto";
 
 export default function TrainGroupsBookingCalendarPage() {
   const { t } = useTranslator();
@@ -29,9 +30,18 @@ export default function TrainGroupsBookingCalendarPage() {
   } = useTrainGroupBookingStore();
   const apiService = useApiService();
 
+  const [unavailableDates, setUnavailableDates] = useState<
+    TrainGroupParticipantUnavailableDateDto[]
+  >([]);
+  const [isInfoDialogVisible, setInfoDialogVisibility] = useState(false);
   const [isDialogVisible, setDialogVisibility] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const { showSuccess, showInfo, showWarn, showError } = useToast();
+
+  const infoDialogControl: DialogControl = {
+    showDialog: () => setInfoDialogVisibility(true),
+    hideDialog: () => setInfoDialogVisibility(false),
+  };
 
   const dialogControl: DialogControl = {
     showDialog: () => setDialogVisibility(true),
@@ -114,12 +124,17 @@ export default function TrainGroupsBookingCalendarPage() {
       .updateParticipants(trainGroupDateParticipantUpdateDto)
       .then((response) => {
         if (response) {
+          setUnavailableDates(response); // Display those to info dialog
           dialogControl.hideDialog();
           handleChangeDate(new Date(timeSlotRequestDto.selectedDate)); // Refresh time slots
           resetSelectedTimeSlotResponseDto();
           resetTimeSlotRequestDto();
           resetTimeSlotResponseDto();
           setLoading(false);
+
+          if (response.length > 0) {
+            infoDialogControl.showDialog();
+          }
         }
       })
       .then(() => {
@@ -172,6 +187,47 @@ export default function TrainGroupsBookingCalendarPage() {
         onSave={onSave}
       >
         <TrainGroupsBookingCalendarTimeslotBookFormComponent />
+      </GenericDialogComponent>
+
+      {/*                                      */}
+      {/*           Unavailable dates          */}
+      {/*                                      */}
+
+      <GenericDialogComponent
+        formMode={FormMode.VIEW}
+        header={t(
+          "The following dates have reached the maximum participants and could not be booked"
+        )}
+        visible={isInfoDialogVisible}
+        control={infoDialogControl}
+      >
+        <div className="flex flex-col gap-4">
+          <div className="p-4 ">
+            <ul className="list-none p-0 m-0 flex flex-col gap-2">
+              {unavailableDates.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex align-items-center gap-2 p-2 hover:surface-hover border-round"
+                >
+                  <i className="pi pi-calendar text-primary"></i>
+                  <span>
+                    {new Date(item.unavailableDate).getDate() +
+                      "/" +
+                      (new Date(item.unavailableDate).getMonth() + 1) +
+                      "/" +
+                      new Date(item.unavailableDate).getFullYear()}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="text-sm text-surface-600">
+            {t(
+              "If any of those dates become available, you can join from Profile page."
+            )}
+          </div>
+        </div>
       </GenericDialogComponent>
     </>
   );
