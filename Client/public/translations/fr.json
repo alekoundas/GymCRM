@@ -207,5 +207,6 @@
   "Attendance date": "Date de présence",
   "The following dates have reached the maximum participants and could not be booked": "Les dates suivantes ont atteint le nombre maximum de participants et n’ont pas pu être réservées",
   "If any of those dates become available, you can join from Profile page.": "Si l’une de ces dates se libère, vous pourrez vous inscrire depuis la page Profil.",
-  "Visible in profile after": "Visible dans le profil après"
+  "Visible in profile after": "Visible dans le profil après",
+  "The email invitation wont take any of the unavailable dates into consideration.": "L’invitation par e-mail ne tiendra pas compte des dates non disponibles."
 }

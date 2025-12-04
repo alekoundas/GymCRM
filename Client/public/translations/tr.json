@@ -207,5 +207,6 @@
   "Attendance date": "Yoklama tarihi",
   "The following dates have reached the maximum participants and could not be booked": "Aşağıdaki tarihler maksimum katılımcı sayısına ulaştı ve rezervasyon yapılamadı",
   "If any of those dates become available, you can join from Profile page.": "Bu tarihlerden herhangi biri boşalırsa, Profil sayfasından katılabilirsiniz.",
-  "Visible in profile after": "Profilde görünecek tarih"
+  "Visible in profile after": "Profilde görünecek tarih",
+  "The email invitation wont take any of the unavailable dates into consideration.": "E-posta daveti, kullanılamayan tarihlerden hiçbirini dikkate almayacaktır."
 }

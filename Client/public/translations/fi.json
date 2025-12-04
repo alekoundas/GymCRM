@@ -207,5 +207,6 @@
   "Attendance date": "Läsnäolopäivä",
   "The following dates have reached the maximum participants and could not be booked": "Seuraavat päivämäärät ovat saavuttaneet osallistujien enimmäismäärän, eikä niitä voitu varata",
   "If any of those dates become available, you can join from Profile page.": "Jos jokin näistä päivämääristä vapautuu, voit liittyä profiilisivulta.",
-  "Visible in profile after": "Näkyvissä profiilissa jälkeen"
+  "Visible in profile after": "Näkyvissä profiilissa jälkeen",
+  "The email invitation wont take any of the unavailable dates into consideration.": "Sähköpostikutsu ei ota huomioon mitään ei-saatavilla olevia päivämääriä."
 }

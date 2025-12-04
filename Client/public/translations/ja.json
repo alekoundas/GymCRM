@@ -207,5 +207,6 @@
   "Attendance date": "出席日",
   "The following dates have reached the maximum participants and could not be booked": "以下の日程は定員に達したため予約できませんでした",
   "If any of those dates become available, you can join from Profile page.": "該当の日程に空きが出た場合、プロフィールページから参加できます。",
-  "Visible in profile after": "プロフィールに表示されるのは"
+  "Visible in profile after": "プロフィールに表示されるのは",
+  "The email invitation wont take any of the unavailable dates into consideration.": "メールの招待には、利用できない日程は考慮されません。"
 }

@@ -207,5 +207,6 @@
   "Attendance date": "Fremmødedato",
   "The following dates have reached the maximum participants and could not be booked": "Følgende datoer har nået det maksimale antal deltagere og kunne ikke bookes",
   "If any of those dates become available, you can join from Profile page.": "Hvis nogen af disse datoer bliver ledige, kan du tilmelde dig fra profilsiden.",
-  "Visible in profile after": "Synlig i profil efter"
+  "Visible in profile after": "Synlig i profil efter",
+  "The email invitation wont take any of the unavailable dates into consideration.": "E-mail invitationen vil ikke tage nogen af de utilgængelige datoer i betragtning."
 }

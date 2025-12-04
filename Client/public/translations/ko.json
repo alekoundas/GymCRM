@@ -207,5 +207,6 @@
   "Attendance date": "출석 날짜",
   "The following dates have reached the maximum participants and could not be booked": "다음 날짜들은 최대 참가 인원을 초과하여 예약할 수 없습니다",
   "If any of those dates become available, you can join from Profile page.": "해당 날짜에 자리가 나면 프로필 페이지에서 참여할 수 있습니다.",
-  "Visible in profile after": "프로필에 표시되는 시점"
+  "Visible in profile after": "프로필에 표시되는 시점",
+  "The email invitation wont take any of the unavailable dates into consideration.": "이메일 초대장은 사용 불가능한 날짜를 고려하지 않습니다."
 }
