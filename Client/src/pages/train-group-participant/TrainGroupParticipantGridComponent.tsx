@@ -183,7 +183,7 @@ export default function TrainGroupParticipantGridComponent({
     },
     {
       field: "recurringStartOnDate",
-      header: "Visible in profile after",
+      header: t("Visible in profile after"),
       sortable: true,
       filter: false,
       filterPlaceholder: t("Search"),

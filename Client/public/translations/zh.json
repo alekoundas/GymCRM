@@ -204,5 +204,8 @@
   "Permanent deletion": "永久删除",
   "Attendances": "考勤",
   "Take attendances": "点名",
-  "Attendance date": "考勤日期"
+  "Attendance date": "考勤日期",
+  "The following dates have reached the maximum participants and could not be booked": "__STRING_NOT_TRANSLATED__",
+  "If any of those dates become available, you can join from Profile page.": "__STRING_NOT_TRANSLATED__",
+  "Visible in profile after": "__STRING_NOT_TRANSLATED__"
 }

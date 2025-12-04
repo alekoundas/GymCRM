@@ -19,6 +19,7 @@ import { TrainGroupParticipantUpdateDto } from "../model/entities/train-group-pa
 import { ApiResponseDto } from "../model/core/api-response/ApiResponseDto";
 import { UserLoginResponseDto } from "../model/entities/user/UserLoginResponseDto";
 import { useTranslator } from "./TranslatorService";
+import { TrainGroupParticipantUnavailableDateDto } from "../model/entities/train-group-participant-unavailable-date/TrainGroupParticipantUnavailableDateDto";
 
 const BASE_URL = "/api/";
 const TOKEN_EXPIRATION_MS = 604800 * 1000; // 7 days
@@ -334,11 +335,11 @@ export const useApiService = () => {
   const updateParticipants = useCallback(
     async (
       data: TrainGroupParticipantUpdateDto
-    ): Promise<TrainGroupParticipantUpdateDto | null> => {
+    ): Promise<TrainGroupParticipantUnavailableDateDto[] | null> => {
       const url = buildUrl("TrainGroupParticipants", "UpdateParticipants");
       return apiRequest<
         TrainGroupParticipantUpdateDto,
-        TrainGroupParticipantUpdateDto
+        TrainGroupParticipantUnavailableDateDto[]
       >(url, "POST", data);
     },
     [buildUrl, apiRequest]

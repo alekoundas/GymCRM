@@ -204,5 +204,8 @@
   "Permanent deletion": "Eliminazione permanente",
   "Attendances": "Presenze",
   "Take attendances": "Fare l'appello",
-  "Attendance date": "Data presenza"
+  "Attendance date": "Data presenza",
+  "The following dates have reached the maximum participants and could not be booked": "__STRING_NOT_TRANSLATED__",
+  "If any of those dates become available, you can join from Profile page.": "__STRING_NOT_TRANSLATED__",
+  "Visible in profile after": "__STRING_NOT_TRANSLATED__"
 }

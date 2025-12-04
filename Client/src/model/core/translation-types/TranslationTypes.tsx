@@ -211,6 +211,9 @@
   'Attendances': string;
   'Take attendances': string;
   'Attendance date': string;
+  'The following dates have reached the maximum participants and could not be booked': string;
+  'If any of those dates become available, you can join from Profile page.': string;
+  'Visible in profile after': string;
     }
 
 

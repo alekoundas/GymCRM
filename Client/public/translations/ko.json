@@ -204,5 +204,8 @@
   "Permanent deletion": "영구 삭제",
   "Attendances": "출석",
   "Take attendances": "출석 부르기",
-  "Attendance date": "출석 날짜"
+  "Attendance date": "출석 날짜",
+  "The following dates have reached the maximum participants and could not be booked": "__STRING_NOT_TRANSLATED__",
+  "If any of those dates become available, you can join from Profile page.": "__STRING_NOT_TRANSLATED__",
+  "Visible in profile after": "__STRING_NOT_TRANSLATED__"
 }

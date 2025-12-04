@@ -108,7 +108,7 @@ namespace API.Controllers
         // Handle Booking. 
         // PUT: api/controller/5
         [HttpPost("UpdateParticipants")]
-        public async Task<ActionResult<ApiResponse<TrainGroup>>> UpdateParticipants([FromBody] TrainGroupParticipantUpdateDto updateDto)
+        public async Task<ActionResult<ApiResponse<List<TrainGroupParticipantUnavailableDate>>>> UpdateParticipants([FromBody] TrainGroupParticipantUpdateDto updateDto)
         {
 
             ApiDbContext dbContext = _dataService.GetDbContext();
@@ -128,7 +128,7 @@ namespace API.Controllers
             {
                 string className = typeof(TrainGroup).Name;
                 dbContext.Dispose();
-                return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, className]);
+                return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, className]);
             }
 
 
@@ -147,7 +147,7 @@ namespace API.Controllers
             if (isCurrentDateWithConflict)
             {
                 dbContext.Dispose();
-                return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer[TranslationKeys.Current_date_is_already_selected_in_a_Recurrence_date]);
+                return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse(_localizer[TranslationKeys.Current_date_is_already_selected_in_a_Recurrence_date]);
             }
 
 
@@ -176,7 +176,7 @@ namespace API.Controllers
                     else
                     {
                         dbContext.Dispose();
-                        return new ApiResponse<TrainGroup>().SetErrorResponse($"Something unexpected happend! Please contact Administrator.");
+                        return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse($"Something unexpected happend! Please contact Administrator.");
                     }
                 }
 
@@ -269,7 +269,7 @@ namespace API.Controllers
                     if (slotStartUtc > nowUtc.AddHours(offsetH) && slotStartUtc <= nowUtc.AddHours(offsetH).AddHours(12))
                     {
                         dbContext.Dispose();
-                        return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]); // Add key to TranslationKeys
+                        return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse(_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]); // Add key to TranslationKeys
                     }
                 }
             }
@@ -304,12 +304,13 @@ namespace API.Controllers
                 if (numberOfParticipants >= existingEntity.MaxParticipants)
                 {
                     dbContext.Dispose();
-                    return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer[TranslationKeys.Maximum_amount_of_participants_has_been_reached]);
+                    return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse(_localizer[TranslationKeys.Maximum_amount_of_participants_has_been_reached]);
                 }
             }
 
 
             // Add TrainGroup Participants
+            List<TrainGroupParticipantUnavailableDate> futureUnavailableDatesResponse = new List<TrainGroupParticipantUnavailableDate>();
             foreach (TrainGroupParticipant incomingParticipant in incomingParticipants)
             {
                 // Check which future dates user cant book.
@@ -336,6 +337,7 @@ namespace API.Controllers
                         .ToList();
 
                     incomingParticipant.TrainGroupParticipantUnavailableDates = futureUnavailableDates;
+                    futureUnavailableDatesResponse = futureUnavailableDatesResponse.Concat(futureUnavailableDates).ToList();
                 }
 
                 // Add new Participant
@@ -351,20 +353,20 @@ namespace API.Controllers
             User? user = _dataService.Users.Where(x => x.Id == new Guid(updateDto.UserId))
                 .FirstOrDefault();
 
-            if (user != null)
-            {
-                await _emailService.SendBookingEmailAsync(
-                    user,
-                    emailDatesAdd,
-                    emailDatesRemove
-                );
-            }
+            //if (user != null)
+            //{
+            //    await _emailService.SendBookingEmailAsync(
+            //        user,
+            //        emailDatesAdd,
+            //        emailDatesRemove
+            //    );
+            //}
 
 
             //if (futureUnavailableDates.Count > 0)
             //    return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity, "warning", "Future unavailable dates that cannot be booked: " + futureUnavailableDates.Select(x => x.UnavailableDate.ToUniversalTime().ToString()).ToList().ToString());
 
-            return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity);
+            return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetSuccessResponse(futureUnavailableDatesResponse);
         }
 
         // Computes next occurrence datetime in UTC

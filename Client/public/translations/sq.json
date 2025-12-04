@@ -204,5 +204,8 @@
   "Permanent deletion": "Fshirje e përhershme",
   "Attendances": "Pjesëmarrjet",
   "Take attendances": "Merre pjesëmarrjen",
-  "Attendance date": "Data e pjesëmarrjes"
+  "Attendance date": "Data e pjesëmarrjes",
+  "The following dates have reached the maximum participants and could not be booked": "__STRING_NOT_TRANSLATED__",
+  "If any of those dates become available, you can join from Profile page.": "__STRING_NOT_TRANSLATED__",
+  "Visible in profile after": "__STRING_NOT_TRANSLATED__"
 }
