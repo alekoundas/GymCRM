@@ -298,10 +298,7 @@ namespace API.Controllers
                 numberOfParticipants = existingParticipants
                     .Where(x => x.TrainGroupDateId == incomingParticipant.TrainGroupDateId)
                     .Where(x => x.SelectedDate == null || x.SelectedDate == updateDto.SelectedDate)
-                    .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y =>
-                        y.UnavailableDate == x.TrainGroupDate.FixedDay
-                        || y.UnavailableDate.Day == x.TrainGroupDate.RecurrenceDayOfMonth
-                        || y.UnavailableDate.DayOfWeek == x.TrainGroupDate.RecurrenceDayOfWeek))
+                    .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y => y.UnavailableDate == updateDto.SelectedDate))
                     .Count();
 
                 if (numberOfParticipants >= existingEntity.MaxParticipants)
