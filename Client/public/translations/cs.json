@@ -205,7 +205,7 @@
   "Attendances": "Docházka",
   "Take attendances": "Zaznamenat docházku",
   "Attendance date": "Datum docházky",
-  "The following dates have reached the maximum participants and could not be booked": "__STRING_NOT_TRANSLATED__",
-  "If any of those dates become available, you can join from Profile page.": "__STRING_NOT_TRANSLATED__",
-  "Visible in profile after": "__STRING_NOT_TRANSLATED__"
+  "The following dates have reached the maximum participants and could not be booked": "Následující termíny dosáhly maximálního počtu účastníků a nelze je rezervovat",
+  "If any of those dates become available, you can join from Profile page.": "Pokud se některý z těchto termínů uvolní, můžete se přihlásit na stránce Profil.",
+  "Visible in profile after": "Viditelné v profilu po"
 }

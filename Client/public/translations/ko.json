@@ -205,7 +205,7 @@
   "Attendances": "출석",
   "Take attendances": "출석 부르기",
   "Attendance date": "출석 날짜",
-  "The following dates have reached the maximum participants and could not be booked": "__STRING_NOT_TRANSLATED__",
-  "If any of those dates become available, you can join from Profile page.": "__STRING_NOT_TRANSLATED__",
-  "Visible in profile after": "__STRING_NOT_TRANSLATED__"
+  "The following dates have reached the maximum participants and could not be booked": "다음 날짜들은 최대 참가 인원을 초과하여 예약할 수 없습니다",
+  "If any of those dates become available, you can join from Profile page.": "해당 날짜에 자리가 나면 프로필 페이지에서 참여할 수 있습니다.",
+  "Visible in profile after": "프로필에 표시되는 시점"
 }

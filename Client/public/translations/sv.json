@@ -205,7 +205,7 @@
   "Attendances": "Närvaro",
   "Take attendances": "Ta närvaro",
   "Attendance date": "Närvarodatum",
-  "The following dates have reached the maximum participants and could not be booked": "__STRING_NOT_TRANSLATED__",
-  "If any of those dates become available, you can join from Profile page.": "__STRING_NOT_TRANSLATED__",
-  "Visible in profile after": "__STRING_NOT_TRANSLATED__"
+  "The following dates have reached the maximum participants and could not be booked": "Följande datum har nått maxantalet deltagare och kunde inte bokas",
+  "If any of those dates become available, you can join from Profile page.": "Om någon av dessa datum blir ledig kan du anmäla dig från profilsidan.",
+  "Visible in profile after": "Synlig i profilen efter"
 }

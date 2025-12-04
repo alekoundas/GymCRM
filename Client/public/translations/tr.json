@@ -205,7 +205,7 @@
   "Attendances": "Devam",
   "Take attendances": "Yoklama al",
   "Attendance date": "Yoklama tarihi",
-  "The following dates have reached the maximum participants and could not be booked": "__STRING_NOT_TRANSLATED__",
-  "If any of those dates become available, you can join from Profile page.": "__STRING_NOT_TRANSLATED__",
-  "Visible in profile after": "__STRING_NOT_TRANSLATED__"
+  "The following dates have reached the maximum participants and could not be booked": "Aşağıdaki tarihler maksimum katılımcı sayısına ulaştı ve rezervasyon yapılamadı",
+  "If any of those dates become available, you can join from Profile page.": "Bu tarihlerden herhangi biri boşalırsa, Profil sayfasından katılabilirsiniz.",
+  "Visible in profile after": "Profilde görünecek tarih"
 }

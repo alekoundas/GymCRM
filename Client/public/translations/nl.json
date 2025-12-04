@@ -205,7 +205,7 @@
   "Attendances": "Aanwezigheden",
   "Take attendances": "Aanwezigheid opnemen",
   "Attendance date": "Aanwezigheidsdatum",
-  "The following dates have reached the maximum participants and could not be booked": "__STRING_NOT_TRANSLATED__",
-  "If any of those dates become available, you can join from Profile page.": "__STRING_NOT_TRANSLATED__",
-  "Visible in profile after": "__STRING_NOT_TRANSLATED__"
+  "The following dates have reached the maximum participants and could not be booked": "De volgende data hebben het maximum aantal deelnemers bereikt en konden niet worden geboekt",
+  "If any of those dates become available, you can join from Profile page.": "Als een van die data weer beschikbaar komt, kun je je aanmelden via de profielpagina.",
+  "Visible in profile after": "Zichtbaar in profiel na"
 }

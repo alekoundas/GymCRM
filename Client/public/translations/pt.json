@@ -205,7 +205,7 @@
   "Attendances": "Presenças",
   "Take attendances": "Passar chamada",
   "Attendance date": "Data da presença",
-  "The following dates have reached the maximum participants and could not be booked": "__STRING_NOT_TRANSLATED__",
-  "If any of those dates become available, you can join from Profile page.": "__STRING_NOT_TRANSLATED__",
-  "Visible in profile after": "__STRING_NOT_TRANSLATED__"
+  "The following dates have reached the maximum participants and could not be booked": "As seguintes datas atingiram o número máximo de participantes e não puderam ser reservadas",
+  "If any of those dates become available, you can join from Profile page.": "Se alguma dessas datas ficar disponível, você poderá se inscrever a partir da página de Perfil.",
+  "Visible in profile after": "Visível no perfil após"
 }
