@@ -214,6 +214,7 @@
   'The following dates have reached the maximum participants and could not be booked': string;
   'If any of those dates become available, you can join from Profile page.': string;
   'Visible in profile after': string;
+  'The email invitation wont take any of the unavailable dates into consideration.': string;
     }
 
 

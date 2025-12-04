@@ -207,5 +207,6 @@
   "Attendance date": "Ημέρα παρουσίας",
   "The following dates have reached the maximum participants and could not be booked": "Οι παρακάτω ημερομηνίες έχουν συμπληρώσει τον μέγιστο αριθμό συμμετεχόντων και δεν ήταν δυνατή η κράτησή τους",
   "If any of those dates become available, you can join from Profile page.": "Αν κάποια από αυτές τις ημερομηνίες γίνει ξανά διαθέσιμη, μπορείς να εγγραφείς από τη σελίδα Προφίλ.",
-  "Visible in profile after": "Ορατό στο προφίλ μετά από"
+  "Visible in profile after": "Ορατό στο προφίλ μετά από",
+  "The email invitation wont take any of the unavailable dates into consideration.": "Η πρόσκληση μέσω email δεν θα λάβει υπόψη καμία από τις μη διαθέσιμες ημερομηνίες."
 }

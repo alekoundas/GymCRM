@@ -227,6 +227,11 @@ export default function TrainGroupsBookingCalendarPage() {
               "If any of those dates become available, you can join from Profile page."
             )}
           </div>
+          <div className="text-sm text-surface-600">
+            {t(
+              "The email invitation wont take any of the unavailable dates into consideration."
+            )}
+          </div>
         </div>
       </GenericDialogComponent>
     </>

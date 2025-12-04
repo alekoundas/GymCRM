@@ -207,5 +207,6 @@
   "Attendance date": "تاريخ الحضور",
   "The following dates have reached the maximum participants and could not be booked": "لقد وصلت التواريخ التالية إلى الحد الأقصى لعدد المشاركين ولا يمكن حجزها",
   "If any of those dates become available, you can join from Profile page.": "إذا أصبح أي من تلك التواريخ متاحًا، يمكنك الانضمام من صفحة الملف الشخصي.",
-  "Visible in profile after": "مرئي في الملف الشخصي بعد"
+  "Visible in profile after": "مرئي في الملف الشخصي بعد",
+  "The email invitation wont take any of the unavailable dates into consideration.": "لن تأخذ دعوة البريد الإلكتروني أيًا من التواريخ غير المتاحة بعين الاعتبار."
 }

@@ -207,5 +207,6 @@
   "Attendance date": "Datum docházky",
   "The following dates have reached the maximum participants and could not be booked": "Následující termíny dosáhly maximálního počtu účastníků a nelze je rezervovat",
   "If any of those dates become available, you can join from Profile page.": "Pokud se některý z těchto termínů uvolní, můžete se přihlásit na stránce Profil.",
-  "Visible in profile after": "Viditelné v profilu po"
+  "Visible in profile after": "Viditelné v profilu po",
+  "The email invitation wont take any of the unavailable dates into consideration.": "Pozvánka e-mailem nebude brát v úvahu žádná z nedostupných dat."
 }

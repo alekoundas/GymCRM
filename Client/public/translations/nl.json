@@ -207,5 +207,6 @@
   "Attendance date": "Aanwezigheidsdatum",
   "The following dates have reached the maximum participants and could not be booked": "De volgende data hebben het maximum aantal deelnemers bereikt en konden niet worden geboekt",
   "If any of those dates become available, you can join from Profile page.": "Als een van die data weer beschikbaar komt, kun je je aanmelden via de profielpagina.",
-  "Visible in profile after": "Zichtbaar in profiel na"
+  "Visible in profile after": "Zichtbaar in profiel na",
+  "The email invitation wont take any of the unavailable dates into consideration.": "De e-mailuitnodiging houdt geen rekening met de niet-beschikbare data."
 }

@@ -207,5 +207,6 @@
   "Attendance date": "Närvarodatum",
   "The following dates have reached the maximum participants and could not be booked": "Följande datum har nått maxantalet deltagare och kunde inte bokas",
   "If any of those dates become available, you can join from Profile page.": "Om någon av dessa datum blir ledig kan du anmäla dig från profilsidan.",
-  "Visible in profile after": "Synlig i profilen efter"
+  "Visible in profile after": "Synlig i profilen efter",
+  "The email invitation wont take any of the unavailable dates into consideration.": "E-postinbjudan kommer inte att ta hänsyn till några av de otillgängliga datumen."
 }

@@ -207,5 +207,6 @@
   "Attendance date": "Дата посещаемости",
   "The following dates have reached the maximum participants and could not be booked": "Следующие даты достигли максимального количества участников и не могут быть забронированы",
   "If any of those dates become available, you can join from Profile page.": "Если какое-либо из этих мест освободится, вы сможете записаться со страницы профиля.",
-  "Visible in profile after": "Отображается в профиле после"
+  "Visible in profile after": "Отображается в профиле после",
+  "The email invitation wont take any of the unavailable dates into consideration.": "Приглашение по электронной почте не будет учитывать недоступные даты."
 }

@@ -207,5 +207,6 @@
   "Attendance date": "考勤日期",
   "The following dates have reached the maximum participants and could not be booked": "以下日期已达到最大参与人数，无法预订",
   "If any of those dates become available, you can join from Profile page.": "如果这些日期中有名额释放，您可以从个人资料页面加入。",
-  "Visible in profile after": "个人资料中显示时间"
+  "Visible in profile after": "个人资料中显示时间",
+  "The email invitation wont take any of the unavailable dates into consideration.": "电子邮件邀请不会考虑任何不可用的日期。"
 }

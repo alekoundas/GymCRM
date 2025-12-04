@@ -207,5 +207,6 @@
   "Attendance date": "Data e pjesëmarrjes",
   "The following dates have reached the maximum participants and could not be booked": "Datat e mëposhtme kanë arritur numrin maksimal të pjesëmarrësve dhe nuk mund të rezervohen",
   "If any of those dates become available, you can join from Profile page.": "Nëse ndonjë nga këto data lirohet, mund të regjistroheni nga faqja e Profilit.",
-  "Visible in profile after": "E dukshme në profil pas"
+  "Visible in profile after": "E dukshme në profil pas",
+  "The email invitation wont take any of the unavailable dates into consideration.": "Ftesa me email nuk do të marrë parasysh asnjë nga datat e papranueshme."
 }
