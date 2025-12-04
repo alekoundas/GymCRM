@@ -205,7 +205,7 @@
   "Attendances": "Παρουσίες",
   "Take attendances": "Πάρε παρουσίες",
   "Attendance date": "Ημέρα παρουσίας",
-  "The following dates have reached the maximum participants and could not be booked": "__STRING_NOT_TRANSLATED__",
-  "If any of those dates become available, you can join from Profile page.": "__STRING_NOT_TRANSLATED__",
-  "Visible in profile after": "__STRING_NOT_TRANSLATED__"
+  "The following dates have reached the maximum participants and could not be booked": "Οι παρακάτω ημερομηνίες έχουν συμπληρώσει τον μέγιστο αριθμό συμμετεχόντων και δεν ήταν δυνατή η κράτησή τους",
+  "If any of those dates become available, you can join from Profile page.": "Αν κάποια από αυτές τις ημερομηνίες γίνει ξανά διαθέσιμη, μπορείς να εγγραφείς από τη σελίδα Προφίλ.",
+  "Visible in profile after": "Ορατό στο προφίλ μετά από"
 }
