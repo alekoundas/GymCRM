@@ -52,7 +52,7 @@ namespace API.Controllers
                     dto.Body
                 );
 
-            return new ApiResponse<bool>().SetSuccessResponse(_localizer[TranslationKeys.Password_reset_email_sent]);
+            return new ApiResponse<bool>().SetSuccessResponse("One or more Emails send!");
         }
 
 
