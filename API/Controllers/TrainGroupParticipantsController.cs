@@ -353,14 +353,14 @@ namespace API.Controllers
             User? user = _dataService.Users.Where(x => x.Id == new Guid(updateDto.UserId))
                 .FirstOrDefault();
 
-            //if (user != null)
-            //{
-            //    await _emailService.SendBookingEmailAsync(
-            //        user,
-            //        emailDatesAdd,
-            //        emailDatesRemove
-            //    );
-            //}
+            if (user != null)
+            {
+                await _emailService.SendBookingEmailAsync(
+                    user,
+                    emailDatesAdd,
+                    emailDatesRemove
+                );
+            }
 
 
             //if (futureUnavailableDates.Count > 0)
