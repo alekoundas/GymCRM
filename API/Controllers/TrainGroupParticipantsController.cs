@@ -317,27 +317,61 @@ namespace API.Controllers
                 // Only applies to DAY_OF_MONTH and DAY_OF_WEEK
                 if (incomingParticipant.SelectedDate == null)
                 {
-                    List<TrainGroupParticipantUnavailableDate> futureUnavailableDates =
-                    existingParticipants
+
+
+
+
+                    List<DateTime?> oneOffDatesDistincted = existingParticipants
                         .Where(x => x.SelectedDate != null)
                         .Where(x => x.SelectedDate >= DateTime.UtcNow)
-                        .Where(x =>
-                            x.TrainGroup.MaxParticipants -
-                            x.TrainGroup.TrainGroupParticipants
-                                .Where(y => y.TrainGroupDate.TrainGroupDateType != TrainGroupDateTypeEnum.FIXED_DAY)
-                                .Where(y =>
-                                    y.TrainGroupDate.RecurrenceDayOfMonth == x.SelectedDate!.Value.Day ||
-                                    y.TrainGroupDate.RecurrenceDayOfWeek == x.SelectedDate!.Value.DayOfWeek ||
-                                    y.SelectedDate == x.SelectedDate!.Value
-                                )
-                                .Count()
-                            <= 0
-                        )
-                        .Select(x => new TrainGroupParticipantUnavailableDate() { UnavailableDate = x.SelectedDate!.Value })
+                        .Select(x => x.SelectedDate)
+                        .Distinct()
                         .ToList();
 
-                    incomingParticipant.TrainGroupParticipantUnavailableDates = futureUnavailableDates;
-                    futureUnavailableDatesResponse = futureUnavailableDatesResponse.Concat(futureUnavailableDates).ToList();
+                    foreach (var distinctedDate in oneOffDatesDistincted)
+                    {
+                        int recuringParticipantCount = existingEntity.TrainGroupDates
+                            .First(x => x.Id == incomingParticipant.TrainGroupDateId)
+                            .TrainGroupParticipants
+                            .Where(x => x.SelectedDate == null)
+                            .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y => y.TrainGroupParticipantId == x.Id && y.UnavailableDate == distinctedDate))
+                            .Count();
+
+                        int oneOffParticipantCount = existingParticipants
+                            .Where(x => x.SelectedDate != null && x.SelectedDate == distinctedDate)
+                            .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y => y.TrainGroupParticipantId == x.Id && y.UnavailableDate == distinctedDate))
+                            .Count();
+
+                        // Mark unavailable only if fully booked (no spots left)
+                        if ((oneOffParticipantCount + recuringParticipantCount) >= existingEntity.MaxParticipants)
+                        {
+                            incomingParticipant.TrainGroupParticipantUnavailableDates.Add(new TrainGroupParticipantUnavailableDate() { UnavailableDate = distinctedDate!.Value });
+                            futureUnavailableDatesResponse.Add(new TrainGroupParticipantUnavailableDate() { UnavailableDate = distinctedDate!.Value });
+                        }
+                    }
+
+
+
+                    //List<TrainGroupParticipantUnavailableDate> futureUnavailableDates =
+                    //existingParticipants
+                    //    .Where(x => x.SelectedDate != null)
+                    //    .Where(x => x.SelectedDate >= DateTime.UtcNow)
+                    //    .Where(x =>
+                    //    {
+                    //        int recuringParticipantCount = x.TrainGroupDate.TrainGroupParticipants
+                    //            .Where(y => y.SelectedDate == null)
+                    //            .Where(y => !y.TrainGroupParticipantUnavailableDates.Any(z => z.TrainGroupParticipantId == y.Id && z.UnavailableDate == x.SelectedDate))
+                    //            .Count();
+
+
+                    //        // Mark unavailable only if fully booked (no spots left)
+                    //        return participantCount >= x.TrainGroup.MaxParticipants;
+                    //    })
+                    //    .Select(x => new TrainGroupParticipantUnavailableDate() { UnavailableDate = x.SelectedDate!.Value })
+                    //    .ToList();
+
+                    //incomingParticipant.TrainGroupParticipantUnavailableDates = futureUnavailableDates;
+                    //futureUnavailableDatesResponse = futureUnavailableDatesResponse.Concat(futureUnavailableDates).ToList();
                 }
 
                 // Add new Participant
@@ -354,13 +388,19 @@ namespace API.Controllers
                 .FirstOrDefault();
 
             if (user != null)
-            {
-                await _emailService.SendBookingEmailAsync(
-                    user,
-                    emailDatesAdd,
-                    emailDatesRemove
-                );
-            }
+                try
+                {
+
+                    await _emailService.SendBookingEmailAsync(
+                        user,
+                        emailDatesAdd,
+                        emailDatesRemove
+                    );
+                }
+                catch (Exception e)
+                {
+
+                }
 
 
             //if (futureUnavailableDates.Count > 0)

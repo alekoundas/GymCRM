@@ -124,8 +124,7 @@ namespace API.Controllers
                     SpotsLeft =
                     (
                         x.Key.MaxParticipants -
-                        (
-                            x.Key.TrainGroupParticipants
+                        x.Key.TrainGroupParticipants
                                 .Where(y => !y.TrainGroupParticipantUnavailableDates.Any(z => z.TrainGroupParticipantId == y.Id && z.UnavailableDate == selectedDate))
                                 .Where(y =>
                                   y.SelectedDate != null ?
@@ -138,7 +137,6 @@ namespace API.Controllers
                                 //.Select(y => y.UserId)
                                 //.Distinct()
                                 .Count()
-                        )
                     ),
                 })
                 .ToList();
