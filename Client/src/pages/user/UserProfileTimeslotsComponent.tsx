@@ -633,11 +633,14 @@ export default function UserProfileTimeslotsComponent() {
                                 0
                               )
                             ) ||
-                          isDateTwelveHoursFromNow(
-                            selectedTimeSlotRecurrenceDate.date,
-                            selectedTrainGroup.startOn,
-                            selectedTimeSlotRecurrenceDate.trainGroupDateType
-                          )
+                          ((calendarRef.current?.getApi().view?.currentStart ??
+                            new Date()) >= new Date()
+                            ? false
+                            : isDateTwelveHoursFromNow(
+                                selectedTimeSlotRecurrenceDate.date,
+                                selectedTrainGroup.startOn,
+                                selectedTimeSlotRecurrenceDate.trainGroupDateType
+                              ))
                     }
                   ></Button>
 

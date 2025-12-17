@@ -61,7 +61,7 @@ namespace API.Controllers
                 else
                 {
                     // Recurring: Compute next upcoming occurrence with local time overlaid
-                    slotStartUtc = CalculateNextOccurrenceDateTime(trainGroupParticipant!.TrainGroupDate, nowUtc);
+                    slotStartUtc = CalculateNextOccurrenceDateTime(trainGroupParticipant!.TrainGroupDate, entityDto.UnavailableDate);
                 }
 
                 if (slotStartUtc > nowUtc.AddHours(offsetH) && slotStartUtc <= nowUtc.AddHours(offsetH).AddHours(12))
