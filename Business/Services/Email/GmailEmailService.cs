@@ -9,6 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using MimeKit;
+using MimeKit.Utils;
+using System.Text;
 
 namespace Business.Services.Email
 {
@@ -80,7 +82,7 @@ namespace Business.Services.Email
                 var mimeMessage = new MimeMessage();
                 mimeMessage.From.Add(new MailboxAddress(fromName, fromEmail));
                 mimeMessage.To.Add(new MailboxAddress(to, to));
-                mimeMessage.Subject = subject;
+                mimeMessage.Subject = Encoding.UTF8.GetString(Rfc2047.EncodeText(Encoding.UTF8, subject));
                 var bodyBuilder = new BodyBuilder
                 {
                     TextBody = htmlBody,
