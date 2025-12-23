@@ -52,7 +52,7 @@ namespace API.Controllers
                     dto.Body
                 );
 
-            return new ApiResponse<bool>().SetSuccessResponse("One or more Emails send!");
+            return new ApiResponse<bool>().SetSuccessResponse(true,"One or more Emails send!");
         }
 
 

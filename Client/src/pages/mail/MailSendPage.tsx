@@ -21,7 +21,7 @@ export default function MailSendPage() {
   const onSend = async () => {
     const response = await apiService.emailSend(mailSendDto);
     if (response) {
-      navigate("/administrator");
+      navigate("/administrator/emails");
     }
   };
 
