@@ -21,6 +21,7 @@ import { Avatar } from "primereact/avatar";
 import MailSendFormComponent from "./MailSendFormComponent";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
+import MailSendPage from "./MailSendPage";
 
 export default function MailsPage() {
   const { t } = useTranslator();
@@ -265,10 +266,10 @@ export default function MailsPage() {
         visible={isAddDialogVisible}
         control={dialogControlAdd}
         onSave={OnSaveAdd}
-        formMode={FormMode.ADD}
+        formMode={FormMode.VIEW}
       >
         <div className="w-full">
-          <MailSendFormComponent />
+          <MailSendPage />
         </div>
       </GenericDialogComponent>
 
@@ -279,10 +280,10 @@ export default function MailsPage() {
         visible={isEditDialogVisible}
         control={dialogControlEdit}
         onSave={OnSaveEdit}
-        formMode={FormMode.EDIT}
+        formMode={FormMode.VIEW}
       >
         <div className="w-full">
-          <MailFormComponent />
+          <MailSendPage />
         </div>
       </GenericDialogComponent>
 

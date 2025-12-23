@@ -16,7 +16,7 @@ export default function MailSendPage() {
   const { mailSendDto, resetMailSendDto } = useMailStore();
   const [isInfoDialogVisible, setInfoDialogVisible] = useState(false); // Dialog visibility
 
-  useEffect(() => resetMailSendDto(), []); // Reset form on load.
+  // useEffect(() => resetMailSendDto(), []); // Reset form on load.
 
   const onSend = async () => {
     const response = await apiService.emailSend(mailSendDto);
