@@ -74,6 +74,7 @@
   "Remove_from_Calendar": "Poista kalenterista",
   "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "Napsauta liitettyjä 'add-*.ics'-tiedostoja ja valitse 'Lisää kalenteriin'.",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Napsauta liitettyjä 'cancel-*.ics'-tiedostoja poistaaksesi tapahtumat.",
+  "User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group": "Käyttäjällä on jo varaus samaan aikaan ja päivämäärään eri harjoitusryhmässä",
 
   "_0_is_required": "{0} vaaditaan!",
   "_0_already_exists": "{0} on jo olemassa!",

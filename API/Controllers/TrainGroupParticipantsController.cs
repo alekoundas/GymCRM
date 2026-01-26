@@ -274,27 +274,11 @@ namespace API.Controllers
                 }
             }
 
-            // Validate if any of the incoming participants is already joined.
-            // Check if any of the incoming participants contains selected date, then check for recurring dates.
-            //bool isAlreadyParticipant = incomingParticipants.Any(x =>
-            //    existingParticipants
-            //        .Where(x => x.UserId == new Guid(updateDto.UserId))
-            //        .Any(y => x.TrainGroupDateId == y.TrainGroupDateId)
-            //);
-
-            //if (isAlreadyParticipant)
-            //{
-            //    dbContext.Dispose();
-            //    return new ApiResponse<TrainGroup>().SetErrorResponse(_localizer[TranslationKeys.Participant_already_joined]);
-            //}
-
 
             // Validate max participants
             foreach (TrainGroupParticipant incomingParticipant in incomingParticipants)
             {
                 int numberOfParticipants = 0;
-
-
                 numberOfParticipants = existingParticipants
                     .Where(x => x.TrainGroupDateId == incomingParticipant.TrainGroupDateId)
                     .Where(x => x.SelectedDate == null || x.SelectedDate == updateDto.SelectedDate)
@@ -308,6 +292,69 @@ namespace API.Controllers
                 }
             }
 
+            // VALIDATE FOR SCHEDULING CONFLICTS: Same hour and day but different TrainGroup
+            foreach (TrainGroupParticipant incomingParticipant in incomingParticipants)
+            {
+                // Determine the date and hour for this incoming participant
+                DateTime participantDate;
+                int participantHour;
+                int participantMinute;
+
+                if (incomingParticipant.SelectedDate.HasValue)
+                {
+                    // One-off participant: Use selected date
+                    participantDate = incomingParticipant.SelectedDate.Value.Date;
+                    participantHour = existingEntity.StartOn.Hour;
+                    participantMinute = existingEntity.StartOn.Minute;
+                }
+                else
+                {
+                    // Recurring participant: Calculate next occurrence
+                    DateTime nowUtc = DateTime.UtcNow;
+                    DateTime nextOccurrence = CalculateNextOccurrenceDateTime(existingEntity.TrainGroupDates.First(x=>x.Id  == incomingParticipant.TrainGroupDateId), nowUtc);
+                    participantDate = nextOccurrence.Date;
+                    participantHour = nextOccurrence.Hour;
+                    participantMinute = nextOccurrence.Minute;
+                }
+
+                // Check for other bookings by same user with same date and hour
+                var conflictingBooking = _dataService.TrainGroupParticipants
+                    .Include(x=> x.TrainGroup.TrainGroupDates)
+                    .Where(x => x.UserId == new Guid(updateDto.UserId))
+                    .Where(x => x.TrainGroupId != updateDto.TrainGroupId) // Different TrainGroup
+                    .Where(x => x.SelectedDate == null || x.SelectedDate.Value.Date >= DateTime.UtcNow.Date) // Future bookings only
+                    .ToList() // Switch to LINQ-to-Objects for complex date/hour calculation
+                    .FirstOrDefault(x =>
+                    {
+                        DateTime otherDate;
+                        int otherHour;
+                        int otherMinute;
+
+                        if (x.SelectedDate.HasValue)
+                        {
+                            otherDate = x.SelectedDate.Value.Date;
+                            otherHour = x.TrainGroup.StartOn.Hour;
+                            otherMinute = x.TrainGroup.StartOn.Minute;
+                        }
+                        else
+                        {
+                            DateTime nowUtc = DateTime.UtcNow;
+                            DateTime nextOccurrence = CalculateNextOccurrenceDateTime(x.TrainGroupDate, nowUtc);
+                            otherDate = nextOccurrence.Date;
+                            otherHour = nextOccurrence.Hour;
+                            otherMinute = nextOccurrence.Minute;
+                        }
+
+                        return otherDate == participantDate && otherHour == participantHour && otherMinute == participantMinute;
+                    });
+
+                if (conflictingBooking != null)
+                {
+                    dbContext.Dispose();
+                    return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse(
+                        _localizer[TranslationKeys.User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group]);
+                }
+            }
 
             // Add TrainGroup Participants
             List<TrainGroupParticipantUnavailableDate> futureUnavailableDatesResponse = new List<TrainGroupParticipantUnavailableDate>();
@@ -317,10 +364,6 @@ namespace API.Controllers
                 // Only applies to DAY_OF_MONTH and DAY_OF_WEEK
                 if (incomingParticipant.SelectedDate == null)
                 {
-
-
-
-
                     List<DateTime?> oneOffDatesDistincted = existingParticipants
                         .Where(x => x.SelectedDate != null)
                         .Where(x => x.SelectedDate >= DateTime.UtcNow)
@@ -349,29 +392,6 @@ namespace API.Controllers
                             futureUnavailableDatesResponse.Add(new TrainGroupParticipantUnavailableDate() { UnavailableDate = distinctedDate!.Value });
                         }
                     }
-
-
-
-                    //List<TrainGroupParticipantUnavailableDate> futureUnavailableDates =
-                    //existingParticipants
-                    //    .Where(x => x.SelectedDate != null)
-                    //    .Where(x => x.SelectedDate >= DateTime.UtcNow)
-                    //    .Where(x =>
-                    //    {
-                    //        int recuringParticipantCount = x.TrainGroupDate.TrainGroupParticipants
-                    //            .Where(y => y.SelectedDate == null)
-                    //            .Where(y => !y.TrainGroupParticipantUnavailableDates.Any(z => z.TrainGroupParticipantId == y.Id && z.UnavailableDate == x.SelectedDate))
-                    //            .Count();
-
-
-                    //        // Mark unavailable only if fully booked (no spots left)
-                    //        return participantCount >= x.TrainGroup.MaxParticipants;
-                    //    })
-                    //    .Select(x => new TrainGroupParticipantUnavailableDate() { UnavailableDate = x.SelectedDate!.Value })
-                    //    .ToList();
-
-                    //incomingParticipant.TrainGroupParticipantUnavailableDates = futureUnavailableDates;
-                    //futureUnavailableDatesResponse = futureUnavailableDatesResponse.Concat(futureUnavailableDates).ToList();
                 }
 
                 // Add new Participant
