@@ -1,4 +1,5 @@
-﻿using Core.Dtos.User;
+﻿using Core.Dtos.TrainGroup;
+using Core.Dtos.User;
 using Core.Translations;
 using System.ComponentModel.DataAnnotations;
 
@@ -14,7 +15,8 @@ namespace Core.Dtos.TrainGroupΑttendance
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public int TrainGroupId { get; set; }
-        //public TrainGroup TrainGroup { get; set; } = null!;
+        public TrainGroupDto TrainGroup { get; set; } = null!;
+
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string UserId { get; set; } = "";

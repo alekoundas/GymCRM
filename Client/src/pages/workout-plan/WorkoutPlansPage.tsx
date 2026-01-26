@@ -50,6 +50,7 @@ export default function WorkoutPlansPage() {
       ? [
           { fieldName: "createdOn", filterType: "between" },
           { fieldName: "title", filterType: "contains" },
+          { fieldName: "userId", filterType: "in" },
         ]
       : [
           { fieldName: "createdOn", filterType: "between" },
@@ -119,12 +120,15 @@ export default function WorkoutPlansPage() {
       sortable: true,
       filter: true,
       filterPlaceholder: t("Search"),
-      filterTemplate: (options: ColumnFilterElementTemplateOptions) => (
-        <DataTableFilterIdComponent
-          options={options}
-          controller="users"
-        />
-      ),
+      filterTemplate: (options: ColumnFilterElementTemplateOptions) =>
+        isAdminPage ? (
+          <DataTableFilterIdComponent
+            options={options}
+            controller="users"
+          />
+        ) : (
+          <></>
+        ),
       body: (rowData: { user: UserDto | undefined }, options: any) =>
         chipTemplate(rowData.user),
       style: { width: "10%" },
