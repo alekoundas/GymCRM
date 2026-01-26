@@ -66,7 +66,9 @@ namespace API.Controllers
 
         protected override void DataTableQueryUpdate(IGenericRepository<TrainGroupΑttendance> query, DataTableDto<TrainGroupΑttendanceDto> dataTable)
         {
-            query = query.Include(x => x.User);
+            query = query
+                .Include(x => x.User)
+                .Include(x => x.TrainGroup);
         }
 
     }
