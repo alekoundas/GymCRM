@@ -74,6 +74,7 @@
   "Remove_from_Calendar": "Удалить из календаря",
   "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "Нажмите на прикрепленные файлы 'add-*.ics' и выберите 'Добавить в календарь'.",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Нажмите на прикрепленные файлы 'cancel-*.ics', чтобы удалить события.",
+  "User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group": "Пользователь уже имеет бронирование в одно и то же время и дату в другой группе обучения",
 
   "_0_is_required": "{0} требуется!",
   "_0_already_exists": "{0} уже существует!",

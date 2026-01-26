@@ -74,6 +74,7 @@
   "Remove_from_Calendar": "Odebrat z kalendáře",
   "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "Klikněte na připojené soubory 'add-*.ics' a vyberte 'Přidat do kalendáře'.",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Klikněte na připojené soubory 'cancel-*.ics' pro odebrání událostí.",
+  "User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group": "Uživatel má již rezervaci ve stejný čas a datum v jiné tréninové skupině",
 
   "_0_is_required": "{0} je vyžadováno!",
   "_0_already_exists": "{0} již existuje!",

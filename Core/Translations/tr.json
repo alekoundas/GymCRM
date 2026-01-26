@@ -74,6 +74,7 @@
   "Remove_from_Calendar": "Takvimden Kaldır",
   "Click_the_attached_add_ics_files_and_select_Add_to_Calendar": "Eklentideki 'add-*.ics' dosyalarına tıklayın ve 'Takvime Ekle' seçin.",
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Eklentideki 'cancel-*.ics' dosyalarına tıklayarak etkinlikleri kaldırın.",
+  "User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group": "Kullanıcının farklı bir eğitim grubunda aynı saat ve tarihte zaten bir rezervasyonu var",
 
   "_0_is_required": "{0} gereklidir!",
   "_0_already_exists": "{0} zaten var!",

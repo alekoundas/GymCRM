@@ -81,6 +81,7 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string Remove_from_Calendar = "Remove_from_Calendar";
         public const string Click_the_attached_add_ics_files_and_select_Add_to_Calendar = "Click_the_attached_add_ics_files_and_select_Add_to_Calendar";
         public const string Click_the_attached_cancel_ics_files_to_remove_the_events = "Click_the_attached_cancel_ics_files_to_remove_the_events";
+        public const string User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group = "User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group";
         public const string _0_is_required = "_0_is_required";
         public const string _0_already_exists = "_0_already_exists";
         public const string _0_not_found = "_0_not_found";
