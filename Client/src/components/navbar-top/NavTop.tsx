@@ -74,9 +74,10 @@ export default function NavTop() {
   const start = (
     <img
       alt="logo"
-      src="https://primefaces.org/cdn/primereact/images/logo.png"
-      height="40"
-      className="mr-2"
+      src="/logos/logo-borderless.png"
+      height="65"
+      width="65"
+      className="mr-2 mt-1"
     ></img>
   );
 
