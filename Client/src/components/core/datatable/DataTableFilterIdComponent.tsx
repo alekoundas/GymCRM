@@ -37,7 +37,7 @@ export default function DataTableFilterIdComponent({
   }, [options.value]);
 
   const fetchData = async (dto: LookupDto) => {
-    dto.take = 10;
+    dto.take = 1000;
     const result = apiService.getDataLookup(controller, dto);
     return result;
   };
@@ -83,7 +83,7 @@ export default function DataTableFilterIdComponent({
   };
 
   const getDisplayImageSrc = (
-    profileImage: string | undefined
+    profileImage: string | undefined,
   ): string | undefined => {
     if (!profileImage) return undefined;
     if (profileImage.startsWith("data:")) return profileImage;
@@ -91,7 +91,7 @@ export default function DataTableFilterIdComponent({
   };
 
   const itemTemplate: (option: LookupOptionDto) => React.ReactNode = (
-    option
+    option,
   ) => (
     <div className="flex align-items-center gap-2">
       {option.profileImage && (

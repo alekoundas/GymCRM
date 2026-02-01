@@ -52,8 +52,23 @@ namespace API.Controllers
                     dto.Body
                 );
 
-            return new ApiResponse<bool>().SetSuccessResponse(true,"One or more Emails send!");
+            return new ApiResponse<bool>().SetSuccessResponse(true, "One or more Emails send!");
         }
+
+        // POST: api/controller/DeleteAll
+        [HttpPost("DeleteAll")]
+        public virtual async Task<ActionResult<ApiResponse<bool>>> DeleteAll()
+        {
+            if (!IsUserAuthorized("Delete"))
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            string className = typeof(Mail).Name;
+            List<Mail> mails = await _dataService.Mails.ToListAsync();
+
+            int result = await _dataService.Mails.RemoveRangeAsync(mails);
+            return new ApiResponse<bool>().SetSuccessResponse(true, _localizer[TranslationKeys._0_deleted_successfully, className]);
+        }
+
 
 
         protected override void DataTableQueryUpdate(IGenericRepository<Mail> query, DataTableDto<MailDto> dataTable)

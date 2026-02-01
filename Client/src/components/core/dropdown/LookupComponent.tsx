@@ -32,7 +32,7 @@ export default function LookupComponent({
 
   const fetchData = async (dto: LookupDto) => {
     setLoading(true);
-    dto.take = 30;
+    dto.take = 1000;
     const result = await apiService.getDataLookup(controller, dto);
     setLoading(false);
     return result;
@@ -92,7 +92,7 @@ export default function LookupComponent({
       setSelectedId(value);
     }
     const entity: LookupOptionDto | undefined = lookupDto.data?.find(
-      (x) => x.id === value
+      (x) => x.id === value,
     );
     if (onChange) onChange(entity);
   };
@@ -125,7 +125,7 @@ export default function LookupComponent({
   const userTemplate = (user: UserDto | undefined): JSX.Element | undefined => {
     if (user) {
       const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
-        0
+        0,
       )}`.toUpperCase();
       const imageSrc = "data:image/png;base64," + user.profileImage;
       return (

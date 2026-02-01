@@ -22,6 +22,7 @@ import MailSendFormComponent from "./MailSendFormComponent";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
 import MailSendPage from "./MailSendPage";
+import { Button } from "primereact/button";
 
 export default function MailsPage() {
   const { t } = useTranslator();
@@ -44,6 +45,8 @@ export default function MailsPage() {
   const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
   const [isEditDialogVisible, setEditDialogVisibility] = useState(false); // Dialog visibility
   const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
+  const [isDeleteAllDialogVisible, setDeleteAllDialogVisibility] =
+    useState(false); // Dialog visibility
 
   const dialogControlView: DialogControl = {
     showDialog: () => setViewDialogVisibility(true),
@@ -60,6 +63,10 @@ export default function MailsPage() {
   const dialogControlDelete: DialogControl = {
     showDialog: () => setDeleteDialogVisibility(true),
     hideDialog: () => setDeleteDialogVisibility(false),
+  };
+  const dialogControlDeleteAll: DialogControl = {
+    showDialog: () => setDeleteAllDialogVisibility(true),
+    hideDialog: () => setDeleteAllDialogVisibility(false),
   };
 
   const [datatableDto, setDatatableDto] = useState<DataTableDto<MailDto>>({
@@ -81,7 +88,7 @@ export default function MailsPage() {
   const chipTemplate = (user: UserDto | undefined) => {
     if (user) {
       const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
-        0
+        0,
       )}`.toUpperCase();
       const imageSrc = "data:image/png;base64," + user.profileImage;
       return (
@@ -206,7 +213,7 @@ export default function MailsPage() {
     const response = await apiService.update(
       "mails",
       mailDto,
-      mailDto.id ?? -1
+      mailDto.id ?? -1,
     );
 
     if (response) {
@@ -217,10 +224,15 @@ export default function MailsPage() {
     }
   };
 
-  const onDelete = async (): Promise<void> => {
-    const response = await apiService.delete("mails", mailDto.id ?? -1);
+  const onDelete = async (all?: boolean): Promise<void> => {
+    if (all) {
+      const response = await apiService.deleteAllMail("mails");
+    } else {
+      const response = await apiService.delete("mails", mailDto.id ?? -1);
+    }
 
     dialogControlDelete.hideDialog();
+    dialogControlDeleteAll.hideDialog();
     if (triggerRefreshDataTable.current)
       triggerRefreshDataTable.current(datatableDto);
   };
@@ -228,6 +240,12 @@ export default function MailsPage() {
   return (
     <>
       <Card title={t("Email History")}>
+        <Button
+          label={t("Delete All Emails")}
+          icon="pi pi-times"
+          outlined
+          onClick={() => dialogControlDeleteAll.showDialog()}
+        />
         <div className="h-full">
           <DataTableComponent
             controller="mails"
@@ -294,6 +312,20 @@ export default function MailsPage() {
         visible={isDeleteDialogVisible}
         control={dialogControlDelete}
         onDelete={onDelete}
+        formMode={FormMode.DELETE}
+      >
+        <div className="flex justify-content-center">
+          <p>{t("Are you sure")}?</p>
+        </div>
+      </GenericDialogComponent>
+
+      {/*                                       */}
+      {/*          Delete All Email History         */}
+      {/*                                       */}
+      <GenericDialogComponent
+        visible={isDeleteAllDialogVisible}
+        control={dialogControlDeleteAll}
+        onDelete={() => onDelete(true)}
         formMode={FormMode.DELETE}
       >
         <div className="flex justify-content-center">
