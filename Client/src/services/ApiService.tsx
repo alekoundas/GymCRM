@@ -32,14 +32,14 @@ export const useApiService = () => {
     (
       controller: string,
       endpoint: string = "",
-      id?: number | string
+      id?: number | string,
     ): string => {
       let url = `${BASE_URL}${controller}`;
       if (id) url += `/${id}`;
       if (endpoint) url += `/${endpoint}`;
       return url;
     },
-    []
+    [],
   );
 
   const showMessages = useCallback(
@@ -47,10 +47,10 @@ export const useApiService = () => {
       if (!messages) return;
       const allMessages = Object.values(messages).flat();
       allMessages.forEach((msg) =>
-        isSuccess ? showSuccess(msg) : showError(msg)
+        isSuccess ? showSuccess(msg) : showError(msg),
       );
     },
-    [showSuccess, showError]
+    [showSuccess, showError],
   );
 
   const refreshUserToken = useCallback(async (): Promise<boolean> => {
@@ -87,7 +87,7 @@ export const useApiService = () => {
         TokenService.setRefreshTokenExpireDate(expireDate.toISOString());
         console.log(
           "Token refresh successful, new expiration:",
-          expireDate.toISOString()
+          expireDate.toISOString(),
         );
         // showSuccess("Token refreshed successfully!");
         return true;
@@ -109,7 +109,7 @@ export const useApiService = () => {
       url: string,
       method: string,
       token: string | null | undefined,
-      data?: TRequest
+      data?: TRequest,
     ): Promise<ApiResponseDto<TResponse> | null> => {
       if (TokenService.isRefreshTokenExpired()) {
         showWarn(t("Please log in again."));
@@ -126,7 +126,7 @@ export const useApiService = () => {
       console.warn(t("Token refresh failed."));
       return null;
     },
-    [showWarn, showInfo, refreshUserToken]
+    [showWarn, showInfo, refreshUserToken],
   );
 
   const apiFetch = useCallback(
@@ -134,7 +134,7 @@ export const useApiService = () => {
       url: string,
       method: string,
       data?: TRequest,
-      retries = 1
+      retries = 1,
     ): Promise<ApiResponseDto<TResponse> | null> => {
       const token = LocalStorageService.getAccessToken();
       const language = LocalStorageService.getLanguage();
@@ -192,14 +192,14 @@ export const useApiService = () => {
         return null;
       }
     },
-    [handle401, showError, showMessages]
+    [handle401, showError, showMessages],
   );
 
   const apiRequest = useCallback(
     async <TRequest, TResponse>(
       url: string,
       method: string,
-      data?: TRequest
+      data?: TRequest,
     ): Promise<TResponse | null> => {
       const response = await apiFetch<TRequest, TResponse>(url, method, data);
       if (!response || !response.isSucceed) {
@@ -209,18 +209,18 @@ export const useApiService = () => {
       showMessages(response.messages, true);
       return response.data ?? null;
     },
-    [apiFetch, showMessages]
+    [apiFetch, showMessages],
   );
 
   const get = useCallback(
     async <TEntity,>(
       controller: string,
-      id: number | string
+      id: number | string,
     ): Promise<TEntity | null> => {
       const url = buildUrl(controller, "", id);
       return apiRequest<TEntity, TEntity>(url, "GET");
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const getDataLookup = useCallback(
@@ -228,113 +228,121 @@ export const useApiService = () => {
       const url = buildUrl(controller, "Lookup");
       return apiRequest<LookupDto, LookupDto>(url, "POST", data);
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const getDataAutoComplete = useCallback(
     async <TEntity,>(
       controller: string,
-      data: AutoCompleteDto<TEntity>
+      data: AutoCompleteDto<TEntity>,
     ): Promise<AutoCompleteDto<TEntity> | null> => {
       const url = buildUrl(controller, "AutoComplete");
       return apiRequest<AutoCompleteDto<TEntity>, AutoCompleteDto<TEntity>>(
         url,
         "POST",
-        data
+        data,
       );
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const getDataGrid = useCallback(
     async <TEntity,>(
       controller: string,
-      data: DataTableDto<TEntity>
+      data: DataTableDto<TEntity>,
     ): Promise<DataTableDto<TEntity> | null> => {
       const url = buildUrl(controller, "GetDataTable");
       return apiRequest<DataTableDto<TEntity>, DataTableDto<TEntity>>(
         url,
         "POST",
-        data
+        data,
       );
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const create = useCallback(
     async <TEntity,>(
       controller: string,
-      data: TEntity
+      data: TEntity,
     ): Promise<TEntity[] | null> => {
       const url = buildUrl(controller);
       return apiRequest<TEntity[], TEntity[]>(url, "POST", [data]);
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const post = useCallback(
     async <TEntity,>(
       controller: string,
-      data: TEntity
+      data: TEntity,
     ): Promise<TEntity[] | null> => {
       const url = buildUrl(controller);
       return apiRequest<TEntity[], TEntity[]>(url, "POST", [data]);
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const createRange = useCallback(
     async <TEntity,>(
       controller: string,
-      data: TEntity[]
+      data: TEntity[],
     ): Promise<TEntity[] | null> => {
       const url = buildUrl(controller);
       return apiRequest<TEntity[], TEntity[]>(url, "POST", data);
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const update = useCallback(
     async <TEntity,>(
       controller: string,
       data: TEntity,
-      id: number | string
+      id: number | string,
     ): Promise<TEntity | null> => {
       const url = buildUrl(controller, "", id);
       return apiRequest<TEntity, TEntity>(url, "PUT", data);
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const deleteMethod = useCallback(
     async <TEntity,>(
       controller: string,
-      id: number | string
+      id: number | string,
     ): Promise<TEntity | null> => {
       const url = buildUrl(controller, "", id);
       return apiRequest<TEntity, TEntity>(url, "DELETE");
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
+  );
+
+  const deleteAllMail = useCallback(
+    async <TEntity,>(controller: string): Promise<TEntity | null> => {
+      const url = buildUrl(controller, "DeleteAll");
+      return apiRequest<TEntity, TEntity>(url, "POST");
+    },
+    [buildUrl, apiRequest],
   );
 
   const timeslots = useCallback(
     async (
       endpoint: string,
-      data: TimeSlotRequestDto
+      data: TimeSlotRequestDto,
     ): Promise<TimeSlotResponseDto[] | null> => {
       const url = buildUrl(endpoint);
       return apiRequest<TimeSlotRequestDto, TimeSlotResponseDto[]>(
         url,
         "POST",
-        data
+        data,
       );
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const updateParticipants = useCallback(
     async (
-      data: TrainGroupParticipantUpdateDto
+      data: TrainGroupParticipantUpdateDto,
     ): Promise<TrainGroupParticipantUnavailableDateDto[] | null> => {
       const url = buildUrl("TrainGroupParticipants", "UpdateParticipants");
       return apiRequest<
@@ -342,7 +350,7 @@ export const useApiService = () => {
         TrainGroupParticipantUnavailableDateDto[]
       >(url, "POST", data);
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const passwordForgot = useCallback(
@@ -351,11 +359,11 @@ export const useApiService = () => {
       const result = await apiRequest<UserPasswordForgotDto, boolean>(
         url,
         "POST",
-        data
+        data,
       );
       return result ?? false;
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const passwordReset = useCallback(
@@ -364,11 +372,11 @@ export const useApiService = () => {
       const result = await apiRequest<UserPasswordResetDto, boolean>(
         url,
         "POST",
-        data
+        data,
       );
       return result ?? false;
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const passwordChange = useCallback(
@@ -377,17 +385,17 @@ export const useApiService = () => {
       const result = await apiRequest<UserPasswordChangeDto, boolean>(
         url,
         "POST",
-        data
+        data,
       );
       return result ?? false;
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const login = useCallback(
     async (
       data: UserLoginRequestDto,
-      authLogin: () => void
+      authLogin: () => void,
     ): Promise<boolean> => {
       const url = buildUrl("Auth", "login");
       const result = await apiRequest<
@@ -408,13 +416,13 @@ export const useApiService = () => {
       TokenService.setRefreshTokenExpireDate(expireDate.toISOString());
       console.debug(
         "Login successful, tokens set, expiration:",
-        expireDate.toISOString()
+        expireDate.toISOString(),
       );
       authLogin();
       showSuccess(t("Login successful!"));
       return true;
     },
-    [buildUrl, apiRequest, showError, showSuccess]
+    [buildUrl, apiRequest, showError, showSuccess],
   );
 
   const register = useCallback(
@@ -423,7 +431,7 @@ export const useApiService = () => {
       const result = await apiRequest<UserRegisterDto, UserRegisterDto>(
         url,
         "POST",
-        data
+        data,
       );
       if (!result) return false;
 
@@ -433,7 +441,7 @@ export const useApiService = () => {
       showSuccess(t("Registration successful!"));
       return login(loginDto, authLogin);
     },
-    [buildUrl, apiRequest, showSuccess, login]
+    [buildUrl, apiRequest, showSuccess, login],
   );
 
   const logout = useCallback(
@@ -449,7 +457,7 @@ export const useApiService = () => {
       TokenService.logout();
       authLogout();
     },
-    [buildUrl, apiRequest, showSuccess]
+    [buildUrl, apiRequest, showSuccess],
   );
 
   const emailSend = useCallback(
@@ -458,7 +466,7 @@ export const useApiService = () => {
       const result = await apiRequest<MailSendDto, boolean>(url, "POST", data);
       return result ?? false;
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   const getChartData = useCallback(async (): Promise<ChartData | null> => {
@@ -471,7 +479,7 @@ export const useApiService = () => {
       const url = buildUrl(controller, "");
       return apiRequest<TEntity, TEntity>(url, "GET");
     },
-    [buildUrl, apiRequest]
+    [buildUrl, apiRequest],
   );
 
   return {
@@ -485,6 +493,7 @@ export const useApiService = () => {
     createRange,
     update,
     delete: deleteMethod,
+    deleteAllMail,
     timeslots,
     updateParticipants,
     passwordForgot,
