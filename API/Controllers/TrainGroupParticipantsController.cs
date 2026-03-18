@@ -151,6 +151,22 @@ namespace API.Controllers
             }
 
 
+
+            // If selected date doesnt match with traingroupdate date
+            bool isCurrentDateInvalid = !updateDto.TrainGroupParticipantDtos
+                .Where(x => x.SelectedDate != null)
+                .All(x => existingEntity.TrainGroupDates
+                    .Where(y => y.Id == x.TrainGroupDateId)
+                    .All(y => y.RecurrenceDayOfMonth == x.SelectedDate?.Day || y.RecurrenceDayOfWeek == x.SelectedDate?.DayOfWeek)
+                );
+            if (isCurrentDateInvalid)
+            {
+                dbContext.Dispose();
+                return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse("Something went wrong. Please refresh the page.");
+            }
+
+
+
             List<TrainGroupParticipant> incomingParticipants = _mapper.Map<List<TrainGroupParticipant>>(updateDto.TrainGroupParticipantDtos);
             List<TrainGroupParticipant> existingParticipants = existingEntity
                 .TrainGroupParticipants
@@ -311,7 +327,7 @@ namespace API.Controllers
                 {
                     // Recurring participant: Calculate next occurrence
                     DateTime nowUtc = DateTime.UtcNow;
-                    DateTime nextOccurrence = CalculateNextOccurrenceDateTime(existingEntity.TrainGroupDates.First(x=>x.Id  == incomingParticipant.TrainGroupDateId), nowUtc);
+                    DateTime nextOccurrence = CalculateNextOccurrenceDateTime(existingEntity.TrainGroupDates.First(x => x.Id == incomingParticipant.TrainGroupDateId), nowUtc);
                     participantDate = nextOccurrence.Date;
                     participantHour = nextOccurrence.Hour;
                     participantMinute = nextOccurrence.Minute;
@@ -319,7 +335,7 @@ namespace API.Controllers
 
                 // Check for other bookings by same user with same date and hour
                 var conflictingBooking = _dataService.TrainGroupParticipants
-                    .Include(x=> x.TrainGroup.TrainGroupDates)
+                    .Include(x => x.TrainGroup.TrainGroupDates)
                     .Where(x => x.UserId == new Guid(updateDto.UserId))
                     .Where(x => x.TrainGroupId != updateDto.TrainGroupId) // Different TrainGroup
                     .Where(x => x.SelectedDate == null || x.SelectedDate.Value.Date >= DateTime.UtcNow.Date) // Future bookings only
