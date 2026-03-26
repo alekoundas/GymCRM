@@ -14,8 +14,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using System.Collections;
 using System.Data;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Linq.Expressions;
+using System.Threading.Channels;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace API.Controllers
 {
@@ -344,152 +348,324 @@ namespace API.Controllers
             return new ApiResponse<AutoCompleteDto<UserDto>>().SetSuccessResponse(autoCompleteDto);
         }
 
+        // POST: api/Users/TimeSlots
+        //[HttpPost("TimeSlots")]
+        //[Authorize]
+        //public async Task<ActionResult<ApiResponse<List<TimeSlotResponseDto>>>> TimeSlots([FromBody] TimeSlotRequestDto timeSlotRequestDto)
+        //{
+        //    using var dbContext = _dataService.GetDbContext();
+        //    DateTime selectedDateStart = timeSlotRequestDto.SelectedDate.Date;
+        //    DateTime selectedDateEnd = timeSlotRequestDto.SelectedDate.Date.AddDays(6);
+        //    List<TrainGroupDate>? trainGroupDates = await dbContext.TrainGroupDates
+        //        //.AsSplitQuery()                    // ← Major performance boost for multiple collections
+        //        //.AsNoTracking()                    // ← No change tracking needed for this read
+        //        .Include(x => x.TrainGroup.Trainer)
+        //        .Include(x => x.TrainGroupParticipants)
+        //        .Include(x => x.TrainGroup.TrainGroupDates)
+        //        .Include(x => x.TrainGroup.TrainGroupUnavailableDates)
+        //        .Include(x => x.TrainGroup.TrainGroupParticipants)
+        //        .ThenInclude(x => x.TrainGroupParticipantUnavailableDates)
+        //        .Where(x => x.TrainGroupParticipants.Any(y => y.UserId == new Guid(timeSlotRequestDto.UserId)))
+        //        .Where(x =>
+        //            (x.FixedDay >= selectedDateStart && x.FixedDay <= selectedDateEnd)
+        //            ||
+        //            (x.RecurrenceDayOfWeek >= selectedDateStart.DayOfWeek && x.RecurrenceDayOfWeek <= selectedDateEnd.DayOfWeek)
+        //            ||
+        //            (
+        //                selectedDateStart.Month == selectedDateEnd.Month ?
+        //                (x.RecurrenceDayOfMonth >= selectedDateStart.Day && x.RecurrenceDayOfMonth <= selectedDateEnd.Day) :
+        //                (x.RecurrenceDayOfMonth >= selectedDateStart.Day || x.RecurrenceDayOfMonth <= selectedDateEnd.Day)
+        //            )
+        //        )
+        //        .ToListAsync();
+
+        //    List<TimeSlotResponseDto>? timeSlotRequestDtos = trainGroupDates
+        //        .GroupBy(x => x.TrainGroup)
+        //        .Distinct()
+        //        .Select(x => new TimeSlotResponseDto()
+        //        {
+        //            Id = x.Key.Id,
+        //            Title = x.Key.Title,
+        //            Description = x.Key.Description,
+        //            Duration = x.Key.Duration,
+        //            StartOn = x.Key.StartOn,
+        //            TrainerId = x.Key.TrainerId,
+        //            Trainer = _mapper.Map<UserDto>(x.Key.Trainer),
+        //            TrainGroupId = x.Key.Id,
+        //            IsUnavailableTrainGroup = x.Key.TrainGroupUnavailableDates.Any(y => y.UnavailableDate >= selectedDateStart && y.UnavailableDate <= selectedDateEnd),
+        //            UnavailableTrainGroupId = x.Key.TrainGroupUnavailableDates.FirstOrDefault(y => y.UnavailableDate >= selectedDateStart && y.UnavailableDate <= selectedDateEnd)?.Id,
+        //            RecurrenceDates = x.Key.TrainGroupDates
+        //            .SelectMany(y => y.TrainGroupParticipants.Where(z => z.UserId == new Guid(timeSlotRequestDto.UserId) && z.SelectedDate == null))
+        //            .Where(y => y.TrainGroupDate.RecurrenceDayOfMonth.HasValue || y.TrainGroupDate.RecurrenceDayOfWeek.HasValue)
+        //            .Where(y =>
+        //                y.RecurringStartOnDate == null ?
+        //                true :
+        //                (y.RecurringStartOnDate.Value <= selectedDateStart) ||
+        //                (y.RecurringStartOnDate.Value >= selectedDateStart && y.RecurringStartOnDate.Value <= selectedDateEnd)
+        //            )
+        //            .Where(y =>
+        //                (y.TrainGroupDate.RecurrenceDayOfWeek >= selectedDateStart.DayOfWeek && y.TrainGroupDate.RecurrenceDayOfWeek <= selectedDateEnd.DayOfWeek)
+        //                ||
+        //                (
+        //                    selectedDateStart.Month == selectedDateEnd.Month ?
+        //                    (y.TrainGroupDate.RecurrenceDayOfMonth >= selectedDateStart.Day && y.TrainGroupDate.RecurrenceDayOfMonth <= selectedDateEnd.Day) :
+        //                    (y.TrainGroupDate.RecurrenceDayOfMonth >= selectedDateStart.Day || y.TrainGroupDate.RecurrenceDayOfMonth <= selectedDateEnd.Day)
+        //                )
+        //            )
+        //            .Select(y =>
+        //                new TimeSlotRecurrenceDateDto()
+        //                {
+        //                    TrainGroupDateId = y.Id,
+        //                    TrainGroupDateType = y.TrainGroupDate.TrainGroupDateType,
+        //                    Date = y.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
+        //                        ? new DateTime(2000, 1, 2 + (int)y.TrainGroupDate.RecurrenceDayOfWeek!.Value)
+        //                        : new DateTime(2000, 1, y.TrainGroupDate.RecurrenceDayOfMonth!.Value),
+        //                    IsUserJoined = y.TrainGroupParticipantUnavailableDates
+        //                        .Where(z =>
+        //                            z.UnavailableDate >= selectedDateStart &&
+        //                            z.UnavailableDate <= selectedDateEnd
+        //                        )
+        //                        .Where(z =>
+        //                            y.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
+        //                            ? z.UnavailableDate.DayOfWeek == y.TrainGroupDate.RecurrenceDayOfWeek
+        //                            : z.UnavailableDate.Day == y.TrainGroupDate.RecurrenceDayOfMonth)
+        //                        .FirstOrDefault() == null,
+        //                    IsOneOff = false,
+        //                    IsUnavailableTrainGroup = y.TrainGroupParticipantUnavailableDates
+        //                        .Where(z => z.UnavailableDate >= selectedDateStart && z.UnavailableDate <= selectedDateEnd)
+        //                        .Any(z => y.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK ?
+        //                            z.UnavailableDate.DayOfWeek == y.TrainGroupDate.RecurrenceDayOfWeek :
+        //                            z.UnavailableDate.Day == y.TrainGroupDate.RecurrenceDayOfMonth
+        //                        ),
+        //                    TrainGroupParticipantId = y.Id,
+        //                    TrainGroupParticipantUnavailableDateId = y.TrainGroupParticipantUnavailableDates
+        //                        .Where(z =>
+        //                            z.UnavailableDate >= selectedDateStart &&
+        //                            z.UnavailableDate <= selectedDateEnd
+        //                        )
+        //                        .Where(z =>
+        //                            y.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
+        //                            ? z.UnavailableDate.DayOfWeek == y.TrainGroupDate.RecurrenceDayOfWeek
+        //                            : z.UnavailableDate.Day == y.TrainGroupDate.RecurrenceDayOfMonth)
+        //                        .FirstOrDefault()?.Id
+        //                }
+        //            )
+        //            .Concat(
+        //                x.Key.TrainGroupDates
+        //                .Where(x => x.FixedDay.HasValue)
+        //                .Where(y => y.TrainGroupParticipants.Any(x => x.UserId == new Guid(timeSlotRequestDto.UserId)))
+        //                .Where(x => x.FixedDay >= selectedDateStart && x.FixedDay <= selectedDateEnd)
+        //                .Select(y =>
+        //                     new TimeSlotRecurrenceDateDto()
+        //                     {
+        //                         TrainGroupDateId = y.Id,
+        //                         TrainGroupDateType = y.TrainGroupDateType,
+        //                         Date = y.FixedDay!.Value,
+        //                         IsUserJoined = true,
+        //                         IsOneOff = true,
+        //                         IsUnavailableTrainGroup = x.Key.TrainGroupUnavailableDates
+        //                            .Where(z => z.UnavailableDate >= selectedDateStart && z.UnavailableDate <= selectedDateEnd)
+        //                            .Any(z => z.UnavailableDate == y.FixedDay),
+        //                         TrainGroupParticipantId = y.TrainGroupParticipants
+        //                            .FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?.Id,
+        //                         TrainGroupParticipantUnavailableDateId = null,
+        //                     }
+        //                )
+        //            )
+        //            .Concat(
+        //                x.Key.TrainGroupDates
+        //                .SelectMany(y => y.TrainGroupParticipants.Where(z => z.UserId == new Guid(timeSlotRequestDto.UserId) && z.SelectedDate != null))
+        //                .Where(y => y.SelectedDate >= selectedDateStart && y.SelectedDate <= selectedDateEnd)
+        //                .Select(y =>
+        //                    new TimeSlotRecurrenceDateDto()
+        //                    {
+        //                        TrainGroupDateId = y.TrainGroupDate.Id,
+        //                        TrainGroupDateType = y.TrainGroupDate.TrainGroupDateType,
+        //                        Date = y.SelectedDate!.Value,
+        //                        IsUserJoined = true,
+        //                        IsOneOff = true,
+        //                        IsUnavailableTrainGroup = false,
+        //                        TrainGroupParticipantId = y.Id,
+        //                        TrainGroupParticipantUnavailableDateId = null
+        //                    }
+        //                )
+        //            )
+        //            .ToList(),
+        //            SpotsLeft = 0 // Not needed here.
+        //        })
+        //        .ToList();
+
+        //    return new ApiResponse<List<TimeSlotResponseDto>>().SetSuccessResponse(timeSlotRequestDtos);
+        //}
 
         // POST: api/Users/TimeSlots
         [HttpPost("TimeSlots")]
         [Authorize]
         public async Task<ActionResult<ApiResponse<List<TimeSlotResponseDto>>>> TimeSlots([FromBody] TimeSlotRequestDto timeSlotRequestDto)
         {
+            using var dbContext = _dataService.GetDbContext();
+
+            Guid userId = new Guid(timeSlotRequestDto.UserId);
+
             DateTime selectedDateStart = timeSlotRequestDto.SelectedDate.Date;
             DateTime selectedDateEnd = timeSlotRequestDto.SelectedDate.Date.AddDays(6);
-            List<TrainGroupDate>? trainGroupDates = await _dataService.TrainGroupDates
-                .Include(x => x.TrainGroup.Trainer)
-                .Include(x => x.TrainGroupParticipants)
-                .Include(x => x.TrainGroup.TrainGroupDates)
-                .Include(x => x.TrainGroup.TrainGroupUnavailableDates)
-                .Include(x => x.TrainGroup.TrainGroupParticipants)
-                .ThenInclude<TrainGroupParticipant, IEnumerable<TrainGroupParticipantUnavailableDate>>(x => x.TrainGroupParticipantUnavailableDates)
-                .Where(x => x.TrainGroupParticipants.Any(y => y.UserId == new Guid(timeSlotRequestDto.UserId)))
-                .Where(x =>
-                    (x.FixedDay >= selectedDateStart && x.FixedDay <= selectedDateEnd)
-                    ||
-                    (x.RecurrenceDayOfWeek >= selectedDateStart.DayOfWeek && x.RecurrenceDayOfWeek <= selectedDateEnd.DayOfWeek)
-                    ||
-                    (
-                        selectedDateStart.Month == selectedDateEnd.Month ?
-                        (x.RecurrenceDayOfMonth >= selectedDateStart.Day && x.RecurrenceDayOfMonth <= selectedDateEnd.Day) :
-                        (x.RecurrenceDayOfMonth >= selectedDateStart.Day || x.RecurrenceDayOfMonth <= selectedDateEnd.Day)
-                    )
-                )
-                .ToListAsync(true);
 
-            List<TimeSlotResponseDto>? timeSlotRequestDtos = trainGroupDates
-                .GroupBy(x => x.TrainGroup)
-                .Distinct()
-                .Select(x => new TimeSlotResponseDto()
+            HashSet<DayOfWeek> daysInWindow = Enumerable
+                .Range(0, 7)
+                .Select(i => selectedDateStart.AddDays(i).DayOfWeek)
+                .ToHashSet();
+
+            HashSet<int> daysOfMonthInWindow = Enumerable
+                .Range(0, 7)
+                .Select(i => selectedDateStart.AddDays(i).Day)
+                .ToHashSet();
+
+            // Root is now TrainGroup — no cycles, clean include tree
+            List<TrainGroup> trainGroups = await dbContext.TrainGroups
+                .AsNoTracking()
+                .AsSplitQuery()
+                .Include(g => g.Trainer)
+                .Include(g => g.TrainGroupUnavailableDates)
+                .Include(g => g.TrainGroupDates)
+                    .ThenInclude(d => d.TrainGroupParticipants)
+                        .ThenInclude(p => p.TrainGroupParticipantUnavailableDates)
+                // Only groups that have at least one date this user is registered on,
+                // and that date falls in the requested window
+                .Where(g => g.TrainGroupDates.Any(d =>
+                    d.TrainGroupParticipants.Any(p => p.UserId == userId)
+                    && (
+                        (d.FixedDay.HasValue && d.FixedDay >= selectedDateStart && d.FixedDay <= selectedDateEnd)
+                        || (d.RecurrenceDayOfWeek.HasValue && daysInWindow.Contains(d.RecurrenceDayOfWeek.Value))
+                        || (d.RecurrenceDayOfMonth.HasValue && daysOfMonthInWindow.Contains(d.RecurrenceDayOfMonth.Value))
+                    )
+                ))
+                .ToListAsync();
+
+            List<TimeSlotResponseDto> result = trainGroups
+                .Select(g => new TimeSlotResponseDto
                 {
-                    Id = x.Key.Id,
-                    Title = x.Key.Title,
-                    Description = x.Key.Description,
-                    Duration = x.Key.Duration,
-                    StartOn = x.Key.StartOn,
-                    TrainerId = x.Key.TrainerId,
-                    Trainer = _mapper.Map<UserDto>(x.Key.Trainer),
-                    TrainGroupId = x.Key.Id,
-                    IsUnavailableTrainGroup = x.Key.TrainGroupUnavailableDates.Any(y => y.UnavailableDate >= selectedDateStart && y.UnavailableDate <= selectedDateEnd),
-                    UnavailableTrainGroupId = x.Key.TrainGroupUnavailableDates.FirstOrDefault(y => y.UnavailableDate >= selectedDateStart && y.UnavailableDate <= selectedDateEnd)?.Id,
-                    RecurrenceDates = x.Key.TrainGroupDates
-                    .SelectMany(y => y.TrainGroupParticipants.Where(z => z.UserId == new Guid(timeSlotRequestDto.UserId) && z.SelectedDate == null))
-                    .Where(y => y.TrainGroupDate.RecurrenceDayOfMonth.HasValue || y.TrainGroupDate.RecurrenceDayOfWeek.HasValue)
-                    .Where(y =>
-                        y.RecurringStartOnDate == null ?
-                        true :
-                        (y.RecurringStartOnDate.Value <= selectedDateStart) ||
-                        (y.RecurringStartOnDate.Value >= selectedDateStart && y.RecurringStartOnDate.Value <= selectedDateEnd)
-                    )
-                    .Where(y =>
-                        (y.TrainGroupDate.RecurrenceDayOfWeek >= selectedDateStart.DayOfWeek && y.TrainGroupDate.RecurrenceDayOfWeek <= selectedDateEnd.DayOfWeek)
-                        ||
-                        (
-                            selectedDateStart.Month == selectedDateEnd.Month ?
-                            (y.TrainGroupDate.RecurrenceDayOfMonth >= selectedDateStart.Day && y.TrainGroupDate.RecurrenceDayOfMonth <= selectedDateEnd.Day) :
-                            (y.TrainGroupDate.RecurrenceDayOfMonth >= selectedDateStart.Day || y.TrainGroupDate.RecurrenceDayOfMonth <= selectedDateEnd.Day)
-                        )
-                    )
-                    .Select(y =>
-                        new TimeSlotRecurrenceDateDto()
-                        {
-                            TrainGroupDateId = y.Id,
-                            TrainGroupDateType = y.TrainGroupDate.TrainGroupDateType,
-                            Date = y.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
-                                ? new DateTime(2000, 1, 2 + (int)y.TrainGroupDate.RecurrenceDayOfWeek!.Value)
-                                : new DateTime(2000, 1, y.TrainGroupDate.RecurrenceDayOfMonth!.Value),
-                            IsUserJoined = y.TrainGroupParticipantUnavailableDates
-                                .Where(z =>
-                                    z.UnavailableDate >= selectedDateStart &&
-                                    z.UnavailableDate <= selectedDateEnd
-                                )
-                                .Where(z =>
-                                    y.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
-                                    ? z.UnavailableDate.DayOfWeek == y.TrainGroupDate.RecurrenceDayOfWeek
-                                    : z.UnavailableDate.Day == y.TrainGroupDate.RecurrenceDayOfMonth)
-                                .FirstOrDefault() == null,
-                            IsOneOff = false,
-                            IsUnavailableTrainGroup = y.TrainGroupParticipantUnavailableDates
-                                .Where(z => z.UnavailableDate >= selectedDateStart && z.UnavailableDate <= selectedDateEnd)
-                                .Any(z => y.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK ?
-                                    z.UnavailableDate.DayOfWeek == y.TrainGroupDate.RecurrenceDayOfWeek :
-                                    z.UnavailableDate.Day == y.TrainGroupDate.RecurrenceDayOfMonth
-                                ),
-                            TrainGroupParticipantId = y.Id,
-                            TrainGroupParticipantUnavailableDateId = y.TrainGroupParticipantUnavailableDates
-                                .Where(z =>
-                                    z.UnavailableDate >= selectedDateStart &&
-                                    z.UnavailableDate <= selectedDateEnd
-                                )
-                                .Where(z =>
-                                    y.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
-                                    ? z.UnavailableDate.DayOfWeek == y.TrainGroupDate.RecurrenceDayOfWeek
-                                    : z.UnavailableDate.Day == y.TrainGroupDate.RecurrenceDayOfMonth)
-                                .FirstOrDefault()?.Id
-                        }
-                    )
-                    .Concat(
-                        x.Key.TrainGroupDates
-                        .Where(x => x.FixedDay.HasValue)
-                        .Where(y => y.TrainGroupParticipants.Any(x => x.UserId == new Guid(timeSlotRequestDto.UserId)))
-                        .Where(x => x.FixedDay >= selectedDateStart && x.FixedDay <= selectedDateEnd)
-                        .Select(y =>
-                             new TimeSlotRecurrenceDateDto()
-                             {
-                                 TrainGroupDateId = y.Id,
-                                 TrainGroupDateType = y.TrainGroupDateType,
-                                 Date = y.FixedDay!.Value,
-                                 IsUserJoined = true,
-                                 IsOneOff = true,
-                                 IsUnavailableTrainGroup = x.Key.TrainGroupUnavailableDates
-                                    .Where(z => z.UnavailableDate >= selectedDateStart && z.UnavailableDate <= selectedDateEnd)
-                                    .Any(z => z.UnavailableDate == y.FixedDay),
-                                 TrainGroupParticipantId = y.TrainGroupParticipants
-                                    .FirstOrDefault(z => z.UserId == new Guid(timeSlotRequestDto.UserId))?.Id,
-                                 TrainGroupParticipantUnavailableDateId = null,
-                             }
-                        )
-                    )
-                    .Concat(
-                        x.Key.TrainGroupDates
-                        .SelectMany(y => y.TrainGroupParticipants.Where(z => z.UserId == new Guid(timeSlotRequestDto.UserId) && z.SelectedDate != null))
-                        .Where(y => y.SelectedDate >= selectedDateStart && y.SelectedDate <= selectedDateEnd)
-                        .Select(y =>
-                            new TimeSlotRecurrenceDateDto()
-                            {
-                                TrainGroupDateId = y.TrainGroupDate.Id,
-                                TrainGroupDateType = y.TrainGroupDate.TrainGroupDateType,
-                                Date = y.SelectedDate!.Value,
-                                IsUserJoined = true,
-                                IsOneOff = true,
-                                IsUnavailableTrainGroup = false,
-                                TrainGroupParticipantId = y.Id,
-                                TrainGroupParticipantUnavailableDateId = null
-                            }
-                        )
-                    )
-                    .ToList(),
-                    SpotsLeft = 0 // Not needed here.
+                    Id = g.Id,
+                    Title = g.Title,
+                    Description = g.Description,
+                    Duration = g.Duration,
+                    StartOn = g.StartOn,
+                    TrainerId = g.TrainerId,
+                    Trainer = _mapper.Map<UserDto>(g.Trainer),
+                    TrainGroupId = g.Id,
+
+                    IsUnavailableTrainGroup = g.TrainGroupUnavailableDates
+                        .Any(u => u.UnavailableDate >= selectedDateStart && u.UnavailableDate <= selectedDateEnd),
+
+                    UnavailableTrainGroupId = g.TrainGroupUnavailableDates
+                        .FirstOrDefault(u => u.UnavailableDate >= selectedDateStart && u.UnavailableDate <= selectedDateEnd)?.Id,
+
+                    RecurrenceDates = BuildRecurrenceDates(
+                        g.TrainGroupDates.ToList(),
+                        userId,
+                        selectedDateStart,
+                        selectedDateEnd,
+                        daysInWindow,
+                        daysOfMonthInWindow,
+                        g.TrainGroupUnavailableDates),
+
+                    SpotsLeft = 0
                 })
                 .ToList();
 
-            return new ApiResponse<List<TimeSlotResponseDto>>().SetSuccessResponse(timeSlotRequestDtos);
+            return new ApiResponse<List<TimeSlotResponseDto>>().SetSuccessResponse(result);
+        }
+
+        private static List<TimeSlotRecurrenceDateDto> BuildRecurrenceDates(
+            List<TrainGroupDate> groupDates,
+            Guid userId,
+            DateTime selectedDateStart,
+            DateTime selectedDateEnd,
+            HashSet<DayOfWeek> daysInWindow,
+            HashSet<int> daysOfMonthInWindow,
+            IEnumerable<TrainGroupUnavailableDate> groupUnavailableDates)
+        {
+            // ── 1. Recurring participants (SelectedDate == null) ──────────────────────
+            var recurring = groupDates
+                .SelectMany(d => d.TrainGroupParticipants
+                    .Where(p => p.UserId == userId && p.SelectedDate == null)
+                    .Select(p => (date: d, participant: p)))
+                .Where(t => t.date.RecurrenceDayOfMonth.HasValue || t.date.RecurrenceDayOfWeek.HasValue)
+                .Where(t =>
+                    t.participant.RecurringStartOnDate == null
+                    || t.participant.RecurringStartOnDate.Value <= selectedDateStart
+                    || (t.participant.RecurringStartOnDate.Value >= selectedDateStart
+                        && t.participant.RecurringStartOnDate.Value <= selectedDateEnd))
+                .Where(t =>
+                    (t.date.RecurrenceDayOfWeek.HasValue && daysInWindow.Contains(t.date.RecurrenceDayOfWeek.Value))
+                    || (t.date.RecurrenceDayOfMonth.HasValue && daysOfMonthInWindow.Contains(t.date.RecurrenceDayOfMonth.Value)))
+                .Select(t =>
+                {
+                    bool byWeek = t.date.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK;
+
+                    TrainGroupParticipantUnavailableDate? unavail = t.participant
+                        .TrainGroupParticipantUnavailableDates
+                        .Where(z => z.UnavailableDate >= selectedDateStart && z.UnavailableDate <= selectedDateEnd)
+                        .FirstOrDefault(z => byWeek
+                            ? z.UnavailableDate.DayOfWeek == t.date.RecurrenceDayOfWeek
+                            : z.UnavailableDate.Day == t.date.RecurrenceDayOfMonth);
+
+                    return new TimeSlotRecurrenceDateDto
+                    {
+                        TrainGroupDateId = t.date.Id,
+                        TrainGroupDateType = t.date.TrainGroupDateType,
+                        Date = byWeek
+                            ? new DateTime(2000, 1, 2 + (int)t.date.RecurrenceDayOfWeek!.Value)
+                            : new DateTime(2000, 1, t.date.RecurrenceDayOfMonth!.Value),
+                        IsUserJoined = unavail == null,
+                        IsOneOff = false,
+                        IsUnavailableTrainGroup = unavail != null,
+                        TrainGroupParticipantId = t.participant.Id,
+                        TrainGroupParticipantUnavailableDateId = unavail?.Id
+                    };
+                });
+
+            // ── 2. Fixed-day dates (FixedDay on the TrainGroupDate itself) ────────────
+            var fixedDay = groupDates
+                .Where(d => d.FixedDay.HasValue
+                         && d.FixedDay >= selectedDateStart
+                         && d.FixedDay <= selectedDateEnd
+                         && d.TrainGroupParticipants.Any(p => p.UserId == userId))
+                .Select(d => new TimeSlotRecurrenceDateDto
+                {
+                    TrainGroupDateId = d.Id,
+                    TrainGroupDateType = d.TrainGroupDateType,
+                    Date = d.FixedDay!.Value,
+                    IsUserJoined = true,
+                    IsOneOff = true,
+                    IsUnavailableTrainGroup = groupUnavailableDates
+                        .Any(u => u.UnavailableDate >= selectedDateStart
+                               && u.UnavailableDate <= selectedDateEnd
+                               && u.UnavailableDate == d.FixedDay),
+                    TrainGroupParticipantId = d.TrainGroupParticipants
+                        .FirstOrDefault(p => p.UserId == userId)?.Id,
+                    TrainGroupParticipantUnavailableDateId = null
+                });
+
+            // ── 3. One-off participant bookings (SelectedDate != null) ────────────────
+            var oneOff = groupDates
+                .SelectMany(d => d.TrainGroupParticipants
+                    .Where(p => p.UserId == userId
+                             && p.SelectedDate != null
+                             && p.SelectedDate >= selectedDateStart
+                             && p.SelectedDate <= selectedDateEnd)
+                    .Select(p => new TimeSlotRecurrenceDateDto
+                    {
+                        TrainGroupDateId = d.Id,
+                        TrainGroupDateType = d.TrainGroupDateType,
+                        Date = p.SelectedDate!.Value,
+                        IsUserJoined = true,
+                        IsOneOff = true,
+                        IsUnavailableTrainGroup = false,
+                        TrainGroupParticipantId = p.Id,
+                        TrainGroupParticipantUnavailableDateId = null
+                    }));
+
+            return recurring.Concat(fixedDay).Concat(oneOff).ToList();
         }
     }
 }
