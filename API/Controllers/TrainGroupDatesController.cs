@@ -41,6 +41,8 @@ namespace API.Controllers
         public async Task<ActionResult<ApiResponse<List<TimeSlotResponseDto>>>> TimeSlots([FromBody] TimeSlotRequestDto timeSlotRequestDto)
         {
             DateTime selectedDate = timeSlotRequestDto.SelectedDate.Date;
+            Guid userId = new Guid(timeSlotRequestDto.UserId);
+
             using var dbContext = _dataService.GetDbContext();
             List<TrainGroupDate>? trainGroupDates = await dbContext.TrainGroupDates
                     .Include(x => x.TrainGroup.Trainer)
@@ -53,6 +55,7 @@ namespace API.Controllers
                         x.FixedDay == selectedDate
                         || x.RecurrenceDayOfMonth == selectedDate.Day
                         || x.RecurrenceDayOfWeek == selectedDate.DayOfWeek)
+                    .AsSplitQuery()
                     .ToListAsync();
 
             List<TimeSlotResponseDto>? timeSlotRequestDtos = trainGroupDates
@@ -80,7 +83,7 @@ namespace API.Controllers
                                 Date = y.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK
                                     ? new DateTime(2000, 1, 2 + (int)y.RecurrenceDayOfWeek!.Value)
                                     : new DateTime(2000, 1, y.RecurrenceDayOfMonth!.Value),
-                                IsUserJoined = y.TrainGroupParticipants.Where(z => z.SelectedDate == null).Any(z => z.UserId == new Guid(timeSlotRequestDto.UserId)),
+                                IsUserJoined = y.TrainGroupParticipants.Where(z => z.SelectedDate == null).Any(z => z.UserId == userId),
                             }
                         )
                         .Concat(
@@ -93,7 +96,7 @@ namespace API.Controllers
                                     TrainGroupDateId = y.Id,
                                     TrainGroupDateType = y.TrainGroupDateType,
                                     Date = y.FixedDay!.Value,
-                                    IsUserJoined = y.TrainGroupParticipants.Any(z => z.UserId == new Guid(timeSlotRequestDto.UserId)),
+                                    IsUserJoined = y.TrainGroupParticipants.Any(z => z.UserId == userId),
                                 }
                             )
                         )
@@ -114,7 +117,7 @@ namespace API.Controllers
                                             TrainGroupDateType = null,
                                             Date = selectedDate,
                                             IsUserJoined = x.Key.TrainGroupParticipants
-                                                .Where(y => y.UserId == new Guid(timeSlotRequestDto.UserId))
+                                                .Where(y => y.UserId == userId)
                                                 .Where(y => y.SelectedDate.HasValue)
                                                 .Where(y => y.SelectedDate == selectedDate)
                                                 .Any(),
@@ -133,7 +136,7 @@ namespace API.Controllers
                                     :
                                         (y.TrainGroupDate.FixedDay == selectedDate
                                         || y.TrainGroupDate.RecurrenceDayOfWeek == selectedDate.DayOfWeek
-                                        || y.TrainGroupDate.RecurrenceDayOfMonth == selectedDate.Month)
+                                        || y.TrainGroupDate.RecurrenceDayOfMonth == selectedDate.Day)
                                 )
                                 //.Select(y => y.UserId)
                                 //.Distinct()
