@@ -44,25 +44,57 @@ export default function WorkoutPlansPage() {
 
   const [datatableDto, setDatatableDto] = useState<
     DataTableDto<WorkoutPlanDto>
-  >({
-    ...new DataTableDto(),
-    filters: isAdminPage // If Admin see everything
-      ? [
-          { fieldName: "createdOn", filterType: "between" },
-          { fieldName: "title", filterType: "contains" },
-          { fieldName: "userId", filterType: "in" },
-        ]
-      : [
-          { fieldName: "createdOn", filterType: "between" },
-          { fieldName: "title", filterType: "contains" },
-          {
-            fieldName: "UserId",
-            value: TokenService.getUserId(),
-            filterType: "equals",
-          },
-        ],
-    dataTableSorts: [],
+  >(() => {
+    // Read userId from URL if it exists (comma-separated array as string)
+    const searchParams = new URLSearchParams(location.search);
+    const userIdParam = searchParams.get("userId")?.split(",");
+
+    const baseFilters = [
+      { fieldName: "createdOn", filterType: "between" as const },
+      { fieldName: "title", filterType: "contains" as const },
+    ];
+
+    const userIdFilter = isAdminPage
+      ? userIdParam
+        ? {
+            fieldName: "userId",
+            filterType: "in" as const,
+            values: userIdParam,
+          }
+        : { fieldName: "userId", filterType: "in" as const }
+      : {
+          fieldName: "userId",
+          values: [TokenService.getUserId()],
+          filterType: "in" as const,
+        };
+
+    return {
+      ...new DataTableDto(),
+      filters: [...baseFilters, userIdFilter],
+      dataTableSorts: [],
+    };
   });
+
+  // Sync userId filter to URL
+  useEffect(() => {
+    const userIdFilter = datatableDto.filters.find(
+      (f) => f.fieldName === "userId",
+    );
+
+    const searchParams = new URLSearchParams(location.search);
+    const currentUserIdParam = searchParams.get("userId");
+
+    // Filter value is already a string (comma-separated if multiple IDs)
+    const filterValue = userIdFilter?.values?.join(",");
+
+    // Update URL if filter value changes
+    if (filterValue && filterValue !== currentUserIdParam) {
+      navigate(`?userId=${filterValue}`, { replace: true });
+    } else if (!filterValue && currentUserIdParam) {
+      // Clear userId from URL if filter is removed
+      navigate("", { replace: true });
+    }
+  }, [datatableDto.filters, navigate, location.search]);
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
     if (isAdminPage)
@@ -75,7 +107,7 @@ export default function WorkoutPlansPage() {
   const chipTemplate = (user: UserDto | undefined) => {
     if (user) {
       const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
-        0
+        0,
       )}`.toUpperCase();
       const imageSrc = "data:image/png;base64," + user.profileImage;
       return (
@@ -161,7 +193,7 @@ export default function WorkoutPlansPage() {
 
   const onDataTableClick = (
     buttonType: ButtonTypeEnum,
-    rowData?: WorkoutPlanDto
+    rowData?: WorkoutPlanDto,
   ) => {
     switch (buttonType) {
       case ButtonTypeEnum.VIEW:
