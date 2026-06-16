@@ -10,6 +10,7 @@ export interface UserDto {
   firstName: string;
   lastName: string;
   address: string;
+  medicalHistory: string;
   profileImage?: string | null; // Base64-encoded image (e.g., "data:image/jpeg;base64,...") or null
   userStatusId?: number;
   userStatus?: UserStatusDto;
@@ -23,6 +24,7 @@ export class UserDto {
   firstName: string = "";
   lastName: string = "";
   address: string = "";
+  medicalHistory: string = "";
   profileImage?: string | null; // Base64-encoded image (e.g., "data:image/jpeg;base64,...") or null
   userStatusId?: number;
   userStatus?: UserStatusDto;

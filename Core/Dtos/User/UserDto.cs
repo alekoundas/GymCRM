@@ -33,6 +33,8 @@ namespace Core.Dtos.User
         [StringLength(100, ErrorMessage = TranslationKeys.Address_cannot_exceed_200_characters)]
         public string Address { get; set; } = "";
 
+        public string MedicalHistory { get; set; } = "";
+
         public int? UserStatusId { get; set; }
         public UserStatusDto? UserStatus { get; set; }
 

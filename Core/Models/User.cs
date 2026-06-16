@@ -9,6 +9,7 @@ namespace Core.Models
         public string LastName { get; set; } = "";
         public override string Email { get; set; } = "";
         public string Address { get; set; } = "";
+        public string MedicalHistory { get; set; } = "";
         public byte[]? ProfileImage { get; set; }
 
 

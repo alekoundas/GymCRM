@@ -102,6 +102,7 @@ namespace API.Controllers
             user.ProfileImage = request.ProfileImage;
             user.UserStatusId = request.UserStatusId;
             user.Address = request.Address;
+            user.MedicalHistory = request.MedicalHistory;
 
             UserDto userDto = _mapper.Map<UserDto>(user);
             IdentityResult response = await _userManager.UpdateAsync(user);
