@@ -146,25 +146,29 @@ export default function WorkoutPlansPage() {
       filterPlaceholder: t("Search"),
       style: { width: "40%" },
     },
-    {
-      field: "userId",
-      header: t("Participant"),
-      sortable: true,
-      filter: true,
-      filterPlaceholder: t("Search"),
-      filterTemplate: (options: ColumnFilterElementTemplateOptions) =>
-        isAdminPage ? (
-          <DataTableFilterIdComponent
-            options={options}
-            controller="users"
-          />
-        ) : (
-          <></>
-        ),
-      body: (rowData: { user: UserDto | undefined }, options: any) =>
-        chipTemplate(rowData.user),
-      style: { width: "10%" },
-    },
+    ...(isAdminPage
+      ? [
+          {
+            field: "userId",
+            header: t("Participant"),
+            sortable: true,
+            filter: true,
+            filterPlaceholder: t("Search"),
+            filterTemplate: (options: ColumnFilterElementTemplateOptions) =>
+              isAdminPage ? (
+                <DataTableFilterIdComponent
+                  options={options}
+                  controller="users"
+                />
+              ) : (
+                <></>
+              ),
+            body: (rowData: { user: UserDto | undefined }, options: any) =>
+              chipTemplate(rowData.user),
+            style: { width: "10%" },
+          },
+        ]
+      : []),
     {
       field: "createdOn",
       header: t("CreatedOn"),
