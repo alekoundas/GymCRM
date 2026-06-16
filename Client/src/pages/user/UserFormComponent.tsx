@@ -1,6 +1,7 @@
 import { FormMode } from "../../enum/FormMode";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
 import LookupComponent from "../../components/core/dropdown/LookupComponent";
 import { useUserStore } from "../../stores/UserStore";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
@@ -102,6 +103,23 @@ export default function UserFormComponent({ formMode }: IField) {
                   // },
                 });
             }}
+          />
+        </div>
+
+        <div className="field ">
+          <label
+            htmlFor="medicalHistory"
+            className="block text-900 font-medium mb-2"
+          >
+            {t("Medical History")}
+          </label>
+          <InputTextarea
+            id="medicalHistory"
+            name="medicalHistory"
+            value={userDto.medicalHistory}
+            onChange={(x) => updateUserDto({ [x.target.name]: x.target.value })}
+            disabled={formMode !== FormMode.EDIT}
+            rows={4}
           />
         </div>
       </div>

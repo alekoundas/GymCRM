@@ -1,7 +1,9 @@
 import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
 import { useUserStore } from "../../stores/UserStore";
 import { Button } from "primereact/button";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
@@ -10,14 +12,17 @@ export default function UserProfileFormComponent() {
   const { t } = useTranslator();
   const apiService = useApiService();
   const { userDto, updateUserDto } = useUserStore();
+  const location = useLocation();
+  const isAdminPage = location.pathname.includes("/administrator");
   const [editingField, setEditingField] = useState<string | undefined>(
-    undefined
+    undefined,
   ); // Track which field is being edited
   const [originalValues, setOriginalValues] = useState<Partial<UserDto>>({}); // Store original values per field
   const [formData, setFormData] = useState({
     firstName: userDto?.firstName,
     lastName: userDto?.lastName,
     address: userDto?.address,
+    medicalHistory: userDto?.medicalHistory,
   });
 
   // Sync formData when userDto changes
@@ -26,6 +31,7 @@ export default function UserProfileFormComponent() {
       firstName: userDto?.firstName,
       lastName: userDto?.lastName,
       address: userDto?.address,
+      medicalHistory: userDto?.medicalHistory,
     });
   }, [userDto]);
 
@@ -54,7 +60,7 @@ export default function UserProfileFormComponent() {
     const response = await apiService.update<UserDto>(
       "Users",
       updatedUser,
-      userDto.id
+      userDto.id,
     );
     if (response) {
       updateUserDto(response); // Update store with backend response
@@ -214,6 +220,49 @@ export default function UserProfileFormComponent() {
           />
         </div>
       </div>
+
+      {isAdminPage && (
+        <div className="field">
+          <label
+            htmlFor="medicalHistory"
+            className="block text-900 font-medium mb-2"
+          >
+            {t("Medical History")}
+          </label>
+          <div className="flex align-items-start gap-2">
+            <InputTextarea
+              id="medicalHistory"
+              placeholder={t("Medical History")}
+              className="w-full mb-3"
+              value={formData.medicalHistory}
+              onChange={(e) => handleChange("medicalHistory", e.target.value)}
+              disabled={editingField !== "medicalHistory"}
+              rows={4}
+            />
+            {editingField !== "medicalHistory" ? (
+              <Button
+                icon="pi pi-pencil"
+                className="p-button-rounded p-button-text p-button-secondary"
+                onClick={() => handleEdit("medicalHistory")}
+                visible={editingField === undefined}
+              />
+            ) : (
+              <>
+                <Button
+                  icon="pi pi-times"
+                  className="p-button-rounded p-button-text p-button-danger"
+                  onClick={() => handleCancel("medicalHistory")}
+                />
+                <Button
+                  icon="pi pi-check"
+                  className="p-button-rounded p-button-text p-button-success"
+                  onClick={() => handleSave("medicalHistory")}
+                />
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

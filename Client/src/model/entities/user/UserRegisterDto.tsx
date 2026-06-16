@@ -6,6 +6,7 @@ export interface UserRegisterDto {
   firstName: string;
   lastName: string;
   address: string;
+  medicalHistory: string;
   password: string;
   phoneNumbers: PhoneNumberDto[];
 }
@@ -17,6 +18,7 @@ export class UserRegisterDto {
   firstName: string = "";
   lastName: string = "";
   address: string = "";
+  medicalHistory: string = "";
   password: string = "";
   phoneNumbers: PhoneNumberDto[] = [];
 }
