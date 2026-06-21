@@ -50,7 +50,8 @@ export default function NavTop() {
       visible:
         TokenService.isUserAllowed("Roles_View") ||
         TokenService.isUserAllowed("Users_View") ||
-        TokenService.isUserAllowed("TrainGroups_View"),
+        TokenService.isUserAllowed("TrainGroups_View") ||
+        TokenService.isUserAllowed("WorkoutPlansAdmin_View"),
       command: () => {
         navigate("/administrator");
       },

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Data;
 using System.Security.Claims;
 
 namespace DataAccess
@@ -53,6 +54,21 @@ namespace DataAccess
                 await TrySeedTrainerUserAsync(userManager, roleManager);
                 await TrySeedSimpleUserUserAsync(userManager, roleManager);
 
+
+                // Seed new permissions to admin
+                var claims = new List<Claim>
+               {
+
+                   new Claim("Permission", "WorkoutPlansAdmin_View"),
+                   new Claim("Permission", "WorkoutPlansAdmin_Add"),
+                   new Claim("Permission", "WorkoutPlansAdmin_Edit"),
+                   new Claim("Permission", "WorkoutPlansAdmin_Delete"),
+
+               };
+
+                var role = await roleManager.FindByNameAsync("Administrator");
+                await AddClaimsToRoleAsync(roleManager, role, claims);
+
             }
             catch (Exception ex)
             {
@@ -72,58 +88,58 @@ namespace DataAccess
                     throw new InvalidOperationException($"Failed to create role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
 
                 var claims = new List<Claim>
-                {
-                    new Claim("Permission", "Roles_View"),
-                    new Claim("Permission", "Roles_Add"),
-                    new Claim("Permission", "Roles_Edit"),
-                    new Claim("Permission", "Roles_Delete"),
+               {
+                   new Claim("Permission", "Roles_View"),
+                   new Claim("Permission", "Roles_Add"),
+                   new Claim("Permission", "Roles_Edit"),
+                   new Claim("Permission", "Roles_Delete"),
 
-                    new Claim("Permission", "Users_View"),
-                    new Claim("Permission", "Users_Add"),
-                    new Claim("Permission", "Users_Edit"),
-                    new Claim("Permission", "Users_Delete"),
+                   new Claim("Permission", "Users_View"),
+                   new Claim("Permission", "Users_Add"),
+                   new Claim("Permission", "Users_Edit"),
+                   new Claim("Permission", "Users_Delete"),
 
-                    new Claim("Permission", "Mails_View"),
-                    new Claim("Permission", "Mails_Add"),
-                    new Claim("Permission", "Mails_Edit"),
-                    new Claim("Permission", "Mails_Delete"),
+                   new Claim("Permission", "Mails_View"),
+                   new Claim("Permission", "Mails_Add"),
+                   new Claim("Permission", "Mails_Edit"),
+                   new Claim("Permission", "Mails_Delete"),
 
-                    //new Claim("Permission", "Claims_View"),
-                    //new Claim("Permission", "Claims_Add"),
-                    //new Claim("Permission", "Claims_Edit"),
-                    //new Claim("Permission", "Claims_Delete"),
-                    new Claim("Permission", "TrainGroups_View"),
-                    new Claim("Permission", "TrainGroups_Add"),
-                    new Claim("Permission", "TrainGroups_Edit"),
-                    new Claim("Permission", "TrainGroups_Delete"),
+                   //new Claim("Permission", "Claims_View"),
+                   //new Claim("Permission", "Claims_Add"),
+                   //new Claim("Permission", "Claims_Edit"),
+                   //new Claim("Permission", "Claims_Delete"),
+                   new Claim("Permission", "TrainGroups_View"),
+                   new Claim("Permission", "TrainGroups_Add"),
+                   new Claim("Permission", "TrainGroups_Edit"),
+                   new Claim("Permission", "TrainGroups_Delete"),
 
-                    new Claim("Permission", "TrainGroupDates_View"),
-                    new Claim("Permission", "TrainGroupDates_Add"),
-                    new Claim("Permission", "TrainGroupDates_Edit"),
-                    new Claim("Permission", "TrainGroupDates_Delete"),
+                   new Claim("Permission", "TrainGroupDates_View"),
+                   new Claim("Permission", "TrainGroupDates_Add"),
+                   new Claim("Permission", "TrainGroupDates_Edit"),
+                   new Claim("Permission", "TrainGroupDates_Delete"),
 
-                    new Claim("Permission", "TrainGroupParticipants_View"),
-                    new Claim("Permission", "TrainGroupParticipants_Add"),
-                    new Claim("Permission", "TrainGroupParticipants_Edit"),
-                    new Claim("Permission", "TrainGroupParticipants_Delete"),
+                   new Claim("Permission", "TrainGroupParticipants_View"),
+                   new Claim("Permission", "TrainGroupParticipants_Add"),
+                   new Claim("Permission", "TrainGroupParticipants_Edit"),
+                   new Claim("Permission", "TrainGroupParticipants_Delete"),
 
-                    new Claim("Permission", "WorkoutPlans_View"),
-                    new Claim("Permission", "WorkoutPlans_Add"),
-                    new Claim("Permission", "WorkoutPlans_Edit"),
-                    new Claim("Permission", "WorkoutPlans_Delete"),
+                   new Claim("Permission", "WorkoutPlans_View"),
+                   new Claim("Permission", "WorkoutPlans_Add"),
+                   new Claim("Permission", "WorkoutPlans_Edit"),
+                   new Claim("Permission", "WorkoutPlans_Delete"),
 
-                    new Claim("Permission", "UserStatuses_View"),
-                    new Claim("Permission", "UserStatuses_Add"),
-                    new Claim("Permission", "UserStatuses_Edit"),
-                    new Claim("Permission", "UserStatuses_Delete"),
-                };
+                   new Claim("Permission", "WorkoutPlansAdmin_View"),
+                   new Claim("Permission", "WorkoutPlansAdmin_Add"),
+                   new Claim("Permission", "WorkoutPlansAdmin_Edit"),
+                   new Claim("Permission", "WorkoutPlansAdmin_Delete"),
 
-                foreach (var claim in claims)
-                {
-                    var claimResult = await roleManager.AddClaimAsync(role, claim);
-                    if (!claimResult.Succeeded)
-                        throw new InvalidOperationException($"Failed to add claim {claim.Value}: {string.Join(", ", claimResult.Errors.Select(e => e.Description))}");
-                }
+                   new Claim("Permission", "UserStatuses_View"),
+                   new Claim("Permission", "UserStatuses_Add"),
+                   new Claim("Permission", "UserStatuses_Edit"),
+                   new Claim("Permission", "UserStatuses_Delete"),
+               };
+
+                await AddClaimsToRoleAsync(roleManager, role, claims);
             }
         }
 
@@ -158,14 +174,9 @@ namespace DataAccess
                     new Claim("Permission", "TrainGroupParticipants_Add"),
                     new Claim("Permission", "TrainGroupParticipants_Edit"),
                     new Claim("Permission", "TrainGroupParticipants_Delete")
-                };
+            };
 
-                foreach (var claim in claims)
-                {
-                    var claimResult = await roleManager.AddClaimAsync(role, claim);
-                    if (!claimResult.Succeeded)
-                        throw new InvalidOperationException($"Failed to add claim {claim.Value}: {string.Join(", ", claimResult.Errors.Select(e => e.Description))}");
-                }
+                await AddClaimsToRoleAsync(roleManager, role, claims);
             }
         }
 
@@ -186,12 +197,7 @@ namespace DataAccess
                     new Claim("Permission", "TrainGroupParticipants_Delete"),
                 };
 
-                foreach (var claim in claims)
-                {
-                    var claimResult = await roleManager.AddClaimAsync(role, claim);
-                    if (!claimResult.Succeeded)
-                        throw new InvalidOperationException($"Failed to add claim {claim.Value}: {string.Join(", ", claimResult.Errors.Select(e => e.Description))}");
-                }
+                await AddClaimsToRoleAsync(roleManager, role, claims);
             }
         }
 
@@ -284,6 +290,22 @@ namespace DataAccess
                     var roleResult = await userManager.AddToRoleAsync(user, "SimpleUser");
                     if (!roleResult.Succeeded)
                         throw new InvalidOperationException($"Failed to assign role: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
+                }
+            }
+        }
+
+        private async Task AddClaimsToRoleAsync(RoleManager<Role> roleManager, Role role, List<Claim> claims)
+        {
+            foreach (var claim in claims)
+            {
+                var existingClaims = await roleManager.GetClaimsAsync(role);
+                var claimExists = existingClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value);
+
+                if (!claimExists)
+                {
+                    var claimResult = await roleManager.AddClaimAsync(role, claim);
+                    if (!claimResult.Succeeded)
+                        throw new InvalidOperationException($"Failed to add claim {claim.Value}: {string.Join(", ", claimResult.Errors.Select(e => e.Description))}");
                 }
             }
         }

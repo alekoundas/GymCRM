@@ -38,8 +38,8 @@ namespace API.Controllers
 
         public override async Task<ActionResult<ApiResponse<WorkoutPlanDto>>> Get(string? id)
         {
-            if (!IsUserAuthorized("View"))
-                return new ApiResponse<WorkoutPlanDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+            //if (!IsUserAuthorized("View"))
+            //    return new ApiResponse<WorkoutPlanDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
             WorkoutPlan? entity = await _dataService.GetGenericRepository<WorkoutPlan>()
                 .Include(x=>x.Exercises)

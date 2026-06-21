@@ -97,10 +97,22 @@ export default function WorkoutPlansPage() {
   }, [datatableDto.filters, navigate, location.search]);
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
-    if (isAdminPage)
-      return [ButtonTypeEnum.ADD, ButtonTypeEnum.EDIT, ButtonTypeEnum.DELETE];
+    const result: ButtonTypeEnum[] = [];
+    if (isAdminPage) {
+      const isView = TokenService.isUserAllowed("WorkoutPlansAdmin_View");
+      if (isView) result.push(ButtonTypeEnum.VIEW);
+      const isAdd = TokenService.isUserAllowed("WorkoutPlansAdmin_Add");
+      if (isAdd) result.push(ButtonTypeEnum.ADD);
+      const isEdit = TokenService.isUserAllowed("WorkoutPlansAdmin_Edit");
+      if (isEdit) result.push(ButtonTypeEnum.EDIT);
+      const isDelete = TokenService.isUserAllowed("WorkoutPlansAdmin_Delete");
+      if (isDelete) result.push(ButtonTypeEnum.DELETE);
+      return result;
+    }
 
-    return [ButtonTypeEnum.EDIT];
+    const isEdit = TokenService.isUserAllowed("WorkoutPlans_Edit");
+    if (isEdit) result.push(ButtonTypeEnum.EDIT);
+    return result;
   };
 
   // Custom chip template for selected users

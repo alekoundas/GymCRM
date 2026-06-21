@@ -63,7 +63,7 @@ export default function ExerciseListComponent({
     const groupExercisesCount = workoutPlanDto.exercises.filter(
       (x) =>
         x.id !== newExerciseDto.id &&
-        x.groupNumber === newExerciseDto.groupNumber
+        x.groupNumber === newExerciseDto.groupNumber,
     ).length;
     newExerciseDto.groupExerciseOrderNumber = groupExercisesCount;
 
@@ -96,7 +96,7 @@ export default function ExerciseListComponent({
       const response = await apiService.update<WorkoutPlanDto>(
         "WorkoutPlans",
         updatedDto,
-        workoutPlanDto.id
+        workoutPlanDto.id,
       );
       if (response) {
         setWorkoutPlanDto(response); // Update store with backend response
@@ -116,7 +116,7 @@ export default function ExerciseListComponent({
 
   const getGroups = (): ExerciseGroup[] => {
     const sortedExercises = workoutPlanDto.exercises.sort(
-      (x, y) => x.groupNumber - y.groupNumber
+      (x, y) => x.groupNumber - y.groupNumber,
     );
     const groups: ExerciseGroup[] = [];
 
@@ -188,7 +188,7 @@ export default function ExerciseListComponent({
               {group.exercises
                 .sort(
                   (x, y) =>
-                    x.groupExerciseOrderNumber - y.groupExerciseOrderNumber
+                    x.groupExerciseOrderNumber - y.groupExerciseOrderNumber,
                 )
                 .map((exercise) => (
                   <ExerciseListItemComponent
