@@ -42,7 +42,9 @@ export default function NavLeft() {
     // ... other menu groups (Trainer, Email) same as before
     {
       label: t("Trainer"),
-      visible: TokenService.isUserAllowed("TrainGroups_View"),
+      visible:
+        TokenService.isUserAllowed("TrainGroups_View") ||
+        TokenService.isUserAllowed("WorkoutPlansAdmin_View"),
       items: [
         {
           label: t("Calendar"),
@@ -59,7 +61,7 @@ export default function NavLeft() {
         {
           label: t("Workout Plans"),
           icon: "pi pi-clipboard",
-          visible: TokenService.isUserAllowed("WorkoutPlans_View"),
+          visible: TokenService.isUserAllowed("WorkoutPlansAdmin_View"),
           command: () => navigate("/administrator/workout-plans"),
         },
       ],

@@ -15,6 +15,7 @@ import { MenuItem } from "primereact/menuitem";
 import ExerciseFormComponent from "./ExerciseFormComponent";
 import ExerciseHistoryGridComponent from "../exercise-history/ExerciseHistoryGridComponent";
 import { Checkbox } from "primereact/checkbox";
+import { TokenService } from "../../services/TokenService";
 
 interface IField {
   formMode: FormMode;
@@ -56,7 +57,7 @@ export default function ExerciseListItemComponent({
   const { workoutPlanDto, setExercises, newExerciseDto, updateNewExerciseDto } =
     useWorkoutPlanStore();
   const exerciseDto: ExerciseDto = workoutPlanDto.exercises.some(
-    (x) => x.id == exerciseId
+    (x) => x.id == exerciseId,
   )
     ? workoutPlanDto.exercises.find((x) => x.id == exerciseId)!
     : newExerciseDto;
@@ -65,7 +66,7 @@ export default function ExerciseListItemComponent({
     const groupExercisesCount = workoutPlanDto.exercises.filter(
       (x) =>
         x.id !== newExerciseDto.id &&
-        x.groupNumber === newExerciseDto.groupNumber
+        x.groupNumber === newExerciseDto.groupNumber,
     ).length;
 
     if (groupExercisesCount > 0) {
@@ -83,7 +84,7 @@ export default function ExerciseListItemComponent({
       const response = await apiService.update<ExerciseDto>(
         "Exercises",
         newExerciseDto,
-        newExerciseDto.id
+        newExerciseDto.id,
       );
       if (response) {
         // setOriginalValues({});
@@ -97,7 +98,7 @@ export default function ExerciseListItemComponent({
   const updateExercise = (id: number, field: keyof ExerciseDto, value: any) => {
     if (workoutPlanDto.exercises.some((x) => x.id === id)) {
       const updatedExercises = workoutPlanDto.exercises.map((x) =>
-        x.id === id ? { ...x, [field]: value } : x
+        x.id === id ? { ...x, [field]: value } : x,
       );
       setExercises(updatedExercises);
     } else {
@@ -147,12 +148,12 @@ export default function ExerciseListItemComponent({
         await apiService.update<ExerciseDto>(
           "Exercises",
           { ...prevExercise, groupExerciseOrderNumber: originalCurrOrder },
-          prevExercise.id
+          prevExercise.id,
         );
         await apiService.update<ExerciseDto>(
           "Exercises",
           { ...current, groupExerciseOrderNumber: originalPrevOrder },
-          id
+          id,
         );
       }
     } else {
@@ -178,24 +179,24 @@ export default function ExerciseListItemComponent({
 
       if (formMode === FormMode.EDIT) {
         const prevGroupExercises = exercises.filter(
-          (e) => e.groupNumber === prevGroupNum
+          (e) => e.groupNumber === prevGroupNum,
         );
         const currGroupExercisesFull = exercises.filter(
-          (e) => e.groupNumber === currGroupNum
+          (e) => e.groupNumber === currGroupNum,
         );
 
         for (const e of prevGroupExercises) {
           await apiService.update<ExerciseDto>(
             "Exercises",
             { ...e, groupNumber: currGroupNum },
-            e.id
+            e.id,
           );
         }
         for (const e of currGroupExercisesFull) {
           await apiService.update<ExerciseDto>(
             "Exercises",
             { ...e, groupNumber: prevGroupNum },
-            e.id
+            e.id,
           );
         }
       }
@@ -235,12 +236,12 @@ export default function ExerciseListItemComponent({
         await apiService.update<ExerciseDto>(
           "Exercises",
           { ...nextExercise, groupExerciseOrderNumber: originalCurrOrder },
-          nextExercise.id
+          nextExercise.id,
         );
         await apiService.update<ExerciseDto>(
           "Exercises",
           { ...current, groupExerciseOrderNumber: originalNextOrder },
-          id
+          id,
         );
       }
     } else {
@@ -267,24 +268,24 @@ export default function ExerciseListItemComponent({
 
       if (formMode === FormMode.EDIT) {
         const nextGroupExercises = exercises.filter(
-          (e) => e.groupNumber === nextGroupNum
+          (e) => e.groupNumber === nextGroupNum,
         );
         const currGroupExercisesFull = exercises.filter(
-          (e) => e.groupNumber === currGroupNum
+          (e) => e.groupNumber === currGroupNum,
         );
 
         for (const e of nextGroupExercises) {
           await apiService.update<ExerciseDto>(
             "Exercises",
             { ...e, groupNumber: currGroupNum },
-            e.id
+            e.id,
           );
         }
         for (const e of currGroupExercisesFull) {
           await apiService.update<ExerciseDto>(
             "Exercises",
             { ...e, groupNumber: nextGroupNum },
-            e.id
+            e.id,
           );
         }
       }
@@ -334,17 +335,18 @@ export default function ExerciseListItemComponent({
   const getMenuItems: (id: number) => MenuItem[] = (id) => {
     const menuItems: MenuItem[] = [];
 
-    // menuItems.push({
-    //   label: t("View"),
-    //   icon: "pi pi-eye",
-    //   command: () => {
-    //     const exercise = workoutPlanDto.exercises.find((x) => x.id === id);
-    //     if (exercise) {
-    //       updateNewExerciseDto({ ...exercise });
-    //     }
-    //     dialogControlView.showDialog();
-    //   },
-    // });
+    menuItems.push({
+      label: t("View"),
+      icon: "pi pi-eye",
+      command: () => {
+        const exercise = workoutPlanDto.exercises.find((x) => x.id === id);
+        if (exercise) {
+          updateNewExerciseDto({ ...exercise });
+        }
+        dialogControlView.showDialog();
+      },
+      visible: TokenService.isUserAllowed("WorkoutPlansAdmin_View"),
+    });
     menuItems.push({
       label: t("Edit"),
       icon: "pi pi-pencil",
@@ -355,7 +357,10 @@ export default function ExerciseListItemComponent({
         }
         dialogControlEdit.showDialog();
       },
-      // visible: formMode !== FormMode.VIEW,
+
+      visible:
+        TokenService.isUserAllowed("WorkoutPlansAdmin_Edit") ||
+        TokenService.isUserAllowed("WorkoutPlans_Edit"),
     });
     menuItems.push({
       label: t("Move up"),

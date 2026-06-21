@@ -92,12 +92,19 @@ export class TokenService {
 
   // Is user allowed
   public static isUserAllowed = (claim: string): boolean => {
-    const permissions: string[] = TokenService.getClaim("Permission");
+    const permissions: string[] | undefined | string =
+      TokenService.getClaim("Permission");
     if (permissions) {
-      const isAllowed = permissions
-        .map((x) => x.toLocaleLowerCase())
-        .includes(claim.toLowerCase());
-      return isAllowed;
+      if (Array.isArray(permissions)) {
+        const isAllowed = permissions
+          .map((x) => x.toLocaleLowerCase())
+          .includes(claim.toLowerCase());
+        return isAllowed;
+      } else {
+        const permission = permissions.toLocaleLowerCase();
+        const isAllowed = permission.includes(claim.toLowerCase());
+        return isAllowed;
+      }
     }
 
     return false;
