@@ -148,7 +148,7 @@ export default function ExerciseFormComponent({
         </label>
         <div className="w-full flex flex-nowrap">
           <InputText
-            id={`sets-${newExerciseDto.id}`}
+            id={`videoUrl-${newExerciseDto.id}`}
             value={newExerciseDto.videoUrl}
             onChange={(e) =>
               updateExercise(newExerciseDto.id, "videoUrl", e.target.value ?? 0)

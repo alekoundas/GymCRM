@@ -95,7 +95,6 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
               icon="pi pi-check"
               onClick={handleSave}
               disabled={!isSaveEnabled}
-              autoFocus
             />
           )}
         </div>
@@ -117,7 +116,6 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
               severity="danger"
               onClick={handleDelete}
               disabled={!isSaveEnabled}
-              autoFocus
             />
           )}
         </div>
@@ -149,7 +147,7 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
                 hideDialog: control.hideDialog,
                 toggleDialogSave: setIsSaveEnabled,
                 formMode: formMode,
-              })
+              }),
             );
           } else {
             // children = 1
@@ -182,6 +180,8 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
       onHide={control.hideDialog}
       draggable={false}
       resizable={false}
+      modal
+      appendTo={document.body}
     >
       {React.Children.map(children, renderChildrenWithProps)}
       {/* {React.Children.map(children, (child) =>
