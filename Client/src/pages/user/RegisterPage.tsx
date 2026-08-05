@@ -25,7 +25,7 @@ export default function RegisterPage() {
   const onSave = () => {
     // assing uuser id for required user id
     userRegisterDto.phoneNumbers.forEach(
-      (x) => (x.userId = "00000000-0000-0000-0000-000000000000")
+      (x) => (x.userId = "00000000-0000-0000-0000-000000000000"),
     );
 
     apiService.register(userRegisterDto, login).then((isSuccessful) => {
@@ -40,12 +40,12 @@ export default function RegisterPage() {
         <div className="surface-card p-4 shadow-2 border-round w-full lg:w-6">
           <div className="text-center mb-5">
             <img
-              src="https://primefaces.org/cdn/primereact/images/logo.png"
-              alt="hyper"
-              height={50}
+              src="/logos/logo-borderless.png"
+              alt="logo"
+              height={150}
+              width={150}
               className="mb-3"
             />
-            <div className="text-900 text-3xl font-medium mb-3">Join us</div>
           </div>
 
           <div>
