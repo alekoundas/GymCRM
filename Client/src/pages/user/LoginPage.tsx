@@ -1,5 +1,6 @@
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
+import { Password } from "primereact/password";
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -35,9 +36,10 @@ export default function LoginPage() {
         <div className="surface-card p-4 shadow-2 border-round w-full lg:w-6">
           <div className="text-center mb-5">
             <img
-              src="https://primefaces.org/cdn/primereact/images/logo.png"
-              alt="hyper"
-              height={50}
+              src="/logos/logo-borderless.png"
+              alt="logo"
+              height={150}
+              width={150}
               className="mb-3"
             />
             <div className="text-900 text-3xl font-medium mb-3">
@@ -54,7 +56,7 @@ export default function LoginPage() {
             </a>
           </div>
 
-          <div>
+          <div className="p-fluid">
             <label
               htmlFor="userNameOrEmail"
               className="block text-900 font-medium mb-2"
@@ -77,14 +79,16 @@ export default function LoginPage() {
             >
               {t("Password")}
             </label>
-            <InputText
+            <Password
               id="password"
               name="password"
-              type="password"
               placeholder={t("Password")}
               className="w-full mb-3"
+              inputClassName="w-full"
               value={userLoginDto.password}
               onChange={handleChange}
+              toggleMask
+              feedback={false}
             />
 
             <div className="flex align-items-center justify-content-between mb-6">
