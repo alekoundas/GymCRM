@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { UserRegisterDto } from "../../model/entities/user/UserRegisterDto";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
+import { Password } from "primereact/password";
 
 export default function RegisterPage() {
   const { t } = useTranslator();
@@ -48,7 +49,7 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div>
+          <div className="p-fluid">
             <label
               htmlFor="userName"
               className="block text-900 font-medium mb-2"
@@ -158,27 +159,19 @@ export default function RegisterPage() {
             >
               {t("Password")}
             </label>
-            <InputText
+            <Password
               id="password"
               name="password"
-              type="password"
               placeholder={t("Password")}
               className="w-full mb-3"
+              inputClassName="w-full"
               value={userRegisterDto.password}
               onChange={handleChange}
+              toggleMask
+              feedback={false}
             />
 
-            <div className="flex align-items-center justify-content-between mb-6">
-              <div className="flex align-items-center">
-                {/* <Checkbox
-                  id="rememberme"
-                  onChange={(e) => setChecked(e.checked)}
-                  checked={checked}
-                  className="mr-2"
-                /> */}
-                {/* <label htmlFor="rememberme">Remember me</label> */}
-              </div>
-            </div>
+            <div className="flex align-items-center justify-content-between mb-6"></div>
 
             <Button
               label={t("Register")}
