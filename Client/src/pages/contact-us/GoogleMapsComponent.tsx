@@ -13,8 +13,8 @@ export default function GoogleMapsComponent({ address, zoom = 15 }: IField) {
       title="Business location"
       src={src}
       width="100%"
-      height="400"
-      style={{ border: 0 }}
+      height="100%"
+      style={{ border: 0, display: "block", minHeight: "300px" }}
       loading="lazy"
       referrerPolicy="no-referrer-when-downgrade"
     />

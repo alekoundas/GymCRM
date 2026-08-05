@@ -39,7 +39,7 @@ export default function App() {
   return (
     <>
       <div className="flex flex-column p-0 m-0 h-full">
-        <div className="pt-0 pb-1">
+        <div className="pt-1 pb-1">
           <NavTop />
         </div>
 
