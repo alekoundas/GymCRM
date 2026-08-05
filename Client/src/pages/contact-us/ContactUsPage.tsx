@@ -53,7 +53,9 @@ export default function ContactUsPage() {
 
               <div className="field mb-3">
                 <label className="font-semibold text-900">{t("Address")}</label>
-                <p className="mt-1 text-600">{contactInfo.address}</p>
+                <p className="mt-1 text-600">
+                  {t("Mpizaniou 3, Ilioupoli 163 43")}
+                </p>
               </div>
 
               <div className="field">
@@ -63,7 +65,7 @@ export default function ContactUsPage() {
             </div>
           </div>
           <div className=" col-12  lg:col-6 xl:col-6">
-            {/* <GoogleMapsComponent /> */}
+            <GoogleMapsComponent address={contactInfo.address} />
           </div>
         </div>
       </Card>
