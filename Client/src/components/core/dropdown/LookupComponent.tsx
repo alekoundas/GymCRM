@@ -33,7 +33,10 @@ export default function LookupComponent({
   const fetchData = async (dto: LookupDto) => {
     setLoading(true);
     dto.take = 1000;
-    const result = await apiService.getDataLookup(controller, dto);
+    const result = await apiService.getDataLookup(controller, {
+      ...dto,
+      data: [],
+    });
     setLoading(false);
     return result;
   };
