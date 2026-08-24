@@ -38,7 +38,7 @@ export default function DataTableFilterIdComponent({
 
   const fetchData = async (dto: LookupDto) => {
     dto.take = 1000;
-    const result = apiService.getDataLookup(controller, dto);
+    const result = apiService.getDataLookup(controller, { ...dto, data: [] });
     return result;
   };
 
