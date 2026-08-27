@@ -76,6 +76,12 @@
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Eklentideki 'cancel-*.ics' dosyalarına tıklayarak etkinlikleri kaldırın.",
   "User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group": "Kullanıcının farklı bir eğitim grubunda aynı saat ve tarihte zaten bir rezervasyonu var",
 
+  "Workout_plan_has_no_rule_assigned": "This workout plan has no rule assigned yet.",
+  "Selected_week_does_not_exist_in_the_rule": "The selected week does not exist in this rule.",
+  "A_recording_is_already_running_for_this_plan": "A recording is already running for this workout plan.",
+  "The_recording_can_no_longer_be_stopped": "This recording can no longer be stopped.",
+  "The_rule_is_in_use_by_a_running_recording": "This rule is locked while a recording that uses it is running.",
+
   "_0_is_required": "{0} gereklidir!",
   "_0_already_exists": "{0} zaten var!",
   "_0_not_found": "{0} bulunamadı!",

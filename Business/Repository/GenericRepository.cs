@@ -136,6 +136,16 @@ namespace Business.Repository
             return this;
         }
 
+        public GenericRepository<TEntity> OrderByDescending<TKey>(Expression<Func<TEntity, TKey>> keySelector)
+        {
+            if (_query == null)
+                _query = _contextFactory.CreateDbContext().Set<TEntity>();
+
+            _query = _query.OrderByDescending(keySelector);
+
+            return this;
+        }
+
         public GenericRepository<TEntity> OrderBy(string propertyName, OrderDirectionEnum orderDirection)
         {
             if (_query == null)

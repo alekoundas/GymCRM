@@ -55,7 +55,9 @@ namespace DataAccess
                 await TrySeedSimpleUserUserAsync(userManager, roleManager);
 
 
-                // Seed new permissions to admin
+                // Seed new permissions to admin.
+                // TrySeed*RolesAndClaimsAsync only fires when the role does not exist yet,
+                // so on an existing database this top-up is the only path new claims take.
                 var claims = new List<Claim>
                {
 
@@ -64,10 +66,34 @@ namespace DataAccess
                    new Claim("Permission", "WorkoutPlansAdmin_Edit"),
                    new Claim("Permission", "WorkoutPlansAdmin_Delete"),
 
+                   new Claim("Permission", "WorkoutPlanRules_View"),
+                   new Claim("Permission", "WorkoutPlanRules_Add"),
+                   new Claim("Permission", "WorkoutPlanRules_Edit"),
+                   new Claim("Permission", "WorkoutPlanRules_Delete"),
+
+                   new Claim("Permission", "WorkoutPlanRecordings_View"),
+                   new Claim("Permission", "WorkoutPlanRecordings_Add"),
+                   new Claim("Permission", "WorkoutPlanRecordings_Edit"),
+                   new Claim("Permission", "WorkoutPlanRecordings_Delete"),
+                   new Claim("Permission", "WorkoutPlanRecordingsAdmin_View"),
+
                };
 
                 var role = await roleManager.FindByNameAsync("Administrator");
-                await AddClaimsToRoleAsync(roleManager, role, claims);
+                if (role != null)
+                    await AddClaimsToRoleAsync(roleManager, role, claims);
+
+                // Members need to read their own recordings and to start/stop one.
+                // Deliberately no _Delete: the point of the log is that they cannot erase it.
+                var simpleUserClaims = new List<Claim>
+               {
+                   new Claim("Permission", "WorkoutPlanRecordings_View"),
+                   new Claim("Permission", "WorkoutPlanRecordings_Add"),
+               };
+
+                var simpleUserRole = await roleManager.FindByNameAsync("SimpleUser");
+                if (simpleUserRole != null)
+                    await AddClaimsToRoleAsync(roleManager, simpleUserRole, simpleUserClaims);
 
             }
             catch (Exception ex)

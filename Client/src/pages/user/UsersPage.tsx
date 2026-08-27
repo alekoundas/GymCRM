@@ -73,6 +73,7 @@ export default function UsersPage() {
       ButtonTypeEnum.EDIT,
       ButtonTypeEnum.DELETE,
       ButtonTypeEnum.ATTENDANCES,
+      ButtonTypeEnum.RECORDINGS,
     ];
   };
 
@@ -169,6 +170,11 @@ export default function UsersPage() {
         break;
       case ButtonTypeEnum.ATTENDANCES:
         dialogControlAttendances.showDialog();
+        break;
+      case ButtonTypeEnum.RECORDINGS:
+        navigate(
+          "/administrator/workout-plan-recordings?userId=" + rowData?.id,
+        );
         break;
 
       default:

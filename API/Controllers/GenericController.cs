@@ -134,16 +134,25 @@ namespace API.Controllers
 
         // POST: api/controller/GetDataTable
         [HttpPost("GetDataTable")]
-        public async Task<ApiResponse<DataTableDto<TEntityDto>>> GetDataTable([FromBody] DataTableDto<TEntityDto> dataTable)
+        public virtual async Task<ApiResponse<DataTableDto<TEntityDto>>> GetDataTable([FromBody] DataTableDto<TEntityDto> dataTable)
         {
             var query = _dataService.GetGenericRepository<TEntity>();
             DataTableQueryUpdate(query, dataTable);
 
+            // Fields the derived controller already sorted/filtered itself inside
+            // DataTableQueryUpdate. They are not columns on TEntity, so the
+            // reflection-based helpers below would throw on them.
+            HashSet<string> handledFields = GetHandledDataTableFields();
+
             // Handle Sorting of DataTable.
-            if (dataTable.Sorts.Count() > 0)
+            List<DataTableSortDto> sorts = dataTable.Sorts
+                .Where(x => !handledFields.Contains(x.FieldName))
+                .ToList();
+
+            if (sorts.Count() > 0)
             {
                 // Create the first OrderBy().
-                DataTableSortDto? dataTableSort = dataTable.Sorts.First();
+                DataTableSortDto? dataTableSort = sorts.First();
                 string fieldName = dataTableSort.FieldName.Substring(0, 1).ToUpper() + dataTableSort.FieldName.Substring(1, dataTableSort.FieldName.Length - 1);
 
                 if (dataTableSort.Order > 0)
@@ -152,7 +161,7 @@ namespace API.Controllers
                     query.OrderBy(fieldName, OrderDirectionEnum.DESCENDING);
 
                 // Create the rest OrderBy methods as ThenBy() if any.
-                foreach (var sortInfo in dataTable.Sorts.Skip(1))
+                foreach (var sortInfo in sorts.Skip(1))
                 {
                     fieldName = sortInfo.FieldName.Substring(0, 1).ToUpper() + sortInfo.FieldName.Substring(1, sortInfo.FieldName.Length - 1);
                     if (dataTableSort.Order > 0)
@@ -164,6 +173,9 @@ namespace API.Controllers
 
             foreach (var filter in dataTable.Filters)
             {
+                if (handledFields.Contains(filter.FieldName))
+                    continue;
+
                 string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.contains)
@@ -201,6 +213,9 @@ namespace API.Controllers
 
             foreach (var filter in dataTable.Filters)
             {
+                if (handledFields.Contains(filter.FieldName))
+                    continue;
+
                 string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.contains)
@@ -225,6 +240,8 @@ namespace API.Controllers
 
             int rowCount = await query.CountAsync();
             int totalRecords = rowCount;
+
+            await DataTableResultUpdate(result, resultDto);
 
             dataTable.Data = resultDto;
             dataTable.TotalRecords = totalRecords;
@@ -253,6 +270,21 @@ namespace API.Controllers
 
         protected virtual void DataTableQueryUpdate(IGenericRepository<TEntity> query, DataTableDto<TEntityDto> dataTable)
         {
+        }
+
+        // Field names the derived controller sorts or filters itself in DataTableQueryUpdate,
+        // for values that are not columns on TEntity (counts, EXISTS, aggregates over children).
+        // GetDataTable skips these so its reflection-based helpers never see them.
+        protected virtual HashSet<string> GetHandledDataTableFields()
+        {
+            return new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        // Runs after the rows are mapped, for DTO values that are not columns on TEntity
+        // and cannot be produced by AutoMapper alone. The two lists are index-aligned.
+        protected virtual Task DataTableResultUpdate(List<TEntity> entities, List<TEntityDto> entityDtos)
+        {
+            return Task.CompletedTask;
         }
 
 

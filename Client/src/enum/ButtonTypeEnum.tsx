@@ -6,4 +6,5 @@ export enum ButtonTypeEnum {
   CLONE = "CLONE",
   PROFILE = "PROFILE",
   ATTENDANCES = "ATTENDANCES",
+  RECORDINGS = "RECORDINGS",
 }

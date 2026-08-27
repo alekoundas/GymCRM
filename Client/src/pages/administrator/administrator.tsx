@@ -13,6 +13,8 @@ import NavLeft from "../../components/navbar-left/NavLeft";
 import WorkoutPlansPage from "../workout-plan/WorkoutPlansPage";
 import WorkoutPlanFormPage from "../workout-plan/WorkoutPlanFormPage";
 import UserStatusesPage from "../user-status/UserStatusesPage";
+import WorkoutPlanRulesPage from "../workout-plan-rule/WorkoutPlanRulesPage";
+import WorkoutPlanRecordingsPage from "../workout-plan-recording/WorkoutPlanRecordingsPage";
 import GooglePage from "../google/GooglePage";
 
 export default function Administrator() {
@@ -87,6 +89,15 @@ export default function Administrator() {
             <Route
               path="workout-plans/:id/view"
               element={<WorkoutPlanFormPage formMode={FormMode.VIEW} />}
+            />
+
+            <Route
+              path="workout-plan-rules"
+              element={<WorkoutPlanRulesPage />}
+            />
+            <Route
+              path="workout-plan-recordings"
+              element={<WorkoutPlanRecordingsPage />}
             />
 
             {/* Users */}

@@ -6,6 +6,8 @@ import { UserLoginRequestDto } from "../model/entities/user/UserLoginRequestDto"
 import { UserRefreshTokenDto } from "../model/entities/user/UserRefreshTokenDto";
 import { UserRegisterDto } from "../model/entities/user/UserRegisterDto";
 import { LookupDto } from "../model/lookup/LookupDto";
+import { WorkoutPlanStartContextDto } from "../model/entities/workout-plan-recording/WorkoutPlanStartContextDto";
+import { WorkoutPlanRecordingDto } from "../model/entities/workout-plan-recording/WorkoutPlanRecordingDto";
 import { TimeSlotRequestDto } from "../model/TimeSlotRequestDto";
 import { TimeSlotResponseDto } from "../model/TimeSlotResponseDto";
 import { LocalStorageService } from "./LocalStorageService";
@@ -227,6 +229,36 @@ export const useApiService = () => {
     async (controller: string, data: LookupDto): Promise<LookupDto | null> => {
       const url = buildUrl(controller, "Lookup");
       return apiRequest<LookupDto, LookupDto>(url, "POST", data);
+    },
+    [buildUrl, apiRequest],
+  );
+
+  const getWorkoutPlanStartContext = useCallback(
+    async (workoutPlanId: number): Promise<WorkoutPlanStartContextDto | null> => {
+      const url = buildUrl("WorkoutPlanRecordings", `StartContext/${workoutPlanId}`);
+      return apiRequest<undefined, WorkoutPlanStartContextDto>(url, "GET");
+    },
+    [buildUrl, apiRequest],
+  );
+
+  const startWorkoutPlanRecording = useCallback(
+    async (
+      workoutPlanId: number,
+      weekNumber: number,
+    ): Promise<WorkoutPlanRecordingDto | null> => {
+      const url = buildUrl("WorkoutPlanRecordings", "Start");
+      return apiRequest<
+        { workoutPlanId: number; weekNumber: number },
+        WorkoutPlanRecordingDto
+      >(url, "POST", { workoutPlanId, weekNumber });
+    },
+    [buildUrl, apiRequest],
+  );
+
+  const stopWorkoutPlanRecording = useCallback(
+    async (recordingId: number): Promise<WorkoutPlanRecordingDto | null> => {
+      const url = buildUrl("WorkoutPlanRecordings", `Stop/${recordingId}`);
+      return apiRequest<undefined, WorkoutPlanRecordingDto>(url, "POST");
     },
     [buildUrl, apiRequest],
   );
@@ -486,6 +518,9 @@ export const useApiService = () => {
     get,
     getGoogle,
     getDataLookup,
+    getWorkoutPlanStartContext,
+    startWorkoutPlanRecording,
+    stopWorkoutPlanRecording,
     getDataAutoComplete,
     getDataGrid,
     post,

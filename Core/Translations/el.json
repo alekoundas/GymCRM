@@ -76,6 +76,12 @@
   "Click_the_attached_cancel_ics_files_to_remove_the_events": "Κάντε κλικ στα συνημμένα αρχεία 'cancel-*.ics' για να αφαιρέσετε τα γεγονότα.",
   "User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group": "Ο χρήστης έχει ήδη μια κράτηση την ίδια ώρα και μέρα σε μια διαφορετική ομάδα εκπαίδευσης",
 
+  "Workout_plan_has_no_rule_assigned": "Αυτό το πρόγραμμα δεν έχει ακόμη κανόνα.",
+  "Selected_week_does_not_exist_in_the_rule": "Η επιλεγμένη εβδομάδα δεν υπάρχει σε αυτόν τον κανόνα.",
+  "A_recording_is_already_running_for_this_plan": "Υπάρχει ήδη καταγραφή σε εξέλιξη για αυτό το πρόγραμμα.",
+  "The_recording_can_no_longer_be_stopped": "Αυτή η καταγραφή δεν μπορεί πλέον να σταματήσει.",
+  "The_rule_is_in_use_by_a_running_recording": "Ο κανόνας είναι κλειδωμένος όσο τρέχει καταγραφή που τον χρησιμοποιεί.",
+
   "_0_is_required": "{0} απαιτείται!",
   "_0_already_exists": "{0} υπάρχει ήδη!",
   "_0_not_found": "{0} δεν βρέθηκε!",

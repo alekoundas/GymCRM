@@ -18,6 +18,9 @@ namespace Business.Services
         public IGenericRepository<TrainGroup> TrainGroups { get; }
         public IGenericRepository<UserStatus> UserStatuses { get; }
         public IGenericRepository<WorkoutPlan> WorkoutPlans { get; }
+        public IGenericRepository<WorkoutPlanRule> WorkoutPlanRules { get; }
+        public IGenericRepository<WorkoutPlanRuleWeek> WorkoutPlanRuleWeeks { get; }
+        public IGenericRepository<WorkoutPlanRecording> WorkoutPlanRecordings { get; }
         public IGenericRepository<PhoneNumber> PhoneNumbers { get; }
         public IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
         public IGenericRepository<ExerciseHistory> ExerciseHistories { get; }
@@ -41,6 +44,9 @@ namespace Business.Services
             IGenericRepository<TrainGroup> trainGroupRepository,
             IGenericRepository<UserStatus> userStatusesRepository,
             IGenericRepository<WorkoutPlan> workoutPlanRepository,
+            IGenericRepository<WorkoutPlanRule> workoutPlanRuleRepository,
+            IGenericRepository<WorkoutPlanRuleWeek> workoutPlanRuleWeekRepository,
+            IGenericRepository<WorkoutPlanRecording> workoutPlanRecordingRepository,
             IGenericRepository<PhoneNumber> phoneNumberRepository,
             IGenericRepository<TrainGroupDate> trainGroupDateRepository,
             IGenericRepository<ExerciseHistory> exerciseHistoriesRepository,
@@ -62,6 +68,9 @@ namespace Business.Services
             TrainGroups = trainGroupRepository;
             PhoneNumbers = phoneNumberRepository;
             WorkoutPlans = workoutPlanRepository;
+            WorkoutPlanRules = workoutPlanRuleRepository;
+            WorkoutPlanRuleWeeks = workoutPlanRuleWeekRepository;
+            WorkoutPlanRecordings = workoutPlanRecordingRepository;
             UserStatuses = userStatusesRepository;
             ExerciseHistories = exerciseHistoriesRepository;
 
@@ -94,6 +103,12 @@ namespace Business.Services
                 return (IGenericRepository<TEntity>)UserStatuses;
             if (typeof(TEntity) == typeof(WorkoutPlan))
                 return (IGenericRepository<TEntity>)WorkoutPlans;
+            if (typeof(TEntity) == typeof(WorkoutPlanRule))
+                return (IGenericRepository<TEntity>)WorkoutPlanRules;
+            if (typeof(TEntity) == typeof(WorkoutPlanRuleWeek))
+                return (IGenericRepository<TEntity>)WorkoutPlanRuleWeeks;
+            if (typeof(TEntity) == typeof(WorkoutPlanRecording))
+                return (IGenericRepository<TEntity>)WorkoutPlanRecordings;
             if (typeof(TEntity) == typeof(PhoneNumber))
                 return (IGenericRepository<TEntity>)PhoneNumbers;
             if (typeof(TEntity) == typeof(TrainGroupDate))

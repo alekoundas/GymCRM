@@ -688,6 +688,9 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("CurrentWeek")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
@@ -703,6 +706,9 @@ namespace DataAccess.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("WorkoutPlanRuleId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Id")
@@ -710,7 +716,125 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
+                    b.HasIndex("WorkoutPlanRuleId");
+
                     b.ToTable("WorkoutPlans");
+                });
+
+            modelBuilder.Entity("Core.Models.WorkoutPlanRecording", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("CompletedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("DurationSeconds")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("StartedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("WeekNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("WorkoutPlanId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("WorkoutPlanTitle")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WorkoutPlanId", "StartedOn");
+
+                    b.ToTable("WorkoutPlanRecordings");
+                });
+
+            modelBuilder.Entity("Core.Models.WorkoutPlanRule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("WorkoutPlanRules");
+                });
+
+            modelBuilder.Entity("Core.Models.WorkoutPlanRuleWeek", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MaxRecordings")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Message")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("WeekNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("WorkoutPlanRuleId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkoutPlanRuleId", "WeekNumber")
+                        .IsUnique();
+
+                    b.ToTable("WorkoutPlanRuleWeeks");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
@@ -985,7 +1109,43 @@ namespace DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Core.Models.WorkoutPlanRule", "WorkoutPlanRule")
+                        .WithMany("WorkoutPlans")
+                        .HasForeignKey("WorkoutPlanRuleId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("User");
+
+                    b.Navigation("WorkoutPlanRule");
+                });
+
+            modelBuilder.Entity("Core.Models.WorkoutPlanRecording", b =>
+                {
+                    b.HasOne("Core.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Models.WorkoutPlan", "WorkoutPlan")
+                        .WithMany("Recordings")
+                        .HasForeignKey("WorkoutPlanId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
+
+                    b.Navigation("WorkoutPlan");
+                });
+
+            modelBuilder.Entity("Core.Models.WorkoutPlanRuleWeek", b =>
+                {
+                    b.HasOne("Core.Models.WorkoutPlanRule", "WorkoutPlanRule")
+                        .WithMany("Weeks")
+                        .HasForeignKey("WorkoutPlanRuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkoutPlanRule");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -1080,6 +1240,15 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("Core.Models.WorkoutPlan", b =>
                 {
                     b.Navigation("Exercises");
+
+                    b.Navigation("Recordings");
+                });
+
+            modelBuilder.Entity("Core.Models.WorkoutPlanRule", b =>
+                {
+                    b.Navigation("Weeks");
+
+                    b.Navigation("WorkoutPlans");
                 });
 #pragma warning restore 612, 618
         }

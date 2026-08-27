@@ -46,6 +46,16 @@ export default function DataTableGridRowActionsComponent<TEntity>({
           : true,
       });
 
+    if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.RECORDINGS))
+      menuItems.push({
+        label: t("Recordings"),
+        icon: "pi pi-history",
+        command: () => onButtonClick(ButtonTypeEnum.RECORDINGS, rowData),
+        visible: authorize
+          ? TokenService.isUserAllowed(controller + "_View")
+          : true,
+      });
+
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.VIEW))
       menuItems.push({
         label: t("View"),

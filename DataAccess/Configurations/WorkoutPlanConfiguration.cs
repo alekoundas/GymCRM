@@ -28,6 +28,13 @@ namespace DataAccess.Configurations
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade); // Delete if parent is removed
 
+            // Optional rule. SetNull rather than Restrict: deleting a rule leaves the
+            // plans without one, which simply disables Start until an admin reassigns.
+            builder.HasOne(x => x.WorkoutPlanRule)
+                .WithMany(x => x.WorkoutPlans)
+                .HasForeignKey(x => x.WorkoutPlanRuleId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

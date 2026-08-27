@@ -24,5 +24,7 @@ namespace Core.Dtos.WorkoutPlan
 
         public ICollection<ExerciseAddDto> Exercises { get; set; } = new Collection<ExerciseAddDto>();
 
+        public int? WorkoutPlanRuleId { get; set; }
+
     }
 }
