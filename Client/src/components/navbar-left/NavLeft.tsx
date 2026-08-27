@@ -44,7 +44,8 @@ export default function NavLeft() {
       label: t("Trainer"),
       visible:
         TokenService.isUserAllowed("TrainGroups_View") ||
-        TokenService.isUserAllowed("WorkoutPlansAdmin_View"),
+        TokenService.isUserAllowed("WorkoutPlansAdmin_View") ||
+        TokenService.isUserAllowed("WorkoutPlanRules_View"),
       items: [
         {
           label: t("Calendar"),
@@ -63,6 +64,18 @@ export default function NavLeft() {
           icon: "pi pi-clipboard",
           visible: TokenService.isUserAllowed("WorkoutPlansAdmin_View"),
           command: () => navigate("/administrator/workout-plans"),
+        },
+        {
+          label: t("Workout plan rules"),
+          icon: "pi pi-sliders-h",
+          visible: TokenService.isUserAllowed("WorkoutPlanRules_View"),
+          command: () => navigate("/administrator/workout-plan-rules"),
+        },
+        {
+          label: t("Recordings"),
+          icon: "pi pi-history",
+          visible: TokenService.isUserAllowed("WorkoutPlanRecordingsAdmin_View"),
+          command: () => navigate("/administrator/workout-plan-recordings"),
         },
       ],
     },

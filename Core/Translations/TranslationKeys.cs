@@ -82,6 +82,11 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string Click_the_attached_add_ics_files_and_select_Add_to_Calendar = "Click_the_attached_add_ics_files_and_select_Add_to_Calendar";
         public const string Click_the_attached_cancel_ics_files_to_remove_the_events = "Click_the_attached_cancel_ics_files_to_remove_the_events";
         public const string User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group = "User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group";
+        public const string Workout_plan_has_no_rule_assigned = "Workout_plan_has_no_rule_assigned";
+        public const string Selected_week_does_not_exist_in_the_rule = "Selected_week_does_not_exist_in_the_rule";
+        public const string A_recording_is_already_running_for_this_plan = "A_recording_is_already_running_for_this_plan";
+        public const string The_recording_can_no_longer_be_stopped = "The_recording_can_no_longer_be_stopped";
+        public const string The_rule_is_in_use_by_a_running_recording = "The_rule_is_in_use_by_a_running_recording";
         public const string _0_is_required = "_0_is_required";
         public const string _0_already_exists = "_0_already_exists";
         public const string _0_not_found = "_0_not_found";

@@ -71,7 +71,9 @@ export default function WorkoutPlansPage() {
     return {
       ...new DataTableDto(),
       filters: [...baseFilters, userIdFilter],
-      dataTableSorts: [],
+      // Plans are never retired, so a member can hold dozens. Most recently trained
+      // first beats most recently written by the trainer.
+      dataTableSorts: [{ field: "lastRecordingOn", order: -1 }],
     };
   });
 
@@ -181,6 +183,69 @@ export default function WorkoutPlansPage() {
           },
         ]
       : []),
+    {
+      field: "currentWeek",
+      header: t("Week"),
+      sortable: true,
+      filter: false,
+      filterPlaceholder: "",
+      style: { width: "10%" },
+      body: (rowData: WorkoutPlanDto) =>
+        rowData.currentWeek ? (
+          <Tag value={t("Week") + " " + rowData.currentWeek} />
+        ) : (
+          <span className="text-color-secondary">
+            {rowData.workoutPlanRuleId ? "—" : t("No rule")}
+          </span>
+        ),
+    },
+    {
+      // Computed from the recordings rather than stored - the controller claims
+      // this field name and sorts it itself.
+      field: "lastRecordingOn",
+      header: t("Last used"),
+      sortable: true,
+      filter: false,
+      filterPlaceholder: "",
+      style: { width: "12%" },
+      body: (rowData: WorkoutPlanDto) =>
+        rowData.lastRecordingOn ? (
+          <span>
+            {new Date(rowData.lastRecordingOn).getDate() +
+              "/" +
+              (new Date(rowData.lastRecordingOn).getMonth() + 1) +
+              "/" +
+              new Date(rowData.lastRecordingOn).getFullYear()}
+          </span>
+        ) : (
+          <span className="text-color-secondary">{t("Never")}</span>
+        ),
+    },
+    {
+      field: "isRunning",
+      header: t("Status"),
+      sortable: false,
+      filter: false,
+      filterPlaceholder: "",
+      style: { width: "10%" },
+      body: (rowData: WorkoutPlanDto) => {
+        if (rowData.isRunning)
+          return (
+            <Tag
+              severity="success"
+              value={t("In progress")}
+            />
+          );
+        if (rowData.hasIncompleteRecording)
+          return (
+            <Tag
+              severity="warning"
+              value={t("Left open")}
+            />
+          );
+        return <span className="text-color-secondary">—</span>;
+      },
+    },
     {
       field: "createdOn",
       header: t("CreatedOn"),

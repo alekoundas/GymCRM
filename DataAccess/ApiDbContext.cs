@@ -41,6 +41,9 @@ namespace DataAccess
         public DbSet<TrainGroupParticipantUnavailableDate> TrainGroupParticipantUnavailableDates { get; set; }
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
         public DbSet<GoogleRefreshToken> GoogleRefreshTokens { get; set; }
+        public DbSet<WorkoutPlanRule> WorkoutPlanRules { get; set; }
+        public DbSet<WorkoutPlanRuleWeek> WorkoutPlanRuleWeeks { get; set; }
+        public DbSet<WorkoutPlanRecording> WorkoutPlanRecordings { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -73,6 +76,10 @@ namespace DataAccess
             builder.ApplyConfiguration(new TrainGroupUnavailableDateConfiguration());
             builder.ApplyConfiguration(new TrainGroupParticipantUnavailableDateConfiguration());
 
+
+            builder.ApplyConfiguration(new WorkoutPlanRuleConfiguration());
+            builder.ApplyConfiguration(new WorkoutPlanRuleWeekConfiguration());
+            builder.ApplyConfiguration(new WorkoutPlanRecordingConfiguration());
 
             builder.ApplyConfiguration(new GoogleRefreshTokenConfiguration());
         }

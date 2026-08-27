@@ -10,6 +10,7 @@ import { useApiService } from "../../services/ApiService";
 import { Button } from "primereact/button";
 import LookupComponent from "../../components/core/dropdown/LookupComponent";
 import { Checkbox } from "primereact/checkbox";
+import { Dropdown } from "primereact/dropdown";
 
 interface IField extends DialogChildProps {
   isAdminPage: boolean;
@@ -58,7 +59,13 @@ export default function WorkoutPlanFormComponent({
       workoutPlanDto.id
     );
     if (response) {
-      setWorkoutPlanDto(response); // Update store with backend response
+      // Put returns the entity, which carries none of the values the api computes
+      // (week message, week count, running state). Re-read so they survive a save.
+      const reloaded = await apiService.get<WorkoutPlanDto>(
+        "WorkoutPlans",
+        workoutPlanDto.id
+      );
+      setWorkoutPlanDto(reloaded ?? response);
       setEditingField(undefined);
       setOriginalValues({});
     }
@@ -195,6 +202,109 @@ export default function WorkoutPlanFormComponent({
               </>
             ))}
         </div>
+
+        {/*                                       */}
+        {/*       Rule (administrator only)       */}
+        {/*                                       */}
+
+        {isAdminPage && (
+          <div className="field w-full">
+            <label
+              htmlFor="workoutPlanRuleId"
+              className="block text-900 font-medium mb-2"
+            >
+              {t("Rule")}
+            </label>
+            <LookupComponent
+              controller="WorkoutPlanRules"
+              selectedEntityId={workoutPlanDto.workoutPlanRuleId?.toString() ?? ""}
+              onChange={(e) =>
+                updateWorkoutPlanDto({
+                  workoutPlanRuleId: e?.id ? Number(e.id) : undefined,
+                })
+              }
+              isEnabled={
+                (formMode === FormMode.EDIT &&
+                  editingField === "workoutPlanRuleId") ||
+                formMode === FormMode.ADD
+              }
+            />
+            {formMode === FormMode.EDIT &&
+              (editingField !== "workoutPlanRuleId" ? (
+                <Button
+                  icon="pi pi-pencil"
+                  className="p-button-rounded p-button-text p-button-secondary"
+                  onClick={() => handleEdit("workoutPlanRuleId")}
+                  visible={editingField === undefined}
+                />
+              ) : (
+                <>
+                  <Button
+                    icon="pi pi-times"
+                    className="p-button-rounded p-button-text p-button-danger"
+                    onClick={() => handleCancel("workoutPlanRuleId")}
+                  />
+                  <Button
+                    icon="pi pi-check"
+                    className="p-button-rounded p-button-text p-button-success"
+                    onClick={() => handleSave("workoutPlanRuleId")}
+                  />
+                </>
+              ))}
+          </div>
+        )}
+
+        {/*                                               */}
+        {/*       Current week (administrator only)       */}
+        {/*                                               */}
+
+        {isAdminPage && (workoutPlanDto.weekCount ?? 0) > 0 && (
+          <div className="field w-full">
+            <label
+              htmlFor="currentWeek"
+              className="block text-900 font-medium mb-2"
+            >
+              {t("Current week")}
+            </label>
+            <Dropdown
+              inputId="currentWeek"
+              value={workoutPlanDto.currentWeek ?? null}
+              options={Array.from(
+                { length: workoutPlanDto.weekCount ?? 0 },
+                (_, i) => ({ label: `${t("Week")} ${i + 1}`, value: i + 1 }),
+              )}
+              onChange={(e) => updateWorkoutPlanDto({ currentWeek: e.value })}
+              placeholder={t("Select a value")}
+              className="w-full"
+              disabled={
+                formMode === FormMode.VIEW ||
+                (formMode === FormMode.EDIT && editingField !== "currentWeek")
+              }
+            />
+            {formMode === FormMode.EDIT &&
+              (editingField !== "currentWeek" ? (
+                <Button
+                  icon="pi pi-pencil"
+                  className="p-button-rounded p-button-text p-button-secondary"
+                  onClick={() => handleEdit("currentWeek")}
+                  visible={editingField === undefined}
+                />
+              ) : (
+                <>
+                  <Button
+                    icon="pi pi-times"
+                    className="p-button-rounded p-button-text p-button-danger"
+                    onClick={() => handleCancel("currentWeek")}
+                  />
+                  <Button
+                    icon="pi pi-check"
+                    className="p-button-rounded p-button-text p-button-success"
+                    onClick={() => handleSave("currentWeek")}
+                  />
+                </>
+              ))}
+          </div>
+        )}
       </div>
       <div className="w-full"></div>
     </div>

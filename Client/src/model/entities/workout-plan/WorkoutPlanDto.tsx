@@ -10,6 +10,20 @@ export interface WorkoutPlanDto {
   user: UserDto;
   exercises: ExerciseDto[];
   createdOn: string;
+
+  // Null until an admin assigns one - Start stays disabled while null.
+  workoutPlanRuleId?: number;
+  workoutPlanRuleName: string;
+  // Plain week number, not an id.
+  currentWeek?: number;
+  weekCount: number;
+  currentWeekMessage: string;
+
+  isRunning: boolean;
+  // Server-computed - never derive elapsed time from a timestamp here.
+  elapsedSeconds?: number;
+  hasIncompleteRecording: boolean;
+  lastRecordingOn?: string;
 }
 
 export class WorkoutPlanDto {
@@ -21,4 +35,15 @@ export class WorkoutPlanDto {
   user: UserDto = new UserDto();
   exercises: ExerciseDto[] = [];
   createdOn: string = "";
+
+  workoutPlanRuleId?: number = undefined;
+  workoutPlanRuleName: string = "";
+  currentWeek?: number = undefined;
+  weekCount: number = 0;
+  currentWeekMessage: string = "";
+
+  isRunning: boolean = false;
+  elapsedSeconds?: number = undefined;
+  hasIncompleteRecording: boolean = false;
+  lastRecordingOn?: string = undefined;
 }

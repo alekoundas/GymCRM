@@ -19,6 +19,7 @@ namespace Business.Repository
 
 
         GenericRepository<TEntity> OrderBy<TKey>(Expression<Func<TEntity, TKey>> keySelector);
+        GenericRepository<TEntity> OrderByDescending<TKey>(Expression<Func<TEntity, TKey>> keySelector);
         GenericRepository<TEntity> OrderBy(string propertyName, OrderDirectionEnum orderDirection);
         GenericRepository<TEntity> ThenBy(string propertyName, OrderDirectionEnum orderDirection);
 
