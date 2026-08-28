@@ -1,5 +1,6 @@
 import { FormMode } from "../../enum/FormMode";
 import { useApiService } from "../../services/ApiService";
+import { useToast } from "../../contexts/ToastContext";
 import { useTranslator } from "../../services/TranslatorService";
 import { useWorkoutPlanStore } from "../../stores/WorkoutPlanStore";
 import { WorkoutPlanDto } from "../../model/entities/workout-plan/WorkoutPlanDto";
@@ -26,6 +27,7 @@ interface IField {
 export default function WorkoutPlanFormPage({ formMode }: IField) {
   const { t } = useTranslator();
   const apiService = useApiService();
+  const { showError } = useToast();
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,7 +47,19 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
     hideDialog: () => setEditDialogVisibility(false),
   };
 
+  // A rule with no week would leave the plan pointing at nothing, so it is
+  // settled here rather than being sorted out later on the member's Start.
+  const isMissingWeek = (): boolean => {
+    if (!workoutPlanDto.workoutPlanRuleId || workoutPlanDto.currentWeek)
+      return false;
+
+    showError(t("Set the current week for the selected rule"));
+    return true;
+  };
+
   const onSaveEdit = async (): Promise<void> => {
+    if (isMissingWeek()) return;
+
     const response = await apiService.update<WorkoutPlanDto>(
       "WorkoutPlans",
       workoutPlanDto,
@@ -76,6 +90,8 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
 
   const onSave = async () => {
     if (formMode === FormMode.ADD) {
+      if (isMissingWeek()) return;
+
       const cleanedChildren: ExerciseDto[] = workoutPlanDto.exercises.map(
         (x: ExerciseDto) => ({
           ...x,
@@ -149,6 +165,8 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
 
             <WorkoutPlanRecordingActionsComponent
               workoutPlanId={workoutPlanDto.id}
+              workoutPlanRuleId={workoutPlanDto.workoutPlanRuleId}
+              currentWeek={workoutPlanDto.currentWeek}
               isAdminPage={isAdminPage}
               onChanged={loadWorkoutPlan}
             />
