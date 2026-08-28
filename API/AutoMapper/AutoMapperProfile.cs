@@ -133,7 +133,8 @@ namespace API.AutoMapper
                 .ForMember(x => x.IsRunning, o => o.Ignore())
                 .ForMember(x => x.ElapsedSeconds, o => o.Ignore())
                 .ForMember(x => x.HasIncompleteRecording, o => o.Ignore())
-                .ForMember(x => x.LastRecordingOn, o => o.Ignore());
+                .ForMember(x => x.LastRecordingOn, o => o.Ignore())
+                .ForMember(x => x.RecordingCount, o => o.Ignore());
             CreateMap<WorkoutPlanDto, WorkoutPlan>()
                 .ForMember(x => x.WorkoutPlanRule, o => o.Ignore())
                 .ForMember(x => x.Recordings, o => o.Ignore());

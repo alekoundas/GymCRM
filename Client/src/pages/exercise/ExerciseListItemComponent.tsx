@@ -1,8 +1,6 @@
 import { FormMode } from "../../enum/FormMode";
 import { useTranslator } from "../../services/TranslatorService";
 import { useWorkoutPlanStore } from "../../stores/WorkoutPlanStore";
-import { InputText } from "primereact/inputtext";
-import { InputNumber } from "primereact/inputnumber";
 import { ExerciseDto } from "../../model/entities/exercise/ExerciseDto";
 import { Button } from "primereact/button";
 import { useApiService } from "../../services/ApiService";
@@ -14,19 +12,21 @@ import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
 import ExerciseFormComponent from "./ExerciseFormComponent";
 import ExerciseHistoryGridComponent from "../exercise-history/ExerciseHistoryGridComponent";
-import { Checkbox } from "primereact/checkbox";
 import { TokenService } from "../../services/TokenService";
 
 interface IField {
   formMode: FormMode;
   isAdminPage: boolean;
   exerciseId: number;
+  // Position in the whole plan, counting through groups as well as single exercises.
+  index: number;
 }
 
 export default function ExerciseListItemComponent({
   formMode,
   isAdminPage,
   exerciseId,
+  index,
 }: IField) {
   const { t } = useTranslator();
   const apiService = useApiService();
@@ -392,93 +392,95 @@ export default function ExerciseListItemComponent({
     return menuItems;
   };
 
+  //
+  //          A value is compact when it is a short number - anything with a
+  //          letter in it is a note the trainer wrote and needs its own line.
+  //
+  const isEmptyValue = (value: string | undefined): boolean =>
+    !value || value.trim().length === 0 || value.trim() === "-";
+
+  const isTextValue = (value: string): boolean => /\p{L}/u.test(value);
+
+  const metrics: { label: string; value: string }[] = [
+    { label: t("Sets"), value: exerciseDto.sets },
+    { label: t("Reps"), value: exerciseDto.reps },
+    { label: t("Weight"), value: exerciseDto.weight },
+  ].filter((x) => !isEmptyValue(x.value));
+
+  const compactMetrics = metrics.filter((x) => !isTextValue(x.value));
+  const noteMetrics = metrics.filter((x) => isTextValue(x.value));
+
   return (
     <>
-      <div className="flex align-content-center justify-content-between align-items-center">
-        <div className="w-full">
-          <div className="field w-full">
-            <label htmlFor={`name-${exerciseDto.id}`}>{t("Name")}</label>
-            <div className="w-full flex flex-nowrap">
-              <InputText
-                id={`name-${exerciseDto.id}`}
-                value={exerciseDto.name}
-                className="p-inputtext-sm w-full"
-                disabled={true}
-              />
-            </div>
-          </div>
+      <div className="flex align-items-start gap-2">
+        <span
+          className="flex-none flex align-items-center justify-content-center border-round surface-100 text-color-secondary text-xs font-semibold"
+          style={{ width: "1.5rem", height: "1.5rem" }}
+        >
+          {index}
+        </span>
 
-          <div className="formgrid grid p-2 mb-2 w-full">
-            <div className="field col-12 sm:col-3">
-              <label htmlFor={`sets-${exerciseDto.id}`}>{t("Sets")}</label>
-              <div className="w-full flex flex-nowrap">
-                <InputText
-                  id={`sets-${exerciseDto.id}`}
-                  value={exerciseDto.sets}
-                  className="p-inputtext-sm w-full"
-                  disabled={true}
-                />
-              </div>
-            </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-medium line-height-3">{exerciseDto.name}</div>
 
-            <div className="field col-12 sm:col-3">
-              <label htmlFor={`reps-${exerciseDto.id}`}>{t("Reps")}</label>
-              <div className="w-full flex flex-nowrap">
-                <InputText
-                  id={`reps-${exerciseDto.id}`}
-                  value={exerciseDto.reps}
-                  className="p-inputtext-sm w-full"
-                  disabled={true}
-                />
-              </div>
+          {compactMetrics.length > 0 && (
+            <div className="flex flex-wrap gap-3 mt-2">
+              {compactMetrics.map((metric) => (
+                <div key={metric.label}>
+                  <div className="text-xs uppercase text-color-secondary">
+                    {metric.label}
+                  </div>
+                  <div className="font-semibold">{metric.value}</div>
+                </div>
+              ))}
             </div>
+          )}
 
-            <div className="field col-12 sm:col-3">
-              <label htmlFor={`weight-${exerciseDto.id}`}>{t("Weight")}</label>
-              <div className="w-full flex flex-nowrap">
-                <InputText
-                  id={`weight-${exerciseDto.id}`}
-                  value={exerciseDto.weight}
-                  className="p-inputtext-sm w-full"
-                  disabled={true}
-                />
-              </div>
+          {noteMetrics.map((metric) => (
+            <div key={metric.label} className="mt-2">
+              <span className="inline-flex align-items-baseline gap-2 p-2 border-round surface-100">
+                <span className="flex-none text-xs uppercase text-color-secondary">
+                  {metric.label}
+                </span>
+                <span className="text-sm line-height-3">{metric.value}</span>
+              </span>
             </div>
+          ))}
 
-            <div className="field col-12 sm:col-3">
-              <label htmlFor={`isCircular-${exerciseDto.id}`}>
-                {t("Circular")}
-              </label>
-              <div className="flex flex-nowrap">
-                <Checkbox
-                  id={`isCircular-${exerciseDto.id}`}
-                  checked={workoutPlanDto.isCircular}
-                  className="p-inputtext-sm w-full"
-                  disabled={true}
-                />
-              </div>
+          {exerciseDto.description.length > 0 && (
+            <div className="flex gap-2 mt-2 pt-2 border-top-1 surface-border">
+              <i className="pi pi-info-circle text-color-secondary text-sm mt-1" />
+              <span className="text-sm text-color-secondary line-height-3">
+                {exerciseDto.description}
+              </span>
             </div>
-          </div>
+          )}
+
+          {exerciseDto.videoUrl.length > 0 && (
+            <a
+              href={exerciseDto.videoUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex align-items-center gap-2 mt-2 text-sm text-primary no-underline"
+            >
+              <i className="pi pi-video" />
+              <span>{t("Watch video")}</span>
+            </a>
+          )}
         </div>
 
-        <div className="w-1">
-          <div className="flex align-content-center  justify-content-between h-full">
-            <div></div>
-            <Button
-              icon="pi pi-ellipsis-v"
-              className="p-button-rounded p-button-info p-button-sm"
-              onClick={(e) => menuRef.current?.toggle(e)}
-            />
-            <Menu
-              ref={menuRef}
-              closeOnEscape
-              model={getMenuItems(exerciseDto.id)}
-              popup
-              appendTo={document.body}
-            />
-            <div></div>
-          </div>
-        </div>
+        <Button
+          icon="pi pi-ellipsis-v"
+          className="flex-none p-button-rounded p-button-text p-button-secondary"
+          onClick={(e) => menuRef.current?.toggle(e)}
+        />
+        <Menu
+          ref={menuRef}
+          closeOnEscape
+          model={getMenuItems(exerciseDto.id)}
+          popup
+          appendTo={document.body}
+        />
       </div>
 
       {/*                                   */}

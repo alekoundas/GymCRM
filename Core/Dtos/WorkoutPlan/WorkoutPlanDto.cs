@@ -52,6 +52,8 @@ namespace Core.Dtos.WorkoutPlan
         // Drives the grid's default sort.
         public DateTime? LastRecordingOn { get; set; }
 
+        public int RecordingCount { get; set; }
+
         public DateTime CreatedOn { get; set; }
     }
 }

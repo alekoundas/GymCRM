@@ -108,41 +108,48 @@ export default function WorkoutPlanRecordingActionsComponent({
   const isRunning = scenario === WorkoutPlanStartScenario.Running;
 
   //
-  //          The action bar
+  //          The action bar. It sticks to the bottom of the scroll so the
+  //          timer stays reachable however far down the exercises you are.
   //
   const renderActions = () => {
     if (scenario === WorkoutPlanStartScenario.NoRule)
       return (
-        <Message
-          severity="info"
-          className="w-full"
-          text={t("The trainer has not set a rule for this plan yet")}
-        />
+        <div className="flex align-items-center gap-2 text-sm text-color-secondary">
+          <i className="pi pi-info-circle" />
+          <span>{t("The trainer has not set a rule for this plan yet")}</span>
+        </div>
       );
 
     if (isRunning)
       return (
-        <div className="flex align-items-center justify-content-between gap-3 w-full">
-          <div>
-            <Tag
-              severity="success"
-              value={t("In progress")}
-            />
-            <div className="text-3xl font-semibold mt-2">
+        <div className="flex align-items-center justify-content-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex align-items-center gap-2">
+              <span
+                className="border-circle bg-green-400 flex-none"
+                style={{ width: "0.5rem", height: "0.5rem" }}
+              />
+              <span className="text-xs uppercase text-color-secondary">
+                {t("In progress")}
+              </span>
+            </div>
+            <div className="text-3xl font-semibold line-height-2">
               {formatDuration(elapsedSeconds)}
             </div>
           </div>
+
           {isPlanOwner ? (
             <Button
               label={t("Finish")}
               icon="pi pi-stop-circle"
               severity="danger"
               outlined
+              size="large"
               disabled={isBusy}
               onClick={onStopClick}
             />
           ) : (
-            <span className="text-color-secondary text-sm text-right">
+            <span className="text-xs text-color-secondary text-right">
               {t("Only the member can start and stop the timer")}
             </span>
           )}
@@ -153,7 +160,8 @@ export default function WorkoutPlanRecordingActionsComponent({
       <Button
         label={t("Start workout")}
         icon="pi pi-play"
-        className="w-full"
+        className="w-full md:w-auto"
+        size="large"
         disabled={!isPlanOwner || isBusy}
         onClick={onStartClick}
       />
@@ -300,7 +308,9 @@ export default function WorkoutPlanRecordingActionsComponent({
 
   return (
     <>
-      <div className="flex align-items-center w-full">{renderActions()}</div>
+      <div className="sticky bottom-0 z-1 surface-card border-top-1 surface-border pt-3 mt-3">
+        {renderActions()}
+      </div>
 
       <Dialog
         header={renderDialogHeader()}

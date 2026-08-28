@@ -11,8 +11,6 @@ import GenericDialogComponent, {
 import ExerciseFormComponent from "./ExerciseFormComponent";
 import ExerciseListItemComponent from "./ExerciseListItemComponent";
 import { Card } from "primereact/card";
-import { InputTextarea } from "primereact/inputtextarea";
-import { WorkoutPlanDto } from "../../model/entities/workout-plan/WorkoutPlanDto";
 
 interface IField {
   formMode: FormMode;
@@ -32,24 +30,13 @@ export default function ExerciseListComponent({
   const apiService = useApiService();
   const {
     workoutPlanDto,
-    updateWorkoutPlanDto,
     setExercises,
     newExerciseDto,
     setNewExerciseDto,
-    workoutPlanDescription,
-    setworkoutPlanDescription,
-    setWorkoutPlanDto,
-    resetworkoutPlanDescription,
   } = useWorkoutPlanStore();
 
   const [groups, setGroups] = useState<ExerciseGroup[]>([]);
-  const [isWorkoutPlanDialogVisible, setWorkoutPlanDialogVisibility] =
-    useState(false); // Dialog visibility
   const [isAddDialogVisible, setAddDialogVisibility] = useState(false); // Dialog visibility
-  const dialogControlWorkoutPlan: DialogControl = {
-    showDialog: () => setWorkoutPlanDialogVisibility(true),
-    hideDialog: () => setWorkoutPlanDialogVisibility(false),
-  };
   const dialogControlAdd: DialogControl = {
     showDialog: () => setAddDialogVisibility(true),
     hideDialog: () => setAddDialogVisibility(false),
@@ -77,30 +64,6 @@ export default function ExerciseListComponent({
       if (response && response[0]) {
         dialogControlAdd.hideDialog();
         setExercises([...workoutPlanDto.exercises, response[0]]);
-      }
-    }
-  };
-
-  const OnDialogWorkoutPlanSave = async (): Promise<void> => {
-    if (formMode === FormMode.ADD) {
-      updateWorkoutPlanDto({ description: workoutPlanDescription });
-      resetworkoutPlanDescription();
-      dialogControlWorkoutPlan.hideDialog();
-    }
-
-    if (formMode === FormMode.EDIT) {
-      const updatedDto = {
-        ...workoutPlanDto,
-        description: workoutPlanDescription,
-      };
-      const response = await apiService.update<WorkoutPlanDto>(
-        "WorkoutPlans",
-        updatedDto,
-        workoutPlanDto.id,
-      );
-      if (response) {
-        setWorkoutPlanDto(response); // Update store with backend response
-        dialogControlWorkoutPlan.hideDialog();
       }
     }
   };
@@ -140,67 +103,83 @@ export default function ExerciseListComponent({
     <>
       <Card>
         <div className="w-full">
-          <div className="flex justify-content-between align-items-center">
-            <div>
-              <Button
-                label={t("Update description")}
-                icon="pi pi-pencil"
-                onClick={() => {
-                  setworkoutPlanDescription(workoutPlanDto.description);
-                  dialogControlWorkoutPlan.showDialog();
-                }}
-                className="p-button-sm"
-                visible={isAdminPage && formMode !== FormMode.VIEW}
-              />
-            </div>
-            <div></div>
-            <div>
-              <h2 className="m-0">{t("Exercises")}</h2>
-            </div>
-            <div></div>
-            <div>
-              <Button
-                label={t("Add Exercise")}
-                icon="pi pi-plus"
-                onClick={addExercise}
-                className="p-button-sm"
-                visible={isAdminPage && formMode !== FormMode.VIEW}
-              />
-            </div>
+          <div className="flex flex-wrap align-items-center justify-content-between gap-2">
+            <h2 className="m-0">{t("Exercises")}</h2>
+
+            <Button
+              label={t("Add Exercise")}
+              icon="pi pi-plus"
+              onClick={addExercise}
+              className="p-button-sm"
+              visible={isAdminPage && formMode !== FormMode.VIEW}
+            />
           </div>
 
-          <div
-            className="flex justify-content-center pt-5 break-words " //text-center
-            style={{ whiteSpace: "pre-line" }}
-          >
-            {workoutPlanDto.description}
-          </div>
         </div>
       </Card>
 
-      <div className="">
-        {groups.map((group) => (
-          <Card
-            key={group.groupNumber ?? group.exercises[0].id}
-            className="mt-3"
-          >
-            <div className="p-3">
-              {group.exercises
-                .sort(
-                  (x, y) =>
-                    x.groupExerciseOrderNumber - y.groupExerciseOrderNumber,
-                )
-                .map((exercise) => (
-                  <ExerciseListItemComponent
+      <div className="grid mt-0">
+        {groups.map((group, groupIndex) => {
+          const groupExercises = [...group.exercises].sort(
+            (x, y) => x.groupExerciseOrderNumber - y.groupExerciseOrderNumber,
+          );
+
+          // Exercises are numbered straight through the plan, whether or not
+          // they sit in a group - they all have a place in the order.
+          const startIndex =
+            groups
+              .slice(0, groupIndex)
+              .reduce((total, x) => total + x.exercises.length, 0) + 1;
+
+          const isGrouped = groupExercises.length > 1;
+
+          return (
+            <div
+              key={group.groupNumber ?? groupExercises[0].id}
+              className={isGrouped ? "col-12 pt-3" : "col-12 xl:col-6 pt-3"}
+            >
+              <Card className="h-full">
+              {isGrouped && (
+                <div className="flex align-items-center flex-wrap gap-2 mb-3 pb-2 border-bottom-1 surface-border">
+                  <i className="pi pi-link text-primary text-sm" />
+                  <span className="text-xs uppercase font-semibold text-primary">
+                    {t("Group")} {groupIndex + 1}
+                  </span>
+                  <span className="text-xs text-color-secondary">
+                    · {groupExercises.length} {t("Exercises")}
+                  </span>
+                </div>
+              )}
+
+              <div
+                className={
+                  isGrouped
+                    ? "flex flex-column gap-3 border-left-2 border-primary pl-3"
+                    : ""
+                }
+              >
+                {groupExercises.map((exercise, exerciseIndex) => (
+                  <div
                     key={exercise.id}
-                    formMode={formMode}
-                    exerciseId={exercise.id}
-                    isAdminPage={isAdminPage}
-                  />
+                    className={
+                      exerciseIndex > 0
+                        ? "pt-3 border-top-1 surface-border"
+                        : ""
+                    }
+                  >
+                    <ExerciseListItemComponent
+                      formMode={formMode}
+                      exerciseId={exercise.id}
+                      isAdminPage={isAdminPage}
+                      index={startIndex + exerciseIndex}
+                    />
+                  </div>
                 ))}
+                </div>
+              </Card>
             </div>
-          </Card>
-        ))}
+          );
+        })}
       </div>
 
       {/*                                       */}
@@ -221,29 +200,6 @@ export default function ExerciseListComponent({
         </div>
       </GenericDialogComponent>
 
-      {/*                                              */}
-      {/*       Update Workout Plan Description        */}
-      {/*                                              */}
-
-      <GenericDialogComponent
-        formMode={FormMode.EDIT}
-        visible={isWorkoutPlanDialogVisible}
-        control={dialogControlWorkoutPlan}
-        onSave={OnDialogWorkoutPlanSave}
-      >
-        <div className="field">
-          <label htmlFor={`description`}>{t("Description")}</label>
-          <div className="w-full flex flex-nowrap">
-            <InputTextarea
-              id={`description`}
-              value={workoutPlanDescription}
-              onChange={(e) => setworkoutPlanDescription(e.target.value)}
-              rows={10}
-              className="p-inputtext-sm w-full"
-            />
-          </div>
-        </div>
-      </GenericDialogComponent>
     </>
   );
 }

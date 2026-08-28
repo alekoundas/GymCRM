@@ -8,9 +8,10 @@ import { useEffect, useState } from "react";
 import { ExerciseDto } from "../../model/entities/exercise/ExerciseDto";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-import { Tag } from "primereact/tag";
-import { Message } from "primereact/message";
 import WorkoutPlanFormComponent from "./WorkoutPlanFormComponent";
+import WorkoutPlanHeaderComponent, {
+  WorkoutPlanHeaderFooter,
+} from "./WorkoutPlanHeaderComponent";
 import ExerciseListComponent from "../exercise/ExerciseListComponent";
 import GenericDialogComponent, {
   DialogControl,
@@ -33,10 +34,28 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
 
   const [isRecordingsDialogVisible, setRecordingsDialogVisibility] =
     useState(false);
+  const [isEditDialogVisible, setEditDialogVisibility] = useState(false);
 
   const dialogControlRecordings: DialogControl = {
     showDialog: () => setRecordingsDialogVisibility(true),
     hideDialog: () => setRecordingsDialogVisibility(false),
+  };
+  const dialogControlEdit: DialogControl = {
+    showDialog: () => setEditDialogVisibility(true),
+    hideDialog: () => setEditDialogVisibility(false),
+  };
+
+  const onSaveEdit = async (): Promise<void> => {
+    const response = await apiService.update<WorkoutPlanDto>(
+      "WorkoutPlans",
+      workoutPlanDto,
+      workoutPlanDto.id,
+    );
+
+    if (response) {
+      dialogControlEdit.hideDialog();
+      loadWorkoutPlan();
+    }
   };
 
   const loadWorkoutPlan = () => {
@@ -76,108 +95,76 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
     }
   };
 
-  return (
-    <>
-      <Card
-        title={t("Workout plan")}
-        footer={
-          <div className="flex justify-content-between">
-            <div></div>
-            <Button
-              label={t("Save")}
-              icon="pi pi-check"
-              onClick={onSave}
-              visible={formMode === FormMode.ADD && isAdminPage}
-              autoFocus
-            />
-          </div>
-        }
-      >
-        {/*                                                  */}
-        {/*       Current week, message and recordings       */}
-        {/*                                                  */}
+  // A reading layout, so it gets a column rather than the whole monitor.
+  const pageStyle = { maxWidth: "82rem" };
 
-        {formMode !== FormMode.ADD && (
-          <div className="w-full pb-3">
-            <div className="flex align-items-center justify-content-between gap-2 flex-wrap">
-              <div className="flex align-items-center gap-2">
-                {workoutPlanDto.currentWeek ? (
-                  <Tag
-                    icon="pi pi-replay"
-                    value={
-                      t("Week") +
-                      " " +
-                      workoutPlanDto.currentWeek +
-                      " " +
-                      t("of") +
-                      " " +
-                      (workoutPlanDto.weekCount ?? 0)
-                    }
-                  />
-                ) : (
-                  <Tag
-                    severity="secondary"
-                    value={
-                      workoutPlanDto.workoutPlanRuleId
-                        ? t("Never")
-                        : t("No rule")
-                    }
-                  />
-                )}
-              </div>
-
+  // Creating a plan is the one case that is a form first and foremost.
+  if (formMode === FormMode.ADD) {
+    return (
+      <div className="mx-auto" style={pageStyle}>
+        <Card
+          title={t("Workout plan")}
+          footer={
+            <div className="flex justify-content-end">
               <Button
-                label={t("Recordings")}
-                icon="pi pi-history"
-                className="p-button-sm p-button-outlined"
-                onClick={() => dialogControlRecordings.showDialog()}
+                label={t("Save")}
+                icon="pi pi-check"
+                onClick={onSave}
+                visible={isAdminPage}
+                autoFocus
               />
             </div>
-
-            {(workoutPlanDto.currentWeekMessage?.length ?? 0) > 0 && (
-              <Message
-                severity="info"
-                className="w-full mt-3 justify-content-start"
-                text={workoutPlanDto.currentWeekMessage}
-              />
-            )}
-
-            {workoutPlanDto.hasIncompleteRecording && (
-              <Message
-                severity="warn"
-                className="w-full mt-3 justify-content-start"
-                text={
-                  t("The recording was left open") +
-                  ". " +
-                  t("No duration was recorded") +
-                  "."
-                }
-              />
-            )}
-
-            <div className="mt-3">
-              <WorkoutPlanRecordingActionsComponent
-                workoutPlanId={workoutPlanDto.id}
-                isAdminPage={isAdminPage}
-                onChanged={loadWorkoutPlan}
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="card">
+          }
+        >
           <WorkoutPlanFormComponent
             formMode={formMode}
             isAdminPage={isAdminPage}
           />
-        </div>
-      </Card>
+        </Card>
 
-      <div className="pt-3">
-        <ExerciseListComponent
-          formMode={formMode}
-          isAdminPage={isAdminPage}
-        />
+        <div className="pt-3">
+          <ExerciseListComponent
+            formMode={formMode}
+            isAdminPage={isAdminPage}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto" style={pageStyle}>
+      {/*                                                            */}
+      {/*       Plan on the left, exercises on the right once        */}
+      {/*       there is room for two columns                        */}
+      {/*                                                            */}
+
+      <div className="grid">
+        <div className="col-12 lg:col-4">
+          <Card>
+            <WorkoutPlanHeaderComponent
+              isAdminPage={isAdminPage}
+              onEdit={() => dialogControlEdit.showDialog()}
+            />
+
+            <WorkoutPlanRecordingActionsComponent
+              workoutPlanId={workoutPlanDto.id}
+              isAdminPage={isAdminPage}
+              onChanged={loadWorkoutPlan}
+            />
+
+            <WorkoutPlanHeaderFooter
+              onOpenRecordings={() => dialogControlRecordings.showDialog()}
+            />
+          </Card>
+        </div>
+
+        <div className="col-12 lg:col-8">
+          <ExerciseListComponent
+            formMode={formMode}
+            isAdminPage={isAdminPage}
+          />
+        </div>
       </div>
 
       {/*                                    */}
@@ -195,6 +182,23 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
           isAdminPage={isAdminPage}
         />
       </GenericDialogComponent>
-    </>
+
+      {/*                              */}
+      {/*       Edit workout plan      */}
+      {/*                              */}
+
+      <GenericDialogComponent
+        header={t("Edit plan")}
+        visible={isEditDialogVisible}
+        control={dialogControlEdit}
+        onSave={onSaveEdit}
+        formMode={FormMode.EDIT}
+      >
+        <WorkoutPlanFormComponent
+          formMode={FormMode.EDIT}
+          isAdminPage={isAdminPage}
+        />
+      </GenericDialogComponent>
+    </div>
   );
 }
