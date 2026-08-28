@@ -5,6 +5,7 @@ using Core.Dtos;
 using Core.Dtos.Lookup;
 using Core.Dtos.UserStatus;
 using Core.Models;
+using Core.System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -44,7 +45,7 @@ namespace API.Controllers
                 query.Where(x => x.Id.ToString() == lookupDto.Filter.Id);
 
             if (lookupDto.Filter.Value.Length > 0)
-                query.Where(x =>x.Name.ToLower().Contains(lookupDto.Filter.Value.ToLower()));
+                query.Where(x =>TextNormalizer.Normalize(x.Name).Contains(TextNormalizer.Normalize(lookupDto.Filter.Value)));
 
             // Handle Pagging.
             query.AddPagging(lookupDto.Skip, lookupDto.Take);
@@ -66,7 +67,7 @@ namespace API.Controllers
                 query.Where(x => x.Id.ToString() == lookupDto.Filter.Id);
 
             if (lookupDto.Filter.Value.Length > 0)
-                query.Where(x => x.Name.ToLower().Contains(lookupDto.Filter.Value.ToLower()));
+                query.Where(x => TextNormalizer.Normalize(x.Name).Contains(TextNormalizer.Normalize(lookupDto.Filter.Value)));
             lookupDto.TotalRecords = await query.CountAsync();
 
 

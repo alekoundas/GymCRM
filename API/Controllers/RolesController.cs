@@ -4,6 +4,7 @@ using Core.Dtos;
 using Core.Dtos.Identity;
 using Core.Dtos.Lookup;
 using Core.Models;
+using Core.System;
 using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -157,7 +158,7 @@ namespace API.Controllers
             if (lookupDto.Filter?.Id != null && lookupDto.Filter?.Id.Length > 0)
                 query = query.Where(x => lookupDto.Filter.Id.ToLower().Contains(x.Id.ToString().ToLower()));
             else if (lookupDto.Filter?.Value != null && lookupDto.Filter?.Value.Length > 0)
-                query = query.Where(x => x.Name!.ToLower().Contains(lookupDto.Filter.Value.ToLower()));
+                query = query.Where(x => TextNormalizer.Normalize(x.Name!).Contains(TextNormalizer.Normalize(lookupDto.Filter.Value)));
 
 
             // Handle Pagging.

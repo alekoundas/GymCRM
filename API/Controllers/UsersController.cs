@@ -8,6 +8,7 @@ using Core.Dtos.TrainGroupDate;
 using Core.Dtos.User;
 using Core.Enums;
 using Core.Models;
+using Core.System;
 using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -258,16 +259,20 @@ namespace API.Controllers
             var query = _dataService.GetGenericRepository<User>()
                 .Include(x => x.UserStatus);
 
+            // Both sides normalised, so "ελενη" finds "Ελένη". Sqlite's own lower()
+            // leaves Greek untouched, which is why this cannot just be ToLower().
+            string searchValue = TextNormalizer.Normalize(lookupDto.Filter.Value);
+
             if (lookupDto.Filter.Id.Length > 0)
                 query.Where(x => x.Id == new Guid(lookupDto.Filter.Id));
 
             if (lookupDto.Filter.Value.Length > 0)
                 query.Where(x =>
-                x.FirstName.ToLower().Contains(lookupDto.Filter.Value.ToLower()) ||
-                x.LastName.ToLower().Contains(lookupDto.Filter.Value.ToLower()) ||
-                x.Email.ToLower().Contains(lookupDto.Filter.Value.ToLower()) ||
-                x.PhoneNumbers.Any(y => y.Number.Contains(lookupDto.Filter.Value.ToLower())) ||
-                x.UserName!.ToLower().Contains(lookupDto.Filter.Value.ToLower())
+                TextNormalizer.Normalize(x.FirstName).Contains(searchValue) ||
+                TextNormalizer.Normalize(x.LastName).Contains(searchValue) ||
+                TextNormalizer.Normalize(x.Email).Contains(searchValue) ||
+                x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
+                TextNormalizer.Normalize(x.UserName!).Contains(searchValue)
             );
 
             // Handle Pagging.
@@ -296,11 +301,11 @@ namespace API.Controllers
 
             if (lookupDto.Filter.Value.Length > 0)
                 query.Where(x =>
-                x.FirstName.ToLower().Contains(lookupDto.Filter.Value.ToLower()) ||
-                x.LastName.ToLower().Contains(lookupDto.Filter.Value.ToLower()) ||
-                x.Email.ToLower().Contains(lookupDto.Filter.Value.ToLower()) ||
-                x.PhoneNumbers.Any(y => y.Number.Contains(lookupDto.Filter.Value.ToLower())) ||
-                x.UserName!.ToLower().Contains(lookupDto.Filter.Value.ToLower())
+                TextNormalizer.Normalize(x.FirstName).Contains(searchValue) ||
+                TextNormalizer.Normalize(x.LastName).Contains(searchValue) ||
+                TextNormalizer.Normalize(x.Email).Contains(searchValue) ||
+                x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
+                TextNormalizer.Normalize(x.UserName!).Contains(searchValue)
             );
             lookupDto.TotalRecords = await query.CountAsync();
 
@@ -314,14 +319,16 @@ namespace API.Controllers
         public async Task<ApiResponse<AutoCompleteDto<UserDto>>> AutoComplete([FromBody] AutoCompleteDto<UserDto> autoCompleteDto)
         {
             var query = _dataService.GetGenericRepository<User>();
-            string searchValue = autoCompleteDto.SearchValue.ToLower();
+            // Both sides normalised, so "ελενη" finds "Ελένη". Sqlite's own lower()
+            // leaves Greek untouched, which is why this cannot just be ToLower().
+            string searchValue = TextNormalizer.Normalize(autoCompleteDto.SearchValue);
             if (autoCompleteDto.SearchValue.Length > 0)
                 query.Where(x =>
-                    x.FirstName.ToLower().Contains(searchValue) ||
-                    x.LastName.ToLower().Contains(searchValue) ||
-                    x.Email.ToLower().Contains(searchValue) ||
+                    TextNormalizer.Normalize(x.FirstName).Contains(searchValue) ||
+                    TextNormalizer.Normalize(x.LastName).Contains(searchValue) ||
+                    TextNormalizer.Normalize(x.Email).Contains(searchValue) ||
                     x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
-                    x.UserName!.ToLower().Contains(searchValue)
+                    TextNormalizer.Normalize(x.UserName!).Contains(searchValue)
                 );
 
             // Handle Pagging.
@@ -333,11 +340,11 @@ namespace API.Controllers
 
             if (autoCompleteDto.SearchValue.Length > 0)
                 query.Where(x =>
-                    x.FirstName.ToLower().Contains(searchValue) ||
-                    x.LastName.ToLower().Contains(searchValue) ||
-                    x.Email.ToLower().Contains(searchValue) ||
+                    TextNormalizer.Normalize(x.FirstName).Contains(searchValue) ||
+                    TextNormalizer.Normalize(x.LastName).Contains(searchValue) ||
+                    TextNormalizer.Normalize(x.Email).Contains(searchValue) ||
                     x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
-                    x.UserName!.ToLower().Contains(searchValue)
+                    TextNormalizer.Normalize(x.UserName!).Contains(searchValue)
                 );
 
             autoCompleteDto.Suggestions = customerDto;

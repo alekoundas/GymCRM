@@ -6,6 +6,7 @@ using Core.Dtos.DataTable;
 using Core.Dtos.Lookup;
 using Core.Dtos.WorkoutPlanRule;
 using Core.Models;
+using Core.System;
 using Core.Translations;
 using DataAccess;
 using Microsoft.AspNetCore.Authorization;
@@ -188,7 +189,7 @@ namespace API.Controllers
                 query = query.Where(x => x.Id == filterId);
 
             if (lookupDto.Filter.Value.Length > 0)
-                query = query.Where(x => x.Name.ToLower().Contains(lookupDto.Filter.Value.ToLower()));
+                query = query.Where(x => TextNormalizer.Normalize(x.Name).Contains(TextNormalizer.Normalize(lookupDto.Filter.Value)));
 
             lookupDto.TotalRecords = await query.CountAsync();
 
