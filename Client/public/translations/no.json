@@ -266,5 +266,8 @@
   "Plan notes": "Plan notes",
   "Edit plan": "Edit plan",
   "Last recording": "Last recording",
-  "Set the current week for the selected rule": "Set the current week for the selected rule"
+  "Set the current week for the selected rule": "Set the current week for the selected rule",
+  "Select all": "Select all",
+  "Clear": "Clear",
+  "Selected": "Selected"
 }

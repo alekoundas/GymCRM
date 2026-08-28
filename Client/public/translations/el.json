@@ -265,5 +265,8 @@
   "Plan notes": "Σημειώσεις προγράμματος",
   "Edit plan": "Επεξεργασία προγράμματος",
   "Last recording": "Τελευταία καταγραφή",
-  "Set the current week for the selected rule": "Όρισε την τρέχουσα εβδομάδα για τον κανόνα που διάλεξες"
+  "Set the current week for the selected rule": "Όρισε την τρέχουσα εβδομάδα για τον κανόνα που διάλεξες",
+  "Select all": "Επιλογή όλων",
+  "Clear": "Καθαρισμός",
+  "Selected": "Επιλεγμένοι"
 }

@@ -272,6 +272,9 @@
   'Edit plan': string;
   'Last recording': string;
   'Set the current week for the selected rule': string;
+  'Select all': string;
+  'Clear': string;
+  'Selected': string;
     }
 
 

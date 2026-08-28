@@ -84,6 +84,7 @@ export default function MailSendFormComponent({ formMode }: IField) {
         <AutoCompleteComponent
           controller="users"
           isEnabled={true}
+          isSelectAllVisible
           itemTemplate={userTemplate}
           selectedItemTemplate={chipTemplate}
           onChange={(x) => updateMailSendDto({ userIds: x.map((y) => y.id) })}
