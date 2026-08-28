@@ -92,13 +92,9 @@ namespace API.Controllers
         {
             query = query.Include(x => x.User);
 
-            // Row-level guard: without the admin claim a member only ever sees their own
-            // recordings, whatever filters the client happens to send.
-            if (!User.HasClaim("Permission", AdminViewClaim))
-            {
-                Guid callerId = GetCallerId() ?? Guid.Empty;
-                query = query.Where(x => x.UserId == callerId);
-            }
+            Guid? scopeUserId = GetScopeToCallerId(AdminViewClaim);
+            if (scopeUserId != null)
+                query = query.Where(x => x.UserId == scopeUserId.Value);
         }
 
         protected override Task DataTableResultUpdate(List<WorkoutPlanRecording> entities, List<WorkoutPlanRecordingDto> entityDtos)
@@ -120,10 +116,5 @@ namespace API.Controllers
             return Task.CompletedTask;
         }
 
-        private Guid? GetCallerId()
-        {
-            string? rawId = User.FindFirst("Id")?.Value;
-            return Guid.TryParse(rawId, out Guid callerId) ? callerId : null;
-        }
     }
 }

@@ -544,6 +544,10 @@ namespace API.Controllers
         {
             query = query.Include(x => x.User).ThenInclude<User, UserStatus>(x => x.UserStatus!);
 
+            Guid? scopeUserId = GetScopeToCallerId("TrainGroupParticipants_View");
+            if (scopeUserId != null)
+                query = query.Where(x => x.UserId == scopeUserId.Value);
+
 
             List<DataTableFilterDto> customFilters = dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.custom).ToList();
 

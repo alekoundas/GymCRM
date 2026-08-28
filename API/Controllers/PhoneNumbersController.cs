@@ -2,6 +2,8 @@
 using Business.Services;
 using Core.Dtos;
 using Core.Dtos.PhoneNumber;
+using Business.Repository;
+using Core.Dtos.DataTable;
 using Core.Models;
 using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
@@ -90,5 +92,14 @@ namespace API.Controllers
         {
             return true;
         }
+
+        protected override void DataTableQueryUpdate(IGenericRepository<PhoneNumber> query, DataTableDto<PhoneNumberDto> dataTable)
+        {
+            // Anyone who can list users can see their numbers; everybody else gets theirs.
+            Guid? scopeUserId = GetScopeToCallerId("Users_View");
+            if (scopeUserId != null)
+                query = query.Where(x => x.UserId == scopeUserId.Value);
+        }
+
     }
 }

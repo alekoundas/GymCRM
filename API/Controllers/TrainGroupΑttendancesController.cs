@@ -154,6 +154,11 @@ namespace API.Controllers
             query = query
                 .Include(x => x.User)
                 .Include(x => x.TrainGroup);
+
+            // Same claim the rest of this controller authorises against.
+            Guid? scopeUserId = GetScopeToCallerId("TrainGroups_View");
+            if (scopeUserId != null)
+                query = query.Where(x => x.UserId == scopeUserId.Value);
         }
 
     }
