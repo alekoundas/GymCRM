@@ -87,6 +87,11 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string A_recording_is_already_running_for_this_plan = "A_recording_is_already_running_for_this_plan";
         public const string The_recording_can_no_longer_be_stopped = "The_recording_can_no_longer_be_stopped";
         public const string The_rule_is_in_use_by_a_running_recording = "The_rule_is_in_use_by_a_running_recording";
+        public const string Attendance_Confirmation = "Attendance_Confirmation";
+        public const string Attendance_Information = "Attendance_Information";
+        public const string Your_attendance_was_recorded = "Your_attendance_was_recorded";
+        public const string Train_group = "Train_group";
+        public const string Attendance_date = "Attendance_date";
         public const string _0_is_required = "_0_is_required";
         public const string _0_already_exists = "_0_already_exists";
         public const string _0_not_found = "_0_not_found";
