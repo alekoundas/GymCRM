@@ -211,6 +211,13 @@ namespace API.Controllers
             List<TEntity> result = await query.ToListAsync();
             List<TEntityDto> resultDto = _mapper.Map<List<TEntityDto>>(result);
 
+            // ToListAsync disposes the query, so the count below builds a fresh one and
+            // the filters have to go on again - that is what the loop underneath is for.
+            // The derived controller's work has to be repeated for the same reason, or
+            // the total ignores it: wrong page counts, and a row count that gives away
+            // how much a member is not allowed to see.
+            DataTableQueryUpdate(query, dataTable);
+
             foreach (var filter in dataTable.Filters)
             {
                 if (handledFields.Contains(filter.FieldName))
@@ -287,6 +294,26 @@ namespace API.Controllers
             return Task.CompletedTask;
         }
 
+
+        // The caller's own id, from the "Id" claim the token carries.
+        protected Guid? GetCallerId()
+        {
+            string? rawId = User.FindFirst("Id")?.Value;
+            return Guid.TryParse(rawId, out Guid callerId) ? callerId : null;
+        }
+
+        // Row-level guard for the grids of anything a member owns. GetDataTable takes
+        // its filters from the request body, so a client-side filter is a convenience
+        // and never a fence. Null means the caller holds the admin claim and may see
+        // everyone. Guid.Empty when the token carries no id - matches nothing, which
+        // is the safe way to fail.
+        protected Guid? GetScopeToCallerId(string adminViewClaim)
+        {
+            if (User.HasClaim("Permission", adminViewClaim))
+                return null;
+
+            return GetCallerId() ?? Guid.Empty;
+        }
 
         protected virtual bool IsUserAuthorized(string action)
         {

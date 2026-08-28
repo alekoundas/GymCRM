@@ -20,6 +20,8 @@ namespace API.Controllers
     public class WorkoutPlansController : GenericController<WorkoutPlan, WorkoutPlanDto, WorkoutPlanAddDto>
     {
         // Sort/filter names that are computed from the recordings, not columns on WorkoutPlan.
+        private const string AdminViewClaim = "WorkoutPlansAdmin_View";
+
         private const string LastRecordingOnField = "lastRecordingOn";
         private const string IsRunningField = "isRunning";
 
@@ -68,6 +70,10 @@ namespace API.Controllers
         {
             query = query.Include(x => x.User).ThenInclude<User, UserStatus>(x => x.UserStatus!);
             query = query.Include(x => x.WorkoutPlanRule!);
+
+            Guid? scopeUserId = GetScopeToCallerId(AdminViewClaim);
+            if (scopeUserId != null)
+                query = query.Where(x => x.UserId == scopeUserId.Value);
 
             // "Is a recording live for this plan" is an EXISTS over the children, so the
             // reflection-based helpers in GetDataTable cannot express it. Same for the

@@ -258,10 +258,5 @@ namespace API.Controllers
                 && x.WorkoutPlan.WorkoutPlanRuleId == ruleId);
         }
 
-        private Guid? GetCallerId()
-        {
-            string? rawId = User.FindFirst("Id")?.Value;
-            return Guid.TryParse(rawId, out Guid callerId) ? callerId : null;
-        }
     }
 }

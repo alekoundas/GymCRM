@@ -23,6 +23,9 @@ namespace API.Controllers
         // field is claimed here and both its filter and its sort are done typed.
         private const string StatusField = "status";
 
+        // Mail bodies are personal, so without this a member could read the whole gym's.
+        private const string AdminViewClaim = "Mails_View";
+
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
@@ -81,6 +84,10 @@ namespace API.Controllers
         protected override void DataTableQueryUpdate(IGenericRepository<Mail> query, DataTableDto<MailDto> dataTable)
         {
             query = query.Include(x => x.User);
+
+            Guid? scopeUserId = GetScopeToCallerId(AdminViewClaim);
+            if (scopeUserId != null)
+                query = query.Where(x => x.UserId == scopeUserId.Value);
 
             DataTableFilterDto? statusFilter = dataTable.Filters
                 .FirstOrDefault(x => string.Equals(x.FieldName, StatusField, StringComparison.OrdinalIgnoreCase));
