@@ -24,6 +24,9 @@ interface IField {
   // When set the grid is scoped to a single plan - the dialog opened from the plan page.
   workoutPlanId?: number;
   isAdminPage: boolean;
+  // Only the standalone page remembers its filters in the url. The same grid also
+  // runs inside the plan dialog, which has no business touching the address bar.
+  isUrlStateEnabled?: boolean;
 }
 
 // Seconds to h:mm:ss, or mm:ss when under an hour.
@@ -55,6 +58,7 @@ const formatTime = (value: string | undefined): string => {
 export default function WorkoutPlanRecordingGridComponent({
   workoutPlanId,
   isAdminPage,
+  isUrlStateEnabled = false,
 }: IField) {
   const { t } = useTranslator();
   const apiService = useApiService();
@@ -266,6 +270,7 @@ export default function WorkoutPlanRecordingGridComponent({
   return (
     <>
       <DataTableComponent
+        isUrlStateEnabled={isUrlStateEnabled}
         dataTableDto={datatableDto}
         setDataTableDto={setDatatableDto}
         formMode={FormMode.VIEW}

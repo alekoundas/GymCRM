@@ -186,6 +186,7 @@ export default function UserStatusGridComponent() {
   return (
     <>
       <DataTableComponent
+        isUrlStateEnabled
         dataTableDto={datatableDto}
         setDataTableDto={setDatatableDto}
         formMode={FormMode.EDIT}

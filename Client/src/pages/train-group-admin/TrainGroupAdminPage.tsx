@@ -240,6 +240,7 @@ export default function TrainGroupAdminPage() {
       <Card title={t("Train Groups")}>
         <div className="card">
           <DataTableComponent
+            isUrlStateEnabled
             dataTableDto={datatableDto}
             setDataTableDto={setDatatableDto}
             formMode={FormMode.EDIT}

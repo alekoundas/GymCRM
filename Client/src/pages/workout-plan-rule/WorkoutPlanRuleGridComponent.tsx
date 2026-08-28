@@ -208,6 +208,7 @@ export default function WorkoutPlanRuleGridComponent() {
   return (
     <>
       <DataTableComponent
+        isUrlStateEnabled
         dataTableDto={datatableDto}
         setDataTableDto={setDatatableDto}
         formMode={FormMode.EDIT}
