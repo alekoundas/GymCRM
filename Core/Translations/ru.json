@@ -92,5 +92,6 @@
   "_0_cannot_exceed_50_characters": "{0} не может превышать 50 символов!",
   "_0_cannot_exceed_100_characters": "{0} не может превышать 100 символов!",
   "_0_cannot_exceed_200_characters": "{0} не может превышать 200 символов!",
-  "_0_cannot_exceed_500_characters": "{0} не может превышать 500 символов!"
+  "_0_cannot_exceed_500_characters": "{0} не может превышать 500 символов!",
+  "_0_emails_queued": "{0} emails queued for sending!"
 }

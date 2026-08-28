@@ -16,6 +16,9 @@ import MailFormComponent from "./MailFormComponent";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 import DataTableFilterDateComponent from "../../components/core/datatable/DataTableFilterDateComponent";
 import DataTableFilterNumberComponent from "../../components/core/datatable/DataTableFilterNumberComponent";
+import DataTableFilterEnumComponent from "../../components/core/datatable/DataTableFilterEnumComponent";
+import { MailStatusEnum } from "../../enum/MailStatusEnum";
+import { Tag } from "primereact/tag";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
 import MailSendFormComponent from "./MailSendFormComponent";
@@ -76,6 +79,7 @@ export default function MailsPage() {
       { fieldName: "id", filterType: "equals" },
       { fieldName: "subject", filterType: "contains" },
       { fieldName: "userId", filterType: "in" },
+      { fieldName: "status", filterType: "equals" },
       { fieldName: "createdOn", filterType: "between" },
     ],
   });
@@ -110,6 +114,42 @@ export default function MailsPage() {
       );
     }
   };
+  // Queued, gone out, or refused by Gmail. Failed carries the reason with it,
+  // which is the one people actually need to see.
+  const statusTemplate = (status: MailStatusEnum | undefined) => {
+    if (status === MailStatusEnum.SENT)
+      return (
+        <Tag
+          severity="success"
+          icon="pi pi-check"
+          value={t("Sent")}
+        />
+      );
+
+    if (status === MailStatusEnum.FAILED)
+      return (
+        <Tag
+          severity="danger"
+          icon="pi pi-times"
+          value={t("Failed")}
+        />
+      );
+
+    return (
+      <Tag
+        severity="warning"
+        icon="pi pi-clock"
+        value={t("Pending")}
+      />
+    );
+  };
+
+  const statusFilterValues = [
+    { label: t("Pending"), value: MailStatusEnum.PENDING },
+    { label: t("Sent"), value: MailStatusEnum.SENT },
+    { label: t("Failed"), value: MailStatusEnum.FAILED },
+  ];
+
   const dataTableColumns: DataTableColumns<MailDto>[] = [
     {
       field: "id",
@@ -144,6 +184,21 @@ export default function MailsPage() {
       ),
       body: (rowData, options) => chipTemplate(rowData.user),
       style: { width: "20%" },
+    },
+    {
+      field: "status",
+      header: t("Status"),
+      sortable: true,
+      filter: true,
+      filterPlaceholder: t("Search"),
+      filterTemplate: (options) => (
+        <DataTableFilterEnumComponent
+          options={options}
+          values={statusFilterValues}
+        />
+      ),
+      body: (rowData, options) => statusTemplate(rowData.status),
+      style: { width: "10%" },
     },
     {
       field: "createdOn",

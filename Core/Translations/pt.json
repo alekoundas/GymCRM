@@ -92,5 +92,6 @@
   "_0_cannot_exceed_50_characters": "{0} não pode exceder 50 caracteres!",
   "_0_cannot_exceed_100_characters": "{0} não pode exceder 100 caracteres!",
   "_0_cannot_exceed_200_characters": "{0} não pode exceder 200 caracteres!",
-  "_0_cannot_exceed_500_characters": "{0} não pode exceder 500 caracteres!"
+  "_0_cannot_exceed_500_characters": "{0} não pode exceder 500 caracteres!",
+  "_0_emails_queued": "{0} emails queued for sending!"
 }

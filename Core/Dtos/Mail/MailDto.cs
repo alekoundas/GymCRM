@@ -1,4 +1,5 @@
 ﻿using Core.Dtos.User;
+using Core.Enums;
 using Core.Translations;
 using System.ComponentModel.DataAnnotations;
 
@@ -15,6 +16,13 @@ namespace Core.Dtos.Mail
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string Body { get; set; } = string.Empty;
+
+
+        // Attachments are deliberately not here - the grid has no use for the
+        // .ics payloads and they would bloat every page of the history.
+        public MailStatusEnum Status { get; set; }
+        public DateTime? SentOn { get; set; }
+        public string Error { get; set; } = string.Empty;
 
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]

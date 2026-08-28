@@ -92,6 +92,12 @@ export default function MailSendPage() {
           </li>
           <li>
             {t(
+              "Emails are sent in the background, the history shows what went out"
+            )}
+            .
+          </li>
+          <li>
+            {t(
               "The email body will be converted to HTML and inserted into the email content. Note that different email providers may render HTML differently, which could lead to inconsistencies in appearance."
             )}
           </li>

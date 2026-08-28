@@ -179,6 +179,10 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Attachments")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Body")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -193,6 +197,16 @@ namespace DataAccess.Migrations
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
+
+                    b.Property<string>("Error")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SentOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Subject")
                         .IsRequired()

@@ -5,6 +5,7 @@ using Business.Services.Email;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.Mail;
+using Core.Enums;
 using Core.Models;
 using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +18,11 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class MailsController : GenericController<Mail, MailDto, MailAddDto>
     {
+        // Status is an enum. The reflection helpers in GetDataTable convert filter
+        // values with Convert.ChangeType, which cannot turn "SENT" into one, so the
+        // field is claimed here and both its filter and its sort are done typed.
+        private const string StatusField = "status";
+
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
@@ -45,14 +51,15 @@ namespace API.Controllers
                 .Where(x => userIds.Any(y => y == x.Id))
                 .ToListAsync();
 
-            foreach (string email in users.Select(x => x.Email))
-                await _emailService.SendEmailAsync(
-                    email,
-                    dto.Subject,
-                    dto.Body
-                );
+            if (users.Count == 0)
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, typeof(User).Name]);
 
-            return new ApiResponse<bool>().SetSuccessResponse(true, "One or more Emails send!");
+            // Written down and handed to the background sender. Sending here meant one
+            // Gmail round trip per recipient on the request thread, which timed the
+            // browser out long before a list this size was through.
+            await _emailService.QueueEmailAsync(users, dto.Subject, dto.Body);
+
+            return new ApiResponse<bool>().SetSuccessResponse(true, _localizer[TranslationKeys._0_emails_queued, users.Count.ToString()]);
         }
 
         // POST: api/controller/DeleteAll
@@ -74,6 +81,31 @@ namespace API.Controllers
         protected override void DataTableQueryUpdate(IGenericRepository<Mail> query, DataTableDto<MailDto> dataTable)
         {
             query = query.Include(x => x.User);
+
+            DataTableFilterDto? statusFilter = dataTable.Filters
+                .FirstOrDefault(x => string.Equals(x.FieldName, StatusField, StringComparison.OrdinalIgnoreCase));
+
+            if (statusFilter?.Value != null && Enum.TryParse(statusFilter.Value, true, out MailStatusEnum status))
+                query = query.Where(x => x.Status == status);
+
+            DataTableSortDto? statusSort = dataTable.Sorts
+                .FirstOrDefault(x => string.Equals(x.FieldName, StatusField, StringComparison.OrdinalIgnoreCase));
+
+            if (statusSort != null)
+            {
+                if (statusSort.Order > 0)
+                    query = query.OrderBy(x => x.Status);
+                else
+                    query = query.OrderByDescending(x => x.Status);
+            }
+        }
+
+        protected override HashSet<string> GetHandledDataTableFields()
+        {
+            return new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                StatusField
+            };
         }
 
     }

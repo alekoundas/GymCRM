@@ -268,5 +268,9 @@
   "Set the current week for the selected rule": "Όρισε την τρέχουσα εβδομάδα για τον κανόνα που διάλεξες",
   "Select all": "Επιλογή όλων",
   "Clear": "Καθαρισμός",
-  "Selected": "Επιλεγμένοι"
+  "Selected": "Επιλεγμένοι",
+  "Pending": "Σε αναμονή",
+  "Sent": "Στάλθηκε",
+  "Failed": "Απέτυχε",
+  "Emails are sent in the background, the history shows what went out": "Τα email φεύγουν στο παρασκήνιο, το ιστορικό δείχνει ποια στάλθηκαν"
 }

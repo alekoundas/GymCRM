@@ -92,5 +92,6 @@
   "_0_cannot_exceed_50_characters": "{0} 不能超过 50 个字符！",
   "_0_cannot_exceed_100_characters": "{0} 不能超过 100 个字符！",
   "_0_cannot_exceed_200_characters": "{0} 不能超过 200 个字符！",
-  "_0_cannot_exceed_500_characters": "{0} 不能超过 500 个字符！"
+  "_0_cannot_exceed_500_characters": "{0} 不能超过 500 个字符！",
+  "_0_emails_queued": "{0} emails queued for sending!"
 }

@@ -98,5 +98,6 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string _0_cannot_exceed_100_characters = "_0_cannot_exceed_100_characters";
         public const string _0_cannot_exceed_200_characters = "_0_cannot_exceed_200_characters";
         public const string _0_cannot_exceed_500_characters = "_0_cannot_exceed_500_characters";
+        public const string _0_emails_queued = "_0_emails_queued";
     }
 }
