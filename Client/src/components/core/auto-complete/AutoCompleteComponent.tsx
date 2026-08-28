@@ -12,11 +12,16 @@ import {
 import { AutoCompleteDto } from "../../../model/core/auto-complete/AutoCompleteDto";
 import { classNames } from "primereact/utils";
 import { Skeleton } from "primereact/skeleton";
+import { Button } from "primereact/button";
+import { useTranslator } from "../../../services/TranslatorService";
 
 interface IField<TEntity> {
   controller: string;
   existingIds?: string[];
   isEnabled: boolean;
+  // Adds a button that pulls the whole list in one go. Off unless asked for - it
+  // only makes sense where selecting everything is a reasonable thing to do.
+  isSelectAllVisible?: boolean;
   itemTemplate: (data: TEntity) => JSX.Element;
   selectedItemTemplate: (data: TEntity) => JSX.Element;
   onChange?: (entities: TEntity[]) => void;
@@ -26,10 +31,13 @@ export default function AutoCompleteComponent<TEntity>({
   controller,
   existingIds,
   isEnabled,
+  isSelectAllVisible,
   itemTemplate,
   selectedItemTemplate,
   onChange,
 }: IField<TEntity>) {
+  const { t } = useTranslator();
+  const [isSelectingAll, setSelectingAll] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false); // used to escape lazyload firing again after dto update.
   const [searchValue, setSearchValue] = useState("");
   const [autoCompleteDto, setAutoCompleteDto] = useState<
@@ -85,6 +93,41 @@ export default function AutoCompleteComponent<TEntity>({
     if (onChange) onChange(value);
     setSelectedEntityDtos(value);
     setSearchValue("");
+  };
+
+  // Two calls on purpose: the page size has to be a real number, and the count
+  // only comes back with a page, so the first one asks how many there are.
+  const selectAll = async () => {
+    setSelectingAll(true);
+
+    const countDto = new AutoCompleteDto<TEntity>();
+    countDto.take = 1;
+    const countResult = await apiService.getDataAutoComplete<TEntity>(
+      controller,
+      countDto,
+    );
+
+    const totalRecords = countResult?.totalRecords ?? 0;
+    if (totalRecords > 0) {
+      const allDto = new AutoCompleteDto<TEntity>();
+      allDto.take = totalRecords;
+
+      const allResult = await apiService.getDataAutoComplete<TEntity>(
+        controller,
+        allDto,
+      );
+
+      const allEntities = allResult?.suggestions ?? [];
+      setSelectedEntityDtos(allEntities);
+      if (onChange) onChange(allEntities);
+    }
+
+    setSelectingAll(false);
+  };
+
+  const clearSelection = () => {
+    setSelectedEntityDtos([]);
+    if (onChange) onChange([]);
   };
 
   const loadingTemplate = (options: VirtualScrollerLoadingTemplateOptions) => {
@@ -151,6 +194,35 @@ export default function AutoCompleteComponent<TEntity>({
           className="w-full"
         />
       </div>
+
+      {isSelectAllVisible && (
+        <div className="flex align-items-center gap-2 mt-2">
+          <Button
+            type="button"
+            label={t("Select all")}
+            icon="pi pi-users"
+            className="p-button-sm p-button-outlined"
+            disabled={!isEnabled || isSelectingAll}
+            loading={isSelectingAll}
+            onClick={selectAll}
+          />
+          {selectedEntityDtos.length > 0 && (
+            <>
+              <Button
+                type="button"
+                label={t("Clear")}
+                icon="pi pi-times"
+                className="p-button-sm p-button-text p-button-secondary"
+                disabled={!isEnabled || isSelectingAll}
+                onClick={clearSelection}
+              />
+              <span className="text-sm text-color-secondary">
+                {selectedEntityDtos.length} {t("Selected")}
+              </span>
+            </>
+          )}
+        </div>
+      )}
     </>
   );
 }
