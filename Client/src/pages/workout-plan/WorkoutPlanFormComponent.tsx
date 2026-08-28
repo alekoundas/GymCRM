@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
@@ -8,6 +8,8 @@ import { DialogChildProps } from "../../components/core/dialog/GenericDialogComp
 import { useTranslator } from "../../services/TranslatorService";
 import { WorkoutPlanDto } from "../../model/entities/workout-plan/WorkoutPlanDto";
 import { useWorkoutPlanStore } from "../../stores/WorkoutPlanStore";
+import { WorkoutPlanRuleDto } from "../../model/entities/workout-plan-rule/WorkoutPlanRuleDto";
+import { useApiService } from "../../services/ApiService";
 import { TokenService } from "../../services/TokenService";
 import LookupComponent from "../../components/core/dropdown/LookupComponent";
 
@@ -24,7 +26,18 @@ export default function WorkoutPlanFormComponent({
   isAdminPage,
 }: IField) {
   const { t } = useTranslator();
+  const apiService = useApiService();
   const { workoutPlanDto, updateWorkoutPlanDto } = useWorkoutPlanStore();
+
+  // The plan's weekCount comes from the server and only refreshes on save, so
+  // picking a rule here has to read the rule's own week count to offer weeks.
+  const [ruleWeekCount, setRuleWeekCount] = useState<number>(
+    workoutPlanDto.weekCount ?? 0,
+  );
+
+  useEffect(() => {
+    setRuleWeekCount(workoutPlanDto.weekCount ?? 0);
+  }, [workoutPlanDto.weekCount]);
 
   const isReadOnly = formMode === FormMode.VIEW;
 
@@ -34,12 +47,33 @@ export default function WorkoutPlanFormComponent({
 
   const weekOptions = useMemo(
     () =>
-      Array.from({ length: workoutPlanDto.weekCount ?? 0 }, (_, i) => ({
+      Array.from({ length: ruleWeekCount }, (_, i) => ({
         label: `${t("Week")} ${i + 1}`,
         value: i + 1,
       })),
-    [workoutPlanDto.weekCount, t],
+    [ruleWeekCount, t],
   );
+
+  const onRuleChange = async (ruleId: number | undefined) => {
+    updateWorkoutPlanDto({ workoutPlanRuleId: ruleId });
+
+    if (!ruleId) {
+      setRuleWeekCount(0);
+      updateWorkoutPlanDto({ currentWeek: undefined });
+      return;
+    }
+
+    const rule = await apiService.get<WorkoutPlanRuleDto>(
+      "WorkoutPlanRules",
+      ruleId,
+    );
+    const weekCount = rule?.weekCount ?? 0;
+    setRuleWeekCount(weekCount);
+
+    // A week the newly chosen rule does not have must not be saved.
+    if ((workoutPlanDto.currentWeek ?? 0) > weekCount)
+      updateWorkoutPlanDto({ currentWeek: undefined });
+  };
 
   return (
     <div className="w-full">
@@ -97,16 +131,12 @@ export default function WorkoutPlanFormComponent({
               selectedEntityId={
                 workoutPlanDto.workoutPlanRuleId?.toString() ?? ""
               }
-              onChange={(e) =>
-                updateWorkoutPlanDto({
-                  workoutPlanRuleId: e?.id ? Number(e.id) : undefined,
-                })
-              }
+              onChange={(e) => onRuleChange(e?.id ? Number(e.id) : undefined)}
               isEnabled={!isReadOnly}
             />
           </div>
 
-          {(workoutPlanDto.weekCount ?? 0) > 0 && (
+          {ruleWeekCount > 0 && (
             <div className="field w-full">
               <label
                 htmlFor="currentWeek"

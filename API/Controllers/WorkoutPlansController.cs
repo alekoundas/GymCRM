@@ -159,8 +159,14 @@ namespace API.Controllers
                 entityDto.ElapsedSeconds = running != null
                     ? (int)(nowUtc - running.StartedOn).TotalSeconds
                     : null;
-                entityDto.HasIncompleteRecording = planRecordings.Any(x => _recordingService.IsIncomplete(x, nowUtc));
-                entityDto.LastRecordingOn = planRecordings.FirstOrDefault()?.StartedOn;
+                // Only the latest one matters. Flagging any lapsed recording ever
+                // would leave the warning up for good, even after a clean session.
+                WorkoutPlanRecording? latest = planRecordings.FirstOrDefault();
+
+                entityDto.HasIncompleteRecording =
+                    latest != null && _recordingService.IsIncomplete(latest, nowUtc);
+                entityDto.LastRecordingOn = latest?.StartedOn;
+                entityDto.LastRecordingDurationSeconds = latest?.DurationSeconds;
                 entityDto.RecordingCount = planRecordings.Count;
 
                 if (entity.WorkoutPlanRuleId != null)
