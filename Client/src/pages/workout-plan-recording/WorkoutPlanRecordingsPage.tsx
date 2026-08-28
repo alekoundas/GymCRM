@@ -12,7 +12,10 @@ export default function WorkoutPlanRecordingsPage() {
     <>
       <Card title={t("Recordings")}>
         <div className="card">
-          <WorkoutPlanRecordingGridComponent isAdminPage={isAdminPage} />
+          <WorkoutPlanRecordingGridComponent
+            isAdminPage={isAdminPage}
+            isUrlStateEnabled
+          />
         </div>
       </Card>
     </>

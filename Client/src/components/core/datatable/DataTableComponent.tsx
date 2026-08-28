@@ -20,6 +20,8 @@ import { TokenService } from "../../../services/TokenService";
 import DataTableGridRowActionsComponent from "./DataTableGridRowActionsComponent";
 import { useDataTableService } from "../../../services/DataTableService";
 import { useTranslator } from "../../../services/TranslatorService";
+import { useSearchParams } from "react-router-dom";
+import { DataTableSortDto } from "../../../model/datatable/DataTableSortDto";
 
 interface IField<TEntity> {
   controller: string;
@@ -42,6 +44,15 @@ interface IField<TEntity> {
   triggerRefreshData?: React.MutableRefObject<
     ((dto: DataTableDto<TEntity>) => void) | undefined
   >;
+  // Remembers filters, sorting and paging in the query string, so a filtered grid
+  // survives a reload and can be sent to someone. Off by default: a grid inside a
+  // dialog or a tab has no business touching the address bar.
+  isUrlStateEnabled?: boolean;
+  // Prefix that keeps two grids on the same page out of each other's parameters.
+  urlStateKey?: string;
+  // Filters the page forces itself, which have no place in a link - the member's
+  // own userId, for instance.
+  urlStateExcludedFields?: string[];
 
   onSelect?: (
     e: DataTableSelectionSingleChangeEvent<DataTableValueArray>
@@ -66,11 +77,121 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   onButtonClick,
   onAfterDataLoaded,
   triggerRefreshData,
+  isUrlStateEnabled = false,
+  urlStateKey,
+  urlStateExcludedFields = [],
   onSelect,
   selectedObject,
 }: IField<TEntity>) {
   const { t } = useTranslator();
   const [loading, setLoading] = useState(true);
+  const [, setSearchParams] = useSearchParams();
+
+  //
+  //          Grid state in the query string. Values only - the page already
+  //          declares each filter's type, so the url never has to carry it.
+  //
+
+  // Filters whose value is a list rather than a single string.
+  const isMultiValueFilter = (filterType: string | undefined): boolean =>
+    filterType === "in" || filterType === "notIn" || filterType === "between";
+
+  const urlName = (name: string): string =>
+    urlStateKey ? `${urlStateKey}.${name}` : name;
+
+  const isUrlField = (fieldName: string): boolean =>
+    !urlStateExcludedFields.includes(fieldName);
+
+  // Applied to the dto in place, before the first load, so a shared link costs one
+  // request rather than loading everything and then filtering it. In place because
+  // onFilter, onSort and onPage all mutate this same object and afterDataLoaded
+  // spreads it - a copy here would be thrown away by the first load.
+  const applyUrlState = (dto: DataTableDto<TEntity>) => {
+    const params = new URLSearchParams(window.location.search);
+
+    const filters = dto.filters.map((filter) => {
+      if (!isUrlField(filter.fieldName)) return filter;
+
+      const values = params.getAll(urlName(filter.fieldName));
+      if (values.length === 0) return filter;
+
+      return isMultiValueFilter(filter.filterType)
+        ? { ...filter, values: values }
+        : { ...filter, value: values[0] };
+    });
+
+    // "-createdOn,title" - a leading minus is descending.
+    const sortParam = params.get(urlName("sort"));
+    const sorts: DataTableSortDto[] = (sortParam?.split(",") ?? [])
+      .filter((x) => x.length > 0)
+      .map((x) => ({
+        fieldName: x.startsWith("-") ? x.substring(1) : x,
+        order: x.startsWith("-") ? -1 : 1,
+      }));
+
+    const rows = Number(params.get(urlName("rows"))) || dto.rows;
+    // One-based in the url, because that is the number the paginator shows.
+    const page = Math.max(0, (Number(params.get(urlName("page"))) || 1) - 1);
+
+    dto.filters = filters;
+
+    if (sorts.length > 0) {
+      dto.sorts = sorts;
+      dto.dataTableSorts = sorts.map((x) => ({
+        field: x.fieldName,
+        order: x.order,
+      }));
+    }
+
+    dto.rows = rows;
+    dto.page = page;
+    dto.first = page * rows;
+  };
+
+  // Written after every load, when the dto has settled. Only this grid's own
+  // parameters are touched, so anything else on the url is left alone.
+  const writeUrlState = (dto: DataTableDto<TEntity>) => {
+    setSearchParams(
+      (previous) => {
+        const params = new URLSearchParams(previous);
+
+        dto.filters.forEach((filter) => {
+          if (!isUrlField(filter.fieldName)) return;
+
+          params.delete(urlName(filter.fieldName));
+
+          const values = isMultiValueFilter(filter.filterType)
+            ? filter.values ?? []
+            : filter.value != null && filter.value !== ""
+              ? [filter.value]
+              : [];
+
+          values.forEach((value) =>
+            params.append(urlName(filter.fieldName), value),
+          );
+        });
+
+        const sort = (dto.sorts ?? [])
+          .map((x) => (x.order === -1 ? "-" : "") + x.fieldName)
+          .join(",");
+
+        params.delete(urlName("sort"));
+        if (sort.length > 0) params.set(urlName("sort"), sort);
+
+        params.delete(urlName("page"));
+        if (dto.page > 0) params.set(urlName("page"), (dto.page + 1).toString());
+
+        params.delete(urlName("rows"));
+        if (dto.rows !== new DataTableDto<TEntity>().rows)
+          params.set(urlName("rows"), dto.rows.toString());
+
+        return params;
+      },
+      // Replace, or every keystroke in a filter box becomes a history entry and
+      // the back button stops meaning anything.
+      { replace: true },
+    );
+  };
 
   const afterDataLoaded = (
     data: DataTableDto<TEntity> | null
@@ -82,8 +203,8 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
       updateData = onAfterDataLoaded(data);
     }
 
-    if (updateData)
-      setDataTableDto({
+    if (updateData) {
+      const merged = {
         ...dataTableDto,
         data: updateData.data,
         totalRecords: updateData.totalRecords,
@@ -91,7 +212,11 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         page: updateData.page,
         first: updateData.first,
         rows: updateData.rows,
-      });
+      };
+
+      setDataTableDto(merged);
+      if (isUrlStateEnabled) writeUrlState(merged);
+    }
 
     return updateData;
   };
@@ -120,6 +245,9 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     }
 
     if (loadDataOnInit) {
+      // Seeded first so the very first request already carries the url's filters.
+      if (isUrlStateEnabled) applyUrlState(dataTableDto);
+
       refreshData(dataTableDto);
     } else {
       setLoading(false);

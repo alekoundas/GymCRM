@@ -304,6 +304,7 @@ export default function MailsPage() {
         <div className="h-full">
           <DataTableComponent
             controller="mails"
+            isUrlStateEnabled
             dataTableDto={datatableDto}
             setDataTableDto={setDatatableDto}
             formMode={FormMode.EDIT}

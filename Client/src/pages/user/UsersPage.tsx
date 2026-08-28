@@ -217,6 +217,7 @@ export default function UsersPage() {
       <Card title={t("Users")}>
         <DataTableComponent
           controller="users"
+          isUrlStateEnabled
           dataTableDto={datatableDto}
           setDataTableDto={setDatatableDto}
           formMode={FormMode.EDIT}

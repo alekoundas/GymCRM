@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FormMode } from "../../enum/FormMode";
 import GenericDialogComponent, {
   DialogControl,
@@ -46,8 +46,13 @@ export default function WorkoutPlansPage() {
     DataTableDto<WorkoutPlanDto>
   >(() => {
     // Read userId from URL if it exists (comma-separated array as string)
+    // Links from the users grid still arrive comma separated; the shared url
+    // reader repeats the parameter instead, and both are accepted here.
     const searchParams = new URLSearchParams(location.search);
-    const userIdParam = searchParams.get("userId")?.split(",");
+    const userIdParam =
+      searchParams.getAll("userId").length > 1
+        ? searchParams.getAll("userId")
+        : searchParams.get("userId")?.split(",");
 
     const baseFilters = [
       { fieldName: "createdOn", filterType: "between" as const },
@@ -77,26 +82,6 @@ export default function WorkoutPlansPage() {
     };
   });
 
-  // Sync userId filter to URL
-  useEffect(() => {
-    const userIdFilter = datatableDto.filters.find(
-      (f) => f.fieldName === "userId",
-    );
-
-    const searchParams = new URLSearchParams(location.search);
-    const currentUserIdParam = searchParams.get("userId");
-
-    // Filter value is already a string (comma-separated if multiple IDs)
-    const filterValue = userIdFilter?.values?.join(",");
-
-    // Update URL if filter value changes
-    if (filterValue && filterValue !== currentUserIdParam) {
-      navigate(`?userId=${filterValue}`, { replace: true });
-    } else if (!filterValue && currentUserIdParam) {
-      // Clear userId from URL if filter is removed
-      navigate("", { replace: true });
-    }
-  }, [datatableDto.filters, navigate, location.search]);
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
     const result: ButtonTypeEnum[] = [];
@@ -317,6 +302,10 @@ export default function WorkoutPlansPage() {
     <>
       <Card title={t("Workout Plans")}>
         <DataTableComponent
+          isUrlStateEnabled
+          // A member's own id is forced by the page and re-forced by the server,
+          // so it is noise in a link rather than something worth remembering.
+          urlStateExcludedFields={isAdminPage ? [] : ["userId"]}
           dataTableDto={datatableDto}
           setDataTableDto={setDatatableDto}
           formMode={FormMode.EDIT}

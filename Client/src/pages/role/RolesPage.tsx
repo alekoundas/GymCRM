@@ -141,6 +141,7 @@ export default function RolesPage() {
         <div className="card">
           <DataTableComponent
             controller="roles"
+            isUrlStateEnabled
             dataTableDto={datatableDto}
             setDataTableDto={setDatatableDto}
             formMode={FormMode.EDIT}
