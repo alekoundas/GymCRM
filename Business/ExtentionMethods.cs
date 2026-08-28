@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.System;
+using System;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -121,14 +122,17 @@ namespace Business
                 throw new ArgumentException($"Contains filter is only supported for string properties. Property '{columnPath}' is of type '{memberType.Name}'.", nameof(columnPath));
             }
 
-            // Create constant expression for the value
-            Expression constant = Expression.Constant(value, typeof(string));
+            // Both sides go through the same normalising, so case and accents stop
+            // mattering: typing "ελενη" finds "Ελένη". ToLower() used to be tried here
+            // and could not work - it becomes sqlite's lower(), which only folds ASCII
+            // and returns every Greek letter untouched.
+            Expression constant = Expression.Constant(TextNormalizer.Normalize(value), typeof(string));
 
-            // Create Contains method call (e.g., 'item.Property.ToLower().Contains(value)')
-            //MethodInfo toLowerMethod = typeof(string).GetMethod("ToLower", [])!;
-            //Expression toLowerExpression = Expression.Call(member, toLowerMethod);
+            MethodInfo normalizeMethod = typeof(TextNormalizer).GetMethod(nameof(TextNormalizer.Normalize), new[] { typeof(string) })!;
+            Expression normalizedMember = Expression.Call(normalizeMethod, member);
+
             MethodInfo containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) })!;
-            Expression containsExpression = Expression.Call(member, containsMethod, constant);
+            Expression containsExpression = Expression.Call(normalizedMember, containsMethod, constant);
 
             // Create lambda expression (e.g., 'item => item.Property.Contains(value)')
             LambdaExpression lambda = Expression.Lambda(containsExpression, parameter);

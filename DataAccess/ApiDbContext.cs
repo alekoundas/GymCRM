@@ -1,4 +1,6 @@
 ﻿using Core.Models;
+using DataAccess.Interceptors;
+using Core.System;
 using DataAccess.Configurations;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -51,6 +53,9 @@ namespace DataAccess
             //optionsBuilder.UseSqlite("Data Source=" + Directory.GetCurrentDirectory() + "/sqlite.db");
             optionsBuilder.UseSqlite(_configuration.GetConnectionString("DefaultConnection"));
 
+            // Gives every connection the normalize() used by the text filters.
+            optionsBuilder.AddInterceptors(new SqliteFunctionInterceptor());
+
 
             optionsBuilder.EnableSensitiveDataLogging();
             optionsBuilder.EnableDetailedErrors();
@@ -59,6 +64,12 @@ namespace DataAccess
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            // Maps TextNormalizer.Normalize onto the sqlite function of the same
+            // name, so a filter can call it inside the query instead of pulling
+            // every row back to compare in memory.
+            builder.HasDbFunction(typeof(TextNormalizer).GetMethod(nameof(TextNormalizer.Normalize), new[] { typeof(string) })!)
+                .HasName("normalize");
 
             builder.ApplyConfiguration(new MailConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
