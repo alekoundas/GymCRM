@@ -12,11 +12,10 @@ import { formatDuration } from "./WorkoutPlanRecordingGridComponent";
 
 interface IField {
   workoutPlanId: number;
-  // The context is computed from the rule and the week, so both are watched here.
-  // Without them an administrator setting a rule leaves the bar on "no rule yet"
-  // until the page is reloaded.
-  workoutPlanRuleId?: number;
-  currentWeek?: number;
+  // Bumped by the page every time the plan is re-read, so setting a rule refreshes
+  // the bar. The plan fields themselves are no good as a signal - the edit dialog
+  // writes them to the store while typing, long before the server knows about them.
+  planVersion?: number;
   // The admin sees the timer but never drives it - a recording belongs to the member.
   isAdminPage: boolean;
   onChanged?: () => void;
@@ -24,8 +23,7 @@ interface IField {
 
 export default function WorkoutPlanRecordingActionsComponent({
   workoutPlanId,
-  workoutPlanRuleId,
-  currentWeek,
+  planVersion,
   isAdminPage,
   onChanged,
 }: IField) {
@@ -55,7 +53,7 @@ export default function WorkoutPlanRecordingActionsComponent({
 
   useEffect(() => {
     if (workoutPlanId) loadStartContext();
-  }, [workoutPlanId, workoutPlanRuleId, currentWeek]);
+  }, [workoutPlanId, planVersion]);
 
   // Ticks locally between refreshes; the server value stays the source of truth.
   useEffect(() => {

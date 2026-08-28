@@ -5,7 +5,7 @@ import { useTranslator } from "../../services/TranslatorService";
 import { useWorkoutPlanStore } from "../../stores/WorkoutPlanStore";
 import { WorkoutPlanDto } from "../../model/entities/workout-plan/WorkoutPlanDto";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ExerciseDto } from "../../model/entities/exercise/ExerciseDto";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
@@ -37,14 +37,27 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
   const [isRecordingsDialogVisible, setRecordingsDialogVisibility] =
     useState(false);
   const [isEditDialogVisible, setEditDialogVisibility] = useState(false);
+  // Counts the times the plan came back from the server, so anything reading its
+  // own data knows to look again.
+  const [planVersion, setPlanVersion] = useState(0);
 
   const dialogControlRecordings: DialogControl = {
     showDialog: () => setRecordingsDialogVisibility(true),
     hideDialog: () => setRecordingsDialogVisibility(false),
   };
+  // The dialog edits the plan straight in the store, which is also what the page
+  // behind it reads. Cancel has to put back what was there before it opened.
+  const planBeforeEdit = useRef<WorkoutPlanDto | null>(null);
+
   const dialogControlEdit: DialogControl = {
-    showDialog: () => setEditDialogVisibility(true),
-    hideDialog: () => setEditDialogVisibility(false),
+    showDialog: () => {
+      planBeforeEdit.current = workoutPlanDto;
+      setEditDialogVisibility(true);
+    },
+    hideDialog: () => {
+      if (planBeforeEdit.current) setWorkoutPlanDto(planBeforeEdit.current);
+      setEditDialogVisibility(false);
+    },
   };
 
   // A rule with no week would leave the plan pointing at nothing, so it is
@@ -67,6 +80,8 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
     );
 
     if (response) {
+      // Saved, so there is nothing to undo - the reload below brings the truth.
+      planBeforeEdit.current = null;
       dialogControlEdit.hideDialog();
       loadWorkoutPlan();
     }
@@ -78,6 +93,7 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
       apiService.get<WorkoutPlanDto>("WorkoutPlans", id).then((response) => {
         if (response) {
           setWorkoutPlanDto(response);
+          setPlanVersion((previous) => previous + 1);
         }
       });
     }
@@ -165,8 +181,7 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
 
             <WorkoutPlanRecordingActionsComponent
               workoutPlanId={workoutPlanDto.id}
-              workoutPlanRuleId={workoutPlanDto.workoutPlanRuleId}
-              currentWeek={workoutPlanDto.currentWeek}
+              planVersion={planVersion}
               isAdminPage={isAdminPage}
               onChanged={loadWorkoutPlan}
             />
