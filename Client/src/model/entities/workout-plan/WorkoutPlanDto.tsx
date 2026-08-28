@@ -25,6 +25,7 @@ export interface WorkoutPlanDto {
   hasIncompleteRecording: boolean;
   lastRecordingOn?: string;
   recordingCount: number;
+  lastRecordingDurationSeconds?: number;
 }
 
 export class WorkoutPlanDto {
@@ -48,4 +49,5 @@ export class WorkoutPlanDto {
   hasIncompleteRecording: boolean = false;
   lastRecordingOn?: string = undefined;
   recordingCount: number = 0;
+  lastRecordingDurationSeconds?: number = undefined;
 }

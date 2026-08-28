@@ -270,6 +270,7 @@
   'All plans': string;
   'Plan notes': string;
   'Edit plan': string;
+  'Last recording': string;
     }
 
 

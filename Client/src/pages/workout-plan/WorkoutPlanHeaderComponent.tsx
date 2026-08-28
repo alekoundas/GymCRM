@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslator } from "../../services/TranslatorService";
 import { useWorkoutPlanStore } from "../../stores/WorkoutPlanStore";
 import { TokenService } from "../../services/TokenService";
+import { formatDuration } from "../workout-plan-recording/WorkoutPlanRecordingGridComponent";
 
 interface IField {
   isAdminPage: boolean;
@@ -114,7 +115,12 @@ export default function WorkoutPlanHeaderComponent({
         </div>
       )}
 
-      {workoutPlanDto.hasIncompleteRecording && (
+      {/*                                                            */}
+      {/*       Either the last session went wrong, or it is worth    */}
+      {/*       knowing how long it took                              */}
+      {/*                                                            */}
+
+      {workoutPlanDto.hasIncompleteRecording ? (
         <Message
           severity="warn"
           className="w-full mt-3 justify-content-start"
@@ -125,7 +131,12 @@ export default function WorkoutPlanHeaderComponent({
             "."
           }
         />
-      )}
+      ) : workoutPlanDto.lastRecordingDurationSeconds ? (
+        <div className="mt-2 text-sm text-color-secondary">
+          {t("Last recording")}:{" "}
+          {formatDuration(workoutPlanDto.lastRecordingDurationSeconds)}
+        </div>
+      ) : null}
     </div>
   );
 }

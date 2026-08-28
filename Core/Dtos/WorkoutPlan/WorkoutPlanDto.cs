@@ -54,6 +54,10 @@ namespace Core.Dtos.WorkoutPlan
 
         public int RecordingCount { get; set; }
 
+        // Duration of the most recent recording. Null while one is running, and
+        // null for a recording that lapsed without ever being stopped.
+        public int? LastRecordingDurationSeconds { get; set; }
+
         public DateTime CreatedOn { get; set; }
     }
 }
