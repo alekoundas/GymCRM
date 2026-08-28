@@ -271,6 +271,7 @@
   'Plan notes': string;
   'Edit plan': string;
   'Last recording': string;
+  'Set the current week for the selected rule': string;
     }
 
 

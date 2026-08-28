@@ -54,6 +54,11 @@ export default function WorkoutPlanFormComponent({
     [ruleWeekCount, t],
   );
 
+  const isWeekMissing =
+    workoutPlanDto.workoutPlanRuleId !== undefined &&
+    workoutPlanDto.workoutPlanRuleId !== null &&
+    !workoutPlanDto.currentWeek;
+
   const onRuleChange = async (ruleId: number | undefined) => {
     updateWorkoutPlanDto({ workoutPlanRuleId: ruleId });
 
@@ -70,7 +75,8 @@ export default function WorkoutPlanFormComponent({
     const weekCount = rule?.weekCount ?? 0;
     setRuleWeekCount(weekCount);
 
-    // A week the newly chosen rule does not have must not be saved.
+    // A week the newly chosen rule does not have must not be saved. Clearing it
+    // makes the field invalid, which is the prompt to pick a real one.
     if ((workoutPlanDto.currentWeek ?? 0) > weekCount)
       updateWorkoutPlanDto({ currentWeek: undefined });
   };
@@ -136,13 +142,13 @@ export default function WorkoutPlanFormComponent({
             />
           </div>
 
-          {ruleWeekCount > 0 && (
+          {workoutPlanDto.workoutPlanRuleId != null && (
             <div className="field w-full">
               <label
                 htmlFor="currentWeek"
                 className="block text-900 font-medium mb-2"
               >
-                {t("Current week")}
+                {t("Current week")} *
               </label>
               <Dropdown
                 inputId="currentWeek"
@@ -150,10 +156,15 @@ export default function WorkoutPlanFormComponent({
                 options={weekOptions}
                 onChange={(e) => updateWorkoutPlanDto({ currentWeek: e.value })}
                 placeholder={t("Select a value")}
-                className="w-full"
+                emptyMessage={t("No data found.")}
+                className={isWeekMissing ? "w-full p-invalid" : "w-full"}
                 disabled={isReadOnly}
-                showClear
               />
+              {isWeekMissing && (
+                <small className="block mt-1 p-error">
+                  {t("Set the current week for the selected rule")}
+                </small>
+              )}
             </div>
           )}
         </>
