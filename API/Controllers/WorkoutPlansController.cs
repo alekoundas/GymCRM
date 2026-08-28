@@ -47,6 +47,7 @@ namespace API.Controllers
         public override async Task<ActionResult<ApiResponse<WorkoutPlanDto>>> Get(string? id)
         {
             WorkoutPlan? entity = await _dataService.GetGenericRepository<WorkoutPlan>()
+                .Include(x => x.User)
                 .Include(x => x.Exercises)
                 .Include(x => x.WorkoutPlanRule!).ThenInclude<WorkoutPlanRule, ICollection<WorkoutPlanRuleWeek>>(x => x.Weeks)
                 .FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
@@ -160,6 +161,7 @@ namespace API.Controllers
                     : null;
                 entityDto.HasIncompleteRecording = planRecordings.Any(x => _recordingService.IsIncomplete(x, nowUtc));
                 entityDto.LastRecordingOn = planRecordings.FirstOrDefault()?.StartedOn;
+                entityDto.RecordingCount = planRecordings.Count;
 
                 if (entity.WorkoutPlanRuleId != null)
                 {

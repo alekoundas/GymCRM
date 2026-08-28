@@ -265,6 +265,11 @@
   'Last used': string;
   'Never': string;
   'No rule': string;
+  'Watch video': string;
+  'Groups': string;
+  'All plans': string;
+  'Plan notes': string;
+  'Edit plan': string;
     }
 
 

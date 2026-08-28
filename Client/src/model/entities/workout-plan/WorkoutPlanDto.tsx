@@ -24,6 +24,7 @@ export interface WorkoutPlanDto {
   elapsedSeconds?: number;
   hasIncompleteRecording: boolean;
   lastRecordingOn?: string;
+  recordingCount: number;
 }
 
 export class WorkoutPlanDto {
@@ -46,4 +47,5 @@ export class WorkoutPlanDto {
   elapsedSeconds?: number = undefined;
   hasIncompleteRecording: boolean = false;
   lastRecordingOn?: string = undefined;
+  recordingCount: number = 0;
 }
