@@ -1,4 +1,6 @@
 ﻿using Business.Services.CalendarService;
+using Core.Dtos.Mail;
+using Core.Enums;
 using Core.Models;
 using Core.Translations;
 using Google.Apis.Auth.OAuth2;
@@ -11,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using MimeKit;
 using MimeKit.Utils;
 using System.Text;
+using System.Text.Json;
 
 namespace Business.Services.Email
 {
@@ -36,51 +39,63 @@ namespace Business.Services.Email
             _logger = logger;
         }
 
-        public async Task SendEmailAsync(string to, string subject, string htmlBody, List<(string Content, string FileName)>? attachments = null)
-        {
-            List<GoogleRefreshToken> dbtokens = await _dataService.GoogleRefreshTokens.ToListAsync();
-            if (dbtokens.Count != 1)
-            {
-                return;
-            }
+        // One Gmail client for the life of the service. Building it costs a round trip
+        // to Google for the access token, so a batch of mails must not pay that each time.
+        private GmailService? _gmailService;
 
-            var clientId = _configuration["Gmail:ClientId"];
-            var clientSecret = _configuration["Gmail:ClientSecret"];
-            var refreshToken = dbtokens[0].RefreshToken;
-            var username = _configuration["Gmail:Email"];
-            var fromEmail = _configuration["Gmail:Email"];
-            var fromName = _configuration["Gmail:FromName"];
+        private async Task<GmailService> GetGmailServiceAsync()
+        {
+            if (_gmailService != null)
+                return _gmailService;
+
+            List<GoogleRefreshToken> dbtokens = await _dataService.GoogleRefreshTokens.ToListAsync();
+
+            string? clientId = _configuration["Gmail:ClientId"];
+            string? clientSecret = _configuration["Gmail:ClientSecret"];
+            string? refreshToken = dbtokens.Count == 1 ? dbtokens[0].RefreshToken : null;
+            string? username = _configuration["Gmail:Email"];
 
             if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret) ||
-                string.IsNullOrWhiteSpace(refreshToken) || string.IsNullOrWhiteSpace(username) ||
-                string.IsNullOrWhiteSpace(fromEmail))
+                string.IsNullOrWhiteSpace(refreshToken) || string.IsNullOrWhiteSpace(username))
             {
-                _logger.LogError("Gmail API configuration is incomplete: ClientId={ClientId}, ClientSecret={ClientSecret}, RefreshToken={RefreshToken}, Username={Username}, FromEmail={FromEmail}",
-                    clientId, clientSecret, refreshToken != null ? "[REDACTED]" : null, username, fromEmail);
+                // A missing token row used to return quietly, which reported success for
+                // mail that never left. It has to be loud so the queue can record it.
+                _logger.LogError("Gmail API configuration is incomplete: ClientId={ClientId}, ClientSecret={ClientSecret}, RefreshToken={RefreshToken}, Username={Username}, TokenRows={TokenRows}",
+                    clientId, clientSecret, refreshToken != null ? "[REDACTED]" : null, username, dbtokens.Count);
                 throw new InvalidOperationException("Gmail API configuration is incomplete.");
             }
 
+            GoogleCredential credential = GoogleCredential
+                .FromJson($@"{{
+                    ""client_id"": ""{clientId}"",
+                    ""client_secret"": ""{clientSecret}"",
+                    ""refresh_token"": ""{refreshToken}"",
+                    ""type"": ""authorized_user""
+                }}")
+                .CreateScoped(GmailService.Scope.GmailSend);
+
+            // Initialize Gmail service.
+            _gmailService = new GmailService(new BaseClientService.Initializer
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "RosaCoreLab"
+            });
+
+            return _gmailService;
+        }
+
+        // The send itself. It writes no history - each caller knows what it wants recorded.
+        private async Task SendRawAsync(string to, string subject, string htmlBody, List<(string Content, string FileName)>? attachments)
+        {
+            GmailService service = await GetGmailServiceAsync();
+            string username = _configuration["Gmail:Email"]!;
+            string? fromName = _configuration["Gmail:FromName"];
+
             try
             {
-                var credential = GoogleCredential
-                    .FromJson($@"{{
-                        ""client_id"": ""{clientId}"",
-                        ""client_secret"": ""{clientSecret}"",
-                        ""refresh_token"": ""{refreshToken}"",
-                        ""type"": ""authorized_user""
-                    }}")
-                    .CreateScoped(GmailService.Scope.GmailSend);
-
-                // Initialize Gmail service.
-                var service = new GmailService(new BaseClientService.Initializer
-                {
-                    HttpClientInitializer = credential,
-                    ApplicationName = "RosaCoreLab"
-                });
-
                 // Create email.
                 var mimeMessage = new MimeMessage();
-                mimeMessage.From.Add(new MailboxAddress(fromName, fromEmail));
+                mimeMessage.From.Add(new MailboxAddress(fromName, username));
                 mimeMessage.To.Add(new MailboxAddress(to, to));
                 mimeMessage.Subject = Encoding.UTF8.GetString(Rfc2047.EncodeText(Encoding.UTF8, subject));
                 var bodyBuilder = new BodyBuilder
@@ -102,7 +117,6 @@ namespace Business.Services.Email
                             {
                                 FileName = Path.GetFileName(fileName)
                             },
-                            //FileName = Path.GetFileName(fileName)
                         };
                         bodyBuilder.Attachments.Add(attachment);
                     }
@@ -123,16 +137,6 @@ namespace Business.Services.Email
                 var request = service.Users.Messages.Send(message, username);
                 await request.ExecuteAsync();
 
-                // Save mail to database.
-                User? user = await _dataService.Users.FirstOrDefaultAsync(x => x.Email == to);
-                if (user != null)
-                    _dataService.Mails.Add(new Mail
-                    {
-                        UserId = user.Id,
-                        Subject = subject,
-                        Body = htmlBody,
-                    });
-
                 _logger.LogInformation("Email sent successfully to {To}", to);
             }
             catch (Exception ex)
@@ -140,6 +144,65 @@ namespace Business.Services.Email
                 _logger.LogError(ex, "Failed to send email to {To}", to);
                 throw new InvalidOperationException($"Failed to send email: {ex.Message}", ex);
             }
+        }
+
+        public async Task SendEmailAsync(string to, string subject, string htmlBody, List<(string Content, string FileName)>? attachments = null)
+        {
+            await SendRawAsync(to, subject, htmlBody, attachments);
+
+            // Save mail to database.
+            User? user = await _dataService.Users.FirstOrDefaultAsync(x => x.Email == to);
+            if (user != null)
+                await _dataService.Mails.AddAsync(new Mail
+                {
+                    UserId = user.Id,
+                    Subject = subject,
+                    Body = htmlBody,
+                    Status = MailStatusEnum.SENT,
+                    SentOn = DateTime.UtcNow
+                });
+        }
+
+        public async Task QueueEmailAsync(List<User> users, string subject, string htmlBody, List<(string Content, string FileName)>? attachments = null)
+        {
+            string storedAttachments = SerialiseAttachments(attachments);
+
+            List<Mail> mails = users
+                .Select(x => new Mail
+                {
+                    UserId = x.Id,
+                    Subject = subject,
+                    Body = htmlBody,
+                    Status = MailStatusEnum.PENDING,
+                    Attachments = storedAttachments
+                })
+                .ToList();
+
+            await _dataService.Mails.AddRangeAsync(mails);
+        }
+
+        public async Task SendQueuedMailAsync(Mail mail)
+        {
+            await SendRawAsync(mail.User.Email, mail.Subject, mail.Body, DeserialiseAttachments(mail.Attachments));
+        }
+
+        private static string SerialiseAttachments(List<(string Content, string FileName)>? attachments)
+        {
+            if (attachments == null || !attachments.Any())
+                return string.Empty;
+
+            return JsonSerializer.Serialize(attachments
+                .Select(x => new MailAttachmentDto { FileName = x.FileName, Content = x.Content })
+                .ToList());
+        }
+
+        private static List<(string Content, string FileName)>? DeserialiseAttachments(string attachments)
+        {
+            if (string.IsNullOrWhiteSpace(attachments))
+                return null;
+
+            List<MailAttachmentDto>? stored = JsonSerializer.Deserialize<List<MailAttachmentDto>>(attachments);
+            return stored?.Select(x => (x.Content, x.FileName)).ToList();
         }
 
         private List<string> GetDateStrings(List<TrainGroupParticipant> participants)
@@ -283,9 +346,10 @@ namespace Business.Services.Email
         </body>
         </html>";
 
-            // Send the email
-            await SendEmailAsync(
-                user.Email,
+            // Queued rather than sent from here: the member is waiting on their booking
+            // going through, and should not be waiting on Google as well.
+            await QueueEmailAsync(
+                new List<User> { user },
                 _localizer[TranslationKeys.Booking_Confirmation],
                 emailBody,
                 addIcsList.Concat(cancelIcsList).ToList()

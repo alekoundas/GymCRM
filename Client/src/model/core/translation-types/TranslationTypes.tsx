@@ -275,6 +275,10 @@
   'Select all': string;
   'Clear': string;
   'Selected': string;
+  'Pending': string;
+  'Sent': string;
+  'Failed': string;
+  'Emails are sent in the background, the history shows what went out': string;
     }
 
 

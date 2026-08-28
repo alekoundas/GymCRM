@@ -1,4 +1,5 @@
-﻿using API.AutoMapper;
+﻿using API.Services;
+using API.AutoMapper;
 using API.Filters;
 using API.JsonConverter;
 using Business.Repository;
@@ -178,6 +179,8 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddSingleton(appSettings); // appsettings.json
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, GmailEmailService>();
+builder.Services.AddScoped<IMailQueueService, MailQueueService>();
+builder.Services.AddHostedService<MailQueueBackgroundService>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<IWorkoutPlanRecordingService, WorkoutPlanRecordingService>();
 

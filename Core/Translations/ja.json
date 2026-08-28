@@ -92,5 +92,6 @@
   "_0_cannot_exceed_50_characters": "{0} は 50 文字を超えることはできません！",
   "_0_cannot_exceed_100_characters": "{0} は 100 文字を超えることはできません！",
   "_0_cannot_exceed_200_characters": "{0} は 200 文字を超えることはできません！",
-  "_0_cannot_exceed_500_characters": "{0} は 500 文字を超えることはできません！"
+  "_0_cannot_exceed_500_characters": "{0} は 500 文字を超えることはできません！",
+  "_0_emails_queued": "{0} emails queued for sending!"
 }

@@ -268,5 +268,9 @@
   "Set the current week for the selected rule": "Set the current week for the selected rule",
   "Select all": "Select all",
   "Clear": "Clear",
-  "Selected": "Selected"
+  "Selected": "Selected",
+  "Pending": "Pending",
+  "Sent": "Sent",
+  "Failed": "Failed",
+  "Emails are sent in the background, the history shows what went out": "Emails are sent in the background, the history shows what went out"
 }
