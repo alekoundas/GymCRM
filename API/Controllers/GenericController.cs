@@ -178,7 +178,10 @@ namespace API.Controllers
 
                 string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
 
-                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.contains)
+                // Empty means the box was cleared, and "contains nothing" matches every
+                // row anyway - so it is skipped rather than normalising the whole table
+                // to reach the same answer.
+                if (!string.IsNullOrEmpty(filter.Value) && filter.FilterType == DataTableFiltersEnum.contains)
                     query.FilterByColumnContains(filter.FieldName, filter.Value);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.equals)
@@ -225,7 +228,10 @@ namespace API.Controllers
 
                 string fieldName = filter.FieldName.Substring(0, 1).ToUpper() + filter.FieldName.Substring(1, filter.FieldName.Length - 1);
 
-                if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.contains)
+                // Empty means the box was cleared, and "contains nothing" matches every
+                // row anyway - so it is skipped rather than normalising the whole table
+                // to reach the same answer.
+                if (!string.IsNullOrEmpty(filter.Value) && filter.FilterType == DataTableFiltersEnum.contains)
                     query.FilterByColumnContains(filter.FieldName, filter.Value);
 
                 if (filter.Value != null && filter.FilterType == DataTableFiltersEnum.equals)
