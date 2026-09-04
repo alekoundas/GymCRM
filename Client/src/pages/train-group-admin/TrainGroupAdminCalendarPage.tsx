@@ -70,9 +70,17 @@ export default function TrainGroupAdminCalendarPage() {
       });
   };
 
+  // Bumped whenever the attendances dialog closes, so the grid underneath picks up
+  // the rows that were just taken. On close rather than on save: a save that only
+  // partly went through still leaves the grid showing what is really there.
+  const [attendancesVersion, setAttendancesVersion] = useState(0);
+
   const dialogControlTakeAttendances: DialogControl = {
     showDialog: () => setTakeAttendancesModalVisibility(true),
-    hideDialog: () => setTakeAttendancesModalVisibility(false),
+    hideDialog: () => {
+      setTakeAttendancesModalVisibility(false);
+      setAttendancesVersion((previous) => previous + 1);
+    },
   };
   const dialogControlDelete: DialogControl = {
     showDialog: () => setDeleteDialogVisibility(true),
@@ -289,6 +297,7 @@ export default function TrainGroupAdminCalendarPage() {
           <TrainGroupParticipantGridComponent
             trainGroupId={selectedTrainGroupId}
             selectedDate={selectedDate ?? new Date()}
+            refreshToken={attendancesVersion}
           />
         </div>
       </GenericDialogComponent>
