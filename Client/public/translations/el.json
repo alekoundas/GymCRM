@@ -272,5 +272,9 @@
   "Pending": "Σε αναμονή",
   "Sent": "Στάλθηκε",
   "Failed": "Απέτυχε",
-  "Emails are sent in the background, the history shows what went out": "Τα email φεύγουν στο παρασκήνιο, το ιστορικό δείχνει ποια στάλθηκαν"
+  "Emails are sent in the background, the history shows what went out": "Τα email φεύγουν στο παρασκήνιο, το ιστορικό δείχνει ποια στάλθηκαν",
+  "Attendance": "Παρουσία",
+  "Attended": "Παρών",
+  "No record": "Χωρίς καταγραφή",
+  "Already recorded": "Έχει ήδη καταγραφεί"
 }

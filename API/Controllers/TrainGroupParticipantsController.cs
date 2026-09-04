@@ -540,6 +540,38 @@ namespace API.Controllers
         }
 
 
+        // The date the grid was filtered by, kept so the attendance flags below can be
+        // worked out for the same day the rows were chosen for.
+        private DateTime? _selectedDate;
+
+        // Attendance is stored as a full timestamp and the older rows carry a time of
+        // day, so days are compared rather than instants.
+        protected override async Task DataTableResultUpdate(List<TrainGroupParticipant> entities, List<TrainGroupParticipantDto> entityDtos)
+        {
+            if (_selectedDate == null || entities.Count == 0)
+                return;
+
+            DateTime day = _selectedDate.Value.Date;
+            DateTime nextDay = day.AddDays(1);
+
+            List<int> trainGroupIds = entities.Select(x => x.TrainGroupId).Distinct().ToList();
+            List<Guid> userIds = entities.Select(x => x.UserId).Distinct().ToList();
+
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            List<Guid> attendedUserIds = await context.TrainGroupΑttendances
+                .AsNoTracking()
+                .Where(x => trainGroupIds.Contains(x.TrainGroupId)
+                         && userIds.Contains(x.UserId)
+                         && x.AttendanceDate >= day
+                         && x.AttendanceDate < nextDay)
+                .Select(x => x.UserId)
+                .ToListAsync();
+
+            for (int i = 0; i < entities.Count && i < entityDtos.Count; i++)
+                entityDtos[i].HasAttendance = attendedUserIds.Contains(entities[i].UserId);
+        }
+
         protected override void DataTableQueryUpdate(IGenericRepository<TrainGroupParticipant> query, DataTableDto<TrainGroupParticipantDto> dataTable)
         {
             query = query.Include(x => x.User).ThenInclude<User, UserStatus>(x => x.UserStatus!);
@@ -557,6 +589,8 @@ namespace API.Controllers
                 if (filter != null)
                 {
                     DateTime selectedDate = DateTime.Parse(filter?.Value!);
+                    _selectedDate = selectedDate;
+
                     query = query.Where(x =>
                         x.SelectedDate != null ?
                             (x.SelectedDate == selectedDate)

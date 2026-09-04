@@ -279,6 +279,10 @@
   'Sent': string;
   'Failed': string;
   'Emails are sent in the background, the history shows what went out': string;
+  'Attendance': string;
+  'Attended': string;
+  'No record': string;
+  'Already recorded': string;
     }
 
 
