@@ -70,8 +70,18 @@ export default function ExerciseListComponent({
 
   const addExercise = () => {
     const newExercise = new ExerciseDto();
-    newExercise.id = workoutPlanDto.exercises.length * -1;
-    newExercise.groupNumber = workoutPlanDto.exercises.length;
+
+    // Next free number, not a count. Counting only works while the numbers run
+    // 0,1,2 with no gaps - delete an exercise and the count lands on a group that
+    // still exists, and the new exercise joins it instead of standing alone.
+    const groupNumbers = workoutPlanDto.exercises.map((x) => x.groupNumber);
+    newExercise.groupNumber =
+      groupNumbers.length > 0 ? Math.max(...groupNumbers) + 1 : 0;
+
+    // The temporary id counted the same way and collided the same way, which put
+    // two unsaved exercises on the same key.
+    const ids = workoutPlanDto.exercises.map((x) => x.id);
+    newExercise.id = ids.length > 0 ? Math.min(...ids, 0) - 1 : 0;
 
     setNewExerciseDto(newExercise);
     dialogControlAdd.showDialog();

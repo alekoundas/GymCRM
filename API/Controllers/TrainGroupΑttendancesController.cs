@@ -106,11 +106,12 @@ namespace API.Controllers
                 string trainGroupTitle = trainGroups
                     .FirstOrDefault(x => x.Id == batch.Key.TrainGroupId)?.Title ?? string.Empty;
 
-                await _emailService.QueueEmailAsync(
-                    batchUsers,
-                    _localizer[TranslationKeys.Attendance_Confirmation],
-                    GetAttendanceEmailBody(trainGroupTitle, batch.Key.AttendanceDate)
-                );
+                // TODO add if payments are lees than 1.
+                //await _emailService.QueueEmailAsync(
+                //    batchUsers,
+                //    _localizer[TranslationKeys.Attendance_Confirmation],
+                //    GetAttendanceEmailBody(trainGroupTitle, batch.Key.AttendanceDate)
+                //);
             }
         }
 

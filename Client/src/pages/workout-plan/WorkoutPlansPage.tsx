@@ -90,6 +90,7 @@ export default function WorkoutPlansPage() {
       if (isView) result.push(ButtonTypeEnum.VIEW);
       const isAdd = TokenService.isUserAllowed("WorkoutPlansAdmin_Add");
       if (isAdd) result.push(ButtonTypeEnum.ADD);
+      if (isAdd) result.push(ButtonTypeEnum.CLONE);
       const isEdit = TokenService.isUserAllowed("WorkoutPlansAdmin_Edit");
       if (isEdit) result.push(ButtonTypeEnum.EDIT);
       const isDelete = TokenService.isUserAllowed("WorkoutPlansAdmin_Delete");
@@ -257,6 +258,36 @@ export default function WorkoutPlansPage() {
     },
   ];
 
+  // Everything the trainer wrote is worth keeping - the exercises, their grouping,
+  // the notes. What belongs to a person is not: the name and the member, and the
+  // rule with its week, which track how far that member got and mean nothing here.
+  const cloneWorkoutPlan = async (workoutPlanId: number) => {
+    // The grid rows carry no exercises, so the plan has to be read in full first.
+    const source = await apiService.get<WorkoutPlanDto>(
+      "WorkoutPlans",
+      workoutPlanId.toString(),
+    );
+
+    if (!source) return;
+
+    setWorkoutPlanDto({
+      ...new WorkoutPlanDto(),
+      title: "",
+      userId: "",
+      description: source.description,
+      isCircular: source.isCircular,
+      // Detached from the plan they came from, so the save creates new rows rather
+      // than moving the originals.
+      exercises: (source.exercises ?? []).map((x) => ({
+        ...x,
+        id: 0,
+        workoutPlanId: 0,
+      })),
+    });
+
+    navigate("add");
+  };
+
   const onDataTableClick = (
     buttonType: ButtonTypeEnum,
     rowData?: WorkoutPlanDto,
@@ -274,6 +305,11 @@ export default function WorkoutPlansPage() {
       case ButtonTypeEnum.EDIT:
         if (rowData) {
           navigate(rowData.id + "/edit");
+        }
+        break;
+      case ButtonTypeEnum.CLONE:
+        if (rowData) {
+          cloneWorkoutPlan(rowData.id);
         }
         break;
       case ButtonTypeEnum.DELETE:
