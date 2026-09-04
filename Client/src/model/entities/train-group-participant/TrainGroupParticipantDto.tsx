@@ -8,6 +8,8 @@ export interface TrainGroupParticipantDto {
   trainGroupId: number;
   userId: string; // GUID as string
   user?: UserDto | undefined;
+  // Filled per request for the date the grid is filtered by.
+  hasAttendance?: boolean;
 }
 
 export class TrainGroupParticipantDto {
@@ -18,4 +20,5 @@ export class TrainGroupParticipantDto {
   trainGroupId: number = -1;
   userId: string = ""; // GUID as string
   user?: UserDto | undefined;
+  hasAttendance?: boolean = false;
 }

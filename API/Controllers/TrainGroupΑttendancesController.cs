@@ -50,10 +50,16 @@ namespace API.Controllers
         {
             errors = Array.Empty<string>();
 
+            // By day, not by instant. The calendar sends midnight when a date is picked
+            // but the current time when the page's default is used, so comparing exact
+            // timestamps let the same person be marked twice for one day.
+            DateTime day = entity.AttendanceDate.Date;
+            DateTime nextDay = day.AddDays(1);
+
             bool isAlreadyParticipating = _dataService.TrainGroupΑttendances
                 .Where(x => x.TrainGroupId == entity.TrainGroupId)
                 .Where(x => x.UserId == new Guid(entity.UserId))
-                .Any(x => x.AttendanceDate == entity.AttendanceDate);
+                .Any(x => x.AttendanceDate >= day && x.AttendanceDate < nextDay);
 
             if (isAlreadyParticipating)
             {

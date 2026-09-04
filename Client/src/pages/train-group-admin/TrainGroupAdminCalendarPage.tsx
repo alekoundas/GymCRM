@@ -20,6 +20,11 @@ import TrainGroupAttendanceFormComponent from "../train-group-attendance/TrainGr
 import { useTrainGroupAttendanceStore } from "../../stores/TrainGroupAttendanceStore";
 import { TrainGroupAttendanceDto } from "../../model/entities/train-group-attendance/TrainGroupAttendanceDto";
 
+// The day the calendar is on, with no time of day. Local parts on purpose: the
+// admin means the date they can see, not whatever day it is in UTC at the time.
+const toSelectedDate = (value: Date): Date =>
+  new Date(Date.UTC(value.getFullYear(), value.getMonth(), value.getDate()));
+
 export default function TrainGroupAdminCalendarPage() {
   const { t } = useTranslator();
   const apiService = useApiService();
@@ -37,7 +42,9 @@ export default function TrainGroupAdminCalendarPage() {
     useState(false); // Dialog visibility
   const [isViewModalVisible, setViewModalVisibility] = useState(false); // Dialog visibility
   const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(
+    toSelectedDate(new Date()),
+  );
   const [selectedTrainGroupId, setSelectedTrainGroupId] = useState<number>(0);
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
 
@@ -48,9 +55,7 @@ export default function TrainGroupAdminCalendarPage() {
   }, []);
 
   const handleChangeDate = (value: Date) => {
-    const dateCleaned = new Date(
-      Date.UTC(value.getFullYear(), value.getMonth(), value.getDate(), 0, 0, 0)
-    );
+    const dateCleaned = toSelectedDate(value);
     setSelectedDate(dateCleaned);
 
     const timeSlotDto = new TimeSlotRequestDto();

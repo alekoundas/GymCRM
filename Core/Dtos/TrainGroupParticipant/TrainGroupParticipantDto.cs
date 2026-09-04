@@ -11,6 +11,7 @@ namespace Core.Models
         public DateTime? SelectedDate { get; set; } // If null repeating subscriber,if not specific date participant
         public DateTime? RecurringStartOnDate { get; set; } // Set only for recurring participants.
 
+        public bool HasAttendance { get; set; }
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public int TrainGroupDateId { get; set; }
@@ -22,5 +23,6 @@ namespace Core.Models
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string UserId { get; set; } = "";
         public UserDto? User { get; set; }
+
     }
 }

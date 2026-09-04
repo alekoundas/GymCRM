@@ -24,12 +24,16 @@ import { useTrainGroupAttendanceStore } from "../../stores/TrainGroupAttendanceS
 interface IField extends DialogChildProps {
   trainGroupId: number;
   selectedDate: Date;
+  // Bumped by the parent when something outside this grid changed the rows -
+  // taking attendances, for instance, which is done in a dialog above it.
+  refreshToken?: number;
 }
 
 export default function TrainGroupParticipantGridComponent({
   formMode,
   trainGroupId,
   selectedDate,
+  refreshToken,
 }: IField) {
   const { t } = useTranslator();
   const apiService = useApiService();
@@ -104,6 +108,19 @@ export default function TrainGroupParticipantGridComponent({
       },
     ],
   });
+
+  // Skipped on the first render: the grid loads itself on mount.
+  const isFirstRefreshToken = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRefreshToken.current) {
+      isFirstRefreshToken.current = false;
+      return;
+    }
+
+    if (triggerRefreshDataTable.current)
+      triggerRefreshDataTable.current(datatableDto);
+  }, [refreshToken]);
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
     if (formMode !== FormMode.VIEW)
@@ -207,6 +224,32 @@ export default function TrainGroupParticipantGridComponent({
       filterPlaceholder: t("Search"),
       body: (rowData, options) => chipTemplate(rowData.user),
 
+      style: { width: "10%" },
+    },
+    {
+      // Says whether attendance was taken for the date the grid is showing. Not
+      // sortable or filterable - the server works it out per row after the query,
+      // so there is nothing for the datatable helpers to sort or filter on.
+      field: "hasAttendance",
+      header: t("Attendance"),
+      sortable: false,
+      filter: false,
+      filterPlaceholder: "",
+      body: (rowData) =>
+        rowData.hasAttendance ? (
+          <Tag
+            severity="success"
+            icon="pi pi-check"
+            value={t("Attended")}
+          />
+        ) : (
+          // Deliberately not "absent" - nobody has said they were away, attendance
+          // simply has not been taken yet.
+          <Tag
+            severity="secondary"
+            value={t("No record")}
+          />
+        ),
       style: { width: "10%" },
     },
   ];

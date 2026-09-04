@@ -273,5 +273,9 @@
   "Pending": "Pending",
   "Sent": "Sent",
   "Failed": "Failed",
-  "Emails are sent in the background, the history shows what went out": "Emails are sent in the background, the history shows what went out"
+  "Emails are sent in the background, the history shows what went out": "Emails are sent in the background, the history shows what went out",
+  "Attendance": "Attendance",
+  "Attended": "Attended",
+  "No record": "No record",
+  "Already recorded": "Already recorded"
 }
