@@ -39,6 +39,11 @@ export default function WorkoutPlanRecordingActionsComponent({
 
   const intervalRef = useRef<number | undefined>(undefined);
 
+  // When the running recording started, in this device's clock. The timer is worked
+  // out from this rather than counted up, because a phone with its screen off stops
+  // firing intervals and every tick missed that way would be lost for good.
+  const startedAtRef = useRef<number>(Date.now());
+
   const isPlanOwner =
     !isAdminPage && TokenService.isUserAllowed("WorkoutPlanRecordings_Add");
 
@@ -47,7 +52,9 @@ export default function WorkoutPlanRecordingActionsComponent({
     setStartContext(response);
     // The server sends elapsed seconds, so a page reload, a new login or another
     // device all pick the timer up where it actually is.
-    setElapsedSeconds(response?.runningRecording?.elapsedSeconds ?? 0);
+    const elapsed = response?.runningRecording?.elapsedSeconds ?? 0;
+    startedAtRef.current = Date.now() - elapsed * 1000;
+    setElapsedSeconds(elapsed);
     setSelectedWeek(response?.currentWeek ?? response?.nextWeek ?? 1);
   }, [apiService, workoutPlanId]);
 
@@ -62,8 +69,10 @@ export default function WorkoutPlanRecordingActionsComponent({
       return;
     }
 
+    // Read off the clock, not added up. However many ticks the phone skips while it
+    // sleeps, the next one still shows the right number.
     intervalRef.current = window.setInterval(
-      () => setElapsedSeconds((previous) => previous + 1),
+      () => setElapsedSeconds(Math.floor((Date.now() - startedAtRef.current) / 1000)),
       1000,
     );
 
@@ -71,6 +80,24 @@ export default function WorkoutPlanRecordingActionsComponent({
       if (intervalRef.current) window.clearInterval(intervalRef.current);
     };
   }, [startContext?.scenario]);
+
+  // Coming back to the page corrects the timer at once instead of waiting for a tick,
+  // and asks the server again - which is also how a recording that lapsed while the
+  // phone was away gets noticed. This is the page reload members were being told to do.
+  useEffect(() => {
+    if (startContext?.scenario !== WorkoutPlanStartScenario.Running) return;
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState !== "visible") return;
+
+      setElapsedSeconds(Math.floor((Date.now() - startedAtRef.current) / 1000));
+      loadStartContext();
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [startContext?.scenario, loadStartContext]);
 
   const onStartClick = () => {
     if (!startContext) return;
