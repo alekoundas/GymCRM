@@ -277,10 +277,13 @@ export default function WorkoutPlansPage() {
       description: source.description,
       isCircular: source.isCircular,
       // Detached from the plan they came from, so the save creates new rows rather
-      // than moving the originals.
-      exercises: (source.exercises ?? []).map((x) => ({
+      // than moving the originals - and each given its own temporary id. The list
+      // identifies a row by id everywhere: the react key, the edits, the deletes,
+      // the reordering. Cloning them all as 0 made every row the same row, so one
+      // edit rewrote the lot. Negative to match what adding an exercise produces.
+      exercises: (source.exercises ?? []).map((x, index) => ({
         ...x,
-        id: 0,
+        id: (index + 1) * -1,
         workoutPlanId: 0,
       })),
     });
