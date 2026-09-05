@@ -9,6 +9,9 @@ namespace Core.Dtos.WorkoutPlanRule
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string Name { get; set; } = string.Empty;
 
+        // Null falls back to WorkoutPlanRecordingService.AwayGapDays.
+        public int? AwayGapDays { get; set; }
+
         public ICollection<WorkoutPlanRuleWeekAddDto> Weeks { get; set; } = new Collection<WorkoutPlanRuleWeekAddDto>();
     }
 }

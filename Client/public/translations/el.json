@@ -276,5 +276,7 @@
   "Attendance": "Παρουσία",
   "Attended": "Παρών",
   "No record": "Χωρίς καταγραφή",
-  "Already recorded": "Έχει ήδη καταγραφεί"
+  "Already recorded": "Έχει ήδη καταγραφεί",
+  "Days away before asking for the week": "Ημέρες απουσίας πριν ζητηθεί η εβδομάδα",
+  "Leave empty for the default": "Άφησέ το κενό για την προεπιλογή"
 }

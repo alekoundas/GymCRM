@@ -789,6 +789,9 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("AwayGapDays")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("CreatedBy_FullName")
                         .IsRequired()
                         .HasColumnType("TEXT");

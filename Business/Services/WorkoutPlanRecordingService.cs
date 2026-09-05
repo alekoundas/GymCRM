@@ -13,7 +13,14 @@ namespace Business.Services
         public const int LapseAfterHours = 3;
 
         // A gap longer than this resets the per-week count and offers a free week choice.
+        // The default gap. A rule may override it, and most do not.
         public const int AwayGapDays = 12;
+
+        // The gap that actually applies to a plan.
+        public static int ResolveAwayGapDays(WorkoutPlanRule? rule)
+        {
+            return rule?.AwayGapDays ?? AwayGapDays;
+        }
 
         private readonly IDataService _dataService;
 
@@ -60,15 +67,15 @@ namespace Business.Services
 
         // Counts consecutive recordings sitting on currentWeek, walking backwards
         // from the newest. Stops at the first recording on a different week, and at the first gap
-        // longer than AwayGapDays - measured from now to the newest, then between each pair.
-        public static int CountConsecutiveOnWeek(IEnumerable<WorkoutPlanRecording> newestFirst, int currentWeek, DateTime nowUtc)
+        // longer than awayGapDays - measured from now to the newest, then between each pair.
+        public static int CountConsecutiveOnWeek(IEnumerable<WorkoutPlanRecording> newestFirst, int currentWeek, DateTime nowUtc, int awayGapDays)
         {
             int count = 0;
             DateTime cursor = nowUtc;
 
             foreach (WorkoutPlanRecording recording in newestFirst)
             {
-                if ((cursor - recording.StartedOn).TotalDays > AwayGapDays)
+                if ((cursor - recording.StartedOn).TotalDays > awayGapDays)
                     break;
 
                 if (recording.WeekNumber != currentWeek)
@@ -123,6 +130,8 @@ namespace Business.Services
                 return startContext;
             }
 
+            int awayGapDays = ResolveAwayGapDays(plan.WorkoutPlanRule);
+
             List<WorkoutPlanRuleWeek> weeks = plan.WorkoutPlanRule.Weeks
                 .OrderBy(x => x.WeekNumber)
                 .ToList();
@@ -170,7 +179,7 @@ namespace Business.Services
                 return startContext;
             }
 
-            if ((nowUtc - last.StartedOn).TotalDays > AwayGapDays)
+            if ((nowUtc - last.StartedOn).TotalDays > awayGapDays)
             {
                 startContext.Scenario = WorkoutPlanStartScenarioEnum.AwayTooLong;
                 return startContext;
@@ -185,7 +194,7 @@ namespace Business.Services
                 return startContext;
             }
 
-            startContext.RecordingsOnCurrentWeek = CountConsecutiveOnWeek(recordings, plan.CurrentWeek!.Value, nowUtc);
+            startContext.RecordingsOnCurrentWeek = CountConsecutiveOnWeek(recordings, plan.CurrentWeek!.Value, nowUtc, awayGapDays);
             startContext.RemainingOnCurrentWeek = Math.Max(0, currentWeekRow.MaxRecordings - startContext.RecordingsOnCurrentWeek);
             startContext.Scenario = startContext.RemainingOnCurrentWeek > 0
                 ? WorkoutPlanStartScenarioEnum.UnderMax

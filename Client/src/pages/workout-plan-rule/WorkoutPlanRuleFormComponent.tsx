@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
+import { InputNumber } from "primereact/inputnumber";
 import { Message } from "primereact/message";
 import { FormMode } from "../../enum/FormMode";
 import { useTranslator } from "../../services/TranslatorService";
@@ -130,6 +131,30 @@ export default function WorkoutPlanRuleFormComponent({ formMode }: IField) {
             className="w-full"
             disabled={isReadOnly}
           />
+        </div>
+
+        <div className="field col-12 md:col-4">
+          <label
+            htmlFor="rule-away-gap-days"
+            className="block text-900 font-medium mb-2"
+          >
+            {t("Days away before asking for the week")}
+          </label>
+          <InputNumber
+            inputId="rule-away-gap-days"
+            value={workoutPlanRuleDto.awayGapDays ?? null}
+            onValueChange={(e) =>
+              updateWorkoutPlanRuleDto({ awayGapDays: e.value ?? undefined })
+            }
+            min={1}
+            max={365}
+            showButtons
+            className="w-full"
+            disabled={isReadOnly}
+          />
+          <small className="block mt-1 text-color-secondary">
+            {t("Leave empty for the default")}
+          </small>
         </div>
       </div>
 
