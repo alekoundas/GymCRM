@@ -283,6 +283,8 @@
   'Attended': string;
   'No record': string;
   'Already recorded': string;
+  'Days away before asking for the week': string;
+  'Leave empty for the default': string;
     }
 
 

@@ -9,6 +9,8 @@ export interface WorkoutPlanRuleDto {
   workoutPlanCount: number;
   isLocked: boolean;
   createdOn?: string;
+  // Empty means the built-in default.
+  awayGapDays?: number;
 }
 
 // Class
@@ -20,4 +22,5 @@ export class WorkoutPlanRuleDto implements WorkoutPlanRuleDto {
   workoutPlanCount: number = 0;
   isLocked: boolean = false;
   createdOn?: string = undefined;
+  awayGapDays?: number = undefined;
 }

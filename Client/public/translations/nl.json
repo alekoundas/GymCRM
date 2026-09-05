@@ -276,5 +276,7 @@
   "Attendance": "Attendance",
   "Attended": "Attended",
   "No record": "No record",
-  "Already recorded": "Already recorded"
+  "Already recorded": "Already recorded",
+  "Days away before asking for the week": "Days away before asking for the week",
+  "Leave empty for the default": "Leave empty for the default"
 }
