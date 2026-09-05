@@ -66,6 +66,32 @@ namespace API.Controllers
             return new ApiResponse<WorkoutPlanDto>().SetSuccessResponse(entityDto);
         }
 
+        // The week and the rule have to agree, and only the server can be sure of it.
+        // The dialog fetches the rule's weeks to build its dropdown, so there is a
+        // moment where the form still holds the previous rule's week - saving inside
+        // that moment used to persist a week the new rule never had, and the plan
+        // then read as orphaned.
+        protected override bool CustomValidatePUT(WorkoutPlanDto entity, out string[] errors)
+        {
+            errors = Array.Empty<string>();
+
+            if (entity.WorkoutPlanRuleId == null)
+                return false;
+
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            bool weekExists = entity.CurrentWeek != null
+                && context.WorkoutPlanRuleWeeks.Any(x =>
+                    x.WorkoutPlanRuleId == entity.WorkoutPlanRuleId.Value
+                    && x.WeekNumber == entity.CurrentWeek.Value);
+
+            if (weekExists)
+                return false;
+
+            errors = [_localizer[TranslationKeys.Selected_week_does_not_exist_in_the_rule]];
+            return true;
+        }
+
         protected override void DataTableQueryUpdate(IGenericRepository<WorkoutPlan> query, DataTableDto<WorkoutPlanDto> dataTable)
         {
             query = query.Include(x => x.User).ThenInclude<User, UserStatus>(x => x.UserStatus!);

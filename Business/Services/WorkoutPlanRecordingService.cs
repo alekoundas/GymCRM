@@ -160,7 +160,13 @@ namespace Business.Services
             if (last == null)
             {
                 startContext.Scenario = WorkoutPlanStartScenarioEnum.FirstEver;
-                startContext.NextWeek = 1;
+
+                // Start where the trainer put the plan, not back at the beginning. A
+                // week set on a plan that has never been recorded is a deliberate
+                // choice - somebody joining mid-programme carries on from there.
+                // Week 1 only when no usable week was set, which is also what a week
+                // pointing outside the rule falls back to.
+                startContext.NextWeek = currentWeekRow?.WeekNumber ?? 1;
                 return startContext;
             }
 

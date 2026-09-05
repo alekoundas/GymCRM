@@ -60,25 +60,23 @@ export default function WorkoutPlanFormComponent({
     !workoutPlanDto.currentWeek;
 
   const onRuleChange = async (ruleId: number | undefined) => {
-    updateWorkoutPlanDto({ workoutPlanRuleId: ruleId });
+    // Cleared straight away, before anything is fetched. The previous rule's weeks
+    // are not this one's, and leaving them on screen meant the dialog could be saved
+    // during the fetch with a week the new rule has never had.
+    setRuleWeekCount(0);
+    updateWorkoutPlanDto({
+      workoutPlanRuleId: ruleId,
+      currentWeek: undefined,
+    });
 
-    if (!ruleId) {
-      setRuleWeekCount(0);
-      updateWorkoutPlanDto({ currentWeek: undefined });
-      return;
-    }
+    if (!ruleId) return;
 
     const rule = await apiService.get<WorkoutPlanRuleDto>(
       "WorkoutPlanRules",
       ruleId,
     );
-    const weekCount = rule?.weekCount ?? 0;
-    setRuleWeekCount(weekCount);
 
-    // A week the newly chosen rule does not have must not be saved. Clearing it
-    // makes the field invalid, which is the prompt to pick a real one.
-    if ((workoutPlanDto.currentWeek ?? 0) > weekCount)
-      updateWorkoutPlanDto({ currentWeek: undefined });
+    setRuleWeekCount(rule?.weekCount ?? 0);
   };
 
   return (

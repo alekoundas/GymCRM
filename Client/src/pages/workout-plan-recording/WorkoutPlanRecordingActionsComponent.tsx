@@ -182,7 +182,7 @@ export default function WorkoutPlanRecordingActionsComponent({
         return (
           <p className="m-0">
             {t("You have not started this plan yet")}.{" "}
-            {t("It will start on week")} 1.
+            {t("It will start on week")} {startContext.nextWeek}.
           </p>
         );
 
