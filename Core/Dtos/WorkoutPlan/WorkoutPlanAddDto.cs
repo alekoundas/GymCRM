@@ -26,5 +26,10 @@ namespace Core.Dtos.WorkoutPlan
 
         public int? WorkoutPlanRuleId { get; set; }
 
+        // Model binding drops anything the dto has no property for, so leaving this
+        // out meant a plan created with a rule always arrived with no week - silently,
+        // because the client had sent one.
+        public int? CurrentWeek { get; set; }
+
     }
 }
