@@ -73,17 +73,27 @@ namespace API.Controllers
         // then read as orphaned.
         protected override bool CustomValidatePUT(WorkoutPlanDto entity, out string[] errors)
         {
+            return HasWeekOutsideRule(entity.WorkoutPlanRuleId, entity.CurrentWeek, out errors);
+        }
+
+        protected override bool CustomValidatePOST(WorkoutPlanAddDto entity, out string[] errors)
+        {
+            return HasWeekOutsideRule(entity.WorkoutPlanRuleId, entity.CurrentWeek, out errors);
+        }
+
+        private bool HasWeekOutsideRule(int? workoutPlanRuleId, int? currentWeek, out string[] errors)
+        {
             errors = Array.Empty<string>();
 
-            if (entity.WorkoutPlanRuleId == null)
+            if (workoutPlanRuleId == null)
                 return false;
 
             using ApiDbContext context = _dataService.GetDbContext();
 
-            bool weekExists = entity.CurrentWeek != null
+            bool weekExists = currentWeek != null
                 && context.WorkoutPlanRuleWeeks.Any(x =>
-                    x.WorkoutPlanRuleId == entity.WorkoutPlanRuleId.Value
-                    && x.WeekNumber == entity.CurrentWeek.Value);
+                    x.WorkoutPlanRuleId == workoutPlanRuleId.Value
+                    && x.WeekNumber == currentWeek.Value);
 
             if (weekExists)
                 return false;
