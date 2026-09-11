@@ -1,8 +1,5 @@
 import { JSX, useState } from "react";
-import {
-  VirtualScrollerLazyEvent,
-  VirtualScrollerLoadingTemplateOptions,
-} from "primereact/virtualscroller";
+import { VirtualScrollerLoadingTemplateOptions } from "primereact/virtualscroller";
 import { useApiService } from "../../../services/ApiService";
 import {
   AutoComplete,
@@ -38,7 +35,7 @@ export default function AutoCompleteComponent<TEntity>({
 }: IField<TEntity>) {
   const { t } = useTranslator();
   const [isSelectingAll, setSelectingAll] = useState(false);
-  const [isDataLoaded, setIsDataLoaded] = useState(false); // used to escape lazyload firing again after dto update.
+  const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [autoCompleteDto, setAutoCompleteDto] = useState<
     AutoCompleteDto<TEntity>
@@ -47,45 +44,42 @@ export default function AutoCompleteComponent<TEntity>({
   const apiService = useApiService();
 
   const fetchData = async (dto: AutoCompleteDto<TEntity>) => {
-    dto.take = 10;
+    setLoading(true);
+    dto.take = 1000;
 
     const result = await apiService.getDataAutoComplete<TEntity>(
       controller,
       dto
     );
 
+    setLoading(false);
     return result;
   };
 
-  const onLazyLoad = async (event: VirtualScrollerLazyEvent) => {
-    if (isDataLoaded) {
-      setIsDataLoaded(false); // reset value
-      return;
+  const loadPage = async (skip: number, value: string) => {
+    const dto = new AutoCompleteDto<TEntity>();
+    dto.skip = skip;
+    dto.searchValue = value;
+    return await fetchData(dto);
+  };
+
+  // A page at a time until there are no more, rather than a request per scroll tick.
+  // The list opens with the first thousand already in it and the rest arrive behind
+  // it, so scrolling never waits on the network.
+  const load = async (value: string) => {
+    const first = await loadPage(0, value);
+    if (!first) return;
+
+    let all = first.suggestions ?? [];
+    setAutoCompleteDto({ ...first, suggestions: all });
+
+    while (all.length < (first.totalRecords ?? 0)) {
+      const next = await loadPage(all.length, value);
+      if (!next?.suggestions?.length) break;
+
+      all = [...all, ...next.suggestions];
+      setAutoCompleteDto({ ...next, suggestions: all });
     }
-
-    const currentLength = autoCompleteDto.suggestions?.length || 0;
-    const requestedFirst = +event.first;
-    const nextSkip = Math.max(requestedFirst, currentLength);
-
-    if (nextSkip >= (autoCompleteDto.totalRecords || 0)) {
-      return;
-    }
-
-    const dto = { ...autoCompleteDto };
-    dto.skip = nextSkip;
-    dto.searchValue = searchValue;
-
-    const result = await fetchData(dto);
-    if (result)
-      setAutoCompleteDto({
-        ...result,
-        suggestions: [
-          ...(autoCompleteDto.suggestions || []),
-          ...(result.suggestions || []),
-        ],
-      });
-
-    setIsDataLoaded(true); // escape next load.
   };
 
   const handleChange = (event: AutoCompleteChangeEvent): void => {
@@ -95,32 +89,23 @@ export default function AutoCompleteComponent<TEntity>({
     setSearchValue("");
   };
 
-  // Two calls on purpose: the page size has to be a real number, and the count
-  // only comes back with a page, so the first one asks how many there are.
   const selectAll = async () => {
     setSelectingAll(true);
 
-    const countDto = new AutoCompleteDto<TEntity>();
-    countDto.take = 1;
-    const countResult = await apiService.getDataAutoComplete<TEntity>(
-      controller,
-      countDto,
-    );
+    // Pages through the lot, the same way the list itself fills.
+    let all: TEntity[] = [];
+    let total = 0;
 
-    const totalRecords = countResult?.totalRecords ?? 0;
-    if (totalRecords > 0) {
-      const allDto = new AutoCompleteDto<TEntity>();
-      allDto.take = totalRecords;
+    do {
+      const page = await loadPage(all.length, "");
+      if (!page?.suggestions?.length) break;
 
-      const allResult = await apiService.getDataAutoComplete<TEntity>(
-        controller,
-        allDto,
-      );
+      all = [...all, ...page.suggestions];
+      total = page.totalRecords ?? 0;
+    } while (all.length < total);
 
-      const allEntities = allResult?.suggestions ?? [];
-      setSelectedEntityDtos(allEntities);
-      if (onChange) onChange(allEntities);
-    }
+    setSelectedEntityDtos(all);
+    if (onChange) onChange(all);
 
     setSelectingAll(false);
   };
@@ -156,13 +141,7 @@ export default function AutoCompleteComponent<TEntity>({
       setSearchValue(searchQuery);
     }
 
-    const newDto = new AutoCompleteDto<TEntity>();
-    newDto.skip = 0;
-    newDto.searchValue = searchQuery;
-
-    const result = await fetchData(newDto);
-    if (result) setAutoCompleteDto(result);
-    setIsDataLoaded(true); // escape next load.
+    await load(searchQuery);
   };
 
   return (
@@ -172,14 +151,14 @@ export default function AutoCompleteComponent<TEntity>({
           id="recipients"
           multiple
           dropdown
+          // Not lazy any more. The rows are all in memory by the time they are
+          // scrolled to, so the scroller only has to draw them - which is what
+          // stopped the list arriving ten at a time.
           virtualScrollerOptions={{
-            lazy: true,
-            onLazyLoad: onLazyLoad,
             loadingTemplate: loadingTemplate,
             itemSize: 50,
-            showLoader: false, // TODO: Enable this somehow....
-            // loading: loading,
-            delay: 200, // Reduced to minimize double triggers
+            showLoader: false,
+            loading: loading,
             scrollHeight: "300px",
           }}
           value={selectedEntityDtos}
