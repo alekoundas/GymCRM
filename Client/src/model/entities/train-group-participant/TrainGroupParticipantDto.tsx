@@ -10,6 +10,8 @@ export interface TrainGroupParticipantDto {
   user?: UserDto | undefined;
   // Filled per request for the date the grid is filtered by.
   hasAttendance?: boolean;
+  // Lessons still owed to this member. Filled per request, never stored.
+  subscriptionBalance?: number;
 }
 
 export class TrainGroupParticipantDto {
@@ -21,4 +23,5 @@ export class TrainGroupParticipantDto {
   userId: string = ""; // GUID as string
   user?: UserDto | undefined;
   hasAttendance?: boolean = false;
+  subscriptionBalance?: number = 0;
 }

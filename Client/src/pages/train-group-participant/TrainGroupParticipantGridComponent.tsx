@@ -1,3 +1,4 @@
+import SubscriptionBalanceTag from "../subscription/SubscriptionBalanceTag";
 import { useState, useEffect, useRef } from "react";
 import DataTableComponent from "../../components/core/datatable/DataTableComponent";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
@@ -225,6 +226,17 @@ export default function TrainGroupParticipantGridComponent({
       body: (rowData, options) => chipTemplate(rowData.user),
 
       style: { width: "10%" },
+    },
+    {
+      field: "subscriptionBalance",
+      header: t("Remaining"),
+      sortable: false,
+      filter: false,
+      filterPlaceholder: "",
+      body: (rowData) => (
+        <SubscriptionBalanceTag balance={rowData.subscriptionBalance} />
+      ),
+      style: { width: "8%" },
     },
     {
       // Says whether attendance was taken for the date the grid is showing. Not

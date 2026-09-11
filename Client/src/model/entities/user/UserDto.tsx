@@ -15,6 +15,8 @@ export interface UserDto {
   userStatusId?: number;
   userStatus?: UserStatusDto;
   userRoles: UserRoleDto[];
+  // Lessons still owed. Filled per request, never stored.
+  subscriptionBalance?: number;
 }
 
 export class UserDto {
@@ -29,4 +31,5 @@ export class UserDto {
   userStatusId?: number;
   userStatus?: UserStatusDto;
   userRoles: UserRoleDto[] = [];
+  subscriptionBalance?: number = 0;
 }

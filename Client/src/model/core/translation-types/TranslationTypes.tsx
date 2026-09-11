@@ -285,6 +285,24 @@
   'Already recorded': string;
   'Days away before asking for the week': string;
   'Leave empty for the default': string;
+  'Subscriptions': string;
+  'Subscription requests': string;
+  'Subscription request': string;
+  'New subscription': string;
+  'Delete subscription': string;
+  'Requested': string;
+  'Granted': string;
+  'Approved': string;
+  'Rejected': string;
+  'Approve': string;
+  'Reject': string;
+  'Notify user': string;
+  'Comment': string;
+  'Delete and notify': string;
+  'Remaining': string;
+  'This will change the remaining subscriptions': string;
+  'Date': string;
+  'Missing': string;
     }
 
 

@@ -5,6 +5,9 @@ import { UserPasswordChangeDto } from "../model/entities/user/UserPasswordChange
 import { UserLoginRequestDto } from "../model/entities/user/UserLoginRequestDto";
 import { UserRefreshTokenDto } from "../model/entities/user/UserRefreshTokenDto";
 import { UserRegisterDto } from "../model/entities/user/UserRegisterDto";
+import { SubscriptionDto } from "../model/entities/subscription/SubscriptionDto";
+import { SubscriptionAddDto } from "../model/entities/subscription/SubscriptionAddDto";
+import { SubscriptionDecideDto } from "../model/entities/subscription/SubscriptionDecideDto";
 import { LookupDto } from "../model/lookup/LookupDto";
 import { WorkoutPlanStartContextDto } from "../model/entities/workout-plan-recording/WorkoutPlanStartContextDto";
 import { WorkoutPlanRecordingDto } from "../model/entities/workout-plan-recording/WorkoutPlanRecordingDto";
@@ -229,6 +232,55 @@ export const useApiService = () => {
     async (controller: string, data: LookupDto): Promise<LookupDto | null> => {
       const url = buildUrl(controller, "Lookup");
       return apiRequest<LookupDto, LookupDto>(url, "POST", data);
+    },
+    [buildUrl, apiRequest],
+  );
+
+  // The three subscription endpoints are separate on purpose: the one a member can
+  // reach never decides a status or an amount.
+  const addSubscription = useCallback(
+    async (data: SubscriptionAddDto): Promise<SubscriptionDto | null> => {
+      const url = buildUrl("Subscriptions", "Add");
+      return apiRequest<SubscriptionAddDto, SubscriptionDto>(url, "POST", data);
+    },
+    [buildUrl, apiRequest],
+  );
+
+  const requestSubscription = useCallback(
+    async (requestedAmount: number, memberComment: string): Promise<SubscriptionDto | null> => {
+      const url = buildUrl("Subscriptions", "Request");
+      return apiRequest<{ requestedAmount: number; memberComment: string }, SubscriptionDto>(
+        url,
+        "POST",
+        { requestedAmount, memberComment },
+      );
+    },
+    [buildUrl, apiRequest],
+  );
+
+  const decideSubscription = useCallback(
+    async (data: SubscriptionDecideDto): Promise<SubscriptionDto | null> => {
+      const url = buildUrl("Subscriptions", "Decide");
+      return apiRequest<SubscriptionDecideDto, SubscriptionDto>(url, "POST", data);
+    },
+    [buildUrl, apiRequest],
+  );
+
+  const removeSubscription = useCallback(
+    async (id: number, notifyUser: boolean): Promise<boolean | null> => {
+      const url = buildUrl("Subscriptions", "Remove");
+      return apiRequest<{ id: number; notifyUser: boolean }, boolean>(url, "POST", {
+        id,
+        notifyUser,
+      });
+    },
+    [buildUrl, apiRequest],
+  );
+
+  const getSubscriptionBalance = useCallback(
+    async (): Promise<number | null> => {
+      const url = buildUrl("Subscriptions", "Balance");
+      return apiRequest<undefined, number>(url, "GET");
     },
     [buildUrl, apiRequest],
   );
@@ -518,6 +570,11 @@ export const useApiService = () => {
     get,
     getGoogle,
     getDataLookup,
+    addSubscription,
+    requestSubscription,
+    decideSubscription,
+    removeSubscription,
+    getSubscriptionBalance,
     getWorkoutPlanStartContext,
     startWorkoutPlanRecording,
     stopWorkoutPlanRecording,

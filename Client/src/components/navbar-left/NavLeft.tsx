@@ -77,6 +77,18 @@ export default function NavLeft() {
           visible: TokenService.isUserAllowed("WorkoutPlanRecordingsAdmin_View"),
           command: () => navigate("/administrator/workout-plan-recordings"),
         },
+        {
+          label: t("Subscriptions"),
+          icon: "pi pi-ticket",
+          visible: TokenService.isUserAllowed("SubscriptionsAdmin_View"),
+          command: () => navigate("/administrator/subscriptions"),
+        },
+        {
+          label: t("Subscription requests"),
+          icon: "pi pi-inbox",
+          visible: TokenService.isUserAllowed("SubscriptionsAdmin_Edit"),
+          command: () => navigate("/administrator/subscription-requests"),
+        },
       ],
     },
     {
