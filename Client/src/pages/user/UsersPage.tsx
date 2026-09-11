@@ -123,7 +123,9 @@ export default function UsersPage() {
     {
       field: "subscriptionBalance",
       header: t("Remaining"),
-      sortable: false,
+      // Ordered by the server as an expression over the whole table, not by the
+      // datatable over the page it is showing.
+      sortable: true,
       filter: false,
       filterPlaceholder: "",
       body: (rowData) => (

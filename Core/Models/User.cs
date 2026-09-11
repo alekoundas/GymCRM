@@ -27,6 +27,7 @@ namespace Core.Models
         public virtual ICollection<TrainGroup> TrainGroups { get; set; } = new Collection<TrainGroup>();
         public virtual ICollection<TrainGroupParticipant> TrainGroupParticipants { get; set; } = new Collection<TrainGroupParticipant>();
         public virtual ICollection<TrainGroupΑttendance> TrainGroupΑttendances { get; set; } = new Collection<TrainGroupΑttendance>();
+        public virtual ICollection<Subscription> Subscriptions { get; set; } = new Collection<Subscription>();
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
     }
 }

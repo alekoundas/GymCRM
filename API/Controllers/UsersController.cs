@@ -138,6 +138,9 @@ namespace API.Controllers
 
         }
 
+        // Worked out per request rather than stored, so it is sorted apart from the rest.
+        private const string SubscriptionBalanceField = "subscriptionBalance";
+
         // POST: api/Users/GetDataTable
         [HttpPost("GetDataTable")]
         public async Task<ApiResponse<DataTableDto<UserDto>>> GetDataTable([FromBody] DataTableDto<UserDto> dataTable)
@@ -149,8 +152,29 @@ namespace API.Controllers
                 .Include(x => x.UserRoles)
                 .ThenInclude<UserRole, Role>(x => x.Role);
 
+            // The balance is not a column - it is approved subscriptions less attendances -
+            // so the reflection sort below has no property to read. It is ordered as an
+            // expression instead, and here rather than after the query, because sorting
+            // what came back would only sort the page the caller happens to be on.
+            DataTableSortDto? balanceSort = dataTable.Sorts
+                .FirstOrDefault(x => string.Equals(x.FieldName, SubscriptionBalanceField, StringComparison.OrdinalIgnoreCase));
+
+            if (balanceSort != null)
+            {
+                if (balanceSort.Order > 0)
+                    query.OrderBy(x => x.Subscriptions
+                            .Where(y => y.Status == SubscriptionStatusEnum.APPROVED)
+                            .Sum(y => y.Amount)
+                        - x.TrainGroupΑttendances.Count());
+                else
+                    query.OrderByDescending(x => x.Subscriptions
+                            .Where(y => y.Status == SubscriptionStatusEnum.APPROVED)
+                            .Sum(y => y.Amount)
+                        - x.TrainGroupΑttendances.Count());
+            }
+
             // Handle Sorting of DataTable.
-            if (dataTable.Sorts.Count() > 0)
+            if (balanceSort == null && dataTable.Sorts.Count() > 0)
             {
                 // Create the first OrderBy().
                 DataTableSortDto? dataTableSort = dataTable.Sorts.First();
