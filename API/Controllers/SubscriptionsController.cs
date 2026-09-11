@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Repository;
 using Business.Services;
+using Business.Services.Email;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.Subscription;
@@ -10,6 +11,7 @@ using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System.Net;
 
 namespace API.Controllers
 {
@@ -31,17 +33,20 @@ namespace API.Controllers
         private readonly IMapper _mapper;
         private readonly IStringLocalizer _localizer;
         private readonly ISubscriptionService _subscriptionService;
+        private readonly IEmailService _emailService;
 
         public SubscriptionsController(
             IDataService dataService,
             IMapper mapper,
             IStringLocalizer localizer,
-            ISubscriptionService subscriptionService) : base(dataService, mapper, localizer)
+            ISubscriptionService subscriptionService,
+            IEmailService emailService) : base(dataService, mapper, localizer)
         {
             _dataService = dataService;
             _mapper = mapper;
             _localizer = localizer;
             _subscriptionService = subscriptionService;
+            _emailService = emailService;
         }
 
 
@@ -95,6 +100,25 @@ namespace API.Controllers
 
             await _dataService.Subscriptions.AddAsync(subscription);
 
+            if (dto.NotifyUser)
+            {
+                User? user = await _dataService.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+                await QueueSubscriptionEmailAsync(
+                    user,
+                    _localizer[TranslationKeys.Subscription_Renewed],
+                    GetSubscriptionEmailBody(
+                        _localizer[TranslationKeys.Subscription_Renewed],
+                        _localizer[TranslationKeys.Subscriptions_were_added_to_your_account],
+                        new List<(string Label, string Value)>
+                        {
+                            (_localizer[TranslationKeys.Subscriptions_added].Value, subscription.Amount.ToString()),
+                            GetBalanceLine(await _subscriptionService.GetBalanceAsync(userId))
+                        },
+                        dto.AdminComment,
+                        string.Empty));
+            }
+
             return new ApiResponse<SubscriptionDto>().SetSuccessResponse(_mapper.Map<SubscriptionDto>(subscription));
         }
 
@@ -145,6 +169,7 @@ namespace API.Controllers
                 return new ApiResponse<SubscriptionDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
             Subscription? subscription = await _dataService.Subscriptions
+                .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.Id == dto.Id);
 
             if (subscription == null)
@@ -167,6 +192,9 @@ namespace API.Controllers
 
             await _dataService.UpdateAsync(subscription);
 
+            if (dto.NotifyUser)
+                await SendDecisionEmailAsync(subscription);
+
             return new ApiResponse<SubscriptionDto>().SetSuccessResponse(_mapper.Map<SubscriptionDto>(subscription));
         }
 
@@ -186,7 +214,35 @@ namespace API.Controllers
             if (subscription == null)
                 return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(Subscription)]);
 
+            // Read off before the row goes, there is nothing to read afterwards.
+            int removedAmount = subscription.Amount;
+            User? user = subscription.User;
+            string adminComment = subscription.AdminComment;
+            Guid userId = subscription.UserId;
+
             await _dataService.Subscriptions.RemoveAsync(subscription);
+
+            if (dto.NotifyUser)
+            {
+                List<(string Label, string Value)> lines = new List<(string Label, string Value)>();
+
+                // A rejected or still pending entry never counted, so there is no number
+                // worth quoting - only the corrected balance.
+                if (removedAmount > 0)
+                    lines.Add((_localizer[TranslationKeys.Subscriptions_removed].Value, removedAmount.ToString()));
+
+                lines.Add(GetBalanceLine(await _subscriptionService.GetBalanceAsync(userId)));
+
+                await QueueSubscriptionEmailAsync(
+                    user,
+                    _localizer[TranslationKeys.Subscription_Adjusted],
+                    GetSubscriptionEmailBody(
+                        _localizer[TranslationKeys.Subscription_Adjusted],
+                        _localizer[TranslationKeys.Subscriptions_were_removed_from_your_account],
+                        lines,
+                        adminComment,
+                        _localizer[TranslationKeys.Talk_to_your_trainer_or_send_a_new_request_from_your_profile]));
+            }
 
             return new ApiResponse<bool>().SetSuccessResponse(true, _localizer[TranslationKeys._0_deleted_successfully, nameof(Subscription)]);
         }
@@ -224,6 +280,115 @@ namespace API.Controllers
                 return new ApiResponse<Subscription>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
             return await base.Delete(id);
+        }
+
+
+        private async Task SendDecisionEmailAsync(Subscription subscription)
+        {
+            bool isApproved = subscription.Status == SubscriptionStatusEnum.APPROVED;
+
+            List<(string Label, string Value)> lines = new List<(string Label, string Value)>();
+
+            if (subscription.RequestedAmount != null)
+                lines.Add((_localizer[TranslationKeys.Subscriptions_requested].Value, subscription.RequestedAmount.Value.ToString()));
+
+            // What was actually granted, which need not be what was asked for.
+            if (isApproved)
+                lines.Add((_localizer[TranslationKeys.Subscriptions_added].Value, subscription.Amount.ToString()));
+
+            lines.Add(GetBalanceLine(await _subscriptionService.GetBalanceAsync(subscription.UserId)));
+
+            await QueueSubscriptionEmailAsync(
+                subscription.User,
+                isApproved
+                    ? _localizer[TranslationKeys.Subscription_Renewed]
+                    : _localizer[TranslationKeys.Subscription_Request_Answered],
+                GetSubscriptionEmailBody(
+                    isApproved
+                        ? _localizer[TranslationKeys.Subscription_Renewed]
+                        : _localizer[TranslationKeys.Subscription_Request_Answered],
+                    isApproved
+                        ? _localizer[TranslationKeys.Subscriptions_were_added_to_your_account]
+                        : _localizer[TranslationKeys.Your_request_was_not_approved_this_time],
+                    lines,
+                    subscription.AdminComment,
+                    // Somebody turned down wants to know what to do next, not only that
+                    // the answer was no.
+                    isApproved
+                        ? string.Empty
+                        : _localizer[TranslationKeys.Talk_to_your_trainer_or_send_a_new_request_from_your_profile]));
+        }
+
+        // Queued rather than sent, so a slow mail server cannot hold up the dialog the
+        // administrator is sat in front of.
+        private async Task QueueSubscriptionEmailAsync(User? user, string subject, string body)
+        {
+            if (user == null || string.IsNullOrWhiteSpace(user.Email))
+                return;
+
+            await _emailService.QueueEmailAsync(new List<User> { user }, subject, body);
+        }
+
+        // A member is never shown a minus sign - what is owed reads as lessons missing,
+        // the same way the balance tag reads on screen.
+        private (string Label, string Value) GetBalanceLine(int balance)
+        {
+            return balance < 0
+                ? (_localizer[TranslationKeys.Missing_subscriptions].Value, Math.Abs(balance).ToString())
+                : (_localizer[TranslationKeys.Remaining_subscriptions].Value, balance.ToString());
+        }
+
+        private string GetSubscriptionEmailBody(
+            string heading,
+            string intro,
+            List<(string Label, string Value)> lines,
+            string comment,
+            string footer)
+        {
+            string emailBody = @"
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        h2 { color: #2c3e50; }
+                        .section { margin-bottom: 20px; }
+                        ul { list-style-type: none; padding: 0; }
+                        li { padding: 5px 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <h2>" + heading + "</h2>";
+
+            emailBody += "<div class='section'>";
+            emailBody += "<p>" + intro + "</p>";
+            emailBody += "<ul>";
+
+            foreach ((string Label, string Value) line in lines)
+                emailBody += "<li><strong>" + line.Label + ":</strong> " + line.Value + "</li>";
+
+            emailBody += "</ul>";
+            emailBody += "</div>";
+
+            // Whatever the administrator typed goes out as text, never as markup.
+            if (!string.IsNullOrWhiteSpace(comment))
+            {
+                emailBody += "<div class='section'>";
+                emailBody += "<p><strong>" + _localizer[TranslationKeys.Note_from_your_trainer] + ":</strong></p>";
+                emailBody += "<p>" + WebUtility.HtmlEncode(comment) + "</p>";
+                emailBody += "</div>";
+            }
+
+            if (!string.IsNullOrWhiteSpace(footer))
+                emailBody += "<div class='section'><p>" + footer + "</p></div>";
+
+            emailBody += @"
+                    </div>
+                </body>
+                </html>";
+
+            return emailBody;
         }
 
 
