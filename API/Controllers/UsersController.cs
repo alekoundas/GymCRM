@@ -33,14 +33,18 @@ namespace API.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IStringLocalizer _localizer;
 
+        private readonly ISubscriptionService _subscriptionService;
+
         public UsersController(
             IDataService dataService,
             IMapper mapper,
             ILogger<UsersController> logger,
             IUserService userService,
             UserManager<User> userManager,
-            IStringLocalizer localizer)
+            IStringLocalizer localizer,
+            ISubscriptionService subscriptionService)
         {
+            _subscriptionService = subscriptionService;
             _dataService = dataService;
             _logger = logger;
             _userService = userService;
@@ -242,6 +246,16 @@ namespace API.Controllers
 
             int rowCount = await query.CountAsync();
             int totalRecords = rowCount;
+
+            // One query for the whole page rather than one per row. Filled here and not
+            // in DataTableResultUpdate: this controller answers /GetDataTable with its
+            // own method, so that hook never runs for users.
+            Dictionary<Guid, int> balances = await _subscriptionService.GetBalancesAsync(
+                result.Select(x => x.Id).ToList());
+
+            for (int i = 0; i < result.Count && i < resultDto.Count; i++)
+                if (balances.TryGetValue(result[i].Id, out int balance))
+                    resultDto[i].SubscriptionBalance = balance;
 
             dataTable.Data = resultDto;
             dataTable.TotalRecords = totalRecords;

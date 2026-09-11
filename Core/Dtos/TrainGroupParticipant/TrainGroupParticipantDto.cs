@@ -13,6 +13,10 @@ namespace Core.Models
 
         public bool HasAttendance { get; set; }
 
+        // Lessons still owed to this member, so whoever is taking attendance can see
+        // who has run out before marking them present.
+        public int SubscriptionBalance { get; set; }
+
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public int TrainGroupDateId { get; set; }
 
