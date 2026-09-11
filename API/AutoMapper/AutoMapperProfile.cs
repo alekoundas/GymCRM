@@ -4,6 +4,7 @@ using Core.Dtos.Exercise;
 using Core.Dtos.ExerciseHistory;
 using Core.Dtos.Identity;
 using Core.Dtos.Mail;
+using Core.Dtos.Subscription;
 using Core.Dtos.PhoneNumber;
 using Core.Dtos.TrainGroup;
 using Core.Dtos.TrainGroupDate;
@@ -89,6 +90,10 @@ namespace API.AutoMapper
 
             CreateMap<Mail, MailAddDto>();
             CreateMap<MailAddDto, Mail>();
+
+            // Subscription mappings.
+            CreateMap<Subscription, SubscriptionDto>();
+            CreateMap<SubscriptionDto, Subscription>();
 
             // Exercise mappings.
             CreateMap<Exercise, ExerciseDto>();

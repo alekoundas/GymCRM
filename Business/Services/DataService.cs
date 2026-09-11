@@ -21,6 +21,7 @@ namespace Business.Services
         public IGenericRepository<WorkoutPlanRule> WorkoutPlanRules { get; }
         public IGenericRepository<WorkoutPlanRuleWeek> WorkoutPlanRuleWeeks { get; }
         public IGenericRepository<WorkoutPlanRecording> WorkoutPlanRecordings { get; }
+        public IGenericRepository<Subscription> Subscriptions { get; }
         public IGenericRepository<PhoneNumber> PhoneNumbers { get; }
         public IGenericRepository<TrainGroupDate> TrainGroupDates { get; }
         public IGenericRepository<ExerciseHistory> ExerciseHistories { get; }
@@ -47,6 +48,7 @@ namespace Business.Services
             IGenericRepository<WorkoutPlanRule> workoutPlanRuleRepository,
             IGenericRepository<WorkoutPlanRuleWeek> workoutPlanRuleWeekRepository,
             IGenericRepository<WorkoutPlanRecording> workoutPlanRecordingRepository,
+            IGenericRepository<Subscription> subscriptionRepository,
             IGenericRepository<PhoneNumber> phoneNumberRepository,
             IGenericRepository<TrainGroupDate> trainGroupDateRepository,
             IGenericRepository<ExerciseHistory> exerciseHistoriesRepository,
@@ -71,6 +73,7 @@ namespace Business.Services
             WorkoutPlanRules = workoutPlanRuleRepository;
             WorkoutPlanRuleWeeks = workoutPlanRuleWeekRepository;
             WorkoutPlanRecordings = workoutPlanRecordingRepository;
+            Subscriptions = subscriptionRepository;
             UserStatuses = userStatusesRepository;
             ExerciseHistories = exerciseHistoriesRepository;
 
@@ -109,6 +112,8 @@ namespace Business.Services
                 return (IGenericRepository<TEntity>)WorkoutPlanRuleWeeks;
             if (typeof(TEntity) == typeof(WorkoutPlanRecording))
                 return (IGenericRepository<TEntity>)WorkoutPlanRecordings;
+            if (typeof(TEntity) == typeof(Subscription))
+                return (IGenericRepository<TEntity>)Subscriptions;
             if (typeof(TEntity) == typeof(PhoneNumber))
                 return (IGenericRepository<TEntity>)PhoneNumbers;
             if (typeof(TEntity) == typeof(TrainGroupDate))

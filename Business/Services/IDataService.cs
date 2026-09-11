@@ -14,6 +14,7 @@ namespace Business.Services
         IGenericRepository<GoogleRefreshToken> GoogleRefreshTokens { get; }
         IGenericRepository<User> Users { get; }
         IGenericRepository<Mail> Mails { get; }
+        IGenericRepository<Subscription> Subscriptions { get; }
         IGenericRepository<TrainGroup> TrainGroups { get; }
         IGenericRepository<PhoneNumber> PhoneNumbers { get; }
         IGenericRepository<TrainGroupDate> TrainGroupDates { get; }

@@ -88,6 +88,9 @@
   "Train_group": "Ομάδα προπόνησης",
   "Attendance_date": "Ημερομηνία",
 
+  "A_request_is_already_pending": "Έχεις ήδη ένα αίτημα που περιμένει απάντηση.",
+  "The_request_has_already_been_decided": "Αυτό το αίτημα έχει ήδη απαντηθεί.",
+
   "_0_is_required": "{0} απαιτείται!",
   "_0_already_exists": "{0} υπάρχει ήδη!",
   "_0_not_found": "{0} δεν βρέθηκε!",

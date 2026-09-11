@@ -46,6 +46,7 @@ namespace DataAccess
         public DbSet<WorkoutPlanRule> WorkoutPlanRules { get; set; }
         public DbSet<WorkoutPlanRuleWeek> WorkoutPlanRuleWeeks { get; set; }
         public DbSet<WorkoutPlanRecording> WorkoutPlanRecordings { get; set; }
+        public DbSet<Subscription> Subscriptions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -91,6 +92,7 @@ namespace DataAccess
             builder.ApplyConfiguration(new WorkoutPlanRuleConfiguration());
             builder.ApplyConfiguration(new WorkoutPlanRuleWeekConfiguration());
             builder.ApplyConfiguration(new WorkoutPlanRecordingConfiguration());
+            builder.ApplyConfiguration(new SubscriptionConfiguration());
 
             builder.ApplyConfiguration(new GoogleRefreshTokenConfiguration());
         }
