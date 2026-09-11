@@ -19,7 +19,7 @@ namespace DataAccess.Configurations
                 .HasMaxLength(1000);
 
             builder.HasOne(x => x.User)
-                .WithMany()
+                .WithMany(x => x.Subscriptions)
                 .HasForeignKey(x => x.UserId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
