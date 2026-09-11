@@ -27,12 +27,16 @@ namespace API.Controllers
 
         //private readonly ILogger<TrainGroupDateController> _logger;
 
+        private readonly ISubscriptionService _subscriptionService;
+
         public TrainGroupParticipantsController(
             IDataService dataService,
             IMapper mapper,
             IStringLocalizer localizer,
-            IEmailService emailService) : base(dataService, mapper, localizer)
+            IEmailService emailService,
+            ISubscriptionService subscriptionService) : base(dataService, mapper, localizer)
         {
+            _subscriptionService = subscriptionService;
             _dataService = dataService;
             _mapper = mapper;
             _localizer = localizer;
@@ -548,14 +552,26 @@ namespace API.Controllers
         // day, so days are compared rather than instants.
         protected override async Task DataTableResultUpdate(List<TrainGroupParticipant> entities, List<TrainGroupParticipantDto> entityDtos)
         {
-            if (_selectedDate == null || entities.Count == 0)
+            if (entities.Count == 0)
+                return;
+
+            List<Guid> userIds = entities.Select(x => x.UserId).Distinct().ToList();
+
+            // Owed lessons, whatever date the grid happens to be showing.
+            Dictionary<Guid, int> balances = await _subscriptionService.GetBalancesAsync(userIds);
+
+            for (int i = 0; i < entities.Count && i < entityDtos.Count; i++)
+                if (balances.TryGetValue(entities[i].UserId, out int balance))
+                    entityDtos[i].SubscriptionBalance = balance;
+
+            // Whether attendance was taken only means something alongside a date.
+            if (_selectedDate == null)
                 return;
 
             DateTime day = _selectedDate.Value.Date;
             DateTime nextDay = day.AddDays(1);
 
             List<int> trainGroupIds = entities.Select(x => x.TrainGroupId).Distinct().ToList();
-            List<Guid> userIds = entities.Select(x => x.UserId).Distinct().ToList();
 
             using ApiDbContext context = _dataService.GetDbContext();
 

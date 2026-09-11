@@ -40,6 +40,10 @@ namespace Core.Dtos.User
 
         public byte[]? ProfileImage { get; set; }
 
+        // Lessons still owed to this member: approved subscriptions minus attendances.
+        // Worked out per request, never stored, so it cannot drift out of date.
+        public int SubscriptionBalance { get; set; }
+
         public List<UserRoleDto> UserRoles { get; set; } = new List<UserRoleDto>();
         //public string? RoleId { get; set; }
     }
