@@ -18,6 +18,7 @@ import { useTranslator } from "../../services/TranslatorService";
 import { useParams } from "react-router-dom";
 import { TabPanel, TabView } from "primereact/tabview";
 import SubscriptionMemberTabComponent from "../subscription/SubscriptionMemberTabComponent";
+import UserMedicalHistoryComponent from "./UserMedicalHistoryComponent";
 import SubscriptionBalanceTag from "../subscription/SubscriptionBalanceTag";
 
 export default function UserProfilePage() {
@@ -41,6 +42,7 @@ export default function UserProfilePage() {
 
   // A trainer opening somebody else's profile, rather than a member on their own.
   const isAdminView: boolean = params["id"] !== undefined;
+
 
   const [balance, setBalance] = useState<number | null>(null);
 
@@ -261,6 +263,13 @@ export default function UserProfilePage() {
                   isAdminView={isAdminView}
                 />
               )}
+            </TabPanel>
+
+            <TabPanel
+              header={t("Medical History")}
+              leftIcon="pi pi-heart mr-2"
+            >
+              <UserMedicalHistoryComponent />
             </TabPanel>
 
             <TabPanel
