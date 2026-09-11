@@ -3,6 +3,9 @@ using Business.Services;
 using Business.Services.Email;
 using Core.Dtos;
 using Core.Dtos.Chart;
+using Core.Dtos.Subscription;
+using Core.Enums;
+using Microsoft.EntityFrameworkCore;
 using Core.Models;
 using DataAccess;
 using Microsoft.AspNetCore.Authorization;
@@ -12,18 +15,26 @@ namespace API.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
-    public class ChartsController
+    // Derives from ControllerBase only so the subscription panels below can read the
+    // caller's claims; the rest of the page never needed it.
+    public class ChartsController : ControllerBase
     {
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
+        private readonly ISubscriptionService _subscriptionService;
         //private readonly ILogger<TrainGroupDateController> _logger;
 
-        public ChartsController(IDataService dataService, IMapper mapper, IEmailService emailService)
+        public ChartsController(
+            IDataService dataService,
+            IMapper mapper,
+            IEmailService emailService,
+            ISubscriptionService subscriptionService)
         {
             _dataService = dataService;
             _mapper = mapper;
             _emailService = emailService;
+            _subscriptionService = subscriptionService;
         }
 
         [HttpGet]
@@ -65,10 +76,88 @@ namespace API.Controllers
             {
                 DailyEmails = dailyEmails,
                 AvailableEmails = Math.Max(availableEmails, 0), // Prevent negative
-                UserGrowth = userGrowth
+                UserGrowth = userGrowth,
+                Subscriptions = await GetSubscriptionChartsAsync()
             };
 
             return new ApiResponse<ChartDataDto>().SetSuccessResponse(chartData);
+        }
+
+
+        // The subscription panels, for whoever is allowed to see them. A member who
+        // reaches this page gets the rest of the chart data and nothing here.
+        private async Task<SubscriptionChartsDto?> GetSubscriptionChartsAsync()
+        {
+            if (!User.HasClaim("Permission", "SubscriptionsAdmin_View"))
+                return null;
+
+            SubscriptionChartsDto charts = new SubscriptionChartsDto();
+
+            using ApiDbContext context = _dataService.GetDbContext();
+
+
+            // Twelve months back, counted from the first of the current one, so a month
+            // with nothing in it still shows as a gap rather than being skipped.
+            DateTime firstOfThisMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+            DateTime from = firstOfThisMonth.AddMonths(-11);
+
+            List<Subscription> approved = await context.Subscriptions
+                .Where(x => x.Status == SubscriptionStatusEnum.APPROVED
+                         && x.DecidedOn != null
+                         && x.DecidedOn >= from)
+                .ToListAsync();
+
+            for (int i = 0; i < 12; i++)
+            {
+                DateTime month = from.AddMonths(i);
+                DateTime next = month.AddMonths(1);
+
+                charts.MonthlyApproved.Add(new SubscriptionMonthDto
+                {
+                    Month = month,
+                    Amount = approved
+                        .Where(x => x.DecidedOn >= month && x.DecidedOn < next)
+                        .Sum(x => x.Amount)
+                });
+            }
+
+            Dictionary<Guid, int> balances = await _subscriptionService.GetAllBalancesAsync();
+
+            charts.Buckets = new List<SubscriptionBucketDto>
+            {
+                new SubscriptionBucketDto { Key = "ONE_OR_LESS", Count = balances.Count(x => x.Value <= 1) },
+                new SubscriptionBucketDto { Key = "TWO_TO_FIVE", Count = balances.Count(x => x.Value >= 2 && x.Value <= 5) },
+                new SubscriptionBucketDto { Key = "SIX_TO_TEN", Count = balances.Count(x => x.Value >= 6 && x.Value <= 10) },
+                new SubscriptionBucketDto { Key = "ELEVEN_PLUS", Count = balances.Count(x => x.Value >= 11) }
+            };
+
+            List<Guid> debtorIds = balances
+                .Where(x => x.Value < 0)
+                .OrderBy(x => x.Value)
+                .Take(5)
+                .Select(x => x.Key)
+                .ToList();
+
+            if (debtorIds.Count > 0)
+            {
+                List<User> debtors = await context.Users
+                    .Where(x => debtorIds.Contains(x.Id))
+                    .ToListAsync();
+
+                charts.TopDebtors = debtorIds
+                    .Select(id => new { Id = id, User = debtors.FirstOrDefault(x => x.Id == id) })
+                    .Where(x => x.User != null)
+                    .Select(x => new SubscriptionDebtorDto
+                    {
+                        UserId = x.Id.ToString(),
+                        FullName = (x.User!.FirstName + " " + x.User!.LastName).Trim(),
+                        Balance = balances[x.Id]
+                    })
+                    .ToList();
+            }
+
+
+            return charts;
         }
     }
 }

@@ -105,6 +105,10 @@
   "Note_from_your_trainer": "Note from your trainer",
   "Talk_to_your_trainer_or_send_a_new_request_from_your_profile": "Talk to your trainer, or send a new request from your profile whenever you are ready.",
 
+  "Only_one_subscription_left": "You have one subscription left",
+  "This_was_your_last_remaining_subscription": "That was the last lesson on your account.",
+  "Opening_balance": "Opening balance",
+
   "_0_is_required": "{0} ist erforderlich!",
   "_0_already_exists": "{0} existiert bereits!",
   "_0_not_found": "{0} nicht gefunden!",

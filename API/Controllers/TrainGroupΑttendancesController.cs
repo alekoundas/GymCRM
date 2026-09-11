@@ -22,18 +22,24 @@ namespace API.Controllers
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
         private readonly IStringLocalizer _localizer;
+        private readonly ISubscriptionService _subscriptionService;
         //private readonly ILogger<TrainGroupDateController> _logger;
+
+        // The only balance that triggers the warning mail.
+        private const int LastLessonWarningBalance = 1;
 
         public TrainGroupAttendancesController(
             IDataService dataService,
             IMapper mapper,
             IStringLocalizer localizer,
-            IEmailService emailService) : base(dataService, mapper, localizer)
+            IEmailService emailService,
+            ISubscriptionService subscriptionService) : base(dataService, mapper, localizer)
         {
             _dataService = dataService;
             _mapper = mapper;
             _emailService = emailService;
             _localizer = localizer;
+            _subscriptionService = subscriptionService;
         }
 
 
@@ -83,14 +89,30 @@ namespace API.Controllers
             return response;
         }
 
-        // Attendance is taken for a whole group on one date, so everyone in that batch
-        // reads the same mail and the lot goes down as one insert. Queued, never sent
-        // here - the trainer is waiting on the grid, not on Google.
+        // Nobody is told they turned up - they know. The one mail worth sending is to
+        // whoever this attendance has just taken down to their last lesson. Exactly one,
+        // not fewer: at nought and below they were warned on the attendance that took
+        // them to one, and repeating it every session would only be nagging.
+        //
+        // Attendance is taken for a whole group on one date, so everyone left in that
+        // batch reads the same mail. Queued, never sent here - the trainer is waiting on
+        // the grid, not on Google.
         private async Task QueueAttendanceEmailsAsync(List<TrainGroupΑttendanceAddDto> entityDtos)
         {
             List<Guid> userIds = entityDtos.Select(x => new Guid(x.UserId)).Distinct().ToList();
+
+            Dictionary<Guid, int> balances = await _subscriptionService.GetBalancesAsync(userIds);
+
+            List<Guid> lastLessonIds = balances
+                .Where(x => x.Value == LastLessonWarningBalance)
+                .Select(x => x.Key)
+                .ToList();
+
+            if (lastLessonIds.Count == 0)
+                return;
+
             List<User> users = await _dataService.Users
-                .Where(x => userIds.Contains(x.Id))
+                .Where(x => lastLessonIds.Contains(x.Id))
                 .ToListAsync();
 
             List<int> trainGroupIds = entityDtos.Select(x => x.TrainGroupId).Distinct().ToList();
@@ -112,12 +134,11 @@ namespace API.Controllers
                 string trainGroupTitle = trainGroups
                     .FirstOrDefault(x => x.Id == batch.Key.TrainGroupId)?.Title ?? string.Empty;
 
-                // TODO add if payments are lees than 1.
-                //await _emailService.QueueEmailAsync(
-                //    batchUsers,
-                //    _localizer[TranslationKeys.Attendance_Confirmation],
-                //    GetAttendanceEmailBody(trainGroupTitle, batch.Key.AttendanceDate)
-                //);
+                await _emailService.QueueEmailAsync(
+                    batchUsers,
+                    _localizer[TranslationKeys.Only_one_subscription_left],
+                    GetAttendanceEmailBody(trainGroupTitle, batch.Key.AttendanceDate)
+                );
             }
         }
 
@@ -137,14 +158,20 @@ namespace API.Controllers
                 </head>
                 <body>
                     <div class='container'>
-                        <h2>" + _localizer[TranslationKeys.Attendance_Information] + "</h2>";
+                        <h2>" + _localizer[TranslationKeys.Only_one_subscription_left] + "</h2>";
 
             emailBody += "<div class='section'>";
             emailBody += "<p>" + _localizer[TranslationKeys.Your_attendance_was_recorded] + "</p>";
             emailBody += "<ul>";
             emailBody += "<li><strong>" + _localizer[TranslationKeys.Train_group] + ":</strong> " + trainGroupTitle + "</li>";
             emailBody += "<li><strong>" + _localizer[TranslationKeys.Attendance_date] + ":</strong> " + attendanceDate.ToString("dd/MM/yyyy") + "</li>";
+            emailBody += "<li><strong>" + _localizer[TranslationKeys.Remaining_subscriptions] + ":</strong> " + LastLessonWarningBalance + "</li>";
             emailBody += "</ul>";
+            emailBody += "</div>";
+
+            emailBody += "<div class='section'>";
+            emailBody += "<p>" + _localizer[TranslationKeys.This_was_your_last_remaining_subscription] + "</p>";
+            emailBody += "<p>" + _localizer[TranslationKeys.Talk_to_your_trainer_or_send_a_new_request_from_your_profile] + "</p>";
             emailBody += "</div>";
 
             emailBody += @"

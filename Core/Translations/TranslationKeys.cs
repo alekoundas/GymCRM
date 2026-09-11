@@ -107,6 +107,9 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string Missing_subscriptions = "Missing_subscriptions";
         public const string Note_from_your_trainer = "Note_from_your_trainer";
         public const string Talk_to_your_trainer_or_send_a_new_request_from_your_profile = "Talk_to_your_trainer_or_send_a_new_request_from_your_profile";
+        public const string Only_one_subscription_left = "Only_one_subscription_left";
+        public const string This_was_your_last_remaining_subscription = "This_was_your_last_remaining_subscription";
+        public const string Opening_balance = "Opening_balance";
         public const string _0_is_required = "_0_is_required";
         public const string _0_already_exists = "_0_already_exists";
         public const string _0_not_found = "_0_not_found";

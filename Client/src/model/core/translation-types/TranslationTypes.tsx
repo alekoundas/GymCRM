@@ -303,6 +303,26 @@
   'This will change the remaining subscriptions': string;
   'Date': string;
   'Missing': string;
+  'Details': string;
+  'Next trainings': string;
+  'Remaining lessons': string;
+  'Ask for more lessons': string;
+  'Cancel request': string;
+  'Your request will be withdrawn': string;
+  'You have asked for': string;
+  'lessons and are waiting for an answer': string;
+  'Your trainer will review this and get back to you': string;
+  'How many lessons': string;
+  'Subscriptions added per month': string;
+  'Members by remaining subscriptions': string;
+  'Members': string;
+  'or fewer': string;
+  'Furthest behind': string;
+  'Nobody is in the negative': string;
+  'Set opening balances': string;
+  'Gives every member the lessons they have already attended, so everyone starts at zero': string;
+  'Press this once': string;
+  'members were given an opening balance': string;
     }
 
 

@@ -277,10 +277,22 @@ export const useApiService = () => {
     [buildUrl, apiRequest],
   );
 
+  // Without a userId this is the caller's own balance. Passing one is how the
+  // profile page asks after a member, and the server insists on the admin claim.
   const getSubscriptionBalance = useCallback(
-    async (): Promise<number | null> => {
-      const url = buildUrl("Subscriptions", "Balance");
+    async (userId?: string): Promise<number | null> => {
+      const url = buildUrl("Subscriptions", userId ? `Balance?userId=${userId}` : "Balance");
       return apiRequest<undefined, number>(url, "GET");
+    },
+    [buildUrl, apiRequest],
+  );
+
+  // The one-off that puts everybody who was already training on nought. Safe to
+  // call twice - the server leaves anybody who already holds credits alone.
+  const seedInitialSubscriptionBalances = useCallback(
+    async (): Promise<number | null> => {
+      const url = buildUrl("Subscriptions", "SeedInitialBalances");
+      return apiRequest<undefined, number>(url, "POST");
     },
     [buildUrl, apiRequest],
   );
@@ -575,6 +587,7 @@ export const useApiService = () => {
     decideSubscription,
     removeSubscription,
     getSubscriptionBalance,
+    seedInitialSubscriptionBalances,
     getWorkoutPlanStartContext,
     startWorkoutPlanRecording,
     stopWorkoutPlanRecording,

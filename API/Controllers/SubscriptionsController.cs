@@ -7,9 +7,11 @@ using Core.Dtos.DataTable;
 using Core.Dtos.Subscription;
 using Core.Enums;
 using Core.Models;
+using DataAccess;
 using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using System.Net;
 
@@ -248,15 +250,89 @@ namespace API.Controllers
         }
 
 
-        // GET: api/Subscriptions/Balance - the caller's own remaining lessons.
+        // GET: api/Subscriptions/Balance - remaining lessons. Without a userId this is
+        // the caller's own; asking after somebody else takes the administrator claim,
+        // which is what the profile page relies on when a trainer opens a member.
         [HttpGet("Balance")]
-        public async Task<ApiResponse<int>> Balance()
+        public async Task<ApiResponse<int>> Balance(string? userId = null)
         {
             Guid? callerId = GetCallerId();
             if (callerId == null)
                 return new ApiResponse<int>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_loged_in]);
 
-            return new ApiResponse<int>().SetSuccessResponse(await _subscriptionService.GetBalanceAsync(callerId.Value));
+            Guid subject = callerId.Value;
+
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                if (!Guid.TryParse(userId, out Guid requested))
+                    return new ApiResponse<int>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(User)]);
+
+                if (requested != callerId.Value && !User.HasClaim("Permission", AdminViewClaim))
+                    return new ApiResponse<int>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+                subject = requested;
+            }
+
+            return new ApiResponse<int>().SetSuccessResponse(await _subscriptionService.GetBalanceAsync(subject));
+        }
+
+
+        // POST: api/Subscriptions/SeedInitialBalances - the one-off that puts everybody
+        // who was already training on nought, by granting exactly what they have used.
+        // Safe to run twice: a member who already has the opening entry is left alone.
+        [HttpPost("SeedInitialBalances")]
+        public async Task<ApiResponse<int>> SeedInitialBalances()
+        {
+            if (!User.HasClaim("Permission", AdminAddClaim))
+                return new ApiResponse<int>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            Guid? callerId = GetCallerId();
+
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            Dictionary<Guid, int> attended = await context.TrainGroupΑttendances
+                .AsNoTracking()
+                .GroupBy(x => x.UserId)
+                .Select(x => new { x.Key, Count = x.Count() })
+                .ToDictionaryAsync(x => x.Key, x => x.Count);
+
+            if (attended.Count == 0)
+                return new ApiResponse<int>().SetSuccessResponse(0);
+
+            // Anybody already holding granted lessons is left alone. That covers a second
+            // press of the button and equally a member the administrator had already set
+            // up by hand - either way their balance is deliberate and must not be moved.
+            // Matching on the comment text would not do: it is translated, so the same
+            // check would fail the moment somebody ran it in another language.
+            HashSet<Guid> alreadyGranted = (await context.Subscriptions
+                .AsNoTracking()
+                .Where(x => x.Status == SubscriptionStatusEnum.APPROVED)
+                .Select(x => x.UserId)
+                .Distinct()
+                .ToListAsync())
+                .ToHashSet();
+
+            DateTime nowUtc = DateTime.UtcNow;
+
+            List<Subscription> opening = attended
+                .Where(x => !alreadyGranted.Contains(x.Key) && x.Value > 0)
+                .Select(x => new Subscription
+                {
+                    UserId = x.Key,
+                    RequestedAmount = null,
+                    Amount = x.Value,
+                    Status = SubscriptionStatusEnum.APPROVED,
+                    AdminComment = _localizer[TranslationKeys.Opening_balance],
+                    DecidedOn = nowUtc,
+                    CreatedOn = nowUtc,
+                    CreatedBy_Id = callerId?.ToString() ?? string.Empty
+                })
+                .ToList();
+
+            if (opening.Count > 0)
+                await _dataService.Subscriptions.AddRangeAsync(opening);
+
+            return new ApiResponse<int>().SetSuccessResponse(opening.Count);
         }
 
 
