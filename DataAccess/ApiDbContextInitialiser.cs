@@ -55,41 +55,29 @@ namespace DataAccess
                 await TrySeedSimpleUserUserAsync(userManager, roleManager);
 
 
-                // Seed new permissions to admin.
-                // TrySeed*RolesAndClaimsAsync only fires when the role does not exist yet,
-                // so on an existing database this top-up is the only path new claims take.
+                // Claims added by THIS publish, and nothing else.
+                //
                 var claims = new List<Claim>
-               {
-
-                   new Claim("Permission", "WorkoutPlansAdmin_View"),
-                   new Claim("Permission", "WorkoutPlansAdmin_Add"),
-                   new Claim("Permission", "WorkoutPlansAdmin_Edit"),
-                   new Claim("Permission", "WorkoutPlansAdmin_Delete"),
-
-                   new Claim("Permission", "WorkoutPlanRules_View"),
-                   new Claim("Permission", "WorkoutPlanRules_Add"),
-                   new Claim("Permission", "WorkoutPlanRules_Edit"),
-                   new Claim("Permission", "WorkoutPlanRules_Delete"),
-
-                   new Claim("Permission", "WorkoutPlanRecordings_View"),
-                   new Claim("Permission", "WorkoutPlanRecordings_Add"),
-                   new Claim("Permission", "WorkoutPlanRecordings_Edit"),
-                   new Claim("Permission", "WorkoutPlanRecordings_Delete"),
-                   new Claim("Permission", "WorkoutPlanRecordingsAdmin_View"),
-
-               };
+                {
+                    new Claim("Permission", "SubscriptionsAdmin_View"),
+                    new Claim("Permission", "SubscriptionsAdmin_Add"),
+                    new Claim("Permission", "SubscriptionsAdmin_Edit"),
+                    new Claim("Permission", "SubscriptionsAdmin_Delete"),
+                    new Claim("Permission", "Subscriptions_View"),
+                    new Claim("Permission", "Subscriptions_Add"),
+                    new Claim("Permission", "Subscriptions_Delete"),
+                };
 
                 var role = await roleManager.FindByNameAsync("Administrator");
                 if (role != null)
                     await AddClaimsToRoleAsync(roleManager, role, claims);
 
-                // Members need to read their own recordings and to start/stop one.
-                // Deliberately no _Delete: the point of the log is that they cannot erase it.
                 var simpleUserClaims = new List<Claim>
-               {
-                   new Claim("Permission", "WorkoutPlanRecordings_View"),
-                   new Claim("Permission", "WorkoutPlanRecordings_Add"),
-               };
+                {
+                    new Claim("Permission", "Subscriptions_View"),
+                    new Claim("Permission", "Subscriptions_Add"),
+                    new Claim("Permission", "Subscriptions_Delete"),
+                };
 
                 var simpleUserRole = await roleManager.FindByNameAsync("SimpleUser");
                 if (simpleUserRole != null)
@@ -163,6 +151,25 @@ namespace DataAccess
                    new Claim("Permission", "UserStatuses_Add"),
                    new Claim("Permission", "UserStatuses_Edit"),
                    new Claim("Permission", "UserStatuses_Delete"),
+
+                   new Claim("Permission", "WorkoutPlanRules_View"),
+                   new Claim("Permission", "WorkoutPlanRules_Add"),
+                   new Claim("Permission", "WorkoutPlanRules_Edit"),
+                   new Claim("Permission", "WorkoutPlanRules_Delete"),
+
+                   new Claim("Permission", "WorkoutPlanRecordings_View"),
+                   new Claim("Permission", "WorkoutPlanRecordings_Add"),
+                   new Claim("Permission", "WorkoutPlanRecordings_Edit"),
+                   new Claim("Permission", "WorkoutPlanRecordings_Delete"),
+                   new Claim("Permission", "WorkoutPlanRecordingsAdmin_View"),
+
+                   new Claim("Permission", "SubscriptionsAdmin_View"),
+                   new Claim("Permission", "SubscriptionsAdmin_Add"),
+                   new Claim("Permission", "SubscriptionsAdmin_Edit"),
+                   new Claim("Permission", "SubscriptionsAdmin_Delete"),
+                   new Claim("Permission", "Subscriptions_View"),
+                   new Claim("Permission", "Subscriptions_Add"),
+                   new Claim("Permission", "Subscriptions_Delete"),
                };
 
                 await AddClaimsToRoleAsync(roleManager, role, claims);
@@ -221,6 +228,12 @@ namespace DataAccess
                     new Claim("Permission", "WorkoutPlans_View"),
                     new Claim("Permission", "WorkoutPlans_Edit"),
                     new Claim("Permission", "TrainGroupParticipants_Delete"),
+                    new Claim("Permission", "WorkoutPlanRecordings_View"),
+                    new Claim("Permission", "WorkoutPlanRecordings_Add"),
+
+                    new Claim("Permission", "Subscriptions_View"),
+                    new Claim("Permission", "Subscriptions_Add"),
+                    new Claim("Permission", "Subscriptions_Delete"),
                 };
 
                 await AddClaimsToRoleAsync(roleManager, role, claims);

@@ -183,6 +183,7 @@ builder.Services.AddScoped<IMailQueueService, MailQueueService>();
 builder.Services.AddHostedService<MailQueueBackgroundService>();
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<IWorkoutPlanRecordingService, WorkoutPlanRecordingService>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 
 
 

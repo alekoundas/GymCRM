@@ -92,6 +92,8 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string Your_attendance_was_recorded = "Your_attendance_was_recorded";
         public const string Train_group = "Train_group";
         public const string Attendance_date = "Attendance_date";
+        public const string A_request_is_already_pending = "A_request_is_already_pending";
+        public const string The_request_has_already_been_decided = "The_request_has_already_been_decided";
         public const string _0_is_required = "_0_is_required";
         public const string _0_already_exists = "_0_already_exists";
         public const string _0_not_found = "_0_not_found";

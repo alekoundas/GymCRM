@@ -88,6 +88,9 @@
   "Train_group": "Train group",
   "Attendance_date": "Date",
 
+  "A_request_is_already_pending": "You already have a request waiting to be reviewed.",
+  "The_request_has_already_been_decided": "This request has already been answered.",
+
   "_0_is_required": "{0} je vyžadováno!",
   "_0_already_exists": "{0} již existuje!",
   "_0_not_found": "{0} nenalezeno!",
