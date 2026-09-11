@@ -28,6 +28,10 @@ interface DialogComponentProps {
   children: ReactNode;
   onSave?: () => Promise<void>;
   onDelete?: () => Promise<void>;
+  // A dialog whose choices are not "save or cancel" - approve or reject, delete
+  // with or without telling the member - passes its own buttons here so they sit
+  // in the footer with everything else rather than stacked in the body.
+  footer?: ReactNode;
 }
 
 const DialogComponent: React.FC<DialogComponentProps> = ({
@@ -39,6 +43,7 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
   children,
   onSave,
   onDelete,
+  footer: customFooter,
 }) => {
   const { t } = useTranslator();
   const [isSaveEnabled, setIsSaveEnabled] = useState<boolean>(true);
@@ -68,6 +73,8 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
   };
 
   const footer = () => {
+    if (customFooter) return customFooter;
+
     if (formMode === FormMode.VIEW)
       return (
         <div>

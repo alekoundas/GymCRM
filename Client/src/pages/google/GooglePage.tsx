@@ -79,15 +79,6 @@ export default function GooglePage() {
       {TokenService.isUserAllowed("SubscriptionsAdmin_Add") && (
         <Card className="mb-3">
           <div className="flex flex-column gap-3">
-            <div>
-              <h3 className="mt-0 mb-1">{t("Set opening balances")}</h3>
-              <p className="m-0 text-color-secondary">
-                {t(
-                  "Gives every member the lessons they have already attended, so everyone starts at zero",
-                )}
-                . {t("Press this once")}.
-              </p>
-            </div>
 
             <div>
               <Button

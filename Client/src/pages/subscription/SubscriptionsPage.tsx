@@ -236,31 +236,34 @@ export default function SubscriptionsPage() {
         visible={isDeleteDialogVisible}
         control={dialogControlDelete}
         formMode={FormMode.VIEW}
-      >
-        <div className="flex flex-column gap-3">
-          <p className="m-0">
-            {t("This will change the remaining subscriptions")}.
-          </p>
-          <div className="flex flex-column gap-2">
-            <Button
-              label={t("Delete and notify")}
-              icon="pi pi-send"
-              severity="danger"
-              onClick={() => onDelete(true)}
-            />
-            <Button
-              label={t("Delete")}
-              icon="pi pi-trash"
-              severity="danger"
-              outlined
-              onClick={() => onDelete(false)}
-            />
+        footer={
+          <div className="flex justify-content-between align-items-center">
             <Button
               label={t("Cancel")}
+              icon="pi pi-times"
               text
               onClick={() => dialogControlDelete.hideDialog()}
             />
+            <div className="flex gap-2">
+              <Button
+                label={t("Delete")}
+                icon="pi pi-trash"
+                severity="danger"
+                outlined
+                onClick={() => onDelete(false)}
+              />
+              <Button
+                label={t("Delete and notify")}
+                icon="pi pi-send"
+                severity="danger"
+                onClick={() => onDelete(true)}
+              />
+            </div>
           </div>
+        }
+      >
+        <div>
+          <p className="m-0">{t("This will change the remaining subscriptions")}.</p>
         </div>
       </GenericDialogComponent>
     </>

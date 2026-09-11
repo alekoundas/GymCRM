@@ -177,30 +177,32 @@ export default function SubscriptionRequestsPage() {
         visible={isDecideDialogVisible}
         control={dialogControlDecide}
         formMode={FormMode.EDIT}
-      >
-        <div className="flex flex-column gap-3">
-          <SubscriptionDecideFormComponent formMode={FormMode.EDIT} />
-
-          <div className="flex flex-column gap-2">
-            <Button
-              label={t("Approve")}
-              icon="pi pi-check"
-              onClick={() => decide(true)}
-            />
-            <Button
-              label={t("Reject")}
-              icon="pi pi-times"
-              severity="danger"
-              outlined
-              onClick={() => decide(false)}
-            />
+        footer={
+          <div className="flex justify-content-between align-items-center">
             <Button
               label={t("Cancel")}
+              icon="pi pi-times"
               text
               onClick={() => dialogControlDecide.hideDialog()}
             />
+            <div className="flex gap-2">
+              <Button
+                label={t("Reject")}
+                icon="pi pi-times"
+                severity="danger"
+                outlined
+                onClick={() => decide(false)}
+              />
+              <Button
+                label={t("Approve")}
+                icon="pi pi-check"
+                onClick={() => decide(true)}
+              />
+            </div>
           </div>
-        </div>
+        }
+      >
+        <SubscriptionDecideFormComponent formMode={FormMode.EDIT} />
       </GenericDialogComponent>
     </>
   );

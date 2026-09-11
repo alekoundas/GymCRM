@@ -61,10 +61,11 @@ export default function ChartsComponent() {
   const subscriptions = chartData.subscriptions;
 
   // Short month and a two digit year: twelve of them have to sit side by side.
-  const monthLabel = (value: string): string => {
-    const date = new Date(value);
-    return date.toLocaleDateString(undefined, { month: "short", year: "2-digit" });
-  };
+  const monthLabel = (year: number, month: number): string =>
+    new Date(year, month - 1, 1).toLocaleDateString(undefined, {
+      month: "short",
+      year: "2-digit",
+    });
 
   const bucketLabel = (bucket: SubscriptionBucketDto): string => {
     switch (bucket.key) {
@@ -80,7 +81,7 @@ export default function ChartsComponent() {
   };
 
   const monthlySubscriptionsData = {
-    labels: subscriptions?.monthlyApproved.map((x) => monthLabel(x.month)) ?? [],
+    labels: subscriptions?.monthlyApproved.map((x) => monthLabel(x.year, x.month)) ?? [],
     datasets: [
       {
         label: t("Subscriptions"),
