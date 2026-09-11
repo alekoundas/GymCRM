@@ -9,5 +9,5 @@ export class SubscriptionAddDto implements SubscriptionAddDto {
   userId: string = "";
   amount: number = 0;
   adminComment: string = "";
-  notifyUser: boolean = false;
+  notifyUser: boolean = true;
 }
