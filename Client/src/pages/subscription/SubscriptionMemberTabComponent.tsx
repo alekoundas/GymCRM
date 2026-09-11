@@ -247,22 +247,25 @@ export default function SubscriptionMemberTabComponent({
         visible={isCancelDialogVisible}
         control={dialogControlCancel}
         formMode={FormMode.VIEW}
-      >
-        <div className="flex flex-column gap-3">
-          <p className="m-0">{t("Your request will be withdrawn")}.</p>
-          <div className="flex flex-column gap-2">
+        footer={
+          <div className="flex justify-content-between align-items-center">
+            <Button
+              label={t("Close")}
+              icon="pi pi-times"
+              text
+              onClick={() => dialogControlCancel.hideDialog()}
+            />
             <Button
               label={t("Cancel request")}
               icon="pi pi-times"
               severity="danger"
               onClick={onCancelRequest}
             />
-            <Button
-              label={t("Close")}
-              text
-              onClick={() => dialogControlCancel.hideDialog()}
-            />
           </div>
+        }
+      >
+        <div>
+          <p className="m-0">{t("Your request will be withdrawn")}.</p>
         </div>
       </GenericDialogComponent>
     </>

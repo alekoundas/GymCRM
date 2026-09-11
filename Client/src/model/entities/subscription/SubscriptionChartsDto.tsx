@@ -1,6 +1,8 @@
 export interface SubscriptionMonthDto {
-  // The first of the month; formatted client side so the label follows the language.
-  month: string;
+  // Plain numbers, not a date: a date would arrive shifted to UTC and a January
+  // boundary would read as December for anybody west of here.
+  year: number;
+  month: number;
   amount: number;
 }
 

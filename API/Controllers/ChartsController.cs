@@ -114,7 +114,8 @@ namespace API.Controllers
 
                 charts.MonthlyApproved.Add(new SubscriptionMonthDto
                 {
-                    Month = month,
+                    Year = month.Year,
+                    Month = month.Month,
                     Amount = approved
                         .Where(x => x.DecidedOn >= month && x.DecidedOn < next)
                         .Sum(x => x.Amount)

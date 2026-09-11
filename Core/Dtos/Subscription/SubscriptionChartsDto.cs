@@ -1,4 +1,4 @@
-namespace Core.Dtos.Subscription
+﻿namespace Core.Dtos.Subscription
 {
     // Everything the two panels on the administrator's home page need, in one call.
     public class SubscriptionChartsDto
@@ -13,8 +13,12 @@ namespace Core.Dtos.Subscription
 
     public class SubscriptionMonthDto
     {
-        // The first of the month, so the client can format it in its own language.
-        public DateTime Month { get; set; }
+        // Year and month as plain numbers rather than a date. A DateTime would go
+        // through the converter that shifts it to UTC, and a month boundary landing at
+        // 21:00 the evening before reads as the previous month in the wrong timezone.
+        public int Year { get; set; }
+
+        public int Month { get; set; }
 
         public int Amount { get; set; }
     }
