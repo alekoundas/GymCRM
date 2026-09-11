@@ -16,6 +16,9 @@ import { useApiService } from "../../services/ApiService";
 import { LocalStorageService } from "../../services/LocalStorageService";
 import { useTranslator } from "../../services/TranslatorService";
 import { useParams } from "react-router-dom";
+import { TabPanel, TabView } from "primereact/tabview";
+import SubscriptionMemberTabComponent from "../subscription/SubscriptionMemberTabComponent";
+import SubscriptionBalanceTag from "../subscription/SubscriptionBalanceTag";
 
 export default function UserProfilePage() {
   const { t } = useTranslator();
@@ -35,6 +38,11 @@ export default function UserProfilePage() {
   const [isImageUploadSelected, setIsImageUploadSelected] = useState(false);
 
   const userId: string | undefined = params["id"] ?? TokenService.getUserId();
+
+  // A trainer opening somebody else's profile, rather than a member on their own.
+  const isAdminView: boolean = params["id"] !== undefined;
+
+  const [balance, setBalance] = useState<number | null>(null);
 
   // Change Password Dialog State
   const [showChangePasswordDialog, setShowChangePasswordDialog] =
@@ -63,6 +71,19 @@ export default function UserProfilePage() {
 
     loadUser();
   }, []);
+
+  // The badge by the name. The tab reads it too, but it is wanted before anybody
+  // opens a tab, so it is fetched here as well rather than lifted out of the tab.
+  useEffect(() => {
+    const loadBalance = async () => {
+      const response = await apiService.getSubscriptionBalance(
+        isAdminView ? userId : undefined,
+      );
+      if (response !== null) setBalance(response);
+    };
+
+    loadBalance();
+  }, [userId]);
 
   // Handle image upload
   const handleImageUpload = async (event: FileUploadHandlerEvent) => {
@@ -178,22 +199,33 @@ export default function UserProfilePage() {
 
   return (
     <div className="grid">
-      <div className="col-12 md:col-5">
+      <div className="col-12">
         <Card
           className="p-4"
           style={{
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
           }}
-          header={
-            <div className="flex align-items-center justify-content-between mb-5">
-              <div className="flex align-items-center">
-                <div className="mr-5">{renderProfileImage()}</div>
-                <div>
-                  <h2 className="m-0">
-                    {userDto?.firstName} {userDto?.lastName}
-                  </h2>
-                  <p className="text-color-secondary m-0">{userDto?.email}</p>
-                </div>
+        >
+          <div className="flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+            <div className="flex align-items-center">
+              <div className="mr-5">{renderProfileImage()}</div>
+              <div>
+                <h2 className="m-0">
+                  {userDto?.firstName} {userDto?.lastName}
+                </h2>
+                <p className="text-color-secondary m-0">{userDto?.email}</p>
+              </div>
+            </div>
+
+            <div className="flex align-items-center gap-3">
+              <div className="flex align-items-center gap-2">
+                <span className="text-color-secondary">
+                  {t("Remaining lessons")}:
+                </span>
+                <SubscriptionBalanceTag
+                  balance={balance ?? 0}
+                  isAdminView={isAdminView}
+                />
               </div>
               <Button
                 label={t("Change Password")}
@@ -202,36 +234,45 @@ export default function UserProfilePage() {
                 onClick={() => setShowChangePasswordDialog(true)}
               />
             </div>
-          }
-        >
-          <UserProfileFormComponent />
-        </Card>
-      </div>
+          </div>
 
-      <div className="col-12 md:col-7">
-        <Card
-          className="p-4"
-          title={t("Phone Numbers")}
-          style={{
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <PhoneNumberGridComponent />
-        </Card>
-      </div>
+          <TabView>
+            <TabPanel
+              header={t("Details")}
+              leftIcon="pi pi-user mr-2"
+            >
+              <UserProfileFormComponent />
+            </TabPanel>
 
-      <div className="col-12">
-        <div style={{ minWidth: "700px" }}>
-          <Card
-            className="p-4"
-            title={t("Upcoming Train Groups")}
-            style={{
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <UserProfileTimeslotsComponent />
-          </Card>
-        </div>
+            <TabPanel
+              header={t("Phone Numbers")}
+              leftIcon="pi pi-phone mr-2"
+            >
+              <PhoneNumberGridComponent />
+            </TabPanel>
+
+            <TabPanel
+              header={t("Subscriptions")}
+              leftIcon="pi pi-ticket mr-2"
+            >
+              {userId && (
+                <SubscriptionMemberTabComponent
+                  userId={userId}
+                  isAdminView={isAdminView}
+                />
+              )}
+            </TabPanel>
+
+            <TabPanel
+              header={t("Next trainings")}
+              leftIcon="pi pi-calendar mr-2"
+            >
+              <div style={{ minWidth: "700px" }}>
+                <UserProfileTimeslotsComponent />
+              </div>
+            </TabPanel>
+          </TabView>
+        </Card>
       </div>
 
       {/* Change Password Dialog */}

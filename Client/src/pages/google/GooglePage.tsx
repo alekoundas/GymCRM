@@ -3,8 +3,12 @@ import { useApiService } from "../../services/ApiService";
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Card } from "primereact/card";
+import { Message } from "primereact/message";
+import { TokenService } from "../../services/TokenService";
+import { useTranslator } from "../../services/TranslatorService";
 
 export default function GooglePage() {
+  const { t } = useTranslator();
   const apiService = useApiService();
   const params = useParams();
   const [searchParams] = useSearchParams();
@@ -52,8 +56,59 @@ export default function GooglePage() {
     }
   };
 
+  // One-off, to be pressed once after this release and then taken out again. It
+  // grants every member exactly what they have already attended, so everybody who
+  // was training before subscriptions existed starts from nought instead of deep in
+  // the red. Pressing it twice changes nothing: the server skips anybody who
+  // already holds credits.
+  const [seeding, setSeeding] = useState(false);
+  const [seeded, setSeeded] = useState<number | null>(null);
+
+  const handleSeedBalances = async () => {
+    setSeeding(true);
+    try {
+      const response = await apiService.seedInitialSubscriptionBalances();
+      if (response !== null) setSeeded(response);
+    } finally {
+      setSeeding(false);
+    }
+  };
+
   return (
     <>
+      {TokenService.isUserAllowed("SubscriptionsAdmin_Add") && (
+        <Card className="mb-3">
+          <div className="flex flex-column gap-3">
+            <div>
+              <h3 className="mt-0 mb-1">{t("Set opening balances")}</h3>
+              <p className="m-0 text-color-secondary">
+                {t(
+                  "Gives every member the lessons they have already attended, so everyone starts at zero",
+                )}
+                . {t("Press this once")}.
+              </p>
+            </div>
+
+            <div>
+              <Button
+                label={t("Set opening balances")}
+                icon="pi pi-sliders-h"
+                loading={seeding}
+                onClick={handleSeedBalances}
+              />
+            </div>
+
+            {seeded !== null && (
+              <Message
+                severity="success"
+                className="w-full justify-content-start"
+                text={`${seeded} ${t("members were given an opening balance")}.`}
+              />
+            )}
+          </div>
+        </Card>
+      )}
+
       <Card>
         <div className="w-full">
           <div className="flex justify-content-between align-items-center">
