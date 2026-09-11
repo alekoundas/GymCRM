@@ -1,3 +1,5 @@
+import SubscriptionsPage from "../subscription/SubscriptionsPage";
+import SubscriptionRequestsPage from "../subscription/SubscriptionRequestsPage";
 import { Route, Routes } from "react-router-dom";
 import TrainGroupAdminPage from "../train-group-admin/TrainGroupAdminPage";
 import TrainGroupAdminCalendarPage from "../train-group-admin/TrainGroupAdminCalendarPage";
@@ -95,6 +97,15 @@ export default function Administrator() {
               path="workout-plan-rules"
               element={<WorkoutPlanRulesPage />}
             />
+            <Route
+              path="subscriptions"
+              element={<SubscriptionsPage />}
+            />
+            <Route
+              path="subscription-requests"
+              element={<SubscriptionRequestsPage />}
+            />
+
             <Route
               path="workout-plan-recordings"
               element={<WorkoutPlanRecordingsPage />}

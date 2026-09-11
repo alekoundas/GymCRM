@@ -1,3 +1,4 @@
+import SubscriptionBalanceTag from "../subscription/SubscriptionBalanceTag";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { useTranslator } from "../../services/TranslatorService";
 import { useTrainGroupAttendanceStore } from "../../stores/TrainGroupAttendanceStore";
@@ -77,6 +78,8 @@ export default function TrainGroupAttendanceFormComponent({}: IField) {
           >
             {participant.user?.firstName} {participant.user?.lastName}
           </label>
+
+          <SubscriptionBalanceTag balance={participant.subscriptionBalance} />
 
           {participant.hasAttendance && (
             <Tag

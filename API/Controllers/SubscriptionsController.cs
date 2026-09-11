@@ -17,6 +17,11 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class SubscriptionsController : GenericController<Subscription, SubscriptionDto, SubscriptionAddDto>
     {
+        // Status is an enum. The reflection helpers in GetDataTable convert filter values
+        // with Convert.ChangeType, which cannot turn "PENDING" into one, so the field is
+        // claimed here and both its filter and its sort are done typed.
+        private const string StatusField = "status";
+
         private const string AdminViewClaim = "SubscriptionsAdmin_View";
         private const string AdminAddClaim = "SubscriptionsAdmin_Add";
         private const string AdminEditClaim = "SubscriptionsAdmin_Edit";
@@ -166,6 +171,27 @@ namespace API.Controllers
         }
 
 
+        // POST: api/Subscriptions/Remove - an administrator taking an entry back out.
+        // Separate from the plain DELETE because it can also tell the member.
+        [HttpPost("Remove")]
+        public async Task<ApiResponse<bool>> Remove([FromBody] SubscriptionRemoveDto dto)
+        {
+            if (!User.HasClaim("Permission", AdminDeleteClaim))
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            Subscription? subscription = await _dataService.Subscriptions
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == dto.Id);
+
+            if (subscription == null)
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(Subscription)]);
+
+            await _dataService.Subscriptions.RemoveAsync(subscription);
+
+            return new ApiResponse<bool>().SetSuccessResponse(true, _localizer[TranslationKeys._0_deleted_successfully, nameof(Subscription)]);
+        }
+
+
         // GET: api/Subscriptions/Balance - the caller's own remaining lessons.
         [HttpGet("Balance")]
         public async Task<ApiResponse<int>> Balance()
@@ -208,6 +234,31 @@ namespace API.Controllers
             Guid? scopeUserId = GetScopeToCallerId(AdminViewClaim);
             if (scopeUserId != null)
                 query = query.Where(x => x.UserId == scopeUserId.Value);
+
+            DataTableFilterDto? statusFilter = dataTable.Filters
+                .FirstOrDefault(x => string.Equals(x.FieldName, StatusField, StringComparison.OrdinalIgnoreCase));
+
+            if (statusFilter?.Value != null && Enum.TryParse(statusFilter.Value, true, out SubscriptionStatusEnum status))
+                query = query.Where(x => x.Status == status);
+
+            DataTableSortDto? statusSort = dataTable.Sorts
+                .FirstOrDefault(x => string.Equals(x.FieldName, StatusField, StringComparison.OrdinalIgnoreCase));
+
+            if (statusSort != null)
+            {
+                if (statusSort.Order > 0)
+                    query = query.OrderBy(x => x.Status);
+                else
+                    query = query.OrderByDescending(x => x.Status);
+            }
+        }
+
+        protected override HashSet<string> GetHandledDataTableFields()
+        {
+            return new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                StatusField
+            };
         }
     }
 }

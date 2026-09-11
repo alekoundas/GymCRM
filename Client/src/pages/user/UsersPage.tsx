@@ -1,3 +1,4 @@
+import SubscriptionBalanceTag from "../subscription/SubscriptionBalanceTag";
 import { useRef, useState } from "react";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { FormMode } from "../../enum/FormMode";
@@ -118,6 +119,17 @@ export default function UsersPage() {
         return rowData.userRoles[0]?.role?.name;
       },
       style: { width: "20%" },
+    },
+    {
+      field: "subscriptionBalance",
+      header: t("Remaining"),
+      sortable: false,
+      filter: false,
+      filterPlaceholder: "",
+      body: (rowData) => (
+        <SubscriptionBalanceTag balance={rowData.subscriptionBalance} />
+      ),
+      style: { width: "8%" },
     },
     {
       field: "userStatusId",
