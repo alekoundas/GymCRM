@@ -36,7 +36,7 @@ namespace Business.Services.CalendarService
             {
 
                 string uid = GenerateUid(participant.Id, participant.TrainGroupDateId, userId);
-                TimeSpan startTimeOfDayUtc = participant.TrainGroup.StartOn.TimeOfDay;
+                TimeSpan startTimeOfDayUtc = GetDisplayedStartTimeOfDay(participant.TrainGroup);
                 int durationMinutes = (int)participant.TrainGroup.Duration.TimeOfDay.TotalMinutes;
 
                 (DateTime? dtstart, RecurrencePattern? rrule) = ParseDateDescriptionToDtstartAndRrule(participant, startTimeOfDayUtc);
@@ -75,7 +75,7 @@ namespace Business.Services.CalendarService
             foreach (var participant in trainGroupParticipants)
             {
                 string uid = GenerateUid(participant.Id, participant.TrainGroupDateId, userId);
-                TimeSpan startTimeOfDayUtc = participant.TrainGroup.StartOn.TimeOfDay;
+                TimeSpan startTimeOfDayUtc = GetDisplayedStartTimeOfDay(participant.TrainGroup);
                 int durationMinutes = (int)participant.TrainGroup.Duration.TimeOfDay.TotalMinutes;
 
                 (DateTime? dtstart, RecurrencePattern? rrule) = ParseDateDescriptionToDtstartAndRrule(participant, startTimeOfDayUtc);
@@ -100,6 +100,20 @@ namespace Business.Services.CalendarService
             }
 
             return results;
+        }
+
+        // The hour a member actually reads on screen. Sqlite returns StartOn with no
+        // kind, and the api's json converter runs ToUniversalTime over it before the
+        // client ever sees it, which moves it by the host's offset on the stored date.
+        // The calendar file used to take the column as it stood and so disagreed with
+        // the screen by exactly that much. Calling the same conversion here keeps the
+        // two in step whatever the offset and whatever the daylight saving rules say.
+        //
+        // Only the start is treated this way. Duration is a length, not a moment, and
+        // putting it through a timezone would turn an hour into something else.
+        private TimeSpan GetDisplayedStartTimeOfDay(TrainGroup trainGroup)
+        {
+            return trainGroup.StartOn.ToUniversalTime().TimeOfDay;
         }
 
         private string GenerateUid(int trainGroupParticipantId, int trainGroupDateId, Guid userId)
