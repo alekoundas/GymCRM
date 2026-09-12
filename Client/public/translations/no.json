@@ -318,5 +318,7 @@
   "Gives every member the lessons they have already attended, so everyone starts at zero": "Gives every member the lessons they have already attended, so everyone starts at zero",
   "Press this once": "Press this once",
   "members were given an opening balance": "members were given an opening balance",
-  "Anything the trainer should know before a session": "Anything the trainer should know before a session"
+  "Anything the trainer should know before a session": "Anything the trainer should know before a session",
+  "Training": "Training",
+  "Administration": "Administration"
 }
