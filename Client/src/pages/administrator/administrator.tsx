@@ -22,14 +22,15 @@ import GooglePage from "../google/GooglePage";
 export default function Administrator() {
   return (
     <>
-      <div className="flex h-full">
-        <div className="pr-2">
+      {/* The menu keeps its place on the left at every width and the page beside it
+          does the scrolling, so the card stays as tall as the screen. min-w-0 is what
+          lets that column shrink on a phone - a flex child will not go below the width
+          of its contents without it, which is what used to push the page off the side. */}
+      <div className="flex h-full overflow-hidden">
+        <div className="flex-none pr-2">
           <NavLeft />
         </div>
-        <div
-          className="w-full"
-          style={{ minWidth: "400px" }}
-        >
+        <div className="flex-1 min-w-0 overflow-y-auto">
           {/* <ScrollPanel className="custombar2 h-full w-full"> */}
           <Routes>
             <Route

@@ -10,7 +10,10 @@ import { Card } from "primereact/card";
 export default function NavLeft() {
   const { t } = useTranslator();
   const navigate = useNavigate();
-  const [expanded, setExpanded] = useState(true); // start expanded or false if you prefer collapsed by default
+  // Expanded the menu is about 370px wide, which on a phone is the whole screen and
+  // leaves the page beside it nothing at all. There it starts as an icon rail instead;
+  // the toggle still opens it either way.
+  const [expanded, setExpanded] = useState(() => window.innerWidth >= 768);
 
   // A group is shown when at least one thing inside it is. Working that out from the
   // children rather than restating the claims on the group is what stops a screen
