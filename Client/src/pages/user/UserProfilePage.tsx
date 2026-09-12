@@ -202,8 +202,10 @@ export default function UserProfilePage() {
   return (
     <div className="grid">
       <div className="col-12">
+        {/* No p-4 here: the card already pads through .p-card-body, and doubling it
+            up cost about 115px of a 375px phone before the tab panel even started.
+            The panel's own padding is trimmed on small screens for the same reason. */}
         <Card
-          className="p-4"
           style={{
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
           }}
@@ -238,7 +240,7 @@ export default function UserProfilePage() {
             </div>
           </div>
 
-          <TabView>
+          <TabView pt={{ panelcontainer: { className: "p-2 md:p-4" } }}>
             <TabPanel
               header={t("Details")}
               leftIcon="pi pi-user mr-2"
@@ -276,7 +278,9 @@ export default function UserProfilePage() {
               header={t("Next trainings")}
               leftIcon="pi pi-calendar mr-2"
             >
-              <div style={{ minWidth: "700px" }}>
+              {/* Anything the calendar cannot shrink scrolls inside the tab rather
+                  than spilling out over the card. */}
+              <div className="overflow-x-auto">
                 <UserProfileTimeslotsComponent />
               </div>
             </TabPanel>

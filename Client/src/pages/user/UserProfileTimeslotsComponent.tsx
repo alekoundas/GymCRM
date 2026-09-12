@@ -39,6 +39,7 @@ export default function UserProfileTimeslotsComponent() {
 
   // const { userDto, updateUserDto } = useUserStore();
   const calendarRef = useRef<FullCalendar>(null);
+
   const [events, setEvents] = useState<any[]>([]); // Data
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -384,7 +385,13 @@ export default function UserProfileTimeslotsComponent() {
 
   return (
     <>
-      <div className="p-4">
+      {/* Seven columns need room to stay readable, so the calendar keeps a width of
+          its own and the tab it sits in scrolls sideways when the screen is narrower
+          than that - rather than the calendar spilling out over the card. */}
+      <div
+        className="p-0 md:p-4"
+        style={{ minWidth: "700px" }}
+      >
         <FullCalendar
           ref={calendarRef}
           events={events} // Data
