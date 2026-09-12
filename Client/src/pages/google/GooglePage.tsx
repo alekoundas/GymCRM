@@ -27,7 +27,7 @@ export default function GooglePage() {
     if (state?.length > 0 && code?.length > 0) {
       apiService
         .getGoogle<string>(
-          `auth/googlecallback?code=${encodedCode}&state=${encodedState}`
+          `auth/googlecallback?code=${encodedCode}&state=${encodedState}`,
         )
         .then((response) => {});
     }
@@ -76,30 +76,6 @@ export default function GooglePage() {
 
   return (
     <>
-      {TokenService.isUserAllowed("SubscriptionsAdmin_Add") && (
-        <Card className="mb-3">
-          <div className="flex flex-column gap-3">
-
-            <div>
-              <Button
-                label={t("Set opening balances")}
-                icon="pi pi-sliders-h"
-                loading={seeding}
-                onClick={handleSeedBalances}
-              />
-            </div>
-
-            {seeded !== null && (
-              <Message
-                severity="success"
-                className="w-full justify-content-start"
-                text={`${seeded} ${t("members were given an opening balance")}.`}
-              />
-            )}
-          </div>
-        </Card>
-      )}
-
       <Card>
         <div className="w-full">
           <div className="flex justify-content-between align-items-center">
