@@ -324,6 +324,8 @@
   'Press this once': string;
   'members were given an opening balance': string;
   'Anything the trainer should know before a session': string;
+  'Training': string;
+  'Administration': string;
     }
 
 

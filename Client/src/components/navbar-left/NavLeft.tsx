@@ -12,118 +12,124 @@ export default function NavLeft() {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(true); // start expanded or false if you prefer collapsed by default
 
+  // A group is shown when at least one thing inside it is. Working that out from the
+  // children rather than restating the claims on the group is what stops a screen
+  // becoming unreachable: the old Trainer group named neither the recordings nor the
+  // subscription claims, so somebody holding only those saw no group at all.
+  const group = (label: string, items: MenuItem[]): MenuItem => ({
+    label,
+    visible: items.some((item) => item.visible),
+    className: "mt-3",
+    items,
+  });
+
   const baseItems: MenuItem[] = [
-    {
-      label: "Admin",
-      visible:
-        TokenService.isUserAllowed("Users_View") ||
-        TokenService.isUserAllowed("Roles_View"),
-      items: [
-        {
-          label: t("Roles"),
-          icon: "pi pi-key",
-          visible: TokenService.isUserAllowed("Roles_View"),
-          command: () => navigate("/administrator/roles"),
-        },
-        {
-          label: t("Users"),
-          icon: "pi pi-users",
-          visible: TokenService.isUserAllowed("Users_View"),
-          command: () => navigate("/administrator/users"),
-        },
-        {
-          label: t("User Statuses"),
-          icon: "pi pi-palette",
-          visible: TokenService.isUserAllowed("UserStatuses_View"),
-          command: () => navigate("/administrator/user-statuses"),
-        },
-      ],
-    },
-    // ... other menu groups (Trainer, Email) same as before
-    {
-      label: t("Trainer"),
-      visible:
-        TokenService.isUserAllowed("TrainGroups_View") ||
-        TokenService.isUserAllowed("WorkoutPlansAdmin_View") ||
-        TokenService.isUserAllowed("WorkoutPlanRules_View"),
-      items: [
-        {
-          label: t("Calendar"),
-          icon: "pi pi-calendar",
-          visible: TokenService.isUserAllowed("TrainGroups_View"),
-          command: () => navigate("/administrator/train-group-calendar"),
-        },
-        {
-          label: t("Train Groups"),
-          icon: "pi pi-users",
-          visible: TokenService.isUserAllowed("TrainGroups_View"),
-          command: () => navigate("/administrator/train-groups"),
-        },
-        {
-          label: t("Workout Plans"),
-          icon: "pi pi-clipboard",
-          visible: TokenService.isUserAllowed("WorkoutPlansAdmin_View"),
-          command: () => navigate("/administrator/workout-plans"),
-        },
-        {
-          label: t("Workout plan rules"),
-          icon: "pi pi-sliders-h",
-          visible: TokenService.isUserAllowed("WorkoutPlanRules_View"),
-          command: () => navigate("/administrator/workout-plan-rules"),
-        },
-        {
-          label: t("Recordings"),
-          icon: "pi pi-history",
-          visible: TokenService.isUserAllowed("WorkoutPlanRecordingsAdmin_View"),
-          command: () => navigate("/administrator/workout-plan-recordings"),
-        },
-        {
-          label: t("Subscriptions"),
-          icon: "pi pi-ticket",
-          visible: TokenService.isUserAllowed("SubscriptionsAdmin_View"),
-          command: () => navigate("/administrator/subscriptions"),
-        },
-        {
-          label: t("Subscription requests"),
-          icon: "pi pi-inbox",
-          visible: TokenService.isUserAllowed("SubscriptionsAdmin_Edit"),
-          command: () => navigate("/administrator/subscription-requests"),
-        },
-      ],
-    },
-    {
-      label: "Email",
-      visible: TokenService.isUserAllowed("Mails_View"),
-      items: [
-        {
-          label: "Google",
-          icon: "pi pi-google",
-          visible: TokenService.isUserAllowed("Roles_Edit"),
-          command: () => navigate("/administrator/google"),
-        },
-        {
-          label: "Emails",
-          icon: "pi pi-envelope",
-          visible: TokenService.isUserAllowed("Mails_View"),
-          command: () => navigate("/administrator/emails"),
-        },
-        {
-          label: t("Send new Mail"),
-          icon: "pi pi-send",
-          visible: TokenService.isUserAllowed("Mails_Add"),
-          command: () => navigate("/administrator/email-send"),
-        },
-      ],
-    },
+    // What the gym does day to day. Ordered by how often it is opened, with the
+    // configuration screen last.
+    group(t("Training"), [
+      {
+        label: t("Calendar"),
+        icon: "pi pi-calendar",
+        visible: TokenService.isUserAllowed("TrainGroups_View"),
+        command: () => navigate("/administrator/train-group-calendar"),
+      },
+      {
+        label: t("Train Groups"),
+        icon: "pi pi-users",
+        visible: TokenService.isUserAllowed("TrainGroups_View"),
+        command: () => navigate("/administrator/train-groups"),
+      },
+      {
+        label: t("Workout Plans"),
+        icon: "pi pi-clipboard",
+        visible: TokenService.isUserAllowed("WorkoutPlansAdmin_View"),
+        command: () => navigate("/administrator/workout-plans"),
+      },
+      {
+        label: t("Recordings"),
+        icon: "pi pi-history",
+        visible: TokenService.isUserAllowed("WorkoutPlanRecordingsAdmin_View"),
+        command: () => navigate("/administrator/workout-plan-recordings"),
+      },
+      {
+        label: t("Workout plan rules"),
+        icon: "pi pi-sliders-h",
+        visible: TokenService.isUserAllowed("WorkoutPlanRules_View"),
+        command: () => navigate("/administrator/workout-plan-rules"),
+      },
+    ]),
+
+    // Their own heading rather than buried under the trainer - this is the membership
+    // side of the gym, and the requests are an inbox somebody has to work through, so
+    // they come before the ledger.
+    group(t("Subscriptions"), [
+      {
+        label: t("Subscription requests"),
+        icon: "pi pi-inbox",
+        visible: TokenService.isUserAllowed("SubscriptionsAdmin_Edit"),
+        command: () => navigate("/administrator/subscription-requests"),
+      },
+      {
+        label: t("Subscriptions"),
+        icon: "pi pi-ticket",
+        visible: TokenService.isUserAllowed("SubscriptionsAdmin_View"),
+        command: () => navigate("/administrator/subscriptions"),
+      },
+    ]),
+
+    // Set up once and rarely touched afterwards, so it sits below the daily work.
+    group(t("Administration"), [
+      {
+        label: t("Users"),
+        // A single figure, because the collapsed menu is icons only and the group
+        // icon next door already means "several people".
+        icon: "pi pi-user",
+        visible: TokenService.isUserAllowed("Users_View"),
+        command: () => navigate("/administrator/users"),
+      },
+      {
+        label: t("User Statuses"),
+        icon: "pi pi-palette",
+        visible: TokenService.isUserAllowed("UserStatuses_View"),
+        command: () => navigate("/administrator/user-statuses"),
+      },
+      {
+        label: t("Roles"),
+        icon: "pi pi-key",
+        visible: TokenService.isUserAllowed("Roles_View"),
+        command: () => navigate("/administrator/roles"),
+      },
+    ]),
+
+    group("Email", [
+      {
+        label: "Google",
+        icon: "pi pi-google",
+        visible: TokenService.isUserAllowed("Roles_Edit"),
+        command: () => navigate("/administrator/google"),
+      },
+      {
+        label: "Emails",
+        icon: "pi pi-envelope",
+        visible: TokenService.isUserAllowed("Mails_View"),
+        command: () => navigate("/administrator/emails"),
+      },
+      {
+        label: t("Send new Mail"),
+        icon: "pi pi-send",
+        visible: TokenService.isUserAllowed("Mails_Add"),
+        command: () => navigate("/administrator/email-send"),
+      },
+    ]),
   ];
 
   // Transform items: hide labels when collapsed
   const menuItems = expanded
     ? baseItems
-    : baseItems.map((group) => ({
-        ...group,
+    : baseItems.map((menuGroup) => ({
+        ...menuGroup,
         label: undefined, // hide group label
-        items: group.items?.map((item: MenuItem) => ({
+        items: menuGroup.items?.map((item: MenuItem) => ({
           ...item,
           label: undefined, // hide item labels
           tooltip: item.label, // optional: show on hover
