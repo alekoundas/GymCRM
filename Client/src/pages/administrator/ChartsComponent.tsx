@@ -7,6 +7,27 @@ import { useTranslator } from "../../services/TranslatorService";
 import { SubscriptionBucketDto } from "../../model/entities/subscription/SubscriptionChartsDto";
 import SubscriptionBalanceTag from "../subscription/SubscriptionBalanceTag";
 
+// A floor, not a fixed height. The chart is a flex child that takes whatever the card
+// has spare, so a row of cards lines up and no panel is left half empty; this only
+// stops it collapsing when the card is short.
+const MIN_CHART_HEIGHT = "16rem";
+
+// PrimeReact renders the chart inside a div of its own that has no height, so chart.js
+// measures that rather than the box we put it in and falls back to its default canvas
+// height. Filling the wrapper is what lets the card's height reach the canvas.
+const cardPassThrough = {
+  body: { className: "h-full flex flex-column" },
+  content: { className: "flex-1 flex flex-column" },
+};
+
+// A single accent carries the neutral charts; red through green is kept for the one
+// chart where the colour means something - how close a member is to running out.
+const ACCENT = "#60A5FA";
+const ACCENT_SOFT = "rgba(96, 165, 250, 0.25)";
+const GOOD = "#34D399";
+const WARN = "#FBBF24";
+const BAD = "#F87171";
+
 export default function ChartsComponent() {
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const apiService = useApiService();
@@ -24,27 +45,60 @@ export default function ChartsComponent() {
     return <div>{t("Loading charts")}...</div>;
   }
 
-  const dailyEmailChartData = {
-    labels: chartData.dailyEmails.map((d) =>
-      new Date(d.date).toLocaleDateString()
-    ),
-    datasets: [
-      {
-        label: t("Emails Sent"),
-        data: chartData.dailyEmails.map((d) => d.count),
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        borderColor: "rgb(75, 192, 192)",
-        borderWidth: 1,
-      },
-    ],
-  };
+  // Chart.js paints its own text and grid lines and knows nothing about the theme, so
+  // the colours are read off the stylesheet. An unknown variable comes back empty and
+  // chart.js falls back to its default, which is the behaviour we had before.
+  const style = getComputedStyle(document.documentElement);
+  const textColor = style.getPropertyValue("--text-color");
+  const mutedColor = style.getPropertyValue("--text-color-secondary");
+  const gridColor = style.getPropertyValue("--surface-border");
 
-  const dailyEmailOptions = {
+  // maintainAspectRatio is the whole point of this object. Left on, chart.js sizes the
+  // canvas from its own ratio and parks it against the left edge of the card; off, the
+  // canvas fills the box it is given, which is what centres everything.
+  const axisOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { displayColors: false },
+    },
     scales: {
+      x: {
+        ticks: { color: mutedColor },
+        grid: { display: false },
+        border: { color: gridColor },
+      },
       y: {
         beginAtZero: true,
+        ticks: { color: mutedColor, precision: 0 },
+        grid: { color: gridColor, drawBorder: false },
+        border: { display: false },
       },
     },
+  };
+
+  const doughnutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: "68%",
+    plugins: {
+      legend: { position: "bottom" as const, labels: { color: textColor } },
+    },
+  };
+
+  const bar = (label: string, values: number[], colour: string | string[]) => ({
+    label,
+    data: values,
+    backgroundColor: colour,
+    borderRadius: 6,
+    // Four buckets across a wide card would otherwise each be a slab.
+    maxBarThickness: 56,
+  });
+
+  const dailyEmailChartData = {
+    labels: chartData.dailyEmails.map((d) => new Date(d.date).toLocaleDateString()),
+    datasets: [bar(t("Emails Sent"), chartData.dailyEmails.map((d) => d.count), ACCENT)],
   };
 
   const availableEmailsData = {
@@ -52,8 +106,25 @@ export default function ChartsComponent() {
     datasets: [
       {
         data: [500 - chartData.availableEmails, chartData.availableEmails],
-        backgroundColor: ["#FF6384", "#36A2EB"],
-        hoverBackgroundColor: ["#FF6384", "#36A2EB"],
+        backgroundColor: [WARN, ACCENT],
+        hoverBackgroundColor: [WARN, ACCENT],
+        borderWidth: 0,
+      },
+    ],
+  };
+
+  const userGrowthChartData = {
+    labels: chartData.userGrowth.map((d) => new Date(d.date).toLocaleDateString()),
+    datasets: [
+      {
+        label: t("Cumulative Users"),
+        data: chartData.userGrowth.map((d) => d.cumulative),
+        fill: true,
+        backgroundColor: ACCENT_SOFT,
+        borderColor: ACCENT,
+        pointBackgroundColor: ACCENT,
+        pointRadius: 2,
+        tension: 0.35,
       },
     ],
   };
@@ -83,102 +154,127 @@ export default function ChartsComponent() {
   const monthlySubscriptionsData = {
     labels: subscriptions?.monthlyApproved.map((x) => monthLabel(x.year, x.month)) ?? [],
     datasets: [
-      {
-        label: t("Subscriptions"),
-        data: subscriptions?.monthlyApproved.map((x) => x.amount) ?? [],
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-        borderColor: "rgb(54, 162, 235)",
-        borderWidth: 1,
-      },
+      bar(t("Subscriptions"), subscriptions?.monthlyApproved.map((x) => x.amount) ?? [], ACCENT),
     ],
   };
 
   const bucketsData = {
     labels: subscriptions?.buckets.map(bucketLabel) ?? [],
     datasets: [
-      {
-        label: t("Members"),
-        data: subscriptions?.buckets.map((x) => x.count) ?? [],
-        // Running out on the left, comfortable on the right.
-        backgroundColor: ["#EF4444", "#F59E0B", "#3B82F6", "#22C55E"],
-      },
-    ],
-  };
-
-  const wholeNumberOptions = {
-    plugins: { legend: { display: false } },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: { precision: 0 },
-      },
-    },
-  };
-
-  const userGrowthChartData = {
-    labels: chartData.userGrowth.map((d) =>
-      new Date(d.date).toLocaleDateString()
-    ),
-    datasets: [
-      {
-        label: t("Cumulative Users"),
-        data: chartData.userGrowth.map((d) => d.cumulative),
-        fill: false,
-        borderColor: "rgb(75, 192, 192)",
-        tension: 0.1,
-      },
+      // Running out on the left, comfortable on the right.
+      bar(t("Members"), subscriptions?.buckets.map((x) => x.count) ?? [], [
+        BAD,
+        WARN,
+        ACCENT,
+        GOOD,
+      ]),
     ],
   };
 
   return (
     <div className="grid">
       <div className="col-12 md:col-4">
-        <Card title={t("Daily Emails Sent (Last 7 Days)")}>
-          <Chart
-            type="bar"
-            data={dailyEmailChartData}
-            options={dailyEmailOptions}
-          />
+        <Card
+          className="h-full"
+          pt={cardPassThrough}
+          title={t("Daily Emails Sent (Last 7 Days)")}
+        >
+          <div
+            className="flex-1"
+            style={{ minHeight: MIN_CHART_HEIGHT }}
+          >
+            <Chart
+              type="bar"
+              data={dailyEmailChartData}
+              options={axisOptions}
+              style={{ height: "100%" }}
+            />
+          </div>
         </Card>
       </div>
+
       <div className="col-12 md:col-4">
-        <Card title={t("Available Emails (Out of 500)")}>
-          <Chart
-            type="doughnut"
-            data={availableEmailsData}
-          />
+        <Card
+          className="h-full"
+          pt={cardPassThrough}
+          title={t("Available Emails (Out of 500)")}
+        >
+          <div
+            className="flex-1"
+            style={{ minHeight: MIN_CHART_HEIGHT }}
+          >
+            <Chart
+              type="doughnut"
+              data={availableEmailsData}
+              options={doughnutOptions}
+              style={{ height: "100%" }}
+            />
+          </div>
         </Card>
       </div>
+
       <div className="col-12 md:col-4">
-        <Card title={t("User Growth")}>
-          <Chart
-            type="line"
-            data={userGrowthChartData}
-          />
+        <Card
+          className="h-full"
+          pt={cardPassThrough}
+          title={t("User Growth")}
+        >
+          <div
+            className="flex-1"
+            style={{ minHeight: MIN_CHART_HEIGHT }}
+          >
+            <Chart
+              type="line"
+              data={userGrowthChartData}
+              options={axisOptions}
+              style={{ height: "100%" }}
+            />
+          </div>
         </Card>
       </div>
 
       {subscriptions && (
         <>
           <div className="col-12 md:col-6">
-            <Card title={t("Subscriptions added per month")}>
-              <Chart
-                type="bar"
-                data={monthlySubscriptionsData}
-                options={wholeNumberOptions}
-              />
+            <Card
+              className="h-full"
+              pt={cardPassThrough}
+              title={t("Subscriptions added per month")}
+            >
+              <div
+                className="flex-1"
+                style={{ minHeight: MIN_CHART_HEIGHT }}
+              >
+                <Chart
+                  type="bar"
+                  data={monthlySubscriptionsData}
+                  options={axisOptions}
+                  style={{ height: "100%" }}
+                />
+              </div>
             </Card>
           </div>
 
           <div className="col-12 md:col-6">
-            <Card title={t("Members by remaining subscriptions")}>
-              <Chart
-                type="bar"
-                data={bucketsData}
-                options={wholeNumberOptions}
-              />
+            <Card
+              className="h-full"
+              pt={cardPassThrough}
+              title={t("Members by remaining subscriptions")}
+            >
+              <div
+                className="flex-1"
+                style={{ minHeight: MIN_CHART_HEIGHT }}
+              >
+                <Chart
+                  type="bar"
+                  data={bucketsData}
+                  options={axisOptions}
+                  style={{ height: "100%" }}
+                />
+              </div>
 
-              <div className="mt-4">
+              {/* Stays its natural size - only the chart above it stretches. */}
+              <div className="flex-none mt-4 pt-3 border-top-1 surface-border">
                 <h4 className="mt-0 mb-2">{t("Furthest behind")}</h4>
 
                 {subscriptions.topDebtors.length === 0 ? (
@@ -190,9 +286,11 @@ export default function ChartsComponent() {
                     {subscriptions.topDebtors.map((debtor) => (
                       <li
                         key={debtor.userId}
-                        className="flex align-items-center justify-content-between py-2 border-bottom-1 surface-border"
+                        className="flex align-items-center justify-content-between gap-3 py-2 border-bottom-1 surface-border"
                       >
-                        <span>{debtor.fullName}</span>
+                        <span className="white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                          {debtor.fullName}
+                        </span>
                         <SubscriptionBalanceTag balance={debtor.balance} />
                       </li>
                     ))}
