@@ -1,4 +1,8 @@
-import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
+import {
+  Dropdown,
+  DropdownChangeEvent,
+  DropdownFilterEvent,
+} from "primereact/dropdown";
 import { JSX, useEffect, useState } from "react";
 import { VirtualScrollerLazyEvent } from "primereact/virtualscroller";
 import { LookupDto } from "../../../model/lookup/LookupDto";
@@ -29,6 +33,10 @@ export default function LookupComponent({
   const [loading, setLoading] = useState(false);
   const [lookupDto, setLookupDto] = useState<LookupDto>(new LookupDto());
   const [selectedId, setSelectedId] = useState<string | undefined>();
+
+  // What was typed, kept so the pages fetched while scrolling stay inside the search
+  // rather than reverting to the whole list.
+  const [searchValue, setSearchValue] = useState<string>("");
 
   const fetchData = async (dto: LookupDto) => {
     setLoading(true);
@@ -73,14 +81,34 @@ export default function LookupComponent({
         return;
       }
 
-    lookupDto.skip = nextSkip;
+    const dto = { ...lookupDto };
+    dto.skip = nextSkip;
+    dto.filter.value = searchValue;
 
-    const result = await fetchData(lookupDto);
+    const result = await fetchData(dto);
     if (result)
       setLookupDto({
         ...result,
         data: [...(lookupDto.data || []), ...(result.data || [])],
       });
+
+    setIsDataLoaded(true); // escape next load.
+  };
+
+  // Typing searches the server, not the handful of options already pulled down: the
+  // list is paged, so sieving what is loaded would search a page rather than the
+  // table and anybody further down would look as though they were not there.
+  const search = async (event: DropdownFilterEvent): Promise<void> => {
+    const term = event.filter.trim();
+    setSearchValue(term);
+
+    const newDto = new LookupDto();
+    newDto.skip = 0;
+    newDto.filter.value = term;
+
+    // Replaced, not appended - these are answers to a different question.
+    const result = await fetchData(newDto);
+    if (result) setLookupDto(result);
 
     setIsDataLoaded(true); // escape next load.
   };
@@ -169,6 +197,15 @@ export default function LookupComponent({
         valueTemplate={template}
         placeholder={t("Select a value")}
         disabled={!isEnabled}
+        filter
+        filterPlaceholder={t("Search")}
+        // Primereact only sieves the list itself when it is not lazy, and this one is -
+        // so what the server sent back is what is shown. That matters: the server
+        // matches without accents, and a second pass here comparing raw text would
+        // throw away the very rows that makes it find.
+        onFilter={search}
+        resetFilterOnHide
+        emptyFilterMessage={t("No results found")}
         showClear
         className="w-full"
         panelStyle={{ minWidth: "100%" }}

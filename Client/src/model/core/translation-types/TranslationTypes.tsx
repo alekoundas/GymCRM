@@ -335,6 +335,7 @@
   'Recorded': string;
   'Deleted': string;
   'This attendance will be removed and the member gets the lesson back': string;
+  'No results found': string;
     }
 
 
