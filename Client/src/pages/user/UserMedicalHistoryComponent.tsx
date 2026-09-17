@@ -1,4 +1,4 @@
-import { InputTextarea } from "primereact/inputtextarea";
+import RichTextAreaComponent from "../../components/core/text-area/RichTextAreaComponent";
 import { Button } from "primereact/button";
 import { useEffect, useState } from "react";
 import { useUserStore } from "../../stores/UserStore";
@@ -77,17 +77,25 @@ export default function UserMedicalHistoryComponent() {
         </div>
       </div>
 
-      <InputTextarea
-        id="medicalHistory"
-        placeholder={t("Medical History")}
-        className="w-full"
-        // Room for a real history rather than a line or two. It is the whole point
-        // of the tab, so it fills it.
-        style={{ minHeight: "60vh" }}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        disabled={!isEditing}
-      />
+      {/* Room for a real history rather than a line or two. It is the whole point of
+          the tab, so it fills it. Scoped to this editor so the one in the mail page
+          keeps its own size. */}
+      <style>
+        {`
+          .medical-history .ql-editor { min-height: 45vh; }
+          .medical-history .ql-container { font-size: inherit; }
+        `}
+      </style>
+
+      <div className="medical-history">
+        <RichTextAreaComponent
+          value={text}
+          isEnabled={isEditing}
+          // No label: the tab is already called this, and the editor's own row is
+          // wanted only for the rich text / html switch.
+          onChange={setText}
+        />
+      </div>
     </div>
   );
 }
