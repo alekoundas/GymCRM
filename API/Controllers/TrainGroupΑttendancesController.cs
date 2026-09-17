@@ -59,8 +59,21 @@ namespace API.Controllers
             // By day, not by instant. The calendar sends midnight when a date is picked
             // but the current time when the page's default is used, so comparing exact
             // timestamps let the same person be marked twice for one day.
+            // Recorded against a group, or written out by hand - but it has to say what
+            // the session was one way or the other, or the row means nothing later.
+            if (entity.TrainGroupId == null && string.IsNullOrWhiteSpace(entity.TrainGroupTitle))
+            {
+                errors = [_localizer[TranslationKeys._0_is_required, nameof(entity.TrainGroupTitle)]];
+                return true;
+            }
+
             DateTime day = entity.AttendanceDate.Date;
             DateTime nextDay = day.AddDays(1);
+
+            // Only a group can be attended twice in a day by the same person in a way we
+            // can recognise. A hand written one has nothing to match on.
+            if (entity.TrainGroupId == null)
+                return false;
 
             bool isAlreadyParticipating = _dataService.TrainGroupΑttendances
                 .Where(x => x.TrainGroupId == entity.TrainGroupId)
@@ -150,7 +163,11 @@ namespace API.Controllers
                 .Where(x => lastLessonIds.Contains(x.Id))
                 .ToListAsync();
 
-            List<int> trainGroupIds = entityDtos.Select(x => x.TrainGroupId).Distinct().ToList();
+            List<int> trainGroupIds = entityDtos
+                .Where(x => x.TrainGroupId != null)
+                .Select(x => x.TrainGroupId!.Value)
+                .Distinct()
+                .ToList();
             List<TrainGroup> trainGroups = await _dataService.TrainGroups
                 .Where(x => trainGroupIds.Contains(x.Id))
                 .ToListAsync();

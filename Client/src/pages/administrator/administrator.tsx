@@ -1,3 +1,4 @@
+import TrainGroupAttendancesPage from "../train-group-attendance/TrainGroupAttendancesPage";
 import SubscriptionsPage from "../subscription/SubscriptionsPage";
 import SubscriptionRequestsPage from "../subscription/SubscriptionRequestsPage";
 import { Route, Routes } from "react-router-dom";
@@ -113,6 +114,10 @@ export default function Administrator() {
             />
 
             {/* Users */}
+            <Route
+              path="attendances"
+              element={<TrainGroupAttendancesPage />}
+            />
             <Route
               path="users"
               element={<UsersPage />}

@@ -326,6 +326,15 @@
   'Anything the trainer should know before a session': string;
   'Training': string;
   'Administration': string;
+  'Session details': string;
+  'From a train group': string;
+  'Type them in': string;
+  'The session will be copied from the group as it is today': string;
+  'Use this for a session whose group no longer exists': string;
+  'New attendance': string;
+  'Recorded': string;
+  'Deleted': string;
+  'This attendance will be removed and the member gets the lesson back': string;
     }
 
 

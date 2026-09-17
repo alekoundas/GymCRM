@@ -320,5 +320,14 @@
   "members were given an opening balance": "members were given an opening balance",
   "Anything the trainer should know before a session": "Anything the trainer should know before a session",
   "Training": "Training",
-  "Administration": "Administration"
+  "Administration": "Administration",
+  "Session details": "Session details",
+  "From a train group": "From a train group",
+  "Type them in": "Type them in",
+  "The session will be copied from the group as it is today": "The session will be copied from the group as it is today",
+  "Use this for a session whose group no longer exists": "Use this for a session whose group no longer exists",
+  "New attendance": "New attendance",
+  "Recorded": "Recorded",
+  "Deleted": "Deleted",
+  "This attendance will be removed and the member gets the lesson back": "This attendance will be removed and the member gets the lesson back"
 }

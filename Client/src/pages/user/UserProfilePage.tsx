@@ -19,6 +19,7 @@ import { useParams } from "react-router-dom";
 import { TabPanel, TabView } from "primereact/tabview";
 import SubscriptionMemberTabComponent from "../subscription/SubscriptionMemberTabComponent";
 import UserMedicalHistoryComponent from "./UserMedicalHistoryComponent";
+import TrainGroupAttendanceMemberTabComponent from "../train-group-attendance/TrainGroupAttendanceMemberTabComponent";
 import SubscriptionBalanceTag from "../subscription/SubscriptionBalanceTag";
 
 export default function UserProfilePage() {
@@ -272,6 +273,13 @@ export default function UserProfilePage() {
               leftIcon="pi pi-heart mr-2"
             >
               <UserMedicalHistoryComponent />
+            </TabPanel>
+
+            <TabPanel
+              header={t("Attendances")}
+              leftIcon="pi pi-check-square mr-2"
+            >
+              {userId && <TrainGroupAttendanceMemberTabComponent userId={userId} />}
             </TabPanel>
 
             <TabPanel
