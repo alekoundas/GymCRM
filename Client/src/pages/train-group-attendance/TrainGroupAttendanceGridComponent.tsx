@@ -78,7 +78,7 @@ export default function TrainGroupAttendanceGridComponent({
     filters: [
       ...getFilters(),
       { fieldName: "attendanceDate", filterType: "between" },
-      { fieldName: "TrainGroup.title", filterType: "contains" },
+      { fieldName: "trainGroupTitle", filterType: "contains" },
     ],
     dataTableSorts: [],
   });
