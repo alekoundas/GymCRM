@@ -14,5 +14,10 @@ namespace Core.Dtos.TrainGroupDate
         public bool IsUserJoined { get; set; }
         public bool IsUnavailableTrainGroup { get; set; }
 
+        // A session that actually took place, taken from the attendance rather than
+        // projected from who is enrolled today. Read only - the date has been and gone.
+        public bool IsAttendance { get; set; }
+        public int? AttendanceId { get; set; }
+
     }
 }

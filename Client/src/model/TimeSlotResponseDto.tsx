@@ -7,6 +7,9 @@ export interface TimeSlotResponseDto {
   description: string;
   trainerId: string;
   trainer: UserDto;
+  // Carried separately: an attendance keeps the trainer's name even when the account
+  // or the group behind it is gone.
+  trainerFullName: string;
   trainGroupId: number;
   trainGroupDateId: number;
   duration: string;
@@ -23,6 +26,7 @@ export class TimeSlotResponseDto {
   description: string = "";
   trainerId: string = "";
   trainer: UserDto = new UserDto();
+  trainerFullName: string = "";
   trainGroupId: number = -1;
   trainGroupDateId: number = -1;
   duration: string = "";

@@ -563,8 +563,32 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("TrainGroupId")
+                    b.Property<string>("TrainGroupDescription")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("TrainGroupDuration")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("TrainGroupId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("TrainGroupStartOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TrainGroupTitle")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TrainerFullName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("TrainerId")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
@@ -1049,7 +1073,7 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("Core.Models.Subscription", b =>
                 {
                     b.HasOne("Core.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Subscriptions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1133,8 +1157,7 @@ namespace DataAccess.Migrations
                     b.HasOne("Core.Models.TrainGroup", "TrainGroup")
                         .WithMany("TrainGroupΑttendances")
                         .HasForeignKey("TrainGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Core.Models.User", "User")
                         .WithMany("TrainGroupΑttendances")
@@ -1295,6 +1318,8 @@ namespace DataAccess.Migrations
                     b.Navigation("Mails");
 
                     b.Navigation("PhoneNumbers");
+
+                    b.Navigation("Subscriptions");
 
                     b.Navigation("TrainGroupParticipants");
 
