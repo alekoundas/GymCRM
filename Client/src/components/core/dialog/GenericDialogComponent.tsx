@@ -28,6 +28,9 @@ interface DialogComponentProps {
   children: ReactNode;
   onSave?: () => Promise<void>;
   onDelete?: () => Promise<void>;
+  // What the confirming button says. A dialog that asks a question is answered with
+  // "Yes", not saved, and defaults to Save for every dialog that is a form.
+  saveLabel?: string;
   // A dialog whose choices are not "save or cancel" - approve or reject, delete
   // with or without telling the member - passes its own buttons here so they sit
   // in the footer with everything else rather than stacked in the body.
@@ -43,6 +46,7 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
   children,
   onSave,
   onDelete,
+  saveLabel,
   footer: customFooter,
 }) => {
   const { t } = useTranslator();
@@ -98,7 +102,7 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
           />
           {onSave && (
             <Button
-              label={t("Save")}
+              label={saveLabel ?? t("Save")}
               icon="pi pi-check"
               onClick={handleSave}
               disabled={!isSaveEnabled}
