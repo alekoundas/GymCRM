@@ -594,6 +594,7 @@ namespace API.Controllers
                     StartOn = g.StartOn,
                     TrainerId = g.TrainerId,
                     Trainer = _mapper.Map<UserDto>(g.Trainer),
+                    TrainerFullName = (g.Trainer.FirstName + " " + g.Trainer.LastName).Trim(),
                     TrainGroupId = g.Id,
 
                     IsUnavailableTrainGroup = g.TrainGroupUnavailableDates
@@ -614,6 +615,58 @@ namespace API.Controllers
                     SpotsLeft = 0
                 })
                 .ToList();
+
+            // Sessions that actually took place. These come from the attendance rows, which
+            // outlive the group, the enrolment and any edit to either - so a week that has
+            // been and gone reads as what happened rather than as today's enrolments
+            // projected backwards onto it. Which of the two a day shows is decided by the
+            // page, where the recurring markers have already been resolved to real dates.
+            List<TrainGroupΑttendance> attendances = await dbContext.TrainGroupΑttendances
+                .AsNoTracking()
+                .Where(a => a.UserId == userId
+                         && a.AttendanceDate >= selectedDateStart
+                         && a.AttendanceDate < selectedDateEnd.AddDays(1))
+                .ToListAsync();
+
+            List<Guid> trainerIds = attendances
+                .Where(a => a.TrainerId != null)
+                .Select(a => a.TrainerId!.Value)
+                .Distinct()
+                .ToList();
+
+            List<User> trainers = trainerIds.Count == 0
+                ? new List<User>()
+                : await dbContext.Users.AsNoTracking().Where(u => trainerIds.Contains(u.Id)).ToListAsync();
+
+            result.AddRange(attendances.Select(a => new TimeSlotResponseDto
+            {
+                Id = a.TrainGroupId ?? 0,
+                TrainGroupId = a.TrainGroupId ?? 0,
+                Title = a.TrainGroupTitle,
+                Description = a.TrainGroupDescription,
+                StartOn = a.TrainGroupStartOn,
+                Duration = a.TrainGroupDuration,
+                TrainerId = a.TrainerId ?? Guid.Empty,
+                Trainer = _mapper.Map<UserDto>(trainers.FirstOrDefault(u => u.Id == a.TrainerId)),
+                TrainerFullName = a.TrainerFullName,
+                IsUnavailableTrainGroup = false,
+                SpotsLeft = 0,
+                RecurrenceDates = new List<TimeSlotRecurrenceDateDto>
+                {
+                    new TimeSlotRecurrenceDateDto
+                    {
+                        // No TrainGroupDateId, so the page places it on its own date
+                        // rather than expanding it across the week like a recurrence.
+                        TrainGroupDateId = null,
+                        TrainGroupDateType = null,
+                        Date = a.AttendanceDate.Date,
+                        IsUserJoined = true,
+                        IsOneOff = true,
+                        IsAttendance = true,
+                        AttendanceId = a.Id
+                    }
+                }
+            }));
 
             return new ApiResponse<List<TimeSlotResponseDto>>().SetSuccessResponse(result);
         }

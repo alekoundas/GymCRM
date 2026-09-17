@@ -1,4 +1,6 @@
 import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
 import { DataTableDto } from "../model/datatable/DataTableDto";
 import { UserPasswordChangeDto } from "../model/entities/user/UserPasswordChangeDto";
@@ -32,6 +34,9 @@ const refreshPromiseRef = { current: null as Promise<boolean> | null };
 export const useApiService = () => {
   const { t } = useTranslator();
   const { showSuccess, showInfo, showWarn, showError } = useToast();
+  // Renamed on the way in: this only flips the flag the header reads, it clears nothing.
+  const { logout: setLoggedOut } = useAuth();
+  const navigate = useNavigate();
 
   const buildUrl = useCallback(
     (
@@ -58,6 +63,20 @@ export const useApiService = () => {
     [showSuccess, showError],
   );
 
+  // Clearing the tokens was never enough on its own. Whether somebody is signed in is
+  // held in context and read by the header, and nothing was telling it - so the session
+  // ended underneath a page that still offered Logout and stayed where it was. Ending it
+  // happens in one place now: tokens cleared, the context told, and the browser sent to
+  // the login screen.
+  const endExpiredSession = useCallback(() => {
+    TokenService.logout();
+    setLoggedOut();
+
+    if (!window.location.pathname.startsWith("/users/login")) {
+      navigate("/users/login", { replace: true });
+    }
+  }, [setLoggedOut, navigate]);
+
   const refreshUserToken = useCallback(async (): Promise<boolean> => {
     if (refreshPromiseRef.current) {
       console.log("Reusing existing token refresh promise.");
@@ -73,7 +92,7 @@ export const useApiService = () => {
 
         if (!token || !refreshToken) {
           showError(t("Please log in again."));
-          TokenService.logout();
+          endExpiredSession();
           return false;
         }
 
@@ -83,6 +102,7 @@ export const useApiService = () => {
         >(url, "POST", refreshTokenDto);
         if (!response || !response.data) {
           showMessages(response?.messages, false);
+          endExpiredSession();
           return false;
         }
 
@@ -99,7 +119,7 @@ export const useApiService = () => {
       } catch (error) {
         console.error("Unexpected error during token refresh:", error);
         showError(t("Please log in again."));
-        TokenService.logout();
+        endExpiredSession();
         return false;
       } finally {
         refreshPromiseRef.current = null;
@@ -107,7 +127,7 @@ export const useApiService = () => {
     })();
 
     return refreshPromiseRef.current;
-  }, [buildUrl, showError, showSuccess, showMessages]);
+  }, [buildUrl, showError, showSuccess, showMessages, endExpiredSession]);
 
   const handle401 = useCallback(
     async <TRequest, TResponse>(
@@ -118,7 +138,7 @@ export const useApiService = () => {
     ): Promise<ApiResponseDto<TResponse> | null> => {
       if (TokenService.isRefreshTokenExpired()) {
         showWarn(t("Please log in again."));
-        TokenService.logout();
+        endExpiredSession();
         return null;
       }
 
@@ -131,7 +151,7 @@ export const useApiService = () => {
       console.warn(t("Token refresh failed."));
       return null;
     },
-    [showWarn, showInfo, refreshUserToken],
+    [showWarn, showInfo, refreshUserToken, endExpiredSession],
   );
 
   const apiFetch = useCallback(

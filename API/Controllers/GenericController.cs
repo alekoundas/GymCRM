@@ -69,6 +69,8 @@ namespace API.Controllers
 
             List<TEntity> entities = _mapper.Map<List<TEntity>>(entityDtos);
 
+            await BeforeAddAsync(entities);
+
             int result = await _dataService.GetGenericRepository<TEntity>().AddRangeAsync(entities);
             if (result <= 0)
                 return new ApiResponse<List<TEntity>>().SetErrorResponse(_localizer[TranslationKeys.An_error_occurred_while_creating_the_entity]);
@@ -270,6 +272,13 @@ namespace API.Controllers
             errors = Array.Empty<string>();
             return false;
         }
+        // Last look at the rows before they are written, for anything the controller has
+        // to fill in itself rather than take from the caller. Nothing by default.
+        protected virtual Task BeforeAddAsync(List<TEntity> entities)
+        {
+            return Task.CompletedTask;
+        }
+
         protected virtual bool CustomValidatePUT(TEntityDto entity, out string[] errors)
         {
             errors = Array.Empty<string>();

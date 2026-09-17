@@ -577,7 +577,7 @@ namespace API.Controllers
 
             List<Guid> attendedUserIds = await context.TrainGroupΑttendances
                 .AsNoTracking()
-                .Where(x => trainGroupIds.Contains(x.TrainGroupId)
+                .Where(x => x.TrainGroupId != null && trainGroupIds.Contains(x.TrainGroupId.Value)
                          && userIds.Contains(x.UserId)
                          && x.AttendanceDate >= day
                          && x.AttendanceDate < nextDay)

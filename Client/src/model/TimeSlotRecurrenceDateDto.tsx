@@ -9,6 +9,10 @@ export interface TimeSlotRecurrenceDateDto {
   trainGroupParticipantUnavailableDateId: number | undefined; // used in Profile
   isOneOff: boolean; // used in Profile
   isUnavailableTrainGroup: boolean; // used in Profile
+  // A session that actually took place, taken from the attendance rather than
+  // projected from who is enrolled today. Read only - the date has been and gone.
+  isAttendance: boolean;
+  attendanceId: number | undefined;
 }
 
 export class TimeSlotRecurrenceDateDto {
@@ -20,4 +24,6 @@ export class TimeSlotRecurrenceDateDto {
   trainGroupParticipantUnavailableDateId: number | undefined; // used in Profile
   isOneOff: boolean = false; // used in Profile
   isUnavailableTrainGroup: boolean = false; // used in Profile
+  isAttendance: boolean = false;
+  attendanceId: number | undefined;
 }

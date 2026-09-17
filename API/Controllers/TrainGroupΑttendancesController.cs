@@ -77,6 +77,41 @@ namespace API.Controllers
         }
 
 
+        // Copy the session down onto the attendance as it is recorded. From here on the
+        // record stands on its own: the group can be renamed, moved or deleted and what
+        // the member trained at is still whatever it was on the day.
+        protected override async Task BeforeAddAsync(List<TrainGroupΑttendance> entities)
+        {
+            List<int> trainGroupIds = entities
+                .Where(x => x.TrainGroupId != null)
+                .Select(x => x.TrainGroupId!.Value)
+                .Distinct()
+                .ToList();
+
+            if (trainGroupIds.Count == 0)
+                return;
+
+            List<TrainGroup> trainGroups = await _dataService.TrainGroups
+                .Include(x => x.Trainer)
+                .Where(x => trainGroupIds.Contains(x.Id))
+                .ToListAsync();
+
+            foreach (TrainGroupΑttendance attendance in entities)
+            {
+                TrainGroup? trainGroup = trainGroups.FirstOrDefault(x => x.Id == attendance.TrainGroupId);
+                if (trainGroup == null)
+                    continue;
+
+                attendance.TrainGroupTitle = trainGroup.Title;
+                attendance.TrainGroupDescription = trainGroup.Description;
+                attendance.TrainGroupStartOn = trainGroup.StartOn;
+                attendance.TrainGroupDuration = trainGroup.Duration;
+                attendance.TrainerId = trainGroup.TrainerId;
+                attendance.TrainerFullName = (trainGroup.Trainer?.FirstName + " " + trainGroup.Trainer?.LastName).Trim();
+            }
+        }
+
+
         // POST: api/TrainGroupAttendances
         public override async Task<ActionResult<ApiResponse<List<TrainGroupΑttendance>>>> Post([FromBody] List<TrainGroupΑttendanceAddDto> entityDtos)
         {

@@ -107,6 +107,21 @@ export default function UserProfileTimeslotsComponent() {
     });
 
     if (response) {
+      // Midnight today. Everything before it is history and is shown from the
+      // attendances; today and after stay the projection of who is enrolled.
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      // Which groups already have an attendance on which day. Today is the one day both
+      // kinds can produce an entry, and the attendance is the truer of the two.
+      const attendedKeys = new Set(
+        response.flatMap((slot) =>
+          slot.recurrenceDates
+            .filter((x) => x.isAttendance)
+            .map((x) => `${slot.trainGroupId}|${new Date(x.date).toDateString()}`)
+        )
+      );
+
       const mappedEvents = response
         .filter((x) => !x.isUnavailableTrainGroup)
         .flatMap((slot) =>
@@ -165,15 +180,41 @@ export default function UserProfileTimeslotsComponent() {
                   startDate.getTime() + durationMinutes * 60 * 1000
                 );
 
+                // A day that has been and gone is told by its attendances alone. Without
+                // this the calendar would keep projecting today's enrolments back over
+                // weeks that are already history, and change what they say every time
+                // somebody joins or leaves a group.
+                if (!x.isAttendance && startDate < todayStart) return undefined;
+
+                // Today can produce both. The attendance wins.
+                if (
+                  !x.isAttendance &&
+                  attendedKeys.has(
+                    `${slot.trainGroupId}|${startDate.toDateString()}`
+                  )
+                )
+                  return undefined;
+
                 return {
-                  id: x.trainGroupDateId,
+                  // Attendances have no recurrence date behind them, so they carry their
+                  // own id and are looked up by it when clicked.
+                  id: x.isAttendance
+                    ? `att-${x.attendanceId}`
+                    : `${x.trainGroupDateId}`,
                   title: slot.title,
                   start: startDate,
 
                   end: endDate,
-                  backgroundColor: x.isUserJoined ? "#007ad9" : "#ced4da", // Joined: blue, not: gray
+                  backgroundColor: x.isAttendance
+                    ? "#22C55E" // took place
+                    : x.isUserJoined
+                      ? "#007ad9"
+                      : "#ced4da", // Joined: blue, not: gray
                   isUserJoined: x.isUserJoined,
-                  extendedProps: { isUserJoined: x.isUserJoined },
+                  extendedProps: {
+                    isUserJoined: x.isUserJoined,
+                    isAttendance: x.isAttendance,
+                  },
                 };
               }
             })
@@ -222,9 +263,19 @@ export default function UserProfileTimeslotsComponent() {
     }
   };
 
+  // An attendance is identified by its own id; everything else still by the recurrence
+  // date it came from.
+  const matchesEvent = (
+    recurrenceDate: TimeSlotRecurrenceDateDto,
+    eventId: string
+  ): boolean =>
+    eventId.startsWith("att-")
+      ? recurrenceDate.attendanceId === +eventId.slice(4)
+      : recurrenceDate.trainGroupDateId === +eventId;
+
   const onTimeSlotClick = async (arg: EventContentArg) => {
     const timeSlot: TimeSlotResponseDto | undefined = timeSlots.find((x) =>
-      x.recurrenceDates.some((y) => y.trainGroupDateId === +arg.event.id)
+      x.recurrenceDates.some((y) => matchesEvent(y, arg.event.id))
     );
 
     if (arg.event.start) {
@@ -242,11 +293,13 @@ export default function UserProfileTimeslotsComponent() {
       setSelectedDate(dateCleaned);
 
       if (timeSlot) {
-        const trainGroup = timeSlots.find((x) => x.id === timeSlot.id);
+        // The slot itself, not another lookup by id: a deleted group has no id left to
+        // look up, and the attendance carries everything the dialog needs anyway.
+        const trainGroup = timeSlot;
 
         if (trainGroup) {
-          const timeslotDate = timeSlot.recurrenceDates.find(
-            (x) => x.trainGroupDateId === +arg.event.id
+          const timeslotDate = timeSlot.recurrenceDates.find((x) =>
+            matchesEvent(x, arg.event.id)
           );
 
           if (timeslotDate) {
@@ -427,6 +480,17 @@ export default function UserProfileTimeslotsComponent() {
             right: "timeGridWeek,timeGridDay",
           }}
           eventContent={async (arg) => {
+            if (arg.event.extendedProps.isAttendance)
+              return (
+                <Button
+                  severity="success"
+                  className="flex w-full h-full justify-content-center align-items-center"
+                  onClick={() => onTimeSlotClick(arg)}
+                >
+                  <p>{arg.timeText}</p>
+                </Button>
+              );
+
             const isUserJoined = timeSlots.some((x) =>
               x.recurrenceDates.some(
                 (y) => y.trainGroupDateId === +arg.event.id && y.isUserJoined
@@ -549,11 +613,23 @@ export default function UserProfileTimeslotsComponent() {
                 </p>
               </div>
 
-              {isDateTwelveHoursFromNow(
-                selectedTimeSlotRecurrenceDate.date,
-                selectedTrainGroup.startOn,
-                selectedTimeSlotRecurrenceDate.trainGroupDateType
-              ) && (
+              {selectedTimeSlotRecurrenceDate.isAttendance && (
+                <div className="flex justify-content-center pt-4">
+                  <Tag
+                    severity="success"
+                    icon="pi pi-check"
+                    value={t("Attended")}
+                  />
+                </div>
+              )}
+
+              {/* A cut-off only means something for a session still to come. */}
+              {!selectedTimeSlotRecurrenceDate.isAttendance &&
+                isDateTwelveHoursFromNow(
+                  selectedTimeSlotRecurrenceDate.date,
+                  selectedTrainGroup.startOn,
+                  selectedTimeSlotRecurrenceDate.trainGroupDateType
+                ) && (
                 <div className="flex justify-content-center pt-5">
                   <p className="text-xl text-primary m-0 pt-4">
                     {t("Already 12h away! You cant opt out.")}
@@ -561,8 +637,9 @@ export default function UserProfileTimeslotsComponent() {
                 </div>
               )}
 
-              {/* Opt Out */}
-              <div>
+              {/* Opt Out. A session that has already taken place is a record, not a
+                  booking - there is nothing here to change. */}
+              <div hidden={selectedTimeSlotRecurrenceDate.isAttendance}>
                 <div className="flex justify-content-between pt-5">
                   <div></div>
                   <Button
