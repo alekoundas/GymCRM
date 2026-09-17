@@ -1,14 +1,19 @@
 ﻿using AutoMapper;
 using Business.Repository;
 using Business.Services;
+using Core.Dtos;
 using Core.Dtos.DataTable;
+using Core.Dtos.Lookup;
 using Core.Dtos.TrainGroup;
 using Core.Enums;
 using Core.Models;
+using Core.System;
 using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -123,6 +128,39 @@ namespace API.Controllers
 
             errors = errorList.ToArray();
             return errors.Length > 0;
+        }
+
+
+        // POST: api/TrainGroups/Lookup
+        // What the dropdowns read. Every other lookup in the app is written out per
+        // controller like this, because each one decides what its own label is.
+        [HttpPost("Lookup")]
+        public async Task<ApiResponse<LookupDto>> Lookup([FromBody] LookupDto lookupDto)
+        {
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            IQueryable<TrainGroup> query = context.TrainGroups.AsNoTracking();
+
+            if (lookupDto.Filter.Id.Length > 0 && int.TryParse(lookupDto.Filter.Id, out int filterId))
+                query = query.Where(x => x.Id == filterId);
+
+            if (lookupDto.Filter.Value.Length > 0)
+                query = query.Where(x => TextNormalizer.Normalize(x.Title).Contains(TextNormalizer.Normalize(lookupDto.Filter.Value)));
+
+            lookupDto.TotalRecords = await query.CountAsync();
+
+            lookupDto.Data = await query
+                .OrderBy(x => x.Title)
+                .Skip(lookupDto.Skip)
+                .Take(lookupDto.Take)
+                .Select(x => new LookupOptionDto()
+                {
+                    Id = x.Id.ToString(),
+                    Value = x.Title
+                })
+                .ToListAsync();
+
+            return new ApiResponse<LookupDto>().SetSuccessResponse(lookupDto);
         }
 
 

@@ -241,7 +241,7 @@ export default function UserProfilePage() {
             </div>
           </div>
 
-          <TabView pt={{ panelcontainer: { className: "p-2 md:p-4" } }}>
+          <TabView pt={{ panelContainer: { className: "p-2 md:p-4" } }}>
             <TabPanel
               header={t("Details")}
               leftIcon="pi pi-user mr-2"
