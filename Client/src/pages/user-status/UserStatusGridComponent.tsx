@@ -50,7 +50,9 @@ export default function UserStatusGridComponent() {
   const [datatableDto, setDatatableDto] = useState<DataTableDto<UserStatusDto>>(
     {
       ...new DataTableDto(),
-      filters: [],
+      // The datatable builds its filter metadata from this list, so a column marked
+      // filterable without an entry here renders a box that collects nothing.
+      filters: [{ fieldName: "name", filterType: "contains" }],
       dataTableSorts: [],
     }
   );
