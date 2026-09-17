@@ -109,12 +109,14 @@ export default function TrainGroupAttendanceGridComponent({
       style: { width: "10%" },
     },
     {
-      field: "TrainGroup.title",
+      // The snapshot rather than the group: it survives the group being deleted or
+      // renamed, and says what the session was on the day.
+      field: "trainGroupTitle",
       header: t("Train Group"),
       sortable: true,
       filter: true,
       filterPlaceholder: t("Search"),
-      body: (rowData, options) => rowData.trainGroup.title,
+      body: (rowData) => rowData.trainGroupTitle,
       style: { width: "20%" },
     },
     {

@@ -1,3 +1,4 @@
+import TrainGroupAttendancesPage from "./pages/train-group-attendance/TrainGroupAttendancesPage";
 import { Route, Routes } from "react-router-dom";
 import { ScrollPanel } from "primereact/scrollpanel";
 import NavTop from "./components/navbar-top/NavTop.tsx";
@@ -146,6 +147,10 @@ export default function App() {
                 />
 
                 {/* Users */}
+                <Route
+                  path="attendances"
+                  element={<TrainGroupAttendancesPage />}
+                />
                 <Route
                   path="users"
                   element={<UsersPage />}

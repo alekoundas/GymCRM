@@ -43,6 +43,12 @@ export default function NavLeft() {
         command: () => navigate("/administrator/train-groups"),
       },
       {
+        label: t("Attendances"),
+        icon: "pi pi-check-square",
+        visible: TokenService.isUserAllowed("TrainGroups_View"),
+        command: () => navigate("/administrator/attendances"),
+      },
+      {
         label: t("Workout Plans"),
         icon: "pi pi-clipboard",
         visible: TokenService.isUserAllowed("WorkoutPlansAdmin_View"),
