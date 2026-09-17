@@ -369,6 +369,26 @@ export default function UserProfileTimeslotsComponent() {
   };
 
   // Custom chip template for selected users
+  // "18:30" out of a stored wall clock that arrives stamped as utc.
+  const formatClock = (value: string | undefined): string => {
+    if (!value) return "";
+    const date = new Date(value);
+    return (
+      date.getUTCHours().toString().padStart(2, "0") +
+      ":" +
+      date.getUTCMinutes().toString().padStart(2, "0")
+    );
+  };
+
+  const isSelectedSlotJoined = (): boolean =>
+    timeSlots.some((x) =>
+      x.recurrenceDates.some(
+        (y) =>
+          y.trainGroupDateId === selectedTimeSlotRecurrenceDate.trainGroupDateId &&
+          y.isUserJoined
+      )
+    );
+
   const chipTemplate = (user: UserDto | undefined) => {
     if (user) {
       const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
@@ -542,86 +562,100 @@ export default function UserProfileTimeslotsComponent() {
         formMode={FormMode.VIEW}
         visible={isTimeSlotDialogVisible}
         control={timeSlotDialogControl}
+        // The group names the dialog, so it belongs in the title bar next to the close
+        // button rather than repeated as the first line of the body.
+        header={selectedTrainGroup?.title}
+        // Nothing in the footer: closing is what the x in the corner is for, and a
+        // Cancel next to two delete buttons only invites a misread.
+        footer={<></>}
       >
         <div>
           {selectedTrainGroup?.startOn && (
             <>
-              <div>
-                <p>
-                  <strong> {t("Start On")}:</strong>{" "}
-                  {new Date(selectedTrainGroup.startOn)
-                    .getUTCHours()
-                    .toString()
-                    .padStart(2, "0") +
-                    ":" +
-                    new Date(selectedTrainGroup.startOn)
-                      .getUTCMinutes()
-                      .toString()
-                      .padStart(2, "0")}
-                </p>
-                <p>
-                  <strong>{t("Duration")}:</strong>{" "}
-                  {new Date(selectedTrainGroup.duration)
-                    .getUTCHours()
-                    .toString()
-                    .padStart(2, "0") +
-                    ":" +
-                    new Date(selectedTrainGroup.duration)
-                      .getUTCMinutes()
-                      .toString()
-                      .padStart(2, "0")}
-                </p>
-                <p className="mb-0">
-                  <strong>{t("Group Name")}:</strong>{" "}
-                  {selectedTrainGroup.title || "N/A"}
-                </p>
-                <div className="flex p-0 m-0">
-                  <p>
-                    <strong>{t("Trainer")}:</strong>
-                  </p>
-                  {chipTemplate(selectedTrainGroup.trainer)}
+              {/* The session at a glance: what it is and how it stands across the top,
+                  the few facts underneath, and anything the trainer wrote last. */}
+              <div className="flex flex-column gap-4">
+                <div className="flex flex-wrap align-items-center gap-3">
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTimeSlotRecurrenceDate.isAttendance ? (
+                      <Tag
+                        severity="success"
+                        icon="pi pi-check"
+                        value={t("Attended")}
+                      />
+                    ) : (
+                      // Green or red, never grey: being in the group is a yes or a no,
+                      // and grey reads as neither.
+                      <Tag
+                        severity={isSelectedSlotJoined() ? "success" : "danger"}
+                        icon={isSelectedSlotJoined() ? "pi pi-check" : "pi pi-times"}
+                        value={t("Joined")}
+                      />
+                    )}
+
+                    {/* How it was booked matters for a session still to come. For one
+                        that has been and gone it is noise. */}
+                    {!selectedTimeSlotRecurrenceDate.isAttendance && (
+                      <Tag
+                        severity="info"
+                        icon={
+                          selectedTimeSlotRecurrenceDate.isOneOff
+                            ? "pi pi-calendar"
+                            : "pi pi-replay"
+                        }
+                        value={
+                          selectedTimeSlotRecurrenceDate.isOneOff
+                            ? t("One-off")
+                            : t("Recurring")
+                        }
+                      />
+                    )}
+                  </div>
                 </div>
 
-                <p className="flex align-items-center mt-0">
-                  <strong>{t("Book Type")}:</strong>
-                  {selectedTimeSlotRecurrenceDate.isOneOff ? (
-                    <Tag>{t("One-off")}</Tag>
-                  ) : (
-                    <Tag>{t("Recurring")}</Tag>
-                  )}
-                </p>
+                <div className="grid">
+                  <div className="col-6 sm:col-3">
+                    <div className="text-color-secondary text-sm mb-1">
+                      {t("Start On")}
+                    </div>
+                    <div className="text-lg font-medium">
+                      {formatClock(selectedTrainGroup.startOn)}
+                    </div>
+                  </div>
 
-                <p className="flex align-items-center ">
-                  <strong>{t("Joined")}:</strong>{" "}
-                  {timeSlots.some((x) =>
-                    x.recurrenceDates.some(
-                      (y) =>
-                        y.trainGroupDateId ===
-                          selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-                        y.isUserJoined
-                    )
-                  ) ? (
-                    <Tag severity={"success"}>Yes</Tag>
-                  ) : (
-                    <Tag severity={"secondary"}>No</Tag>
-                  )}
-                </p>
-                <p>
-                  <strong>Description:</strong>{" "}
-                  {selectedTrainGroup.description ||
-                    t("No description available.")}
-                </p>
+                  <div className="col-6 sm:col-3">
+                    <div className="text-color-secondary text-sm mb-1">
+                      {t("Duration")}
+                    </div>
+                    <div className="text-lg font-medium">
+                      {formatClock(selectedTrainGroup.duration)}
+                    </div>
+                  </div>
+
+                  <div className="col-12 sm:col-6">
+                    <div className="text-color-secondary text-sm mb-1">
+                      {t("Trainer")}
+                    </div>
+                    {/* The account may be gone; the attendance still carries the name. */}
+                    {selectedTrainGroup.trainer?.firstName ? (
+                      chipTemplate(selectedTrainGroup.trainer)
+                    ) : (
+                      <div className="text-lg font-medium">
+                        {selectedTrainGroup.trainerFullName}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {selectedTrainGroup.description && (
+                  <div className="surface-100 border-round p-3">
+                    <div className="text-color-secondary text-sm mb-1">
+                      {t("Description")}
+                    </div>
+                    <p className="m-0">{selectedTrainGroup.description}</p>
+                  </div>
+                )}
               </div>
-
-              {selectedTimeSlotRecurrenceDate.isAttendance && (
-                <div className="flex justify-content-center pt-4">
-                  <Tag
-                    severity="success"
-                    icon="pi pi-check"
-                    value={t("Attended")}
-                  />
-                </div>
-              )}
 
               {/* A cut-off only means something for a session still to come. */}
               {!selectedTimeSlotRecurrenceDate.isAttendance &&
@@ -640,8 +674,7 @@ export default function UserProfileTimeslotsComponent() {
               {/* Opt Out. A session that has already taken place is a record, not a
                   booking - there is nothing here to change. */}
               <div hidden={selectedTimeSlotRecurrenceDate.isAttendance}>
-                <div className="flex justify-content-between pt-5">
-                  <div></div>
+                <div className="flex flex-wrap justify-content-end gap-2 pt-4 mt-4 border-top-1 surface-border">
                   <Button
                     label={t("Permanent deletion")}
                     severity="danger"
@@ -806,7 +839,8 @@ export default function UserProfileTimeslotsComponent() {
         control={optOutTimeSlotDialogControl}
         onSave={onOptOut}
         formMode={FormMode.ADD}
-        header="Are you sure?"
+        header={`${t("Are you sure")}?`}
+        saveLabel={t("Yes")}
       >
         <div className="flex justify-content-center">
           <p>{t("This action will cancel your booking for this date.")}</p>
@@ -821,7 +855,8 @@ export default function UserProfileTimeslotsComponent() {
         control={optOutDateTimeSlotDialogControl}
         onSave={onOptOutDate}
         formMode={FormMode.ADD}
-        header="Are you sure?"
+        header={`${t("Are you sure")}?`}
+        saveLabel={t("Yes")}
       >
         <div className="flex justify-content-center">
           <p>
@@ -838,7 +873,8 @@ export default function UserProfileTimeslotsComponent() {
         control={optInDateTimeSlotDialogControl}
         onSave={onOptInDate}
         formMode={FormMode.ADD}
-        header="Are you sure?"
+        header={`${t("Are you sure")}?`}
+        saveLabel={t("Yes")}
       >
         <div className="flex justify-content-center">
           <p>
