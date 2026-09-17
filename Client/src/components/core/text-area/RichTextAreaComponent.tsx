@@ -2,7 +2,7 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css"; // Ensure Quill CSS is imported
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslator } from "../../../services/TranslatorService";
 
 // Define allowed tag names
@@ -49,7 +49,25 @@ export default function RichTextAreaComponent({
   const [textAreaHtmlValue, setTextAreaHtmlValue] = useState(value || "");
   const [isHtmlMode, setIsHtmlMode] = useState(false);
 
+  // The last thing typed here and handed upward. The parent usually stores it and
+  // hands the same string straight back, and that echo has to be told apart from a
+  // genuinely new value - otherwise the effect below would reset the editor on every
+  // keystroke and take the caret with it.
+  const lastEmitted = useRef<string | undefined>(undefined);
+
+  // Follow the value when it changes from outside: a record that finished loading
+  // after this mounted, or a form putting back what it had before a cancel. Without
+  // this the editor kept whatever it was given on its very first render, which on a
+  // page that loads its data afterwards means it stays empty for good.
+  useEffect(() => {
+    const incoming = value ?? "";
+    if (incoming === textAreaHtmlValue || incoming === lastEmitted.current) return;
+
+    setTextAreaHtmlValue(incoming);
+  }, [value]);
+
   const handleChange = (inputValue: string): void => {
+    lastEmitted.current = inputValue;
     setTextAreaHtmlValue(inputValue);
     if (onChange) onChange(inputValue);
   };
@@ -275,6 +293,57 @@ export default function RichTextAreaComponent({
           .quill-editor .ql-editor h6 { font-size: 1em; }
           .quill-editor .ql-editor ul, 
           .quill-editor .ql-editor ol { padding-left: 1.5em; }
+
+          /* Quill's snow theme hard-codes #444 for its icons, pickers and borders,
+             which all but disappears on a dark background. Taking the colours from the
+             theme's own variables instead means the toolbar follows whichever theme is
+             on, with nothing to detect and no second set of rules to keep in step. */
+          .quill-editor .ql-toolbar.ql-snow,
+          .quill-editor .ql-container.ql-snow { border-color: var(--surface-border); }
+
+          .quill-editor .ql-editor { color: var(--text-color); }
+          .quill-editor .ql-editor.ql-blank::before { color: var(--text-color-secondary); }
+
+          .quill-editor .ql-snow .ql-stroke,
+          .quill-editor .ql-snow .ql-stroke-miter { stroke: var(--text-color); }
+
+          .quill-editor .ql-snow .ql-fill,
+          .quill-editor .ql-snow .ql-stroke.ql-fill { fill: var(--text-color); }
+
+          .quill-editor .ql-snow .ql-picker,
+          .quill-editor .ql-snow .ql-picker-label { color: var(--text-color); }
+
+          /* What is hovered or switched on picks up the accent, as elsewhere. */
+          .quill-editor .ql-snow.ql-toolbar button:hover .ql-stroke,
+          .quill-editor .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+          .quill-editor .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke {
+            stroke: var(--primary-color);
+          }
+          .quill-editor .ql-snow.ql-toolbar button:hover .ql-fill,
+          .quill-editor .ql-snow.ql-toolbar button.ql-active .ql-fill {
+            fill: var(--primary-color);
+          }
+          .quill-editor .ql-snow .ql-picker-label:hover,
+          .quill-editor .ql-snow .ql-picker-item:hover,
+          .quill-editor .ql-snow .ql-picker-item.ql-selected { color: var(--primary-color); }
+
+          /* The panels that drop out of the pickers, and the link popup. */
+          .quill-editor .ql-snow .ql-picker-options,
+          .quill-editor .ql-snow .ql-tooltip {
+            background-color: var(--surface-overlay);
+            border-color: var(--surface-border);
+            color: var(--text-color);
+            box-shadow: none;
+          }
+          .quill-editor .ql-snow .ql-picker.ql-expanded .ql-picker-label {
+            border-color: var(--surface-border);
+            color: var(--text-color);
+          }
+          .quill-editor .ql-snow .ql-tooltip input[type=text] {
+            background-color: var(--surface-ground);
+            border-color: var(--surface-border);
+            color: var(--text-color);
+          }
         `}
       </style>
 
