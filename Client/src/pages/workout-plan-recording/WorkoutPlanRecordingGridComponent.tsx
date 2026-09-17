@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ColumnFilterElementTemplateOptions } from "primereact/column";
 import { Tag } from "primereact/tag";
@@ -85,6 +85,16 @@ export default function WorkoutPlanRecordingGridComponent({
       { fieldName: "weekNumber", filterType: "equals" as const },
     ];
 
+    // A column is only filterable if it is declared here: the datatable builds its
+    // filter metadata from this list, so one marked filter={true} without an entry
+    // renders a box that collects a value nothing ever reads. Shown only when the
+    // column itself is, which is when the grid is not already scoped to one plan.
+    if (workoutPlanId === undefined)
+      filters.push({
+        fieldName: "workoutPlanTitle",
+        filterType: "contains" as const,
+      } as never);
+
     // Scoped to one plan when opened from the plan page. The server also forces a
     // member to their own rows, so this is a view filter, not the security boundary.
     if (workoutPlanId !== undefined)
@@ -113,6 +123,28 @@ export default function WorkoutPlanRecordingGridComponent({
       dataTableSorts: [{ field: "startedOn", order: -1 }],
     };
   });
+
+  // A recording still running has no duration yet, so the grid carries on from the
+  // elapsed time the server sent with the row. The clock is read each tick rather than
+  // a counter incremented, so a tab that was asleep comes back showing the right time
+  // instead of however many ticks it managed.
+  const [now, setNow] = useState<number>(Date.now());
+  const rowsArrivedAtRef = useRef<number>(Date.now());
+
+  useEffect(() => {
+    rowsArrivedAtRef.current = Date.now();
+    setNow(Date.now());
+
+    // Nothing running, nothing to tick for.
+    if (!datatableDto.data?.some((x) => x.isRunning)) return;
+
+    const interval = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, [datatableDto.data]);
+
+  const runningSeconds = (rowData: WorkoutPlanRecordingDto): number =>
+    (rowData.elapsedSeconds ?? 0) +
+    Math.floor((now - rowsArrivedAtRef.current) / 1000);
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
     const result: ButtonTypeEnum[] = [];
@@ -229,13 +261,19 @@ export default function WorkoutPlanRecordingGridComponent({
       filter: false,
       filterPlaceholder: "",
       style: { width: "12%" },
-      // Deliberately blank for a recording that was never stopped - there is no
-      // duration to show and inventing one would corrupt the numbers.
-      body: (rowData: WorkoutPlanRecordingDto) => (
-        <span className="font-semibold">
-          {formatDuration(rowData.durationSeconds)}
-        </span>
-      ),
+      // One still running shows how long it has been going. One that was never
+      // stopped stays blank: there is no duration to show and inventing one would
+      // corrupt the numbers.
+      body: (rowData: WorkoutPlanRecordingDto) =>
+        rowData.isRunning ? (
+          <span className="font-semibold text-primary">
+            {formatDuration(runningSeconds(rowData))}
+          </span>
+        ) : (
+          <span className="font-semibold">
+            {formatDuration(rowData.durationSeconds)}
+          </span>
+        ),
     },
     {
       field: "isRunning",
