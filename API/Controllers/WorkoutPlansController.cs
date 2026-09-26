@@ -24,6 +24,8 @@ namespace API.Controllers
 
         private const string LastRecordingOnField = "lastRecordingOn";
         private const string IsRunningField = "isRunning";
+        // A filter only, never a column, so it cannot clash with sorting on IsInactive.
+        private const string ActiveOnlyField = "activeOnly";
 
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
@@ -167,6 +169,14 @@ namespace API.Controllers
                 query = query.Where(x => !x.IsInactive);
             }
 
+            // The member page asks for active plans only. Staff open it too, and without
+            // this they would still see plans they had just deactivated there.
+            DataTableFilterDto? activeOnlyFilter = dataTable.Filters
+                .FirstOrDefault(x => string.Equals(x.FieldName, ActiveOnlyField, StringComparison.OrdinalIgnoreCase));
+
+            if (activeOnlyFilter?.Value != null && bool.TryParse(activeOnlyFilter.Value, out bool activeOnly) && activeOnly)
+                query = query.Where(x => !x.IsInactive);
+
             // "Is a recording live for this plan" is an EXISTS over the children, so the
             // reflection-based helpers in GetDataTable cannot express it. Same for the
             // "last used" sort, which is a MAX. Both are claimed below so the generic
@@ -201,7 +211,8 @@ namespace API.Controllers
             return new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 LastRecordingOnField,
-                IsRunningField
+                IsRunningField,
+                ActiveOnlyField
             };
         }
 

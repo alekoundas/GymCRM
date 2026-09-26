@@ -143,34 +143,7 @@ export default function TrainGroupDateParticipantGridComponent({
   };
 
   const dataTableColumns: DataTableColumns<TrainGroupParticipantDto>[] = [
-    {
-      field: "selectedDate",
-      header: t("Selected Date"),
-      sortable: false,
-      filter: false,
-      filterPlaceholder: t("Search"),
-      style: { width: "30%" },
-      body: (rowData: TrainGroupParticipantDto) => {
-        if (rowData.selectedDate) {
-          const date = new Date(rowData.selectedDate);
-          return (
-            date.getDate() +
-            "/" +
-            (date.getMonth() + 1) +
-            "/" +
-            date.getFullYear()
-          );
-        }
-      },
-    },
-    {
-      field: "trainGroupDateId",
-      header: "TrainGroupDateId",
-      sortable: false,
-      filter: false,
-      filterPlaceholder: t("Search"),
-      style: { width: "10%" },
-    },
+   
     {
       field: "userId",
       header: t("Participant"),
@@ -185,7 +158,7 @@ export default function TrainGroupDateParticipantGridComponent({
         />
       ),
       body: (rowData, options) => chipTemplate(rowData.user),
-      style: { width: "10%" },
+      style: { width: "90%" },
     },
   ];
 

@@ -26,6 +26,10 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
+        // The page shrinks a profile picture to a few tens of KB before sending it; this
+        // is the ceiling for anything that arrives some other way.
+        private const int MaxProfileImageBytes = 1024 * 1024;
+
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly ILogger<UsersController> _logger;
@@ -89,6 +93,14 @@ namespace API.Controllers
             User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == new Guid(request.Id));
             if (user == null)
                 return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
+
+            // A new picture has to be a real JPG, PNG or WebP of reasonable size. Only a
+            // changed one is checked, so an older large picture does not block saving
+            // the rest of the profile.
+            bool isNewImage = !(request.ProfileImage ?? Array.Empty<byte>()).AsSpan()
+                .SequenceEqual(user.ProfileImage ?? Array.Empty<byte>());
+            if (isNewImage && !ImageValidator.IsAllowed(request.ProfileImage, MaxProfileImageBytes))
+                return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys.Image_must_be_a_JPG_PNG_or_WebP_of_up_to_0_MB, MaxProfileImageBytes / (1024 * 1024)]);
 
             string? roleName = request.UserRoles[0].Role.Name;
             bool roleExists = await _dataService.Roles.AnyAsync(x => x.Name == roleName);

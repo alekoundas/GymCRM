@@ -81,9 +81,14 @@ export default function WorkoutPlansPage() {
           filterType: "in" as const,
         };
 
+    // The member page lists active plans only, for staff opening it as well.
+    const activeOnlyFilters = isAdminPage
+      ? []
+      : [{ fieldName: "activeOnly", value: "true", filterType: "equals" as const }];
+
     return {
       ...new DataTableDto(),
-      filters: [...baseFilters, userIdFilter],
+      filters: [...baseFilters, userIdFilter, ...activeOnlyFilters],
       // Plans are never retired, so a member can hold dozens. Most recently trained
       // first beats most recently written by the trainer. sorts is what the server
       // orders by; dataTableSorts only draws the arrow.
@@ -403,7 +408,7 @@ export default function WorkoutPlansPage() {
           isUrlStateEnabled
           // A member's own id is forced by the page and re-forced by the server,
           // so it is noise in a link rather than something worth remembering.
-          urlStateExcludedFields={isAdminPage ? [] : ["userId"]}
+          urlStateExcludedFields={isAdminPage ? [] : ["userId", "activeOnly"]}
           dataTableDto={datatableDto}
           setDataTableDto={setDatatableDto}
           formMode={FormMode.EDIT}

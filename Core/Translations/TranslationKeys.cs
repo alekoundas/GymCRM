@@ -88,6 +88,7 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string Workout_plan_activated = "Workout_plan_activated";
         public const string Questionnaire_saved = "Questionnaire_saved";
         public const string Answers_saved = "Answers_saved";
+        public const string Image_must_be_a_JPG_PNG_or_WebP_of_up_to_0_MB = "Image_must_be_a_JPG_PNG_or_WebP_of_up_to_0_MB";
         public const string Calendar_Integration = "Calendar_Integration";
         public const string Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar = "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar";
         public const string Add_to_Calendar = "Add_to_Calendar";

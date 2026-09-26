@@ -7,6 +7,7 @@ import RichTextAreaComponent from "../../components/core/text-area/RichTextAreaC
 import { QuestionnaireQuestionDto } from "../../model/entities/questionnaire/QuestionnaireDto";
 import { useToast } from "../../contexts/ToastContext";
 import { useTranslator } from "../../services/TranslatorService";
+import { ALLOWED_IMAGE_ACCEPT, isAllowedImageType } from "../../services/ImageService";
 
 interface IField extends DialogChildProps {
   question: QuestionnaireQuestionDto;
@@ -26,6 +27,11 @@ export default function QuestionnaireQuestionFormComponent({ question, update }:
     const file = event.files[0];
     fileUploadRef.current?.clear();
     if (!file) return;
+
+    if (!isAllowedImageType(file)) {
+      showError(t("Please choose a JPG, PNG or WebP image"));
+      return;
+    }
 
     if (file.size > MAX_IMAGE_BYTES) {
       showError(t("The image is too large. Please use one under 3 MB"));
@@ -90,7 +96,7 @@ export default function QuestionnaireQuestionFormComponent({ question, update }:
           <FileUpload
             ref={fileUploadRef}
             mode="basic"
-            accept="image/*"
+            accept={ALLOWED_IMAGE_ACCEPT}
             customUpload
             auto
             chooseLabel={t("Upload image")}

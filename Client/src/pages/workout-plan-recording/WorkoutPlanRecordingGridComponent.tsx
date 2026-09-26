@@ -120,31 +120,11 @@ export default function WorkoutPlanRecordingGridComponent({
     return {
       ...new DataTableDto(),
       filters,
+      // sorts is what the server orders by; dataTableSorts only draws the arrow.
+      sorts: [{ fieldName: "startedOn", order: -1 }],
       dataTableSorts: [{ field: "startedOn", order: -1 }],
     };
   });
-
-  // A recording still running has no duration yet, so the grid carries on from the
-  // elapsed time the server sent with the row. The clock is read each tick rather than
-  // a counter incremented, so a tab that was asleep comes back showing the right time
-  // instead of however many ticks it managed.
-  const [now, setNow] = useState<number>(Date.now());
-  const rowsArrivedAtRef = useRef<number>(Date.now());
-
-  useEffect(() => {
-    rowsArrivedAtRef.current = Date.now();
-    setNow(Date.now());
-
-    // Nothing running, nothing to tick for.
-    if (!datatableDto.data?.some((x) => x.isRunning)) return;
-
-    const interval = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(interval);
-  }, [datatableDto.data]);
-
-  const runningSeconds = (rowData: WorkoutPlanRecordingDto): number =>
-    (rowData.elapsedSeconds ?? 0) +
-    Math.floor((now - rowsArrivedAtRef.current) / 1000);
 
   const availableGridRowButtons: () => ButtonTypeEnum[] = () => {
     const result: ButtonTypeEnum[] = [];
@@ -267,7 +247,7 @@ export default function WorkoutPlanRecordingGridComponent({
       body: (rowData: WorkoutPlanRecordingDto) =>
         rowData.isRunning ? (
           <span className="font-semibold text-primary">
-            {formatDuration(runningSeconds(rowData))}
+            <RunningDurationComponent elapsedSeconds={rowData.elapsedSeconds ?? 0} />
           </span>
         ) : (
           <span className="font-semibold">
@@ -332,4 +312,27 @@ export default function WorkoutPlanRecordingGridComponent({
       </GenericDialogComponent>
     </>
   );
+}
+
+// A recording still running has no duration yet, so it carries on from the elapsed
+// time the server sent with the row. It ticks by itself: the grid only re-draws a cell
+// when that row's data changes, so a clock kept in the page never reached it and the
+// time sat still at whatever it was when the grid loaded. The clock is read each tick
+// rather than a counter incremented, so a tab that was asleep comes back right.
+function RunningDurationComponent({ elapsedSeconds }: { elapsedSeconds: number }) {
+  const [arrivedAt, setArrivedAt] = useState<number>(Date.now());
+  const [now, setNow] = useState<number>(Date.now());
+
+  // A reload brings a fresh elapsed time; count on from that.
+  useEffect(() => {
+    setArrivedAt(Date.now());
+    setNow(Date.now());
+  }, [elapsedSeconds]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  return <>{formatDuration(elapsedSeconds + Math.floor((now - arrivedAt) / 1000))}</>;
 }

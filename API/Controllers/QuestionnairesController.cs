@@ -2,6 +2,7 @@ using Business.Services;
 using Core.Dtos;
 using Core.Dtos.Questionnaire;
 using Core.Models;
+using Core.System;
 using Core.Translations;
 using DataAccess;
 using Microsoft.AspNetCore.Authorization;
@@ -18,6 +19,7 @@ namespace API.Controllers
     public class QuestionnairesController : ControllerBase
     {
         private const int MaxAnswerLength = 2000;
+        private const int MaxImageBytes = 3 * 1024 * 1024;
 
         private readonly IDataService _dataService;
         private readonly IStringLocalizer _localizer;
@@ -72,6 +74,9 @@ namespace API.Controllers
             if (string.IsNullOrWhiteSpace(dto.Title))
                 return TitleRequired();
 
+            if (!ImageValidator.IsAllowed(dto.Image, MaxImageBytes))
+                return ImageNotAllowed();
+
             using ApiDbContext context = _dataService.GetDbContext();
             Questionnaire questionnaire = await GetOrCreateAsync(context);
 
@@ -104,6 +109,9 @@ namespace API.Controllers
             QuestionnaireQuestion? question = questionnaire.Questions.FirstOrDefault(x => x.Id == id);
             if (question == null)
                 return NotFoundResponse();
+
+            if (dto.Image != question.Image && !ImageValidator.IsAllowed(dto.Image, MaxImageBytes))
+                return ImageNotAllowed();
 
             Copy(dto, question);
             await context.SaveChangesAsync();
@@ -317,6 +325,10 @@ namespace API.Controllers
 
         private ActionResult NotFoundResponse() =>
             BadRequest(new ApiResponse<QuestionnaireDto>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(QuestionnaireQuestion)]));
+
+        private ActionResult ImageNotAllowed() =>
+            BadRequest(new ApiResponse<QuestionnaireDto>().SetErrorResponse(
+                _localizer[TranslationKeys.Image_must_be_a_JPG_PNG_or_WebP_of_up_to_0_MB, MaxImageBytes / (1024 * 1024)]));
 
         private ActionResult TitleRequired() =>
             BadRequest(new ApiResponse<QuestionnaireDto>().SetErrorResponse(_localizer[TranslationKeys._0_is_required, "Title"]));
