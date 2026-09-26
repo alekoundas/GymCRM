@@ -1,10 +1,9 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Business.Repository;
 using Business.Services;
 using Business.Services.Email;
 using Core.Dtos;
 using Core.Dtos.DataTable;
-using Core.Dtos.TrainGroup;
 using Core.Enums;
 using Core.Models;
 using Core.Translations;
@@ -13,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using System.Globalization;
 
 namespace API.Controllers
 {
@@ -44,450 +44,462 @@ namespace API.Controllers
         }
 
 
-        // POST: api/controller
-        [HttpPost("CustomDelete")]
-        public virtual async Task<ActionResult<ApiResponse<TrainGroupParticipant>>> CustomDelete([FromBody] List<TrainGroupParticipantDeleteDto> entityDtos)
+        // POST: api/TrainGroupParticipants/Book
+        // Adding only. Each ticked option becomes a row of its own, and all of them go in
+        // or none do. Returns the dates a recurring booking could not have because they
+        // were already full - those are saved as skipped dates the member can rejoin
+        // from the profile calendar if a place opens.
+        [HttpPost("Book")]
+        public async Task<ActionResult<ApiResponse<List<DateTime>>>> Book([FromBody] TrainGroupParticipantBookDto dto)
         {
-            TrainGroupParticipantDeleteDto? entityDto = entityDtos.FirstOrDefault();
-            if (!IsUserAuthorized("Delete"))
-                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+            Guid? callerId = GetCallerId();
+            if (callerId == null)
+                return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]));
 
-            string className = typeof(TrainGroupParticipant).Name;
-            TrainGroupParticipant? entity = await _dataService.TrainGroupParticipants
-                .Include(x => x.TrainGroupDate.TrainGroup)
-                .Include(x => x.TrainGroup)
-                .FilterByColumnEquals("Id", entityDto?.Id)
-                .FirstOrDefaultAsync();
-
-            if (entity == null || entityDto == null)
-                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, className]);
-
-            if (!entityDto.IsAdminPage)
-                if (ValidateDELETE(entityDto, entity, out string[] errors))
-                    return BadRequest(new ApiResponse<TrainGroupParticipant>().SetErrorResponse(errors));
-
-            entity = await _dataService.TrainGroupParticipants.FindAsync(entityDto?.Id); // call here to track object
-            if (entity == null || entityDto == null)
-                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, className]);
-
-            int result = await _dataService.GetGenericRepository<TrainGroupParticipant>().RemoveAsync(entity);
-            if (result != 1)
-                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.An_error_occurred_while_deleting_the_entity]);
-
-            return new ApiResponse<TrainGroupParticipant>().SetSuccessResponse(entity, _localizer[TranslationKeys._0_deleted_successfully, className]);
-        }
-
-
-        protected virtual bool ValidateDELETE(TrainGroupParticipantDeleteDto entityDto, TrainGroupParticipant entity, out string[] errors)
-        {
-            errors = Array.Empty<string>();
-            DateTime slotStartUtc;
-            int offsetMin = entityDto.ClientTimezoneOffsetMinutes; // From client: new Date().getTimezoneOffset()
-            double offsetH = -(offsetMin / 60.0);
-            DateTime nowUtc = DateTime.UtcNow;
-
-            if (entity.SelectedDate.HasValue)
+            Guid userId = callerId.Value;
+            if (!string.IsNullOrWhiteSpace(dto.UserId))
             {
-                // One-off: Use stored full UTC datetime (assumes time is set as in frontend)
-                slotStartUtc = entity.SelectedDate.Value;
-                slotStartUtc = slotStartUtc.AddHours(entity.TrainGroup.StartOn.Hour);
-                slotStartUtc = slotStartUtc.AddMinutes(entity.TrainGroup.StartOn.Minute);
-            }
-            else
-            {
-                // Recurring: Compute next upcoming occurrence with local time overlaid
-                slotStartUtc = CalculateNextOccurrenceDateTime(entity.TrainGroupDate, nowUtc);
+                if (!Guid.TryParse(dto.UserId, out Guid requestedId))
+                    return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]));
+
+                if (requestedId != callerId.Value && !IsStaff())
+                    return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]));
+
+                userId = requestedId;
             }
 
-            if (slotStartUtc > nowUtc.AddHours(offsetH) && slotStartUtc <= nowUtc.AddHours(offsetH).AddHours(12))
-            {
-                errors = [_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]];
-                return true;
-            }
+            if (!dto.IsOneOff && dto.RecurringTrainGroupDateIds.Count == 0)
+                return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.Select_at_least_one_date_to_book]));
 
-            return false;
-        }
+            DateTime day = dto.SelectedDate.Date;
+            DateTime clientNow = BookingRules.ClientNow(dto.ClientTimezoneOffsetMinutes);
 
+            using ApiDbContext context = _dataService.GetDbContext();
 
-        // Handle Booking. 
-        // PUT: api/controller/5
-        [HttpPost("UpdateParticipants")]
-        public async Task<ActionResult<ApiResponse<List<TrainGroupParticipantUnavailableDate>>>> UpdateParticipants([FromBody] TrainGroupParticipantUpdateDto updateDto)
-        {
-
-            ApiDbContext dbContext = _dataService.GetDbContext();
-            List<TrainGroupParticipant> emailDatesAdd = new List<TrainGroupParticipant>();
-            List<TrainGroupParticipant> emailDatesRemove = new List<TrainGroupParticipant>();
-
-            // Load existing entity with related data
-            TrainGroup? existingEntity = await dbContext.Set<TrainGroup>()
-                .Include(x => x.TrainGroupParticipants)
+            TrainGroup? trainGroup = await context.TrainGroups
                 .Include(x => x.TrainGroupDates)
-                .ThenInclude(x => x.TrainGroupParticipants)
+                .Include(x => x.TrainGroupUnavailableDates)
+                .Include(x => x.TrainGroupParticipants)
                 .ThenInclude(x => x.TrainGroupParticipantUnavailableDates)
-                .Where(x => x.Id == updateDto.TrainGroupId)
-                .FirstOrDefaultAsync();
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(x => x.Id == dto.TrainGroupId);
 
-            if (existingEntity == null)
+            if (trainGroup == null)
+                return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, nameof(TrainGroup)]));
+
+            // The group date that runs on the day the member picked.
+            TrainGroupDate? sessionDate =
+                trainGroup.TrainGroupDates.FirstOrDefault(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY && BookingRules.OccursOn(x, day))
+                ?? trainGroup.TrainGroupDates.FirstOrDefault(x => x.TrainGroupDateType != TrainGroupDateTypeEnum.FIXED_DAY && BookingRules.OccursOn(x, day));
+
+            if (sessionDate == null)
+                return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.Participant_selected_date_doesnt_match_any_of_the_train_group_dates]));
+
+            if (BookingRules.SessionStart(trainGroup, day) <= clientNow)
+                return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.This_session_has_already_started]));
+
+            List<TrainGroupDate> recurringDates = new List<TrainGroupDate>();
+            foreach (int trainGroupDateId in dto.RecurringTrainGroupDateIds.Distinct())
             {
-                string className = typeof(TrainGroup).Name;
-                dbContext.Dispose();
-                return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, className]);
+                TrainGroupDate? trainGroupDate = trainGroup.TrainGroupDates
+                    .FirstOrDefault(x => x.Id == trainGroupDateId && x.TrainGroupDateType != TrainGroupDateTypeEnum.FIXED_DAY);
+
+                if (trainGroupDate == null)
+                    return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]));
+
+                recurringDates.Add(trainGroupDate);
             }
 
+            // The recurring booking already covers the picked day.
+            if (dto.IsOneOff && recurringDates.Any(x => x.Id == sessionDate.Id))
+                return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.Current_date_is_already_selected_in_a_Recurrence_date]));
 
-            // Validate user selection.
-            // Cant have curent date selected with a recurring date be the same date.
-            bool isCurrentDateWithConflict = updateDto.TrainGroupParticipantDtos
-                .Where(x => x.SelectedDate != null)
-                .Any(x => updateDto.TrainGroupParticipantDtos
-                    .Where(y => y.SelectedDate == null)
-                    .Any(y => existingEntity.TrainGroupDates
-                        .Where(z => z.Id == y.TrainGroupDateId)
-                        .Any(z => z.RecurrenceDayOfMonth == x.SelectedDate?.Day || z.RecurrenceDayOfWeek == x.SelectedDate?.DayOfWeek)
-                    )
-                );
+            string callerName = await GetCallerFullNameAsync(context);
+            List<TrainGroupParticipant> members = trainGroup.TrainGroupParticipants.ToList();
+            List<TrainGroupParticipant> mine = members.Where(x => x.UserId == userId).ToList();
 
-            if (isCurrentDateWithConflict)
+            // Everything the member holds in other groups, for the same-hour clash check.
+            List<TrainGroupParticipant> elsewhere = await context.TrainGroupParticipants
+                .Include(x => x.TrainGroup)
+                .Include(x => x.TrainGroupDate)
+                .Include(x => x.TrainGroupParticipantUnavailableDates)
+                .Where(x => x.UserId == userId && x.TrainGroupId != trainGroup.Id)
+                .AsSplitQuery()
+                .ToListAsync();
+
+            TimeSpan startTime = trainGroup.StartOn.TimeOfDay;
+            bool ClashesOn(DateTime date) => elsewhere.Any(x => x.TrainGroup.StartOn.TimeOfDay == startTime && BookingRules.HoldsPlace(x, date));
+
+            List<TrainGroupParticipant> added = new List<TrainGroupParticipant>();
+            List<TrainGroupParticipant> absorbed = new List<TrainGroupParticipant>();
+            List<DateTime> fullDates = new List<DateTime>();
+
+            if (dto.IsOneOff)
             {
-                dbContext.Dispose();
-                return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse(_localizer[TranslationKeys.Current_date_is_already_selected_in_a_Recurrence_date]);
+                if (trainGroup.TrainGroupUnavailableDates.Any(x => x.UnavailableDate.Date == day))
+                    return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.This_session_has_been_cancelled_by_the_gym]));
+
+                if (mine.Any(x => BookingRules.IsBooked(x, day)))
+                    return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.Participant_already_joined]));
+
+                // A single session is refused outright when it is full. Only a recurring
+                // booking goes ahead around the full dates.
+                if (members.Count(x => BookingRules.HoldsPlace(x, day)) >= trainGroup.MaxParticipants)
+                    return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.Maximum_amount_of_participants_has_been_reached]));
+
+                if (ClashesOn(day))
+                    return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group]));
+
+                // A fixed-day group is booked through its date, with no selected date of its own.
+                bool isFixedDay = sessionDate.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY;
+                added.Add(new TrainGroupParticipant()
+                {
+                    SelectedDate = isFixedDay ? null : DateTime.SpecifyKind(day, DateTimeKind.Utc),
+                    TrainGroupDateId = sessionDate.Id,
+                    TrainGroupDate = sessionDate,
+                    TrainGroupId = trainGroup.Id,
+                    TrainGroup = trainGroup,
+                    UserId = userId,
+                    CreatedBy_Id = callerId.Value.ToString(),
+                    CreatedBy_FullName = callerName
+                });
             }
 
-
-
-            // If selected date doesnt match with traingroupdate date
-            bool isCurrentDateInvalid = !updateDto.TrainGroupParticipantDtos
-                .Where(x => x.SelectedDate != null)
-                .All(x => existingEntity.TrainGroupDates
-                    .Where(y => y.Id == x.TrainGroupDateId)
-                    .All(y => y.RecurrenceDayOfMonth == x.SelectedDate?.Day || y.RecurrenceDayOfWeek == x.SelectedDate?.DayOfWeek)
-                );
-            if (isCurrentDateInvalid)
+            foreach (TrainGroupDate trainGroupDate in recurringDates)
             {
-                dbContext.Dispose();
-                return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse("Something went wrong. Please refresh the page.");
-            }
+                DateTime? firstDay = BookingRules.NextOccurrence(trainGroupDate, day);
+                if (firstDay == null)
+                    return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]));
 
+                DateTime start = firstDay.Value;
 
+                // One recurring booking per day of a group at a time. An old one that has
+                // ended stays, and a new one may start once it has.
+                bool overlaps = mine.Any(x =>
+                    x.SelectedDate == null
+                    && x.TrainGroupDateId == trainGroupDate.Id
+                    && (x.RecurringEndOnDate == null || x.RecurringEndOnDate.Value.Date > start));
 
-            List<TrainGroupParticipant> incomingParticipants = _mapper.Map<List<TrainGroupParticipant>>(updateDto.TrainGroupParticipantDtos);
-            List<TrainGroupParticipant> existingParticipants = existingEntity
-                .TrainGroupParticipants
-                .Where(x => x.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY ? x.TrainGroupDate.FixedDay == updateDto.SelectedDate : true)
-                .ToList();
+                if (overlaps)
+                    return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.Participant_already_joined]));
 
-
-
-            // If selected date exists, assign TrainGroupDateId.
-            foreach (TrainGroupParticipant incomingParticipant in incomingParticipants)
-                if (incomingParticipant.SelectedDate.HasValue && incomingParticipant.TrainGroupDateId == -1)
+                // The member's own one-offs on this day of the group from here on are now
+                // covered by the recurring booking, so they are cancelled rather than left
+                // to hold a second place on the same date.
+                foreach (TrainGroupParticipant oneOff in mine.Where(x =>
+                    x.SelectedDate != null
+                    && x.RemovedOn == null
+                    && x.TrainGroupDateId == trainGroupDate.Id
+                    && x.SelectedDate.Value.Date >= start))
                 {
-                    List<TrainGroupDate> selectedTrainGroupDate = existingEntity
-                            .TrainGroupDates
-                            .Where(x =>
-                                x.FixedDay == updateDto.SelectedDate ||
-                                x.RecurrenceDayOfMonth == updateDto.SelectedDate.Day ||
-                                x.RecurrenceDayOfWeek == updateDto.SelectedDate.DayOfWeek)
-                            .ToList();
+                    MarkRemoved(oneOff, callerName);
+                    absorbed.Add(oneOff);
+                }
 
-                    if (selectedTrainGroupDate.Count() == 1)
-                        incomingParticipant.TrainGroupDateId = selectedTrainGroupDate.First().Id;
-                    else
+                TrainGroupParticipant booking = new TrainGroupParticipant()
+                {
+                    SelectedDate = null,
+                    RecurringStartOnDate = DateTime.SpecifyKind(start, DateTimeKind.Utc),
+                    TrainGroupDateId = trainGroupDate.Id,
+                    TrainGroupDate = trainGroupDate,
+                    TrainGroupId = trainGroup.Id,
+                    TrainGroup = trainGroup,
+                    UserId = userId,
+                    CreatedBy_Id = callerId.Value.ToString(),
+                    CreatedBy_FullName = callerName
+                };
+
+                // Every change to how full this day of the group is happens on a date we
+                // know - somebody's one-off, start, end or skip. After the last of them the
+                // count stays the same for good, so the dates up to there, plus one past it,
+                // are all that need looking at.
+                DateTime lastChange = LastChangeOnOrAfter(members, start);
+                DateTime lastClashChange = LastChangeOnOrAfter(elsewhere, start);
+                DateTime horizon = lastChange > lastClashChange ? lastChange : lastClashChange;
+
+                DateTime? occurrence = start;
+                for (int i = 0; i < 1000 && occurrence != null; i++)
+                {
+                    DateTime date = occurrence.Value;
+                    bool isPastLastChange = date > horizon;
+
+                    if (ClashesOn(date))
+                        return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group]));
+
+                    bool isFull = members.Count(x => BookingRules.HoldsPlace(x, date)) >= trainGroup.MaxParticipants;
+                    bool isCancelledByGym = trainGroup.TrainGroupUnavailableDates.Any(x => x.UnavailableDate.Date == date);
+
+                    // Full from here to forever: a booking that would be skipped on every
+                    // date is no booking.
+                    if (isFull && isPastLastChange)
+                        return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.This_session_is_full_on_every_upcoming_date]));
+
+                    if (isFull && !isCancelledByGym)
                     {
-                        dbContext.Dispose();
-                        return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse($"Something unexpected happend! Please contact Administrator.");
-                    }
-                }
-
-
-            // Handle Deletions and Unchanged participants.
-            var customerParticipants = existingParticipants
-                .Where(x => x.UserId == new Guid(updateDto.UserId))
-                .ToList(); // Create a copy to avoid modifying collection during iteration
-
-            foreach (TrainGroupParticipant existingParticipant in customerParticipants.ToList())
-            {
-                TrainGroupParticipant? incomingParticipant = incomingParticipants
-                    .FirstOrDefault(x =>
-                        x.TrainGroupDateId == existingParticipant.TrainGroupDateId &&
-                        x.SelectedDate == existingParticipant.SelectedDate);
-
-                // Remove unchanged incoming Participants
-                if (incomingParticipant != null)
-                    incomingParticipants.Remove(incomingParticipant);
-
-                // Remove deleted existing Participants except if selected date is not existant in reccuring date.
-                else if (existingParticipant.SelectedDate != null && existingParticipant.SelectedDate.Value != updateDto.SelectedDate)
-                {
-                    List<TrainGroupParticipant> tempIncomingParticipants = _mapper.Map<List<TrainGroupParticipant>>(updateDto.TrainGroupParticipantDtos);
-
-                    bool hasAddedReccuringDate = tempIncomingParticipants
-                        .Where(x => x.TrainGroupDateId == existingParticipant.TrainGroupDateId)
-                        .Any(x => x.SelectedDate == null);
-
-                    var incomingDateIds = _mapper.Map<List<TrainGroupParticipant>>(updateDto.TrainGroupParticipantDtos).Select(y => y.TrainGroupDateId).ToList();
-
-                    bool hasReccuringDayOfWeek = existingEntity.TrainGroupDates
-                        .Where(x => incomingDateIds.Contains(x.Id))
-                        .Where(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
-                        .Where(x => x.RecurrenceDayOfWeek == existingParticipant.SelectedDate.Value.DayOfWeek)
-                        .Any(x => x.TrainGroupParticipants.Any(y => y.UserId.ToString() == updateDto.UserId && y.SelectedDate == null));
-
-                    bool hasReccuringDayOfMonth = existingEntity.TrainGroupDates
-                        .Where(x => incomingDateIds.Contains(x.Id))
-                        .Where(x => x.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH)
-                        .Where(x => x.RecurrenceDayOfMonth == existingParticipant.SelectedDate.Value.Day)
-                        .Any(x => x.TrainGroupParticipants.Any(y => y.UserId.ToString() == updateDto.UserId && y.SelectedDate == null));
-
-                    if (hasReccuringDayOfWeek || hasReccuringDayOfMonth || hasAddedReccuringDate)
-                    {
-                        existingParticipants.Remove(existingParticipant);
-                        dbContext.Remove(existingParticipant);
-                        emailDatesRemove.Add(existingParticipant);
-                    }
-                }
-                // Remove deleted existing Participants
-                else
-                {
-                    existingParticipants.Remove(existingParticipant);
-                    dbContext.Remove(existingParticipant);
-                    emailDatesRemove.Add(existingParticipant);
-                }
-            }
-
-            // 12-HOUR REMOVAL VALIDATION
-            // Check each removal before processing
-            var tempParticipants = customerParticipants.Where(x => x.SelectedDate == null ? true : x.SelectedDate == updateDto.SelectedDate).ToList();
-            foreach (TrainGroupParticipant existingParticipant in tempParticipants) // ToList() to copy for safety
-            {
-                TrainGroupParticipant? incomingParticipant = _mapper.Map<List<TrainGroupParticipant>>(updateDto.TrainGroupParticipantDtos)
-                   .FirstOrDefault(x =>
-                       x.TrainGroupDateId == existingParticipant.TrainGroupDateId &&
-                       x.SelectedDate == existingParticipant.SelectedDate);
-
-                if (incomingParticipant == null)
-                {
-                    DateTime slotStartUtc;
-                    int offsetMin = updateDto.ClientTimezoneOffsetMinutes; // From client: new Date().getTimezoneOffset()
-                    double offsetH = -(offsetMin / 60.0);
-                    DateTime nowUtc = DateTime.UtcNow;
-
-                    if (existingParticipant.SelectedDate.HasValue)
-                    {
-                        // One-off: Use stored full UTC datetime (assumes time is set as in frontend)
-                        slotStartUtc = existingParticipant.SelectedDate.Value;
-                        slotStartUtc = slotStartUtc.AddHours(existingParticipant.TrainGroup.StartOn.Hour);
-                        slotStartUtc = slotStartUtc.AddMinutes(existingParticipant.TrainGroup.StartOn.Minute);
-                    }
-                    else
-                    {
-                        // Recurring: Compute next upcoming occurrence with local time overlaid
-                        slotStartUtc = CalculateNextOccurrenceDateTime(existingParticipant.TrainGroupDate, nowUtc);
-                    }
-
-                    if (slotStartUtc > nowUtc.AddHours(offsetH) && slotStartUtc <= nowUtc.AddHours(offsetH).AddHours(12))
-                    {
-                        dbContext.Dispose();
-                        return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse(_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]); // Add key to TranslationKeys
-                    }
-                }
-            }
-
-
-            // Validate max participants
-            foreach (TrainGroupParticipant incomingParticipant in incomingParticipants)
-            {
-                int numberOfParticipants = 0;
-                numberOfParticipants = existingParticipants
-                    .Where(x => x.TrainGroupDateId == incomingParticipant.TrainGroupDateId)
-                    .Where(x => x.SelectedDate == null || x.SelectedDate == updateDto.SelectedDate)
-                    .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y => y.UnavailableDate == updateDto.SelectedDate))
-                    .Count();
-
-                if (numberOfParticipants >= existingEntity.MaxParticipants)
-                {
-                    dbContext.Dispose();
-                    return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse(_localizer[TranslationKeys.Maximum_amount_of_participants_has_been_reached]);
-                }
-            }
-
-            // VALIDATE FOR SCHEDULING CONFLICTS: Same hour and day but different TrainGroup
-            foreach (TrainGroupParticipant incomingParticipant in incomingParticipants)
-            {
-                // Determine the date and hour for this incoming participant
-                DateTime participantDate;
-                int participantHour;
-                int participantMinute;
-
-                if (incomingParticipant.SelectedDate.HasValue)
-                {
-                    // One-off participant: Use selected date
-                    participantDate = incomingParticipant.SelectedDate.Value.Date;
-                    participantHour = existingEntity.StartOn.Hour;
-                    participantMinute = existingEntity.StartOn.Minute;
-                }
-                else
-                {
-                    // Recurring participant: Calculate next occurrence
-                    DateTime nowUtc = DateTime.UtcNow;
-                    DateTime nextOccurrence = CalculateNextOccurrenceDateTime(existingEntity.TrainGroupDates.First(x => x.Id == incomingParticipant.TrainGroupDateId), nowUtc);
-                    participantDate = nextOccurrence.Date;
-                    participantHour = nextOccurrence.Hour;
-                    participantMinute = nextOccurrence.Minute;
-                }
-
-                // Check for other bookings by same user with same date and hour
-                var conflictingBooking = _dataService.TrainGroupParticipants
-                    .Include(x => x.TrainGroup.TrainGroupDates)
-                    .Where(x => x.UserId == new Guid(updateDto.UserId))
-                    .Where(x => x.TrainGroupId != updateDto.TrainGroupId) // Different TrainGroup
-                    .Where(x => x.SelectedDate == null || x.SelectedDate.Value.Date >= DateTime.UtcNow.Date) // Future bookings only
-                    .ToList() // Switch to LINQ-to-Objects for complex date/hour calculation
-                    .FirstOrDefault(x =>
-                    {
-                        DateTime otherDate;
-                        int otherHour;
-                        int otherMinute;
-
-                        if (x.SelectedDate.HasValue)
+                        booking.TrainGroupParticipantUnavailableDates.Add(new TrainGroupParticipantUnavailableDate()
                         {
-                            otherDate = x.SelectedDate.Value.Date;
-                            otherHour = x.TrainGroup.StartOn.Hour;
-                            otherMinute = x.TrainGroup.StartOn.Minute;
-                        }
-                        else
-                        {
-                            DateTime nowUtc = DateTime.UtcNow;
-                            DateTime nextOccurrence = CalculateNextOccurrenceDateTime(x.TrainGroupDate, nowUtc);
-                            otherDate = nextOccurrence.Date;
-                            otherHour = nextOccurrence.Hour;
-                            otherMinute = nextOccurrence.Minute;
-                        }
-
-                        return otherDate == participantDate && otherHour == participantHour && otherMinute == participantMinute;
-                    });
-
-                if (conflictingBooking != null)
-                {
-                    dbContext.Dispose();
-                    return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetErrorResponse(
-                        _localizer[TranslationKeys.User_already_has_a_booking_for_the_same_time_and_date_on_a_different_train_group]);
-                }
-            }
-
-            // Add TrainGroup Participants
-            List<TrainGroupParticipantUnavailableDate> futureUnavailableDatesResponse = new List<TrainGroupParticipantUnavailableDate>();
-            foreach (TrainGroupParticipant incomingParticipant in incomingParticipants)
-            {
-                // Check which future dates user cant book.
-                // Only applies to DAY_OF_MONTH and DAY_OF_WEEK
-                if (incomingParticipant.SelectedDate == null)
-                {
-                    List<DateTime?> oneOffDatesDistincted = existingParticipants
-                        .Where(x => x.SelectedDate != null)
-                        .Where(x => x.SelectedDate >= DateTime.UtcNow)
-                        .Select(x => x.SelectedDate)
-                        .Distinct()
-                        .ToList();
-
-                    foreach (var distinctedDate in oneOffDatesDistincted)
-                    {
-                        int recuringParticipantCount = existingEntity.TrainGroupDates
-                            .First(x => x.Id == incomingParticipant.TrainGroupDateId)
-                            .TrainGroupParticipants
-                            .Where(x => x.SelectedDate == null)
-                            .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y => y.TrainGroupParticipantId == x.Id && y.UnavailableDate == distinctedDate))
-                            .Count();
-
-                        int oneOffParticipantCount = existingParticipants
-                            .Where(x => x.SelectedDate != null && x.SelectedDate == distinctedDate)
-                            .Where(x => !x.TrainGroupParticipantUnavailableDates.Any(y => y.TrainGroupParticipantId == x.Id && y.UnavailableDate == distinctedDate))
-                            .Count();
-
-                        // Mark unavailable only if fully booked (no spots left)
-                        if ((oneOffParticipantCount + recuringParticipantCount) >= existingEntity.MaxParticipants)
-                        {
-                            incomingParticipant.TrainGroupParticipantUnavailableDates.Add(new TrainGroupParticipantUnavailableDate() { UnavailableDate = distinctedDate!.Value });
-                            futureUnavailableDatesResponse.Add(new TrainGroupParticipantUnavailableDate() { UnavailableDate = distinctedDate!.Value });
-                        }
+                            UnavailableDate = DateTime.SpecifyKind(date, DateTimeKind.Utc),
+                            CreatedBy_Id = callerId.Value.ToString(),
+                            CreatedBy_FullName = callerName
+                        });
+                        fullDates.Add(date);
                     }
+
+                    if (isPastLastChange)
+                        break;
+
+                    occurrence = BookingRules.NextOccurrence(trainGroupDate, date.AddDays(1));
                 }
 
-                // Add new Participant
-                incomingParticipant.Id = 0;
-                dbContext.Add(incomingParticipant);
-                emailDatesAdd.Add(incomingParticipant);
+                members.Add(booking);
+                mine.Add(booking);
+                added.Add(booking);
             }
 
+            context.TrainGroupParticipants.AddRange(added);
+            await context.SaveChangesAsync();
 
-            await dbContext.SaveChangesAsync();
-            dbContext.Dispose();
-
-            User? user = _dataService.Users.Where(x => x.Id == new Guid(updateDto.UserId))
-                .FirstOrDefault();
-
+            User? user = await context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId);
             if (user != null)
                 try
                 {
-
-                    await _emailService.SendBookingEmailAsync(
-                        user,
-                        emailDatesAdd,
-                        emailDatesRemove
-                    );
+                    await _emailService.SendBookingEmailAsync(user, added, absorbed);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-
+                    // The booking stands whether or not the mail goes.
                 }
 
+            List<DateTime> result = fullDates
+                .Distinct()
+                .OrderBy(x => x)
+                .Select(x => DateTime.SpecifyKind(x, DateTimeKind.Utc))
+                .ToList();
 
-            //if (futureUnavailableDates.Count > 0)
-            //    return new ApiResponse<TrainGroup>().SetSuccessResponse(existingEntity, "warning", "Future unavailable dates that cannot be booked: " + futureUnavailableDates.Select(x => x.UnavailableDate.ToUniversalTime().ToString()).ToList().ToString());
-
-            return new ApiResponse<List<TrainGroupParticipantUnavailableDate>>().SetSuccessResponse(futureUnavailableDatesResponse);
+            return new ApiResponse<List<DateTime>>().SetSuccessResponse(result, _localizer[TranslationKeys.Booking_saved]);
         }
 
-        // Computes next occurrence datetime in UTC
-        private DateTime CalculateNextOccurrenceDateTime(TrainGroupDate trainGroupDate, DateTime nowUtc)
+
+        // POST: api/TrainGroupParticipants/5/End
+        // Stops a recurring booking from a date on. The row stays with its end date, so
+        // every session before it is still on the member's calendar.
+        [HttpPost("{id}/End")]
+        public async Task<ActionResult<ApiResponse<bool>>> End(int id, [FromBody] TrainGroupParticipantRemoveDto dto)
         {
-            DateTime nextLocalDate;
-            switch (trainGroupDate.TrainGroupDateType)
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            TrainGroupParticipant? participant = await LoadForChangeAsync(context, id);
+            if (participant == null)
+                return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(TrainGroupParticipant)]));
+
+            if (!CanChange(participant))
+                return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]));
+
+            if (!BookingRules.IsRecurring(participant))
+                return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]));
+
+            DateTime clientNow = BookingRules.ClientNow(dto.ClientTimezoneOffsetMinutes);
+            DateTime fromDate = (dto.FromDate ?? clientNow).Date;
+
+            if (participant.RecurringEndOnDate != null && participant.RecurringEndOnDate.Value.Date <= fromDate)
+                return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.This_booking_has_already_ended]));
+
+            if (!MayBypassWindow(dto.IsAdminPage))
             {
-                case TrainGroupDateTypeEnum.DAY_OF_WEEK:
-                    // Assume RecurrenceDayOfWeek is DayOfWeek enum or convertible
-                    DayOfWeek targetDow = Enum.Parse<DayOfWeek>(trainGroupDate.RecurrenceDayOfWeek.ToString());
-                    int inputDowNum = (int)nowUtc.DayOfWeek;
-                    int targetDowNum = (int)targetDow;
-                    int daysToAdd = (targetDowNum - inputDowNum + 7) % 7;
-                    //if (daysToAdd == 0) daysToAdd = 7; // Next occurrence if today (but adjust if same-day allowed; here next for safety)
-                    nextLocalDate = nowUtc.Date.AddDays(daysToAdd);
-                    break;
-                case TrainGroupDateTypeEnum.DAY_OF_MONTH:
-                    int targetDay = trainGroupDate.RecurrenceDayOfMonth ?? throw new ArgumentException("Missing RecurrenceDayOfMonth");
-                    int year = nowUtc.Year;
-                    int month = nowUtc.Month;
-                    if (nowUtc.Day > targetDay)
-                    {
-                        month++;
-                        if (month > 12) { month = 1; year++; }
-                    }
-                    nextLocalDate = new DateTime(year, month, targetDay, 0, 0, 0);
-                    // JS/.NET auto-rollover for invalid (e.g., Jan 31 -> Feb 3? Wait, new Date rolls to next month)
-                    break;
-                case TrainGroupDateTypeEnum.FIXED_DAY:
-                    nextLocalDate = trainGroupDate.FixedDay!.Value;
-                    break;
-                default:
-                    throw new ArgumentException($"Unsupported TrainGroupDateType: {trainGroupDate.TrainGroupDateType}");
+                if (fromDate < clientNow.Date)
+                    return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.This_session_has_already_started]));
+
+                // The first session the member gives up has to be more than 12 hours off.
+                DateTime? firstLost = FirstSessionOnOrAfter(participant, fromDate);
+                if (firstLost != null)
+                {
+                    DateTime sessionStart = BookingRules.SessionStart(participant.TrainGroup, firstLost.Value);
+                    if (sessionStart <= clientNow)
+                        return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.This_session_has_already_started]));
+
+                    if (sessionStart <= clientNow.AddHours(BookingRules.MemberChangeWindowHours))
+                        return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]));
+                }
             }
 
-            DateTime localStart = nextLocalDate.AddHours(trainGroupDate.TrainGroup.StartOn.Hour);
-            localStart = localStart.AddMinutes(trainGroupDate.TrainGroup.StartOn.Minute);
+            participant.RecurringEndOnDate = DateTime.SpecifyKind(fromDate, DateTimeKind.Utc);
+            MarkRemoved(participant, await GetCallerFullNameAsync(context));
+            await context.SaveChangesAsync();
 
-            return localStart;
+            await SendRemovalEmailAsync(context, participant);
+
+            return new ApiResponse<bool>().SetSuccessResponse(true, _localizer[TranslationKeys.Booking_removed]);
         }
+
+
+        // POST: api/TrainGroupParticipants/5/Cancel
+        // Cancels a one-off or a fixed-day booking. Kept, marked removed, and no longer
+        // counted towards the group's size.
+        [HttpPost("{id}/Cancel")]
+        public async Task<ActionResult<ApiResponse<bool>>> Cancel(int id, [FromBody] TrainGroupParticipantRemoveDto dto)
+        {
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            TrainGroupParticipant? participant = await LoadForChangeAsync(context, id);
+            if (participant == null)
+                return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(TrainGroupParticipant)]));
+
+            if (!CanChange(participant))
+                return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]));
+
+            if (BookingRules.IsRecurring(participant))
+                return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]));
+
+            if (participant.RemovedOn != null)
+                return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.This_booking_is_already_cancelled]));
+
+            if (!MayBypassWindow(dto.IsAdminPage))
+            {
+                DateTime clientNow = BookingRules.ClientNow(dto.ClientTimezoneOffsetMinutes);
+                DateTime day = (participant.SelectedDate ?? participant.TrainGroupDate.FixedDay ?? DateTime.MinValue).Date;
+                DateTime sessionStart = BookingRules.SessionStart(participant.TrainGroup, day);
+
+                if (sessionStart <= clientNow)
+                    return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.This_session_has_already_started]));
+
+                if (sessionStart <= clientNow.AddHours(BookingRules.MemberChangeWindowHours))
+                    return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]));
+            }
+
+            MarkRemoved(participant, await GetCallerFullNameAsync(context));
+            await context.SaveChangesAsync();
+
+            await SendRemovalEmailAsync(context, participant);
+
+            return new ApiResponse<bool>().SetSuccessResponse(true, _localizer[TranslationKeys.Booking_removed]);
+        }
+
+
+        // POST: api/TrainGroupParticipants/Bookings
+        // Everything a member has booked, running, coming up or ended, for the booking
+        // page's list.
+        [HttpPost("Bookings")]
+        public async Task<ActionResult<ApiResponse<List<TrainGroupParticipantBookingDto>>>> Bookings([FromBody] TrainGroupParticipantBookingsRequestDto dto)
+        {
+            Guid? callerId = GetCallerId();
+            if (callerId == null)
+                return BadRequest(new ApiResponse<List<TrainGroupParticipantBookingDto>>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]));
+
+            Guid userId = callerId.Value;
+            if (!string.IsNullOrWhiteSpace(dto.UserId))
+            {
+                if (!Guid.TryParse(dto.UserId, out Guid requestedId) || (requestedId != callerId.Value && !IsStaff()))
+                    return BadRequest(new ApiResponse<List<TrainGroupParticipantBookingDto>>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]));
+
+                userId = requestedId;
+            }
+
+            DateTime clientNow = BookingRules.ClientNow(dto.ClientTimezoneOffsetMinutes);
+
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            List<TrainGroupParticipant> participants = await context.TrainGroupParticipants
+                .AsNoTracking()
+                .Include(x => x.TrainGroup)
+                .ThenInclude(x => x.Trainer)
+                .Include(x => x.TrainGroupDate)
+                .Include(x => x.TrainGroupParticipantUnavailableDates)
+                .Where(x => x.UserId == userId)
+                .AsSplitQuery()
+                .ToListAsync();
+
+            List<TrainGroupParticipantBookingDto> result = participants
+                .Select(x => ToBookingDto(x, clientNow))
+                .ToList();
+
+            return new ApiResponse<List<TrainGroupParticipantBookingDto>>().SetSuccessResponse(result);
+        }
+
+
+        // DELETE: api/TrainGroupParticipants/5
+        // What the admin grids call. Staff taking somebody out ends the booking from today,
+        // the same as the member would, so what came before stays on their calendar.
+        public override async Task<ActionResult<ApiResponse<TrainGroupParticipant>>> Delete(string? id)
+        {
+            // Members hold the Delete claim too, for their own cancellations - which go
+            // through End and Cancel. This one is for staff alone.
+            if (!IsUserAuthorized("Delete") || !IsStaff())
+                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            if (!int.TryParse(id, out int participantId))
+                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(TrainGroupParticipant)]);
+
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            TrainGroupParticipant? participant = await LoadForChangeAsync(context, participantId);
+            if (participant == null)
+                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(TrainGroupParticipant)]);
+
+            if (BookingRules.IsRecurring(participant))
+            {
+                DateTime today = DateTime.UtcNow.Date;
+                if (participant.RecurringEndOnDate == null || participant.RecurringEndOnDate.Value.Date > today)
+                    participant.RecurringEndOnDate = DateTime.SpecifyKind(today, DateTimeKind.Utc);
+            }
+
+            MarkRemoved(participant, await GetCallerFullNameAsync(context));
+            await context.SaveChangesAsync();
+
+            // Just the row's own values - the loaded group would drag its trainer's
+            // account along into the response.
+            return new ApiResponse<TrainGroupParticipant>().SetSuccessResponse(
+                new TrainGroupParticipant() { Id = participant.Id, TrainGroupId = participant.TrainGroupId, UserId = participant.UserId },
+                _localizer[TranslationKeys.Booking_removed]);
+        }
+
+
+        // PUT: api/TrainGroupParticipants/5
+        // Only what the admin forms edit. The generic PUT writes every column from the dto,
+        // which would wipe the dates a booking ended on and the day it was created.
+        public override async Task<ActionResult<ApiResponse<TrainGroupParticipant>>> Put(string? id, [FromBody] TrainGroupParticipantDto entityDto)
+        {
+            if (!IsUserAuthorized("Edit"))
+                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            if (CustomValidatePUT(entityDto, out string[] errors))
+                return BadRequest(new ApiResponse<TrainGroupParticipant>().SetErrorResponse(errors));
+
+            if (!int.TryParse(id, out int participantId) || !Guid.TryParse(entityDto.UserId, out Guid userId))
+                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]);
+
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            TrainGroupParticipant? existing = await context.TrainGroupParticipants.FirstOrDefaultAsync(x => x.Id == participantId);
+            if (existing == null)
+                return new ApiResponse<TrainGroupParticipant>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(TrainGroupParticipant)]);
+
+            existing.UserId = userId;
+            existing.SelectedDate = entityDto.SelectedDate;
+            existing.TrainGroupDateId = entityDto.TrainGroupDateId;
+            await context.SaveChangesAsync();
+
+            return new ApiResponse<TrainGroupParticipant>().SetSuccessResponse(existing, _localizer[TranslationKeys._0_updated_successfully, nameof(TrainGroupParticipant)]);
+        }
+
+
+        // Added from the admin screens. A recurring one starts the day it is added - left
+        // empty it would fall back to CreatedOn, which is the same day but only until the
+        // row is next edited.
+        protected override Task BeforeAddAsync(List<TrainGroupParticipant> entities)
+        {
+            DateTime today = DateTime.SpecifyKind(DateTime.UtcNow.Date, DateTimeKind.Utc);
+            string callerId = GetCallerId()?.ToString() ?? string.Empty;
+
+            foreach (TrainGroupParticipant entity in entities)
+            {
+                entity.CreatedBy_Id = callerId;
+                if (entity.SelectedDate == null && entity.RecurringStartOnDate == null)
+                    entity.RecurringStartOnDate = today;
+            }
+
+            return Task.CompletedTask;
+        }
+
 
         protected override bool CustomValidatePOST(TrainGroupParticipantAddDto entityDto, out string[] errors)
         {
@@ -528,14 +540,20 @@ namespace API.Controllers
                     errorList.Add(_localizer[TranslationKeys.Fixed_date_doesnt_allow_one_off_participants]);
             }
 
-            // Validate if user is already a participant
-            bool isAlreadyParticipant = _dataService.TrainGroupParticipants
+            // Already booked: a one-off against whatever covers its date, a recurring one
+            // against a recurring booking on the same day that is still running. Ended
+            // and cancelled rows are history and do not count.
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            IQueryable<TrainGroupParticipant> existing = context.TrainGroupParticipants
                 .Where(x => x.UserId == participantDto.UserId)
                 .Where(x => x.TrainGroupId == participantDto.TrainGroupId)
-                .Where(x => excludeParticipantId == null || x.Id != excludeParticipantId) // Used in PUT
-                .Where(x => x.SelectedDate == null || x.SelectedDate.Value.Date >= DateTime.UtcNow.Date)
-                .Any(x => x.TrainGroupDateId == participantDto.TrainGroupDateId);
+                .Where(x => x.TrainGroupDateId == participantDto.TrainGroupDateId)
+                .Where(x => excludeParticipantId == null || x.Id != excludeParticipantId); // Used in PUT
 
+            bool isAlreadyParticipant = participantDto.SelectedDate.HasValue
+                ? existing.Where(BookingRules.IsBookedOn(participantDto.SelectedDate.Value)).Any()
+                : existing.Where(x => x.SelectedDate == null).Where(BookingRules.IsOpenOn(DateTime.UtcNow.Date)).Any();
 
             if (isAlreadyParticipant)
                 errorList.Add(_localizer[TranslationKeys.Participant_already_joined]);
@@ -597,29 +615,178 @@ namespace API.Controllers
                 query = query.Where(x => x.UserId == scopeUserId.Value);
 
 
-            List<DataTableFilterDto> customFilters = dataTable.Filters.Where(x => x.FilterType == DataTableFiltersEnum.custom).ToList();
+            DataTableFilterDto? filter = dataTable.Filters
+                .Where(x => x.FilterType == DataTableFiltersEnum.custom)
+                .FirstOrDefault(x => x.FieldName == "ParticipantGridSelectedDate");
 
-            if (customFilters.Any())
+            if (filter != null && !string.IsNullOrWhiteSpace(filter.Value))
             {
-                DataTableFilterDto? filter = customFilters.FirstOrDefault(x => x.FieldName == "ParticipantGridSelectedDate");
-                if (filter != null)
-                {
-                    DateTime selectedDate = DateTime.Parse(filter?.Value!);
-                    _selectedDate = selectedDate;
+                // The page sends midnight UTC for the day it shows. Parsed without
+                // RoundtripKind it would come back in the server's own zone and land on
+                // a different hour, or on a different day west of Greenwich.
+                DateTime selectedDate = DateTime.Parse(filter.Value, null, DateTimeStyles.RoundtripKind).Date;
+                _selectedDate = selectedDate;
 
-                    query = query.Where(x =>
-                        x.SelectedDate != null ?
-                            (x.SelectedDate == selectedDate)
-                        :
-                            (x.TrainGroupDate.FixedDay == selectedDate
-                            || x.TrainGroupDate.RecurrenceDayOfWeek == selectedDate.DayOfWeek
-                            || x.TrainGroupDate.RecurrenceDayOfMonth == selectedDate.Month
-                            )
-                    );
-
-                    query.Where(y => !y.TrainGroupParticipantUnavailableDates.Any(z => z.TrainGroupParticipantId == y.Id && z.UnavailableDate == selectedDate));
-                }
+                // Who is in the session that day - the rule every count uses.
+                query = query.Where(BookingRules.HoldsPlaceOn(selectedDate));
             }
+            else
+            {
+                // A group's current participants. Ended and cancelled bookings are kept
+                // for the calendar but are no longer anybody's to manage here.
+                query = query.Where(BookingRules.IsOpenOn(DateTime.UtcNow.Date));
+            }
+        }
+
+
+        private bool IsStaff() => User.HasClaim("Permission", BookingRules.StaffPermission);
+
+        private bool CanChange(TrainGroupParticipant participant) => IsStaff() || participant.UserId == GetCallerId();
+
+        // A page may say it is an admin page; only a staff caller makes it count.
+        private bool MayBypassWindow(bool isAdminPage) => isAdminPage && IsStaff();
+
+        private static async Task<TrainGroupParticipant?> LoadForChangeAsync(ApiDbContext context, int id) =>
+            await context.TrainGroupParticipants
+                .Include(x => x.TrainGroup)
+                .Include(x => x.TrainGroupDate)
+                .Include(x => x.TrainGroupParticipantUnavailableDates)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+        private void MarkRemoved(TrainGroupParticipant participant, string callerName)
+        {
+            participant.RemovedOn = DateTime.UtcNow;
+            participant.RemovedBy_Id = GetCallerId()?.ToString() ?? string.Empty;
+            participant.RemovedBy_FullName = callerName;
+        }
+
+        private async Task<string> GetCallerFullNameAsync(ApiDbContext context)
+        {
+            Guid? callerId = GetCallerId();
+            if (callerId == null)
+                return string.Empty;
+
+            User? caller = await context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == callerId.Value);
+            return caller == null ? string.Empty : (caller.FirstName + " " + caller.LastName).Trim();
+        }
+
+        private async Task SendRemovalEmailAsync(ApiDbContext context, TrainGroupParticipant participant)
+        {
+            User? user = await context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == participant.UserId);
+            if (user == null)
+                return;
+
+            try
+            {
+                await _emailService.SendBookingEmailAsync(user, new List<TrainGroupParticipant>(), new List<TrainGroupParticipant> { participant });
+            }
+            catch (Exception)
+            {
+                // The change stands whether or not the mail goes.
+            }
+        }
+
+        // The first session a recurring booking still holds on or after a day, if any.
+        private static DateTime? FirstSessionOnOrAfter(TrainGroupParticipant participant, DateTime from)
+        {
+            DateTime? day = BookingRules.NextOccurrence(participant.TrainGroupDate, from);
+            for (int i = 0; i < 400 && day != null; i++)
+            {
+                if (participant.RecurringEndOnDate != null && day.Value >= participant.RecurringEndOnDate.Value.Date)
+                    return null;
+
+                if (BookingRules.HoldsPlace(participant, day.Value))
+                    return day;
+
+                day = BookingRules.NextOccurrence(participant.TrainGroupDate, day.Value.AddDays(1));
+            }
+
+            return null;
+        }
+
+        // The latest date on or after `from` at which any of these bookings starts, ends,
+        // falls or skips - `from` itself when there is none.
+        private static DateTime LastChangeOnOrAfter(IEnumerable<TrainGroupParticipant> participants, DateTime from)
+        {
+            return participants
+                .SelectMany(x => new DateTime?[] { x.SelectedDate, x.RecurringStartOnDate, x.RecurringEndOnDate, x.TrainGroupDate?.FixedDay }
+                    .Concat(x.TrainGroupParticipantUnavailableDates.Select(y => (DateTime?)y.UnavailableDate)))
+                .Where(x => x != null)
+                .Select(x => x!.Value.Date)
+                .Where(x => x >= from)
+                .DefaultIfEmpty(from)
+                .Max();
+        }
+
+        private static DateTime? AsUtc(DateTime? value) =>
+            value == null ? null : DateTime.SpecifyKind(value.Value, DateTimeKind.Utc);
+
+        private static TrainGroupParticipantBookingDto ToBookingDto(TrainGroupParticipant participant, DateTime clientNow)
+        {
+            DateTime today = clientNow.Date;
+            bool isRecurring = BookingRules.IsRecurring(participant);
+
+            TrainGroupParticipantBookingDto dto = new TrainGroupParticipantBookingDto()
+            {
+                Id = participant.Id,
+                TrainGroupId = participant.TrainGroupId,
+                TrainGroupDateId = participant.TrainGroupDateId,
+                TrainGroupDateType = participant.TrainGroupDate.TrainGroupDateType,
+                Title = participant.TrainGroup.Title,
+                TrainerFullName = (participant.TrainGroup.Trainer?.FirstName + " " + participant.TrainGroup.Trainer?.LastName).Trim(),
+                StartOn = participant.TrainGroup.StartOn,
+                Duration = participant.TrainGroup.Duration,
+                IsOneOff = !isRecurring,
+                RemovedOn = AsUtc(participant.RemovedOn),
+                RemovedBy_FullName = participant.RemovedBy_FullName
+            };
+
+            if (!isRecurring)
+            {
+                DateTime? date = (participant.SelectedDate ?? participant.TrainGroupDate.FixedDay)?.Date;
+                dto.Date = AsUtc(date);
+
+                if (date != null && participant.RemovedOn == null && BookingRules.SessionStart(participant.TrainGroup, date.Value) > clientNow)
+                    dto.NextSessionDate = AsUtc(date);
+
+                return dto;
+            }
+
+            DateTime start = (participant.RecurringStartOnDate ?? participant.CreatedOn).Date;
+            DateTime? end = participant.RecurringEndOnDate?.Date;
+
+            dto.RecurrenceDayOfWeek = (int?)participant.TrainGroupDate.RecurrenceDayOfWeek;
+            dto.RecurrenceDayOfMonth = participant.TrainGroupDate.RecurrenceDayOfMonth;
+            dto.StartOnDate = AsUtc(start);
+            dto.EndOnDate = AsUtc(end);
+
+            DateTime? day = BookingRules.NextOccurrence(participant.TrainGroupDate, today > start ? today : start);
+            for (int i = 0; i < 400 && day != null && (end == null || day < end); i++)
+            {
+                if (BookingRules.HoldsPlace(participant, day.Value) && BookingRules.SessionStart(participant.TrainGroup, day.Value) > clientNow)
+                {
+                    dto.NextSessionDate = AsUtc(day);
+                    break;
+                }
+
+                day = BookingRules.NextOccurrence(participant.TrainGroupDate, day.Value.AddDays(1));
+            }
+
+            if (end != null)
+                for (DateTime previous = end.Value.AddDays(-1); previous >= start; previous = previous.AddDays(-1))
+                    if (BookingRules.HoldsPlace(participant, previous))
+                    {
+                        dto.LastSessionDate = AsUtc(previous);
+                        break;
+                    }
+
+            dto.UpcomingSkips = participant.TrainGroupParticipantUnavailableDates
+                .Where(x => x.UnavailableDate.Date >= today && (end == null || x.UnavailableDate.Date < end))
+                .OrderBy(x => x.UnavailableDate)
+                .Select(x => new TrainGroupParticipantSkipDto() { Id = x.Id, Date = DateTime.SpecifyKind(x.UnavailableDate.Date, DateTimeKind.Utc) })
+                .ToList();
+
+            return dto;
         }
     }
 }

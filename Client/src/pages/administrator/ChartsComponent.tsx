@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card } from "primereact/card";
+import { Tag } from "primereact/tag";
 import { ChartData } from "../../model/core/chart/ChartData";
 import { Chart } from "primereact/chart";
 import { useApiService } from "../../services/ApiService";
@@ -251,6 +252,48 @@ export default function ChartsComponent() {
                   options={axisOptions}
                   style={{ height: "100%" }}
                 />
+              </div>
+
+              {/* The queue behind the chart: what has been asked for and not yet
+                  answered, longest wait first. Stays its natural size - only the
+                  chart above it stretches. */}
+              <div className="flex-none mt-4 pt-3 border-top-1 surface-border">
+                <h4 className="mt-0 mb-2">{t("Waiting for approval")}</h4>
+
+                {subscriptions.oldestPendingRequests.length === 0 ? (
+                  <p className="m-0 text-color-secondary">
+                    {t("No requests are waiting")}.
+                  </p>
+                ) : (
+                  <ul className="list-none p-0 m-0">
+                    {subscriptions.oldestPendingRequests.map((request) => (
+                      <li
+                        key={request.id}
+                        className="flex align-items-center justify-content-between gap-3 py-2 border-bottom-1 surface-border"
+                      >
+                        <span className="white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                          {request.fullName}
+                        </span>
+
+                        <div className="flex align-items-center gap-2 flex-none">
+                          {/* The number sits inside the sentence rather than in front
+                              of it: greek puts the "ago" first, so appending a word
+                              would read backwards there. */}
+                          <span className="text-color-secondary text-sm white-space-nowrap">
+                            {t("_0_days_ago").replace(
+                              "{0}",
+                              request.waitingDays.toString()
+                            )}
+                          </span>
+                          <Tag
+                            severity="warning"
+                            value={request.requestedAmount.toString()}
+                          />
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </Card>
           </div>

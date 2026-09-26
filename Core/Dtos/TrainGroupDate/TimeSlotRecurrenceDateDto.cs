@@ -11,6 +11,12 @@ namespace Core.Dtos.TrainGroupDate
 
         public TrainGroupDateTypeEnum? TrainGroupDateType { get; set; }
         public DateTime Date { get; set; }
+
+        // Which weekday (0 = Sunday) or day of the month a recurring date runs on, as
+        // plain numbers. Date above is a made-up day in January 2000 that the json
+        // converter moves by the server's offset, so it cannot be read by UTC getters.
+        public int? RecurrenceDayOfWeek { get; set; }
+        public int? RecurrenceDayOfMonth { get; set; }
         public bool IsUserJoined { get; set; }
         public bool IsUnavailableTrainGroup { get; set; }
 

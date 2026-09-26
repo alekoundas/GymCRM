@@ -22,11 +22,14 @@ import { UserPasswordForgotDto } from "../model/entities/user/UserPasswordForgot
 import { AutoCompleteDto } from "../model/core/auto-complete/AutoCompleteDto";
 import { MailSendDto } from "../model/entities/mail/MailSendDto";
 import { ChartData } from "../model/core/chart/ChartData";
-import { TrainGroupParticipantUpdateDto } from "../model/entities/train-group-participant/TrainGroupParticipantUpdateDto";
+import {
+  TrainGroupParticipantBookDto,
+  TrainGroupParticipantBookingDto,
+  TrainGroupParticipantRemoveDto,
+} from "../model/entities/train-group-participant/TrainGroupParticipantBookingDto";
 import { ApiResponseDto } from "../model/core/api-response/ApiResponseDto";
 import { UserLoginResponseDto } from "../model/entities/user/UserLoginResponseDto";
 import { useTranslator } from "./TranslatorService";
-import { TrainGroupParticipantUnavailableDateDto } from "../model/entities/train-group-participant-unavailable-date/TrainGroupParticipantUnavailableDateDto";
 
 const BASE_URL = "/api/";
 const TOKEN_EXPIRATION_MS = 604800 * 1000; // 7 days
@@ -456,15 +459,45 @@ export const useApiService = () => {
     [buildUrl, apiRequest],
   );
 
-  const updateParticipants = useCallback(
-    async (
-      data: TrainGroupParticipantUpdateDto,
-    ): Promise<TrainGroupParticipantUnavailableDateDto[] | null> => {
-      const url = buildUrl("TrainGroupParticipants", "UpdateParticipants");
+  // Booking and unbooking are separate calls. Book returns the dates a recurring
+  // booking could not have because they were full - saved as skipped dates.
+  const bookTrainGroup = useCallback(
+    async (data: TrainGroupParticipantBookDto): Promise<string[] | null> => {
+      const url = buildUrl("TrainGroupParticipants", "Book");
+      return apiRequest<TrainGroupParticipantBookDto, string[]>(url, "POST", data);
+    },
+    [buildUrl, apiRequest],
+  );
+
+  // Stops a recurring booking from a date on. Nothing is deleted.
+  const endBooking = useCallback(
+    async (id: number, data: TrainGroupParticipantRemoveDto): Promise<boolean | null> => {
+      const url = buildUrl("TrainGroupParticipants", `${id}/End`);
+      return apiRequest<TrainGroupParticipantRemoveDto, boolean>(url, "POST", data);
+    },
+    [buildUrl, apiRequest],
+  );
+
+  // Cancels a one-off. Nothing is deleted.
+  const cancelBooking = useCallback(
+    async (id: number, data: TrainGroupParticipantRemoveDto): Promise<boolean | null> => {
+      const url = buildUrl("TrainGroupParticipants", `${id}/Cancel`);
+      return apiRequest<TrainGroupParticipantRemoveDto, boolean>(url, "POST", data);
+    },
+    [buildUrl, apiRequest],
+  );
+
+  // Without a userId these are the caller's own. Staff may pass one.
+  const getBookings = useCallback(
+    async (userId?: string): Promise<TrainGroupParticipantBookingDto[] | null> => {
+      const url = buildUrl("TrainGroupParticipants", "Bookings");
       return apiRequest<
-        TrainGroupParticipantUpdateDto,
-        TrainGroupParticipantUnavailableDateDto[]
-      >(url, "POST", data);
+        { userId?: string; clientTimezoneOffsetMinutes: number },
+        TrainGroupParticipantBookingDto[]
+      >(url, "POST", {
+        userId,
+        clientTimezoneOffsetMinutes: new Date().getTimezoneOffset(),
+      });
     },
     [buildUrl, apiRequest],
   );
@@ -620,7 +653,10 @@ export const useApiService = () => {
     delete: deleteMethod,
     deleteAllMail,
     timeslots,
-    updateParticipants,
+    bookTrainGroup,
+    endBooking,
+    cancelBooking,
+    getBookings,
     passwordForgot,
     passwordReset,
     passwordChange,

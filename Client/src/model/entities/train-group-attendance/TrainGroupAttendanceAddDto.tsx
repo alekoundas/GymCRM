@@ -15,7 +15,10 @@ export interface TrainGroupAttendanceAddDto {
 }
 
 export class TrainGroupAttendanceAddDto implements TrainGroupAttendanceAddDto {
-  attendanceDate: string = new Date().toISOString();
+  // Today, as midnight UTC - the form's calendar reads it back with the UTC getters.
+  attendanceDate: string = new Date(
+    Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
+  ).toISOString();
   userId: string = "";
   trainGroupId?: number = undefined;
   trainGroupTitle: string = "";

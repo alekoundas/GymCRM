@@ -132,6 +132,26 @@ namespace API.Controllers
                 new SubscriptionBucketDto { Key = "ELEVEN_PLUS", Count = balances.Count(x => x.Value >= 11) }
             };
 
+            // The queue, oldest first - a request left sitting is the one worth chasing.
+            DateTime nowUtc = DateTime.UtcNow;
+
+            charts.OldestPendingRequests = (await context.Subscriptions
+                .AsNoTracking()
+                .Include(x => x.User)
+                .Where(x => x.Status == SubscriptionStatusEnum.PENDING)
+                .OrderBy(x => x.CreatedOn)
+                .Take(5)
+                .ToListAsync())
+                .Select(x => new SubscriptionPendingRequestDto
+                {
+                    Id = x.Id,
+                    UserId = x.UserId.ToString(),
+                    FullName = (x.User.FirstName + " " + x.User.LastName).Trim(),
+                    RequestedAmount = x.RequestedAmount ?? 0,
+                    WaitingDays = Math.Max(0, (int)(nowUtc - x.CreatedOn).TotalDays)
+                })
+                .ToList();
+
             List<Guid> debtorIds = balances
                 .Where(x => x.Value < 0)
                 .OrderBy(x => x.Value)

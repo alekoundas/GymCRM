@@ -75,6 +75,15 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string No_bookings_were_removed = "No_bookings_were_removed";
         public const string Every_0_of_the_month = "Every_0_of_the_month";
         public const string Cannot_remove_a_session_starting_within_12_hours = "Cannot_remove_a_session_starting_within_12_hours";
+        public const string Select_at_least_one_date_to_book = "Select_at_least_one_date_to_book";
+        public const string This_session_has_already_started = "This_session_has_already_started";
+        public const string This_session_has_been_cancelled_by_the_gym = "This_session_has_been_cancelled_by_the_gym";
+        public const string This_session_is_full_on_every_upcoming_date = "This_session_is_full_on_every_upcoming_date";
+        public const string This_booking_has_already_ended = "This_booking_has_already_ended";
+        public const string This_booking_is_already_cancelled = "This_booking_is_already_cancelled";
+        public const string This_date_is_not_part_of_the_booking = "This_date_is_not_part_of_the_booking";
+        public const string Booking_saved = "Booking_saved";
+        public const string Booking_removed = "Booking_removed";
         public const string Calendar_Integration = "Calendar_Integration";
         public const string Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar = "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar";
         public const string Add_to_Calendar = "Add_to_Calendar";
