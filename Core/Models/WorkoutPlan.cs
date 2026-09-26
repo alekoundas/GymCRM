@@ -8,6 +8,11 @@ namespace Core.Models
         public string Description { get; set; } = string.Empty;
         public bool IsCircular { get; set; }
 
+        // Deactivated plans are hidden from the member's list. A member can deactivate
+        // their own; only an admin can make one active again. False by default, so every
+        // plan that existed before the column did stays active.
+        public bool IsInactive { get; set; }
+
         public Guid UserId { get; set; }
         public User User { get; set; } = null!;
 

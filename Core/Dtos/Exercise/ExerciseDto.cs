@@ -46,5 +46,11 @@ namespace Core.Dtos.Exercise
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public int WorkoutPlanId { get; set; }
+
+        // Filled for the admin's exercise history page: whose plan it is, and which.
+        public string WorkoutPlanTitle { get; set; } = string.Empty;
+        public bool IsWorkoutPlanInactive { get; set; }
+        public string UserId { get; set; } = string.Empty;
+        public Core.Dtos.User.UserDto? User { get; set; }
     }
 }

@@ -23,6 +23,11 @@ import { AutoCompleteDto } from "../model/core/auto-complete/AutoCompleteDto";
 import { MailSendDto } from "../model/entities/mail/MailSendDto";
 import { ChartData } from "../model/core/chart/ChartData";
 import {
+  QuestionnaireAnswerDto,
+  QuestionnaireDto,
+  QuestionnaireQuestionDto,
+} from "../model/entities/questionnaire/QuestionnaireDto";
+import {
   TrainGroupParticipantBookDto,
   TrainGroupParticipantBookingDto,
   TrainGroupParticipantRemoveDto,
@@ -487,6 +492,84 @@ export const useApiService = () => {
     [buildUrl, apiRequest],
   );
 
+  // Deactivate hides a plan from its member; only an admin can activate it again.
+  const setWorkoutPlanActive = useCallback(
+    async (id: number, isActive: boolean): Promise<boolean | null> => {
+      const url = buildUrl("WorkoutPlans", `${id}/${isActive ? "Activate" : "Deactivate"}`);
+      return apiRequest<undefined, boolean>(url, "POST");
+    },
+    [buildUrl, apiRequest],
+  );
+
+  // The health questionnaire. Each admin change returns the whole questionnaire as it
+  // now stands, so the page can simply show what came back.
+  const getQuestionnaire = useCallback(async (): Promise<QuestionnaireDto | null> => {
+    const url = buildUrl("Questionnaires");
+    return apiRequest<undefined, QuestionnaireDto>(url, "GET");
+  }, [buildUrl, apiRequest]);
+
+  const setQuestionnaireName = useCallback(
+    async (name: string): Promise<QuestionnaireDto | null> => {
+      const url = buildUrl("Questionnaires", "Name");
+      return apiRequest<{ name: string }, QuestionnaireDto>(url, "PUT", { name });
+    },
+    [buildUrl, apiRequest],
+  );
+
+  const saveQuestionnaireQuestion = useCallback(
+    async (question: QuestionnaireQuestionDto): Promise<QuestionnaireDto | null> => {
+      const url =
+        question.id > 0
+          ? buildUrl("Questionnaires", `Questions/${question.id}`)
+          : buildUrl("Questionnaires", "Questions");
+      return apiRequest<QuestionnaireQuestionDto, QuestionnaireDto>(
+        url,
+        question.id > 0 ? "PUT" : "POST",
+        question,
+      );
+    },
+    [buildUrl, apiRequest],
+  );
+
+  const deleteQuestionnaireQuestion = useCallback(
+    async (id: number): Promise<QuestionnaireDto | null> => {
+      const url = buildUrl("Questionnaires", `Questions/${id}`);
+      return apiRequest<undefined, QuestionnaireDto>(url, "DELETE");
+    },
+    [buildUrl, apiRequest],
+  );
+
+  const moveQuestionnaireQuestion = useCallback(
+    async (id: number, direction: -1 | 1): Promise<QuestionnaireDto | null> => {
+      const url = buildUrl("Questionnaires", `Questions/${id}/Move`);
+      return apiRequest<{ direction: number }, QuestionnaireDto>(url, "POST", { direction });
+    },
+    [buildUrl, apiRequest],
+  );
+
+  // Without a userId these are the caller's own answers.
+  const getQuestionnaireAnswers = useCallback(
+    async (userId?: string): Promise<QuestionnaireAnswerDto[] | null> => {
+      const url = buildUrl("Questionnaires", userId ? `Answers?userId=${userId}` : "Answers");
+      return apiRequest<undefined, QuestionnaireAnswerDto[]>(url, "GET");
+    },
+    [buildUrl, apiRequest],
+  );
+
+  const saveQuestionnaireAnswers = useCallback(
+    async (
+      answers: QuestionnaireAnswerDto[],
+      userId?: string,
+    ): Promise<QuestionnaireAnswerDto[] | null> => {
+      const url = buildUrl("Questionnaires", "Answers");
+      return apiRequest<
+        { userId?: string; answers: QuestionnaireAnswerDto[] },
+        QuestionnaireAnswerDto[]
+      >(url, "PUT", { userId, answers });
+    },
+    [buildUrl, apiRequest],
+  );
+
   // Without a userId these are the caller's own. Staff may pass one.
   const getBookings = useCallback(
     async (userId?: string): Promise<TrainGroupParticipantBookingDto[] | null> => {
@@ -657,6 +740,14 @@ export const useApiService = () => {
     endBooking,
     cancelBooking,
     getBookings,
+    setWorkoutPlanActive,
+    getQuestionnaire,
+    setQuestionnaireName,
+    saveQuestionnaireQuestion,
+    deleteQuestionnaireQuestion,
+    moveQuestionnaireQuestion,
+    getQuestionnaireAnswers,
+    saveQuestionnaireAnswers,
     passwordForgot,
     passwordReset,
     passwordChange,

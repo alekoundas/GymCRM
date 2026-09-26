@@ -11,6 +11,7 @@ import { useUserStore } from "../../stores/UserStore";
 import UserProfileFormComponent from "./UserProfileFormComponent";
 import PhoneNumberGridComponent from "../phone-number/PhoneNumberGridComponent";
 import UserProfileTimeslotsComponent from "./UserProfileTimeslotsComponent";
+import UserHealthQuestionsComponent from "./UserHealthQuestionsComponent";
 import UserProfilePasswordChangeFormComponent from "./UserProfilePasswordChangeFormComponent";
 import { useApiService } from "../../services/ApiService";
 import { LocalStorageService } from "../../services/LocalStorageService";
@@ -273,6 +274,16 @@ export default function UserProfilePage() {
               leftIcon="pi pi-heart mr-2"
             >
               <UserMedicalHistoryComponent />
+            </TabPanel>
+
+            <TabPanel
+              header={t("Health questions")}
+              leftIcon="pi pi-list-check mr-2"
+            >
+              <UserHealthQuestionsComponent
+                userId={userId}
+                isAdminView={isAdminView}
+              />
             </TabPanel>
 
             <TabPanel

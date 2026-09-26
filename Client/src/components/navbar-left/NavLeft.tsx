@@ -72,6 +72,12 @@ export default function NavLeft() {
         command: () => navigate("/administrator/workout-plan-recordings"),
       },
       {
+        label: t("Exercise history"),
+        icon: "pi pi-chart-line",
+        visible: TokenService.isUserAllowed("WorkoutPlansAdmin_View"),
+        command: () => navigate("/administrator/exercise-history"),
+      },
+      {
         label: t("Workout plan rules"),
         icon: "pi pi-sliders-h",
         visible: TokenService.isUserAllowed("WorkoutPlanRules_View"),
@@ -106,6 +112,12 @@ export default function NavLeft() {
         icon: "pi pi-user",
         visible: TokenService.isUserAllowed("Users_View"),
         command: () => navigate("/administrator/users"),
+      },
+      {
+        label: t("Health questionnaire"),
+        icon: "pi pi-heart",
+        visible: TokenService.isUserAllowed("Questionnaires_View"),
+        command: () => navigate("/administrator/questionnaire"),
       },
       {
         label: t("User Statuses"),

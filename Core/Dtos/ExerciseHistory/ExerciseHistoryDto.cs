@@ -42,5 +42,11 @@ namespace Core.Dtos.ExerciseHistory
         public int ExerciseId { get; set; }
 
         public DateTime CreatedOn { get; set; }
+
+        // Filled for the admin's exercise history page: whose plan it is, and which.
+        public int WorkoutPlanId { get; set; }
+        public string WorkoutPlanTitle { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty;
+        public Core.Dtos.User.UserDto? User { get; set; }
     }
 }

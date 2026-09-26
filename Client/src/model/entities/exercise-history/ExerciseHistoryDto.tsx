@@ -1,3 +1,5 @@
+import { UserDto } from "../user/UserDto";
+
 export interface ExerciseHistoryDto {
   id: number;
   name: string;
@@ -9,6 +11,11 @@ export interface ExerciseHistoryDto {
   groupExerciseOrderNumber: number;
   exerciseId: number;
   createdOn: string;
+  // Filled for the admin's exercise history page.
+  workoutPlanId?: number;
+  workoutPlanTitle?: string;
+  userId?: string;
+  user?: UserDto;
 }
 
 export class ExerciseHistoryDto {

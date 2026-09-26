@@ -1,4 +1,5 @@
-﻿using Core.Enums;
+﻿using Business.Services;
+using Core.Enums;
 using Core.Models;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
@@ -121,101 +122,52 @@ namespace Business.Services.CalendarService
             return $"tg-{trainGroupParticipantId}--{trainGroupDateId:N}-{userId:N}";
         }
 
-        // Computes next occurrence datetime in UTC
-        private DateTime CalculateNextOccurrenceDateTime(TrainGroupDate trainGroupDate, DateTime nowUtc)
-        {
-            DateTime nextLocalDate;
-            switch (trainGroupDate.TrainGroupDateType)
-            {
-                case TrainGroupDateTypeEnum.DAY_OF_WEEK:
-                    // Assume RecurrenceDayOfWeek is DayOfWeek enum or convertible
-                    DayOfWeek targetDow = Enum.Parse<DayOfWeek>(trainGroupDate.RecurrenceDayOfWeek.ToString());
-                    int inputDowNum = (int)nowUtc.DayOfWeek;
-                    int targetDowNum = (int)targetDow;
-                    int daysToAdd = (targetDowNum - inputDowNum + 7) % 7;
-                    if (daysToAdd == 0) daysToAdd = 7; // Next occurrence if today (but adjust if same-day allowed; here next for safety)
-                    nextLocalDate = nowUtc.Date.AddDays(daysToAdd);
-                    break;
-                case TrainGroupDateTypeEnum.DAY_OF_MONTH:
-                    int targetDay = trainGroupDate.RecurrenceDayOfMonth ?? throw new ArgumentException("Missing RecurrenceDayOfMonth");
-                    int year = nowUtc.Year;
-                    int month = nowUtc.Month;
-                    if (nowUtc.Day > targetDay)
-                    {
-                        month++;
-                        if (month > 12) { month = 1; year++; }
-                    }
-                    nextLocalDate = new DateTime(year, month, targetDay, 0, 0, 0);
-                    // JS/.NET auto-rollover for invalid (e.g., Jan 31 -> Feb 3? Wait, new Date rolls to next month)
-                    break;
-                case TrainGroupDateTypeEnum.FIXED_DAY:
-                    nextLocalDate = trainGroupDate.FixedDay!.Value;
-                    break;
-                default:
-                    throw new ArgumentException($"Unsupported TrainGroupDateType: {trainGroupDate.TrainGroupDateType}");
-            }
-
-            DateTime localStart = nextLocalDate.AddHours(trainGroupDate.TrainGroup.StartOn.Hour);
-            localStart = localStart.AddMinutes(trainGroupDate.TrainGroup.StartOn.Minute);
-
-            return localStart;
-        }
-
         private (DateTime? Dtstart, RecurrencePattern? Rrule) ParseDateDescriptionToDtstartAndRrule(TrainGroupParticipant participant, TimeSpan startTimeOfDayUtc)
         {
-            DateTime dtstart;
+            TrainGroupDate trainGroupDate = participant.TrainGroupDate;
+
+            // One-off: the day that was booked.
             if (participant.SelectedDate.HasValue)
-            {
-                // One-off: Use stored full UTC datetime (assumes time is set as in frontend)
-                dtstart = participant.SelectedDate.Value;
-                dtstart = dtstart.Date.Add(startTimeOfDayUtc);
-                return (dtstart, null);
-            }
-            else
-            {
-                // Recurring: Compute next upcoming occurrence with local time overlaid
-                dtstart = CalculateNextOccurrenceDateTime(participant.TrainGroupDate, DateTime.UtcNow);
-                dtstart = dtstart.Date.Add(startTimeOfDayUtc);
+                return (participant.SelectedDate.Value.Date.Add(startTimeOfDayUtc), null);
 
-                if (participant.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH)
+            // A fixed-day event is a single entry on its date.
+            if (trainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY)
+                return trainGroupDate.FixedDay.HasValue
+                    ? (trainGroupDate.FixedDay.Value.Date.Add(startTimeOfDayUtc), null)
+                    : (null, null);
+
+            // Recurring: the series starts on the booking's first session. It used to start
+            // on the next occurrence after today, which skipped today - book "every Monday"
+            // on a Monday and that evening's session never reached the calendar - and
+            // ignored a booking that starts weeks later. Bookings from before the start date
+            // was kept, and the ones the admin screens add, start from their next session.
+            DateTime from = participant.RecurringStartOnDate?.Date ?? DateTime.UtcNow.Date;
+            DateTime? firstDay = BookingRules.NextOccurrence(trainGroupDate, from);
+            if (firstDay == null)
+                return (null, null);
+
+            DateTime dtstart = firstDay.Value.Add(startTimeOfDayUtc);
+
+            RecurrencePattern rrule = trainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_MONTH
+                ? new RecurrencePattern
                 {
-                    var rrule = new RecurrencePattern
-                    {
-                        Frequency = FrequencyType.Monthly,
-                        Interval = 1,
-                        ByMonthDay = new List<int> { dtstart.Month }
-                    };
-                    // Optional: Set Until to e.g. 1 year from now (avoids infinite series)
-                    rrule.Until = new CalDateTime(dtstart.AddYears(1));
-
-                    return (dtstart, rrule);
+                    Frequency = FrequencyType.Monthly,
+                    Interval = 1,
+                    // The day of the month. It used to be the month number, so a booking
+                    // on the 5th made in October repeated on the 10th of every month.
+                    ByMonthDay = new List<int> { trainGroupDate.RecurrenceDayOfMonth ?? dtstart.Day }
                 }
-
-                if (participant.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.DAY_OF_WEEK)
+                : new RecurrencePattern
                 {
-                    var rrule = new RecurrencePattern
-                    {
-                        Frequency = FrequencyType.Weekly,
-                        Interval = 1,
-                        ByDay = new List<WeekDay> { new WeekDay(dtstart.DayOfWeek) }
-                    };
-                    // Optional: Set Until to e.g. 1 year from now (avoids infinite series)
-                    rrule.Until = new CalDateTime(dtstart.AddYears(1));
+                    Frequency = FrequencyType.Weekly,
+                    Interval = 1,
+                    ByDay = new List<WeekDay> { new WeekDay(dtstart.DayOfWeek) }
+                };
 
-                    return (dtstart, rrule);
-                }
+            // A year ahead rather than an endless series.
+            rrule.Until = new CalDateTime(dtstart.AddYears(1));
 
-                if (participant.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY)
-                {
-                    if (participant.TrainGroupDate.TrainGroupDateType == TrainGroupDateTypeEnum.FIXED_DAY)
-                    {
-                        // FIXED_DAY is a single one-off entry, no recurrence
-                        return (dtstart, null);
-                    }
-                }
-            }
-
-            return (null, null);
+            return (dtstart, rrule);
         }
 
         //private DateTime GetNextWeeklyOccurrence(DateTime now, DayOfWeek targetDow)

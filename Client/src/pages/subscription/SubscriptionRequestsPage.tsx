@@ -53,6 +53,8 @@ export default function SubscriptionRequestsPage() {
       { fieldName: "status", filterType: "equals", value: SubscriptionStatusEnum.PENDING },
       { fieldName: "userId", filterType: "in" },
     ],
+    // sorts is what the server orders by; dataTableSorts only draws the arrow.
+    sorts: [{ fieldName: "createdOn", order: -1 }],
     dataTableSorts: [{ field: "createdOn", order: -1 }],
   });
 

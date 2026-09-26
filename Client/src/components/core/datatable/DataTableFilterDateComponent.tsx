@@ -12,9 +12,18 @@ export default function DataTableFilterDateComponent({ options }: IField) {
   const { t } = useTranslator();
   const [dates, setDates] = useState<Date[]>([]);
 
-  // Clear filter value where user presses clear.
+  // Follows the grid's value: cleared, or a range restored from the url on coming
+  // back to the page - where it would otherwise still filter the rows while showing
+  // an empty box.
   useEffect(() => {
-    if (options.value === null) setDates([]);
+    if (Array.isArray(options.value) && options.value.length === 2) {
+      const restored = options.value.map((x: string) => new Date(x));
+      if (restored.every((x: Date) => !Number.isNaN(x.getTime()))) {
+        setDates(restored);
+        return;
+      }
+    }
+    setDates([]);
   }, [options.value]);
 
   const onHide = () => {

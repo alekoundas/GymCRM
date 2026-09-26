@@ -22,6 +22,8 @@ import WorkoutPlansPage from "./pages/workout-plan/WorkoutPlansPage.tsx";
 import WorkoutPlanFormPage from "./pages/workout-plan/WorkoutPlanFormPage.tsx";
 import UserStatusesPage from "./pages/user-status/UserStatusesPage.tsx";
 import TrainGroupCategoriesPage from "./pages/train-group-category/TrainGroupCategoriesPage.tsx";
+import ExerciseHistoryAdminPage from "./pages/exercise-history/ExerciseHistoryAdminPage.tsx";
+import QuestionnaireAdminPage from "./pages/questionnaire/QuestionnaireAdminPage.tsx";
 import { useEffect } from "react";
 import { useTranslator } from "./services/TranslatorService.tsx";
 import { LocalStorageService } from "./services/LocalStorageService.tsx";
@@ -174,6 +176,16 @@ export default function App() {
                 <Route
                   path="train-group-categories"
                   element={<TrainGroupCategoriesPage />}
+                />
+
+                <Route
+                  path="exercise-history"
+                  element={<ExerciseHistoryAdminPage />}
+                />
+
+                <Route
+                  path="questionnaire"
+                  element={<QuestionnaireAdminPage />}
                 />
               </Route>
 

@@ -14,11 +14,13 @@ export default function DataTableFilterNumberComponent({ options }: IField) {
   const { t } = useTranslator();
   const [value, setValue] = useState<number | undefined>();
 
-  // Clear filter value where user presses clear.
+  // Follows the grid's value: cleared, or restored from the url on coming back to
+  // the page - where it would otherwise still filter the rows while showing nothing.
   useEffect(() => {
-    if (options.value === null) {
+    const restored = Number(options.value);
+    if (options.value === null || options.value === undefined || options.value === "")
       setValue(undefined);
-    }
+    else if (!Number.isNaN(restored)) setValue(restored);
   }, [options.value]);
 
   const onChange = (e: InputNumberChangeEvent) => {
