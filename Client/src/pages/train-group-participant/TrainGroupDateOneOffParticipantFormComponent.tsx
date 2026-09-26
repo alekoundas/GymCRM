@@ -5,6 +5,7 @@ import LookupComponent from "../../components/core/dropdown/LookupComponent";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { useTranslator } from "../../services/TranslatorService";
 import { UserDto } from "../../model/entities/user/UserDto";
+import { fromUtcDay, toUtcDay } from "../train-group-booking/BookingDates";
 
 interface IField extends DialogChildProps {}
 
@@ -28,25 +29,20 @@ export default function TrainGroupDateOneOffParticipantFormComponent({
           <Calendar
             id="selectedDate"
             name="selectedDate"
+            // Midnight UTC of the picked day, the way the booking page sends it. A
+            // local midnight is the evening before in UTC - in Greece a Friday went to
+            // the server as Thursday 21:00, so a Friday group refused it as "not one of
+            // the group's days".
             value={
               trainGroupParticipant.selectedDate
-                ? new Date(trainGroupParticipant.selectedDate)
+                ? fromUtcDay(trainGroupParticipant.selectedDate)
                 : undefined
             }
             onChange={(e) => {
               if (e.value) {
-                const date = new Date(
-                  e.value.getFullYear(),
-                  e.value.getMonth(),
-                  e.value.getDate(),
-                  0,
-                  0,
-                  0
-                );
-
                 setTrainGroupParticipant({
                   ...trainGroupParticipant,
-                  selectedDate: date.toISOString(),
+                  selectedDate: toUtcDay(e.value),
                 });
               }
             }}

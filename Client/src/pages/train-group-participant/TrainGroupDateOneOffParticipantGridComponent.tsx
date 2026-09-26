@@ -19,6 +19,7 @@ import { TrainGroupParticipantDto } from "../../model/entities/train-group-parti
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
 import { Tag } from "primereact/tag";
+import { toUtcDay } from "../train-group-booking/BookingDates";
 
 interface IField {
   formMode: FormMode;
@@ -151,7 +152,8 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
       // filter: formMode !== FormMode.ADD,
       filter: false,
       filterPlaceholder: t("Search"),
-      style: { width: "30%" },
+      style: { width: "40%" },
+
       body: (rowData: TrainGroupParticipantDto) => {
         if (rowData.selectedDate) {
           const date = new Date(rowData.selectedDate);
@@ -164,14 +166,6 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
           );
         }
       },
-    },
-    {
-      field: "trainGroupDateId",
-      header: "TrainGroupDateId",
-      sortable: false,
-      filter: false,
-      filterPlaceholder: t("Search"),
-      style: { width: "10%" },
     },
     {
       field: "userId",
@@ -187,7 +181,7 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
         />
       ),
       body: (rowData, options) => chipTemplate(rowData.user),
-      style: { width: "10%" },
+      style: { width: "40%" },
     },
   ];
 
@@ -378,14 +372,8 @@ export default function TrainGroupDateOneOffParticipantGridComponent({
         resetTrainGroupParticipant();
         setAddDialogVisible(true);
         const participant = new TrainGroupParticipantDto();
-        participant.selectedDate = new Date(
-          new Date().getFullYear(),
-          new Date().getMonth(),
-          new Date().getDate(),
-          0,
-          0,
-          0
-        ).toISOString();
+        // Today as midnight UTC, the same as the form sends when a date is picked.
+        participant.selectedDate = toUtcDay(new Date());
         setTrainGroupParticipant(participant);
         break;
       case ButtonTypeEnum.EDIT:

@@ -455,6 +455,10 @@
   'e.g. 18 knee pain': string;
   'question': string;
   'questions': string;
+  'Please choose a JPG, PNG or WebP image': string;
+  'The image is too large. Please use one under 10 MB': string;
+  'This file could not be read as an image': string;
+  'Change image': string;
     }
 
 

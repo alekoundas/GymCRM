@@ -22,9 +22,22 @@ import SubscriptionMemberTabComponent from "../subscription/SubscriptionMemberTa
 import UserMedicalHistoryComponent from "./UserMedicalHistoryComponent";
 import TrainGroupAttendanceMemberTabComponent from "../train-group-attendance/TrainGroupAttendanceMemberTabComponent";
 import SubscriptionBalanceTag from "../subscription/SubscriptionBalanceTag";
+import { useToast } from "../../contexts/ToastContext";
+import {
+  ALLOWED_IMAGE_ACCEPT,
+  isAllowedImageType,
+  resizeToJpegDataUrl,
+} from "../../services/ImageService";
+
+// The largest photo taken in. It is shrunk before it is sent, so this only stops the
+// browser being asked to open something enormous.
+const MAX_SOURCE_IMAGE_BYTES = 10 * 1024 * 1024;
+// A profile picture is shown small, so this is plenty.
+const PROFILE_IMAGE_MAX_SIDE = 512;
 
 export default function UserProfilePage() {
   const { t } = useTranslator();
+  const { showError } = useToast();
   const params = useParams();
   const apiService = useApiService();
 
@@ -94,41 +107,52 @@ export default function UserProfilePage() {
     const file = event.files[0];
     if (!file) return;
 
+    if (!isAllowedImageType(file)) {
+      showError(t("Please choose a JPG, PNG or WebP image"));
+      setIsImageUploadSelected(false);
+      return;
+    }
+
+    if (file.size > MAX_SOURCE_IMAGE_BYTES) {
+      showError(t("The image is too large. Please use one under 10 MB"));
+      setIsImageUploadSelected(false);
+      return;
+    }
+
     try {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const fullDataUrl = reader.result as string;
-        // Keep full data URL in DTO for display
-        userDto.profileImage = fullDataUrl;
+      // Shrunk and re-saved as a small JPEG before it goes anywhere.
+      const fullDataUrl = await resizeToJpegDataUrl(file, PROFILE_IMAGE_MAX_SIDE);
 
-        // Extract plain base64 for API (split removes 'data:image/png;base64,' prefix)
-        const plainBase64 = fullDataUrl.split(",")[1];
+      // Keep full data URL in DTO for display
+      userDto.profileImage = fullDataUrl;
 
-        // Create a copy for update with plain base64
-        const updateDto: UserDto = { ...userDto, profileImage: plainBase64 };
+      // Extract plain base64 for API (split removes the 'data:image/jpeg;base64,' prefix)
+      const plainBase64 = fullDataUrl.split(",")[1];
 
-        const response = await apiService.update<UserDto>(
-          "Users",
-          updateDto,
-          userDto.id
-        );
-        if (response) {
-          const id = params["id"];
-          if (id === undefined) {
-            LocalStorageService.setProfileImage(updateDto.profileImage ?? "");
-          }
+      // Create a copy for update with plain base64
+      const updateDto: UserDto = { ...userDto, profileImage: plainBase64 };
 
-          if (
-            response.profileImage &&
-            !response.profileImage.startsWith("data:")
-          ) {
-            response.profileImage = `data:image/png;base64,${response.profileImage}`;
-          }
-          updateUserDto(response);
+      const response = await apiService.update<UserDto>(
+        "Users",
+        updateDto,
+        userDto.id
+      );
+      if (response) {
+        const id = params["id"];
+        if (id === undefined) {
+          LocalStorageService.setProfileImage(updateDto.profileImage ?? "");
         }
-      };
-      reader.readAsDataURL(file);
+
+        if (
+          response.profileImage &&
+          !response.profileImage.startsWith("data:")
+        ) {
+          response.profileImage = `data:image/png;base64,${response.profileImage}`;
+        }
+        updateUserDto(response);
+      }
     } catch (error) {
+      showError(t("This file could not be read as an image"));
       console.error("Image upload failed:", error);
     }
 
@@ -180,12 +204,11 @@ export default function UserProfilePage() {
               mode="basic"
               auto
               name="image"
-              accept="image/*"
-              maxFileSize={5000000}
+              accept={ALLOWED_IMAGE_ACCEPT}
               customUpload
               uploadHandler={handleImageUpload}
               onSelect={() => setIsImageUploadSelected(true)}
-              chooseLabel="Change Image"
+              chooseLabel={t("Change image")}
               style={{
                 position: "absolute",
                 top: "50%",

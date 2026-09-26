@@ -81,6 +81,7 @@
   "Workout_plan_activated": "Workout plan activated!",
   "Questionnaire_saved": "Questionnaire saved!",
   "Answers_saved": "Your answers were saved!",
+  "Image_must_be_a_JPG_PNG_or_WebP_of_up_to_0_MB": "The image must be a JPG, PNG or WebP picture of up to {0} MB!",
   "Calendar_Integration": "Intégration calendrier",
   "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar": "Des fichiers .ics sont joints pour les modifications ci-dessus. Ouvrez les pièces jointes dans Gmail ou téléchargez-les pour ajouter/supprimer des événements de votre Google Agenda.",
   "Add_to_Calendar": "Ajouter au calendrier",

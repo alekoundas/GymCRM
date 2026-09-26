@@ -81,6 +81,7 @@
   "Workout_plan_activated": "Το πρόγραμμα προπόνησης ενεργοποιήθηκε!",
   "Questionnaire_saved": "Το ερωτηματολόγιο αποθηκεύτηκε!",
   "Answers_saved": "Οι απαντήσεις αποθηκεύτηκαν!",
+  "Image_must_be_a_JPG_PNG_or_WebP_of_up_to_0_MB": "Η εικόνα πρέπει να είναι JPG, PNG ή WebP έως {0} MB!",
   "Calendar_Integration": "Ενσωμάτωση Ημερολογίου",
   "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar": "Συνημμένα είναι αρχεία .ics για τις αλλαγές παραπάνω. Ανοίξτε τα συνημμένα στο Gmail ή κατεβάστε τα για να προσθέσετε/αφαιρέσετε γεγονότα από το Google Ημερολόγιό σας.",
   "Add_to_Calendar": "Προσθήκη στο Ημερολόγιο",

@@ -449,5 +449,9 @@
   "answered": "answered",
   "e.g. 18 knee pain": "e.g. 18 knee pain",
   "question": "question",
-  "questions": "questions"
+  "questions": "questions",
+  "Please choose a JPG, PNG or WebP image": "Please choose a JPG, PNG or WebP image",
+  "The image is too large. Please use one under 10 MB": "The image is too large. Please use one under 10 MB",
+  "This file could not be read as an image": "This file could not be read as an image",
+  "Change image": "Change image"
 }
