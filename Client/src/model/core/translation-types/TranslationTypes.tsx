@@ -409,6 +409,12 @@
   'Recurring bookings': string;
   'Stop permanently': string;
   'You can book it again any time from the Book tab': string;
+  'All': string;
+  'Categories': string;
+  'Category': string;
+  'New category': string;
+  'The train groups in this category will be left without one': string;
+  'Train group categories': string;
     }
 
 

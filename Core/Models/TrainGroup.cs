@@ -11,6 +11,10 @@ namespace Core.Models
         public int MaxParticipants { get; set; }
 
 
+        // Optional. Lets the admin calendar list the day's groups in tabs.
+        public int? TrainGroupCategoryId { get; set; }
+        public TrainGroupCategory? TrainGroupCategory { get; set; }
+
         public Guid TrainerId { get; set; }
         public User Trainer { get; set; } = null!;
 

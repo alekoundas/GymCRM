@@ -33,6 +33,7 @@ namespace DataAccess
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<TrainGroup> TrainGroups { get; set; }
         public DbSet<UserStatus> UserStatuses { get; set; }
+        public DbSet<TrainGroupCategory> TrainGroupCategories { get; set; }
         public DbSet<WorkoutPlan> WorkoutPlans { get; set; }
         public DbSet<PhoneNumber> PhoneNumbers { get; set; }
         public DbSet<TrainGroupDate> TrainGroupDates { get; set; }
@@ -78,6 +79,7 @@ namespace DataAccess
             builder.ApplyConfiguration(new UserRoleConfiguration());
             builder.ApplyConfiguration(new ExerciseConfiguration());
             builder.ApplyConfiguration(new UserStatusConfiguration());
+            builder.ApplyConfiguration(new TrainGroupCategoryConfiguration());
             builder.ApplyConfiguration(new TrainGroupConfiguration());
             builder.ApplyConfiguration(new PhoneNumberConfiguration());
             builder.ApplyConfiguration(new WorkoutPlanConfiguration());

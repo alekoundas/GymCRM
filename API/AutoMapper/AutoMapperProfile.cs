@@ -14,6 +14,7 @@ using Core.Dtos.TrainGroupΑttendance;
 using Core.Dtos.User;
 using Core.Dtos.UserRole;
 using Core.Dtos.UserStatus;
+using Core.Dtos.TrainGroupCategory;
 using Core.Dtos.WorkoutPlan;
 using Core.Dtos.WorkoutPlanRecording;
 using Core.Dtos.WorkoutPlanRule;
@@ -148,6 +149,12 @@ namespace API.AutoMapper
             CreateMap<WorkoutPlan, WorkoutPlanAddDto>();
             CreateMap<WorkoutPlanAddDto, WorkoutPlan>();
 
+
+            // TrainGroupCategory mappings.
+            CreateMap<TrainGroupCategory, TrainGroupCategoryDto>();
+            CreateMap<TrainGroupCategoryDto, TrainGroupCategory>();
+            CreateMap<TrainGroupCategory, TrainGroupCategoryAddDto>();
+            CreateMap<TrainGroupCategoryAddDto, TrainGroupCategory>();
 
             // UserStatus mappings.
             CreateMap<UserStatus, UserStatusDto>();

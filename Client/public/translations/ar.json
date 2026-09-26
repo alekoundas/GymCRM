@@ -402,5 +402,11 @@
   "until you stop it": "until you stop it",
   "Recurring bookings": "Recurring bookings",
   "Stop permanently": "Stop permanently",
-  "You can book it again any time from the Book tab": "You can book it again any time from the Book tab"
+  "You can book it again any time from the Book tab": "You can book it again any time from the Book tab",
+  "All": "All",
+  "Categories": "Categories",
+  "Category": "Category",
+  "New category": "New category",
+  "The train groups in this category will be left without one": "The train groups in this category will be left without one",
+  "Train group categories": "Train group categories"
 }

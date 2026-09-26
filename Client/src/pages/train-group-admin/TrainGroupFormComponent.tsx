@@ -45,9 +45,11 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
   };
 
   // Handle Cancel for a specific field
+  // Restores whatever was there before, empty included - an optional field that
+  // had no value goes back to having none.
   const handleCancel = (field: keyof typeof trainGroupDto) => {
     updateTrainGroupDto({
-      [field]: originalValues[field] ?? trainGroupDto[field],
+      [field]: field in originalValues ? originalValues[field] : trainGroupDto[field],
     });
     setEditingField(undefined);
     setOriginalValues({});
@@ -328,6 +330,54 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
                 icon="pi pi-check"
                 className="p-button-rounded p-button-text p-button-success"
                 onClick={() => handleSave("trainerId")}
+              />
+            </>
+          ))}
+      </div>
+
+      {/* Optional. Puts the group in its own tab on the admin calendar. */}
+      <div className="field">
+        <label
+          htmlFor="trainGroupCategoryId"
+          className="block text-900 font-medium mb-2"
+        >
+          {t("Category")}
+        </label>
+        <LookupComponent
+          controller="trainGroupCategories"
+          selectedEntityId={trainGroupDto.trainGroupCategoryId?.toString() ?? ""}
+          onChange={(x) =>
+            handleChange({
+              target: {
+                name: "trainGroupCategoryId",
+                value: x?.id ? +x.id : undefined,
+              },
+            })
+          }
+          isEnabled={
+            (formMode === FormMode.EDIT && editingField === "trainGroupCategoryId") ||
+            formMode === FormMode.ADD
+          }
+        />
+        {formMode === FormMode.EDIT &&
+          (editingField !== "trainGroupCategoryId" ? (
+            <Button
+              icon="pi pi-pencil"
+              className="p-button-rounded p-button-text p-button-secondary"
+              onClick={() => handleEdit("trainGroupCategoryId")}
+              visible={editingField === undefined}
+            />
+          ) : (
+            <>
+              <Button
+                icon="pi pi-times"
+                className="p-button-rounded p-button-text p-button-danger"
+                onClick={() => handleCancel("trainGroupCategoryId")}
+              />
+              <Button
+                icon="pi pi-check"
+                className="p-button-rounded p-button-text p-button-success"
+                onClick={() => handleSave("trainGroupCategoryId")}
               />
             </>
           ))}

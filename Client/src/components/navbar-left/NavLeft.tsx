@@ -27,9 +27,10 @@ export default function NavLeft() {
   });
 
   const baseItems: MenuItem[] = [
-    // What the gym does day to day. Ordered by how often it is opened, with the
-    // configuration screen last.
-    group(t("Training"), [
+    // The sessions themselves: what runs when, who is in it, who came. Ordered by
+    // how often each is opened, with the categories - set up once - after the groups
+    // they label.
+    group(t("Train Groups"), [
       {
         label: t("Calendar"),
         icon: "pi pi-calendar",
@@ -43,11 +44,21 @@ export default function NavLeft() {
         command: () => navigate("/administrator/train-groups"),
       },
       {
+        label: t("Categories"),
+        icon: "pi pi-tags",
+        visible: TokenService.isUserAllowed("TrainGroupCategories_View"),
+        command: () => navigate("/administrator/train-group-categories"),
+      },
+      {
         label: t("Attendances"),
         icon: "pi pi-check-square",
         visible: TokenService.isUserAllowed("TrainGroups_View"),
         command: () => navigate("/administrator/attendances"),
       },
+    ]),
+
+    // The programmes members follow, and what they have logged against them.
+    group(t("Workout Plans"), [
       {
         label: t("Workout Plans"),
         icon: "pi pi-clipboard",

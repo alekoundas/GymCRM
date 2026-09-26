@@ -138,6 +138,7 @@ namespace API.Controllers
                 Trainer = _mapper.Map<UserDto>(trainGroup.Trainer),
                 TrainerFullName = (trainGroup.Trainer.FirstName + " " + trainGroup.Trainer.LastName).Trim(),
                 TrainGroupId = trainGroup.Id,
+                TrainGroupCategoryId = trainGroup.TrainGroupCategoryId,
                 TrainGroupDateId = sessionDate.Id,
                 MaxParticipants = trainGroup.MaxParticipants,
                 SpotsLeft = trainGroup.MaxParticipants - trainGroup.TrainGroupParticipants.Count(x => BookingRules.HoldsPlace(x, day)),

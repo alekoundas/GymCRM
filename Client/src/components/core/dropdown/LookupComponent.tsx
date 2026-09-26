@@ -63,6 +63,9 @@ export default function LookupComponent({
     if (selectedEntityId) {
       setSelectedOptionById(selectedEntityId);
       setSelectedId(selectedEntityId);
+    } else {
+      // Cleared from outside - a form's cancel, say - so the box shows it too.
+      setSelectedId(undefined);
     }
   }, [selectedEntityId]);
 
