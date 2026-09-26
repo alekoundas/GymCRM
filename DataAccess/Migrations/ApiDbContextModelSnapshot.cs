@@ -448,7 +448,21 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("RecurringEndOnDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("RecurringStartOnDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RemovedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RemovedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("RemovedOn")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("SelectedDate")

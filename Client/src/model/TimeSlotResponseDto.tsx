@@ -15,8 +15,13 @@ export interface TimeSlotResponseDto {
   duration: string;
   startOn: string;
   spotsLeft: number;
+  maxParticipants?: number;
   isUnavailableTrainGroup: boolean;
   unavailableTrainGroupId: number | undefined;
+  // Booking page: where the member stands on the requested day.
+  bookedParticipantId?: number;
+  isBookedRecurring?: boolean;
+  skippedUnavailableDateId?: number;
   recurrenceDates: TimeSlotRecurrenceDateDto[];
 }
 

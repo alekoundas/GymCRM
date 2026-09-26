@@ -9,6 +9,9 @@
 
         // The members furthest into the red, worst first.
         public List<SubscriptionDebtorDto> TopDebtors { get; set; } = new List<SubscriptionDebtorDto>();
+
+        // Requests nobody has answered yet, the ones kept waiting longest first.
+        public List<SubscriptionPendingRequestDto> OldestPendingRequests { get; set; } = new List<SubscriptionPendingRequestDto>();
     }
 
     public class SubscriptionMonthDto
@@ -29,6 +32,21 @@
         public string Key { get; set; } = string.Empty;
 
         public int Count { get; set; }
+    }
+
+    public class SubscriptionPendingRequestDto
+    {
+        public int Id { get; set; }
+
+        public string UserId { get; set; } = string.Empty;
+
+        public string FullName { get; set; } = string.Empty;
+
+        public int RequestedAmount { get; set; }
+
+        // How long it has been waiting. Sent as a count of days rather than a date so
+        // no timezone gets a say in whether it reads as one day or two.
+        public int WaitingDays { get; set; }
     }
 
     public class SubscriptionDebtorDto

@@ -18,8 +18,18 @@ export interface SubscriptionDebtorDto {
   balance: number;
 }
 
+export interface SubscriptionPendingRequestDto {
+  id: number;
+  userId: string;
+  fullName: string;
+  requestedAmount: number;
+  // Days waited, not a date: no timezone gets a say in whether it reads as one or two.
+  waitingDays: number;
+}
+
 export interface SubscriptionChartsDto {
   monthlyApproved: SubscriptionMonthDto[];
   buckets: SubscriptionBucketDto[];
   topDebtors: SubscriptionDebtorDto[];
+  oldestPendingRequests: SubscriptionPendingRequestDto[];
 }

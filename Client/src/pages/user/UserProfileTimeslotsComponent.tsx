@@ -5,7 +5,6 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
-import { TrainGroupDateTypeEnum } from "../../enum/TrainGroupDateTypeEnum";
 import { EventContentArg } from "@fullcalendar/core/index.js";
 import GenericDialogComponent, {
   DialogControl,
@@ -21,59 +20,80 @@ import { useTranslator } from "../../services/TranslatorService";
 import { LocalStorageService } from "../../services/LocalStorageService";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { Avatar } from "primereact/avatar";
-import { useDateService } from "../../services/DateService";
-import { DayOfWeekEnum } from "../../enum/DayOfWeekEnum";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import {
+  CHANGE_WINDOW_HOURS,
+  durationMinutes,
+  fromUtcDay,
+  hoursUntil,
+  sessionStart,
+  startOfDay,
+} from "../train-group-booking/BookingDates";
+
+// What a date on the calendar is. Past and future are decided here, against the
+// member's own today - the server only says booked, skipped or attended.
+type EntryStatus = "ATTENDED" | "MISSED" | "UPCOMING" | "SKIPPED";
+
+const entryStatus = (entry: TimeSlotRecurrenceDateDto): EntryStatus => {
+  if (entry.isAttendance) return "ATTENDED";
+  if (entry.trainGroupParticipantUnavailableDateId) return "SKIPPED";
+  return fromUtcDay(entry.date) < startOfDay(new Date()) ? "MISSED" : "UPCOMING";
+};
+
+const statusSeverity = (
+  status: EntryStatus
+): "success" | "danger" | "info" | "secondary" =>
+  status === "ATTENDED"
+    ? "success"
+    : status === "MISSED"
+      ? "danger"
+      : status === "UPCOMING"
+        ? "info"
+        : "secondary";
+
+// Every entry is one session on one real date, so it carries its own id.
+const entryId = (entry: TimeSlotRecurrenceDateDto): string =>
+  entry.isAttendance
+    ? `att-${entry.attendanceId}`
+    : `p-${entry.trainGroupParticipantId}-${entry.date}`;
 
 export default function UserProfileTimeslotsComponent() {
   const { t } = useTranslator();
-  const {
-    getDayOfWeekFromDate,
-    getNextDayOfWeekDateUTC,
-    getNextDayOfMonthDateUTC,
-    getUTCTime,
-  } = useDateService();
   const apiService = useApiService();
   const params = useParams();
   const isAdminPage = location.pathname.includes("/administrator");
 
-  // const { userDto, updateUserDto } = useUserStore();
   const calendarRef = useRef<FullCalendar>(null);
 
   const [events, setEvents] = useState<any[]>([]); // Data
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTrainGroup, setSelectedTrainGroup] =
     useState<TimeSlotResponseDto>(new TimeSlotResponseDto());
-  const [selectedTimeSlotRecurrenceDate, setSelectedTimeSlotRecurrenceDate] =
-    useState<TimeSlotRecurrenceDateDto>(new TimeSlotRecurrenceDateDto());
+  const [selectedEntry, setSelectedEntry] = useState<TimeSlotRecurrenceDateDto>(
+    new TimeSlotRecurrenceDateDto()
+  );
 
   const [loading, setLoading] = useState(false);
-  const [isTimeSlotDialogVisible, setTimeSlotDialogVisible] = useState(false); // Dialog visibility
-  const [isOptOutTimeSlotDialogVisible, setOptOutTimeSlotDialogVisible] =
-    useState(false); // Dialog visibility
-  const [
-    isOptOutDateTimeSlotDialogVisible,
-    setOptOutDateTimeSlotDialogVisible,
-  ] = useState(false); // Dialog visibility
-  const [isOptInDateTimeSlotDialogVisible, setOptInDateTimeSlotDialogVisible] =
-    useState(false); // Dialog visibility
+  const [isTimeSlotDialogVisible, setTimeSlotDialogVisible] = useState(false);
+  const [isStopDialogVisible, setStopDialogVisible] = useState(false);
+  const [isSkipDialogVisible, setSkipDialogVisible] = useState(false);
+  const [isRejoinDialogVisible, setRejoinDialogVisible] = useState(false);
 
   const timeSlotDialogControl: DialogControl = {
     showDialog: () => setTimeSlotDialogVisible(true),
     hideDialog: () => setTimeSlotDialogVisible(false),
   };
-  const optOutTimeSlotDialogControl: DialogControl = {
-    showDialog: () => setOptOutTimeSlotDialogVisible(true),
-    hideDialog: () => setOptOutTimeSlotDialogVisible(false),
+  const stopDialogControl: DialogControl = {
+    showDialog: () => setStopDialogVisible(true),
+    hideDialog: () => setStopDialogVisible(false),
   };
-  const optOutDateTimeSlotDialogControl: DialogControl = {
-    showDialog: () => setOptOutDateTimeSlotDialogVisible(true),
-    hideDialog: () => setOptOutDateTimeSlotDialogVisible(false),
+  const skipDialogControl: DialogControl = {
+    showDialog: () => setSkipDialogVisible(true),
+    hideDialog: () => setSkipDialogVisible(false),
   };
-  const optInDateTimeSlotDialogControl: DialogControl = {
-    showDialog: () => setOptInDateTimeSlotDialogVisible(true),
-    hideDialog: () => setOptInDateTimeSlotDialogVisible(false),
+  const rejoinDialogControl: DialogControl = {
+    showDialog: () => setRejoinDialogVisible(true),
+    hideDialog: () => setRejoinDialogVisible(false),
   };
 
   const fetchTimeSlots = async (currentDate: Date) => {
@@ -97,135 +117,40 @@ export default function UserProfileTimeslotsComponent() {
       timeSlotDto.userId = id;
     }
 
-    const response = await apiService.timeslots("Users/TimeSlots", timeSlotDto); // Replace with your API endpoint
-
-    // Generate 7 days starting from sunday of current week
-    const calendarDates = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(currentDate);
-      date.setDate(currentDate.getDate() + i);
-      return date;
-    });
+    const response = await apiService.timeslots("Users/TimeSlots", timeSlotDto);
 
     if (response) {
-      // Midnight today. Everything before it is history and is shown from the
-      // attendances; today and after stay the projection of who is enrolled.
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
+      // Every entry is a real date now - from booking to leaving, attended, missed,
+      // skipped or still to come - so each is placed on its own day.
+      const mappedEvents = response.flatMap((slot) =>
+        slot.recurrenceDates.map((x) => {
+          const day = fromUtcDay(x.date);
+          const start = sessionStart(day, slot.startOn);
+          const end = new Date(
+            start.getTime() + durationMinutes(slot.duration) * 60 * 1000
+          );
+          const status = entryStatus(x);
 
-      // Which groups already have an attendance on which day. Today is the one day both
-      // kinds can produce an entry, and the attendance is the truer of the two.
-      const attendedKeys = new Set(
-        response.flatMap((slot) =>
-          slot.recurrenceDates
-            .filter((x) => x.isAttendance)
-            .map((x) => `${slot.trainGroupId}|${new Date(x.date).toDateString()}`)
-        )
+          return {
+            id: entryId(x),
+            title: slot.title,
+            start: start,
+            end: end,
+            extendedProps: { status: status },
+          };
+        })
       );
 
-      const mappedEvents = response
-        .filter((x) => !x.isUnavailableTrainGroup)
-        .flatMap((slot) =>
-          slot.recurrenceDates
-            // .filter((x) => !x.isUnavailableTrainGroup)
-            .map((x) => {
-              let startDate: Date | undefined;
-
-              // Fixed Date
-              if (x.trainGroupDateType === TrainGroupDateTypeEnum.FIXED_DAY)
-                startDate = new Date(x.date);
-
-              // Date Of Month
-              if (
-                x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_MONTH
-              ) {
-                const dateOfWeek = calendarDates.find(
-                  (y) => y.getDate() === new Date(x.date).getDate()
-                );
-                if (dateOfWeek) {
-                  startDate = dateOfWeek;
-                }
-              }
-
-              // Date Of Week
-              if (x.trainGroupDateType === TrainGroupDateTypeEnum.DAY_OF_WEEK) {
-                const dateOfWeek = calendarDates.find(
-                  (y) => y.getDay() === new Date(x.date).getDay()
-                );
-                if (dateOfWeek) {
-                  startDate = dateOfWeek;
-                }
-              }
-
-              // One off participant
-              if (!x.trainGroupDateId) {
-                startDate = new Date(x.date);
-              }
-
-              if (startDate) {
-                const startTime = getUTCTime(slot.startOn);
-                startDate = new Date(
-                  startDate.getFullYear(),
-                  startDate.getMonth(),
-                  startDate.getDate(),
-                  startTime.getHours(),
-                  startTime.getMinutes(),
-                  0
-                );
-
-                // Calculate endDate
-                const durationTime = getUTCTime(slot.duration);
-                const durationMinutes =
-                  durationTime.getHours() * 60 + durationTime.getMinutes();
-                const endDate = new Date(
-                  startDate.getTime() + durationMinutes * 60 * 1000
-                );
-
-                // A day that has been and gone is told by its attendances alone. Without
-                // this the calendar would keep projecting today's enrolments back over
-                // weeks that are already history, and change what they say every time
-                // somebody joins or leaves a group.
-                if (!x.isAttendance && startDate < todayStart) return undefined;
-
-                // Today can produce both. The attendance wins.
-                if (
-                  !x.isAttendance &&
-                  attendedKeys.has(
-                    `${slot.trainGroupId}|${startDate.toDateString()}`
-                  )
-                )
-                  return undefined;
-
-                return {
-                  // Attendances have no recurrence date behind them, so they carry their
-                  // own id and are looked up by it when clicked.
-                  id: x.isAttendance
-                    ? `att-${x.attendanceId}`
-                    : `${x.trainGroupDateId}`,
-                  title: slot.title,
-                  start: startDate,
-
-                  end: endDate,
-                  backgroundColor: x.isAttendance
-                    ? "#22C55E" // took place
-                    : x.isUserJoined
-                      ? "#007ad9"
-                      : "#ced4da", // Joined: blue, not: gray
-                  isUserJoined: x.isUserJoined,
-                  extendedProps: {
-                    isUserJoined: x.isUserJoined,
-                    isAttendance: x.isAttendance,
-                  },
-                };
-              }
-            })
-        );
-
-      const mappedEventsCleaned = mappedEvents.filter((x) => x !== undefined);
-      setEvents(mappedEventsCleaned);
+      setEvents(mappedEvents);
       setTimeSlots(response);
     }
 
     setLoading(false);
+  };
+
+  const refetch = async () => {
+    const currentStart = calendarRef.current?.getApi().view.currentStart;
+    if (currentStart) await fetchTimeSlots(currentStart);
   };
 
   useEffect(() => {
@@ -263,112 +188,72 @@ export default function UserProfileTimeslotsComponent() {
     }
   };
 
-  // An attendance is identified by its own id; everything else still by the recurrence
-  // date it came from.
-  const matchesEvent = (
-    recurrenceDate: TimeSlotRecurrenceDateDto,
-    eventId: string
-  ): boolean =>
-    eventId.startsWith("att-")
-      ? recurrenceDate.attendanceId === +eventId.slice(4)
-      : recurrenceDate.trainGroupDateId === +eventId;
-
-  const onTimeSlotClick = async (arg: EventContentArg) => {
-    const timeSlot: TimeSlotResponseDto | undefined = timeSlots.find((x) =>
-      x.recurrenceDates.some((y) => matchesEvent(y, arg.event.id))
-    );
-
-    if (arg.event.start) {
-      const dateCleaned = new Date(
-        Date.UTC(
-          arg.event.start.getFullYear(),
-          arg.event.start.getMonth(),
-          arg.event.start.getDate(),
-          0,
-          0,
-          0,
-          0
-        )
-      );
-      setSelectedDate(dateCleaned);
-
-      if (timeSlot) {
+  const onTimeSlotClick = (arg: EventContentArg) => {
+    for (const slot of timeSlots) {
+      const entry = slot.recurrenceDates.find((x) => entryId(x) === arg.event.id);
+      if (entry) {
         // The slot itself, not another lookup by id: a deleted group has no id left to
         // look up, and the attendance carries everything the dialog needs anyway.
-        const trainGroup = timeSlot;
-
-        if (trainGroup) {
-          const timeslotDate = timeSlot.recurrenceDates.find((x) =>
-            matchesEvent(x, arg.event.id)
-          );
-
-          if (timeslotDate) {
-            setSelectedTimeSlotRecurrenceDate(timeslotDate);
-            setSelectedTrainGroup(trainGroup);
-            timeSlotDialogControl.showDialog();
-          }
-        }
+        setSelectedTrainGroup(slot);
+        setSelectedEntry(entry);
+        timeSlotDialogControl.showDialog();
+        return;
       }
     }
   };
 
-  const onOptOut = async () => {
-    if (selectedTimeSlotRecurrenceDate.trainGroupParticipantId)
-      apiService
-        .post("TrainGroupParticipants/CustomDelete", {
-          id: selectedTimeSlotRecurrenceDate.trainGroupParticipantId,
-          clientTimezoneOffsetMinutes: new Date().getTimezoneOffset(),
-          isAdminPage: isAdminPage,
-        })
-        .then(async () => {
-          optOutTimeSlotDialogControl.hideDialog();
-          timeSlotDialogControl.hideDialog();
-          const calendarApi = calendarRef.current?.getApi();
-          const currentStart = calendarApi?.view.currentStart;
-          if (currentStart) {
-            await fetchTimeSlots(currentStart);
-          }
-        });
+  const offset = () => new Date().getTimezoneOffset();
+
+  // Stop a recurring booking from this date on, or cancel a one-off. Neither deletes
+  // anything: the dates before stay on the calendar.
+  const onStop = async () => {
+    const id = selectedEntry.trainGroupParticipantId;
+    if (!id) return;
+
+    const dto = {
+      fromDate: selectedEntry.date,
+      clientTimezoneOffsetMinutes: offset(),
+      isAdminPage: isAdminPage,
+    };
+    const response = selectedEntry.isOneOff
+      ? await apiService.cancelBooking(id, dto)
+      : await apiService.endBooking(id, dto);
+
+    if (response) {
+      stopDialogControl.hideDialog();
+      timeSlotDialogControl.hideDialog();
+      await refetch();
+    }
   };
 
-  const onOptOutDate = async () => {
-    apiService
-      .create("TrainGroupParticipantUnavailableDates", {
-        trainGroupParticipantId:
-          selectedTimeSlotRecurrenceDate.trainGroupParticipantId,
-        unavailableDate: selectedDate.toISOString(),
-        isAdminPage: isAdminPage,
-      } as TrainGroupParticipantUnavailableDateDto)
-      .then(async () => {
-        optOutDateTimeSlotDialogControl.hideDialog();
-        timeSlotDialogControl.hideDialog();
-        const calendarApi = calendarRef.current?.getApi();
-        const currentStart = calendarApi?.view.currentStart;
-        if (currentStart) {
-          await fetchTimeSlots(currentStart);
-        }
-      });
+  const onSkip = async () => {
+    const response = await apiService.create("TrainGroupParticipantUnavailableDates", {
+      id: 0,
+      trainGroupParticipantId: selectedEntry.trainGroupParticipantId ?? 0,
+      unavailableDate: selectedEntry.date,
+      isAdminPage: isAdminPage,
+      clientTimezoneOffsetMinutes: offset(),
+    } as TrainGroupParticipantUnavailableDateDto);
+
+    if (response) {
+      skipDialogControl.hideDialog();
+      timeSlotDialogControl.hideDialog();
+      await refetch();
+    }
   };
 
-  const onOptInDate = async () => {
-    if (selectedTimeSlotRecurrenceDate.trainGroupParticipantUnavailableDateId)
-      apiService
-        .delete(
-          "TrainGroupParticipantUnavailableDates",
-          selectedTimeSlotRecurrenceDate.trainGroupParticipantUnavailableDateId
-        )
-        .then(async () => {
-          optInDateTimeSlotDialogControl.hideDialog();
-          timeSlotDialogControl.hideDialog();
-          const calendarApi = calendarRef.current?.getApi();
-          const currentStart = calendarApi?.view.currentStart;
-          if (currentStart) {
-            await fetchTimeSlots(currentStart);
-          }
-        });
+  const onRejoin = async () => {
+    const id = selectedEntry.trainGroupParticipantUnavailableDateId;
+    if (!id) return;
+
+    const response = await apiService.delete("TrainGroupParticipantUnavailableDates", id);
+    if (response) {
+      rejoinDialogControl.hideDialog();
+      timeSlotDialogControl.hideDialog();
+      await refetch();
+    }
   };
 
-  // Custom chip template for selected users
   // "18:30" out of a stored wall clock that arrives stamped as utc.
   const formatClock = (value: string | undefined): string => {
     if (!value) return "";
@@ -379,15 +264,6 @@ export default function UserProfileTimeslotsComponent() {
       date.getUTCMinutes().toString().padStart(2, "0")
     );
   };
-
-  const isSelectedSlotJoined = (): boolean =>
-    timeSlots.some((x) =>
-      x.recurrenceDates.some(
-        (y) =>
-          y.trainGroupDateId === selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-          y.isUserJoined
-      )
-    );
 
   const chipTemplate = (user: UserDto | undefined) => {
     if (user) {
@@ -415,46 +291,33 @@ export default function UserProfileTimeslotsComponent() {
     }
   };
 
-  const isDateTwelveHoursFromNow = (
-    apiDate: string,
-    apiStartOnDate: string,
-    type: TrainGroupDateTypeEnum | undefined
-  ): boolean => {
-    let startOnDate = new Date(apiDate);
-    if (type === TrainGroupDateTypeEnum.DAY_OF_WEEK) {
-      const dayOfWeek: DayOfWeekEnum = getDayOfWeekFromDate(
-        new Date(apiDate)
-      )?.toUpperCase() as DayOfWeekEnum;
+  const status = entryStatus(selectedEntry);
+  const statusLabel =
+    status === "ATTENDED"
+      ? t("Attended")
+      : status === "MISSED"
+        ? t("Missed")
+        : status === "UPCOMING"
+          ? t("Upcoming")
+          : t("Skipped");
+  const statusIcon =
+    status === "ATTENDED"
+      ? "pi pi-check"
+      : status === "MISSED"
+        ? "pi pi-times"
+        : status === "UPCOMING"
+          ? "pi pi-clock"
+          : "pi pi-minus-circle";
 
-      // startOnDate = getNextDayOfWeekDateUTC(dayOfWeek, selectedDate);
-      startOnDate = getNextDayOfWeekDateUTC(dayOfWeek, new Date());
-    }
-    if (type === TrainGroupDateTypeEnum.DAY_OF_MONTH) {
-      startOnDate = getNextDayOfMonthDateUTC(
-        new Date(apiDate).getUTCDate(),
-        new Date()
-      );
-    }
-
-    // Parse the time string as local (remove 'Z' if present to treat as local ISO)
-    const timeStr = apiStartOnDate;
-    const localTimeStr = timeStr.endsWith("Z") ? timeStr.slice(0, -1) : timeStr;
-    const timeDate = new Date(localTimeStr);
-
-    // Use local setHours and getHours to overlay local time
-    startOnDate.setHours(
-      timeDate.getHours(),
-      timeDate.getMinutes(),
-      timeDate.getSeconds(),
-      timeDate.getMilliseconds()
-    );
-
-    const isTwelveHoursFromNow =
-      startOnDate > new Date() &&
-      startOnDate <= new Date(new Date().getTime() + 12 * 60 * 60 * 1000);
-
-    return isTwelveHoursFromNow;
-  };
+  // Only a session still to come can change, and a member not inside 12 hours of it.
+  // On the admin pages staff can, and the server checks they really are staff.
+  const selectedDay = selectedEntry.date ? fromUtcDay(selectedEntry.date) : new Date();
+  const hoursToGo = selectedTrainGroup.startOn
+    ? hoursUntil(selectedDay, selectedTrainGroup.startOn)
+    : 0;
+  const isStillToCome = !selectedEntry.isAttendance && hoursToGo > 0;
+  const isInsideWindow = hoursToGo > 0 && hoursToGo < CHANGE_WINDOW_HOURS;
+  const canChange = isStillToCome && (isAdminPage || !isInsideWindow);
 
   return (
     <>
@@ -499,46 +362,16 @@ export default function UserProfileTimeslotsComponent() {
             center: "title",
             right: "timeGridWeek,timeGridDay",
           }}
-          eventContent={async (arg) => {
-            if (arg.event.extendedProps.isAttendance)
-              return (
-                <Button
-                  severity="success"
-                  className="flex w-full h-full justify-content-center align-items-center"
-                  onClick={() => onTimeSlotClick(arg)}
-                >
-                  <p>{arg.timeText}</p>
-                </Button>
-              );
-
-            const isUserJoined = timeSlots.some((x) =>
-              x.recurrenceDates.some(
-                (y) => y.trainGroupDateId === +arg.event.id && y.isUserJoined
-              )
-            );
-
-            if (isUserJoined)
-              return (
-                <Button
-                  className="flex w-full h-full justify-content-center align-items-center"
-                  onClick={async () => await onTimeSlotClick(arg)}
-                >
-                  {/* <b>{arg.event.title}</b> */}
-                  <p>{arg.timeText}</p>
-                </Button>
-              );
-            else
-              return (
-                <Button
-                  severity="secondary"
-                  className="flex w-full h-full justify-content-center align-items-center"
-                  onClick={() => onTimeSlotClick(arg)}
-                >
-                  {/* <b>{arg.event.title}</b> */}
-                  <p>{arg.timeText}</p>
-                </Button>
-              );
-          }}
+          eventContent={(arg) => (
+            // Green attended, red missed, blue still to come, grey skipped.
+            <Button
+              severity={statusSeverity(arg.event.extendedProps.status as EntryStatus)}
+              className="flex w-full h-full justify-content-center align-items-center"
+              onClick={() => onTimeSlotClick(arg)}
+            >
+              <p>{arg.timeText}</p>
+            </Button>
+          )}
           height="auto"
           editable={false} // Allow drag-and-drop
           themeSystem="standard" // Enables CSS vars theming (default, but explicit)
@@ -565,52 +398,31 @@ export default function UserProfileTimeslotsComponent() {
         // The group names the dialog, so it belongs in the title bar next to the close
         // button rather than repeated as the first line of the body.
         header={selectedTrainGroup?.title}
-        // Nothing in the footer: closing is what the x in the corner is for, and a
-        // Cancel next to two delete buttons only invites a misread.
+        // Nothing in the footer: closing is what the x in the corner is for.
         footer={<></>}
       >
         <div>
           {selectedTrainGroup?.startOn && (
             <>
-              {/* The session at a glance: what it is and how it stands across the top,
-                  the few facts underneath, and anything the trainer wrote last. */}
+              {/* The session at a glance: how it stands across the top, the few facts
+                  underneath, and anything the trainer wrote last. */}
               <div className="flex flex-column gap-4">
-                <div className="flex flex-wrap align-items-center gap-3">
-                  <div className="flex flex-wrap gap-2">
-                    {selectedTimeSlotRecurrenceDate.isAttendance ? (
-                      <Tag
-                        severity="success"
-                        icon="pi pi-check"
-                        value={t("Attended")}
-                      />
-                    ) : (
-                      // Green or red, never grey: being in the group is a yes or a no,
-                      // and grey reads as neither.
-                      <Tag
-                        severity={isSelectedSlotJoined() ? "success" : "danger"}
-                        icon={isSelectedSlotJoined() ? "pi pi-check" : "pi pi-times"}
-                        value={t("Joined")}
-                      />
-                    )}
+                <div className="flex flex-wrap gap-2">
+                  <Tag
+                    severity={statusSeverity(status)}
+                    icon={statusIcon}
+                    value={statusLabel}
+                  />
 
-                    {/* How it was booked matters for a session still to come. For one
-                        that has been and gone it is noise. */}
-                    {!selectedTimeSlotRecurrenceDate.isAttendance && (
-                      <Tag
-                        severity="info"
-                        icon={
-                          selectedTimeSlotRecurrenceDate.isOneOff
-                            ? "pi pi-calendar"
-                            : "pi pi-replay"
-                        }
-                        value={
-                          selectedTimeSlotRecurrenceDate.isOneOff
-                            ? t("One-off")
-                            : t("Recurring")
-                        }
-                      />
-                    )}
-                  </div>
+                  {/* How it was booked matters for a booking, not for the record of
+                      a session that took place. */}
+                  {!selectedEntry.isAttendance && (
+                    <Tag
+                      severity="info"
+                      icon={selectedEntry.isOneOff ? "pi pi-calendar" : "pi pi-replay"}
+                      value={selectedEntry.isOneOff ? t("One-off") : t("Recurring")}
+                    />
+                  )}
                 </div>
 
                 <div className="grid">
@@ -658,12 +470,7 @@ export default function UserProfileTimeslotsComponent() {
               </div>
 
               {/* A cut-off only means something for a session still to come. */}
-              {!selectedTimeSlotRecurrenceDate.isAttendance &&
-                isDateTwelveHoursFromNow(
-                  selectedTimeSlotRecurrenceDate.date,
-                  selectedTrainGroup.startOn,
-                  selectedTimeSlotRecurrenceDate.trainGroupDateType
-                ) && (
+              {isStillToCome && isInsideWindow && !isAdminPage && (
                 <div className="flex justify-content-center pt-5">
                   <p className="text-xl text-primary m-0 pt-4">
                     {t("Already 12h away! You cant opt out.")}
@@ -671,216 +478,98 @@ export default function UserProfileTimeslotsComponent() {
                 </div>
               )}
 
-              {/* Opt Out. A session that has already taken place is a record, not a
-                  booking - there is nothing here to change. */}
-              <div hidden={selectedTimeSlotRecurrenceDate.isAttendance}>
+              {/* A session that has been and gone is a record, not a booking - there
+                  is nothing here to change. */}
+              {isStillToCome && (
                 <div className="flex flex-wrap justify-content-end gap-2 pt-4 mt-4 border-top-1 surface-border">
-                  <Button
-                    label={t("Permanent deletion")}
-                    severity="danger"
-                    onClick={optOutTimeSlotDialogControl.showDialog}
-                    disabled={
-                      isAdminPage === true
-                        ? false
-                        : new Date(
-                            Date.UTC(
-                              selectedDate.getFullYear(),
-                              selectedDate.getMonth(),
-                              selectedDate.getDate(),
-                              0,
-                              0,
-                              0,
-                              0
-                            )
-                          ) <
-                            new Date(
-                              Date.UTC(
-                                new Date().getFullYear(),
-                                new Date().getMonth(),
-                                new Date().getDate(),
-                                0,
-                                0,
-                                0,
-                                0
-                              )
-                            ) ||
-                          isDateTwelveHoursFromNow(
-                            selectedTimeSlotRecurrenceDate.date,
-                            selectedTrainGroup.startOn,
-                            selectedTimeSlotRecurrenceDate.trainGroupDateType
-                          )
-                    }
-                  ></Button>
-
-                  <Button
-                    label={t("Delete specific appointment")}
-                    severity="info"
-                    onClick={optOutDateTimeSlotDialogControl.showDialog}
-                    visible={timeSlots.some((x) =>
-                      x.recurrenceDates.some(
-                        (y) =>
-                          y.trainGroupDateId ===
-                            selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-                          !y.isOneOff &&
-                          !y.trainGroupParticipantUnavailableDateId
-                      )
-                    )}
-                    disabled={
-                      isAdminPage === true
-                        ? false
-                        : new Date(
-                            Date.UTC(
-                              selectedDate.getFullYear(),
-                              selectedDate.getMonth(),
-                              selectedDate.getDate(),
-                              0,
-                              0,
-                              0,
-                              0
-                            )
-                          ) <
-                            new Date(
-                              Date.UTC(
-                                new Date().getFullYear(),
-                                new Date().getMonth(),
-                                new Date().getDate(),
-                                0,
-                                0,
-                                0,
-                                0
-                              )
-                            ) ||
-                          ((calendarRef.current?.getApi().view?.currentStart ??
-                            new Date()) >= new Date()
-                            ? false
-                            : isDateTwelveHoursFromNow(
-                                selectedTimeSlotRecurrenceDate.date,
-                                selectedTrainGroup.startOn,
-                                selectedTimeSlotRecurrenceDate.trainGroupDateType
-                              ))
-                    }
-                  ></Button>
-
-                  <Button
-                    label={t("Rejoin specific appointment")}
-                    severity="info"
-                    onClick={optInDateTimeSlotDialogControl.showDialog}
-                    visible={timeSlots.some((x) =>
-                      x.recurrenceDates.some(
-                        (y) =>
-                          y.trainGroupDateId ===
-                            selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-                          !y.isOneOff &&
-                          y.trainGroupParticipantUnavailableDateId
-                      )
-                    )}
-                    disabled={
-                      new Date(
-                        Date.UTC(
-                          selectedDate.getFullYear(),
-                          selectedDate.getMonth(),
-                          selectedDate.getDate(),
-                          0,
-                          0,
-                          0,
-                          0
-                        )
-                      ) <
-                      new Date(
-                        Date.UTC(
-                          new Date().getFullYear(),
-                          new Date().getMonth(),
-                          new Date().getDate(),
-                          0,
-                          0,
-                          0,
-                          0
-                        )
-                      )
-                    }
-                  ></Button>
-
-                  <div></div>
+                  {status === "SKIPPED" ? (
+                    <Button
+                      label={t("Rejoin this date")}
+                      severity="info"
+                      onClick={rejoinDialogControl.showDialog}
+                    />
+                  ) : selectedEntry.isOneOff ? (
+                    <Button
+                      label={t("Cancel session")}
+                      severity="danger"
+                      disabled={!canChange}
+                      onClick={stopDialogControl.showDialog}
+                    />
+                  ) : (
+                    <>
+                      <Button
+                        label={t("Skip this date")}
+                        severity="info"
+                        disabled={!canChange}
+                        onClick={skipDialogControl.showDialog}
+                      />
+                      <Button
+                        label={t("Stop from this date")}
+                        severity="danger"
+                        disabled={!canChange}
+                        onClick={stopDialogControl.showDialog}
+                      />
+                    </>
+                  )}
                 </div>
-
-                {timeSlots.some((x) =>
-                  x.recurrenceDates.some(
-                    (y) =>
-                      y.trainGroupDateId ===
-                        selectedTimeSlotRecurrenceDate.trainGroupDateId &&
-                      !y.isUserJoined &&
-                      !y.trainGroupParticipantId &&
-                      !y.trainGroupParticipantUnavailableDateId
-                  )
-                ) && (
-                  <div className="flex justify-content-between pt-5">
-                    <div></div>
-                    <div>
-                      <p className="text-xl text-primary m-0 pt-4">
-                        {t(
-                          "You havent joined this date. Please join via apointment tab."
-                        )}
-                      </p>
-                    </div>
-                    <div></div>
-                  </div>
-                )}
-              </div>
+              )}
             </>
           )}
         </div>
       </GenericDialogComponent>
 
       {/*                                                */}
-      {/*         Delete Train Group Participant         */}
+      {/*         Stop or cancel the booking             */}
       {/*                                                */}
       <GenericDialogComponent
-        visible={isOptOutTimeSlotDialogVisible}
-        control={optOutTimeSlotDialogControl}
-        onSave={onOptOut}
-        formMode={FormMode.ADD}
-        header={`${t("Are you sure")}?`}
-        saveLabel={t("Yes")}
-      >
-        <div className="flex justify-content-center">
-          <p>{t("This action will cancel your booking for this date.")}</p>
-        </div>
-      </GenericDialogComponent>
-
-      {/*                                               */}
-      {/*          Opt Out Train Group Participant      */}
-      {/*                                               */}
-      <GenericDialogComponent
-        visible={isOptOutDateTimeSlotDialogVisible}
-        control={optOutDateTimeSlotDialogControl}
-        onSave={onOptOutDate}
+        visible={isStopDialogVisible}
+        control={stopDialogControl}
+        onSave={onStop}
         formMode={FormMode.ADD}
         header={`${t("Are you sure")}?`}
         saveLabel={t("Yes")}
       >
         <div className="flex justify-content-center">
           <p>
-            {t("This action will cancel your booking ONLY for this date.")}{" "}
+            {selectedEntry.isOneOff
+              ? t("This action will cancel your booking for this date.")
+              : t(
+                  "Your booking stops from this date on. The sessions before it stay on your calendar."
+                )}
           </p>
         </div>
       </GenericDialogComponent>
 
       {/*                                               */}
-      {/*           Opt In Train Group Participant      */}
+      {/*               Skip this date                  */}
       {/*                                               */}
       <GenericDialogComponent
-        visible={isOptInDateTimeSlotDialogVisible}
-        control={optInDateTimeSlotDialogControl}
-        onSave={onOptInDate}
+        visible={isSkipDialogVisible}
+        control={skipDialogControl}
+        onSave={onSkip}
+        formMode={FormMode.ADD}
+        header={`${t("Are you sure")}?`}
+        saveLabel={t("Yes")}
+      >
+        <div className="flex justify-content-center">
+          <p>{t("This action will cancel your booking ONLY for this date.")} </p>
+        </div>
+      </GenericDialogComponent>
+
+      {/*                                               */}
+      {/*              Rejoin this date                 */}
+      {/*                                               */}
+      <GenericDialogComponent
+        visible={isRejoinDialogVisible}
+        control={rejoinDialogControl}
+        onSave={onRejoin}
         formMode={FormMode.ADD}
         header={`${t("Are you sure")}?`}
         saveLabel={t("Yes")}
       >
         <div className="flex justify-content-center">
           <p>
-            {t(
-              "You will join this date, only if there are any spots available."
-            )}
+            {t("You will join this date, only if there are any spots available.")}
           </p>
         </div>
       </GenericDialogComponent>

@@ -7,6 +7,7 @@ import { DialogChildProps } from "../../components/core/dialog/GenericDialogComp
 import LookupComponent from "../../components/core/dropdown/LookupComponent";
 import { useTranslator } from "../../services/TranslatorService";
 import { TrainGroupAttendanceAddDto } from "../../model/entities/train-group-attendance/TrainGroupAttendanceAddDto";
+import { fromUtcDay, toUtcDay } from "../train-group-booking/BookingDates";
 
 // Either the attendance hangs off a train group, which fills in what the session was,
 // or the session is written out by hand - for one whose group no longer exists.
@@ -60,12 +61,15 @@ export default function TrainGroupAttendanceAddFormComponent({
         >
           {t("Attendance date")} *
         </label>
+        {/* Midnight UTC of the picked day, the way the calendar's Take attendance
+            sends it. A local midnight is the evening before in UTC, and the day
+            the server files the attendance under would be one early. */}
         <Calendar
           inputId="attendance-date"
-          value={dto.attendanceDate ? new Date(dto.attendanceDate) : null}
+          value={dto.attendanceDate ? fromUtcDay(dto.attendanceDate) : null}
           onChange={(e) =>
             update({
-              attendanceDate: e.value ? (e.value as Date).toISOString() : "",
+              attendanceDate: e.value ? toUtcDay(e.value as Date) : "",
             })
           }
           dateFormat="dd/mm/yy"

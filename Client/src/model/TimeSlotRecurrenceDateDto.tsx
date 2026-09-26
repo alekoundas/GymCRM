@@ -4,6 +4,10 @@ export interface TimeSlotRecurrenceDateDto {
   date: string; // UTC string
   trainGroupDateId: number;
   trainGroupDateType: TrainGroupDateTypeEnum | undefined;
+  // Which weekday (0 = Sunday) or day of the month a recurring date runs on. Read
+  // these rather than date for a recurring entry: its date is a made-up day in 2000.
+  recurrenceDayOfWeek?: number;
+  recurrenceDayOfMonth?: number;
   isUserJoined: boolean;
   trainGroupParticipantId: number | undefined; // used in Profile
   trainGroupParticipantUnavailableDateId: number | undefined; // used in Profile
