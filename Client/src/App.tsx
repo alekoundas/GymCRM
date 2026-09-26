@@ -21,6 +21,7 @@ import RegisterPage from "./pages/user/RegisterPage.tsx";
 import WorkoutPlansPage from "./pages/workout-plan/WorkoutPlansPage.tsx";
 import WorkoutPlanFormPage from "./pages/workout-plan/WorkoutPlanFormPage.tsx";
 import UserStatusesPage from "./pages/user-status/UserStatusesPage.tsx";
+import TrainGroupCategoriesPage from "./pages/train-group-category/TrainGroupCategoriesPage.tsx";
 import { useEffect } from "react";
 import { useTranslator } from "./services/TranslatorService.tsx";
 import { LocalStorageService } from "./services/LocalStorageService.tsx";
@@ -168,6 +169,11 @@ export default function App() {
                 <Route
                   path="user-statuses"
                   element={<UserStatusesPage />}
+                />
+
+                <Route
+                  path="train-group-categories"
+                  element={<TrainGroupCategoriesPage />}
                 />
               </Route>
 

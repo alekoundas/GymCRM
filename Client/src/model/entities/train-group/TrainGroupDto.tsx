@@ -11,6 +11,8 @@ export interface TrainGroupDto {
   maxParticipants: number;
   trainerId: string;
   trainer?: UserDto | undefined;
+  // Optional - groups the train group into a tab on the admin calendar.
+  trainGroupCategoryId?: number;
   trainGroupDates: TrainGroupDateDto[];
   trainGroupParticipants: TrainGroupParticipantDto[];
 }
@@ -24,6 +26,7 @@ export class TrainGroupDto {
   maxParticipants: number = 0;
   trainerId: string = "";
   trainer?: UserDto | undefined;
+  trainGroupCategoryId?: number = undefined;
   trainGroupDates: TrainGroupDateDto[] = [];
   trainGroupParticipants: TrainGroupParticipantDto[] = [];
 }

@@ -16,6 +16,7 @@ import NavLeft from "../../components/navbar-left/NavLeft";
 import WorkoutPlansPage from "../workout-plan/WorkoutPlansPage";
 import WorkoutPlanFormPage from "../workout-plan/WorkoutPlanFormPage";
 import UserStatusesPage from "../user-status/UserStatusesPage";
+import TrainGroupCategoriesPage from "../train-group-category/TrainGroupCategoriesPage";
 import WorkoutPlanRulesPage from "../workout-plan-rule/WorkoutPlanRulesPage";
 import WorkoutPlanRecordingsPage from "../workout-plan-recording/WorkoutPlanRecordingsPage";
 import GooglePage from "../google/GooglePage";
@@ -135,6 +136,11 @@ export default function Administrator() {
             <Route
               path="user-statuses"
               element={<UserStatusesPage />}
+            />
+
+            <Route
+              path="train-group-categories"
+              element={<TrainGroupCategoriesPage />}
             />
           </Routes>
           {/* </ScrollPanel> */}

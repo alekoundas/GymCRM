@@ -26,6 +26,8 @@ namespace Core.Dtos.TrainGroup
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public int MaxParticipants { get; set; }
 
+        public int? TrainGroupCategoryId { get; set; }
+
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string? TrainerId { get; set; }
 

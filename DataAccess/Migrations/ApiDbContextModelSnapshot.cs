@@ -375,6 +375,9 @@ namespace DataAccess.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("TrainGroupCategoryId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<Guid>("TrainerId")
                         .HasColumnType("TEXT");
 
@@ -383,9 +386,41 @@ namespace DataAccess.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
+                    b.HasIndex("TrainGroupCategoryId");
+
                     b.HasIndex("TrainerId");
 
                     b.ToTable("TrainGroups");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy_FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy_Id")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("TrainGroupCategories");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroupDate", b =>
@@ -1097,11 +1132,18 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Core.Models.TrainGroup", b =>
                 {
+                    b.HasOne("Core.Models.TrainGroupCategory", "TrainGroupCategory")
+                        .WithMany("TrainGroups")
+                        .HasForeignKey("TrainGroupCategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Core.Models.User", "Trainer")
                         .WithMany("TrainGroups")
                         .HasForeignKey("TrainerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("TrainGroupCategory");
 
                     b.Navigation("Trainer");
                 });
@@ -1315,6 +1357,11 @@ namespace DataAccess.Migrations
                     b.Navigation("TrainGroupUnavailableDates");
 
                     b.Navigation("TrainGroupΑttendances");
+                });
+
+            modelBuilder.Entity("Core.Models.TrainGroupCategory", b =>
+                {
+                    b.Navigation("TrainGroups");
                 });
 
             modelBuilder.Entity("Core.Models.TrainGroupDate", b =>

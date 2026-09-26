@@ -59,13 +59,10 @@ namespace DataAccess
                 //
                 var claims = new List<Claim>
                 {
-                    new Claim("Permission", "SubscriptionsAdmin_View"),
-                    new Claim("Permission", "SubscriptionsAdmin_Add"),
-                    new Claim("Permission", "SubscriptionsAdmin_Edit"),
-                    new Claim("Permission", "SubscriptionsAdmin_Delete"),
-                    new Claim("Permission", "Subscriptions_View"),
-                    new Claim("Permission", "Subscriptions_Add"),
-                    new Claim("Permission", "Subscriptions_Delete"),
+                    new Claim("Permission", "TrainGroupCategories_View"),
+                    new Claim("Permission", "TrainGroupCategories_Add"),
+                    new Claim("Permission", "TrainGroupCategories_Edit"),
+                    new Claim("Permission", "TrainGroupCategories_Delete"),
                 };
 
                 var role = await roleManager.FindByNameAsync("Administrator");
@@ -74,9 +71,6 @@ namespace DataAccess
 
                 var simpleUserClaims = new List<Claim>
                 {
-                    new Claim("Permission", "Subscriptions_View"),
-                    new Claim("Permission", "Subscriptions_Add"),
-                    new Claim("Permission", "Subscriptions_Delete"),
                 };
 
                 var simpleUserRole = await roleManager.FindByNameAsync("SimpleUser");
@@ -170,6 +164,12 @@ namespace DataAccess
                    new Claim("Permission", "Subscriptions_View"),
                    new Claim("Permission", "Subscriptions_Add"),
                    new Claim("Permission", "Subscriptions_Delete"),
+
+                    new Claim("Permission", "TrainGroupCategories_View"),
+                    new Claim("Permission", "TrainGroupCategories_Add"),
+                    new Claim("Permission", "TrainGroupCategories_Edit"),
+                    new Claim("Permission", "TrainGroupCategories_Delete"),
+
                };
 
                 await AddClaimsToRoleAsync(roleManager, role, claims);

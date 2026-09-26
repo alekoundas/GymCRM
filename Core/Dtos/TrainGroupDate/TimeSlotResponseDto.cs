@@ -14,6 +14,7 @@ namespace Core.Dtos.TrainGroupDate
         // account or the group behind it is gone.
         public string TrainerFullName { get; set; } = "";
         public int TrainGroupId { get; set; }
+        public int? TrainGroupCategoryId { get; set; }
         public DateTime Duration { get; set; }
         public DateTime StartOn { get; set; }
         public int SpotsLeft { get; set; }

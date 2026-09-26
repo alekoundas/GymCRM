@@ -37,6 +37,13 @@ namespace DataAccess.Configurations
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
 
+            // Optional category. Deleting a category leaves its groups uncategorised.
+            builder.HasOne(x => x.TrainGroupCategory)
+                .WithMany(x => x.TrainGroups)
+                .HasForeignKey(x => x.TrainGroupCategoryId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // Relationship with RepeatingParticipants (many-to-many with User)
             //builder.HasMany(x => x.RepeatingParticipants)
             //    .WithMany(x => x.RepeatingTrainGroups)

@@ -17,6 +17,7 @@ namespace Business.Services
         public IGenericRepository<Exercise> Exercises { get; }
         public IGenericRepository<TrainGroup> TrainGroups { get; }
         public IGenericRepository<UserStatus> UserStatuses { get; }
+        public IGenericRepository<TrainGroupCategory> TrainGroupCategories { get; }
         public IGenericRepository<WorkoutPlan> WorkoutPlans { get; }
         public IGenericRepository<WorkoutPlanRule> WorkoutPlanRules { get; }
         public IGenericRepository<WorkoutPlanRuleWeek> WorkoutPlanRuleWeeks { get; }
@@ -44,6 +45,7 @@ namespace Business.Services
             IGenericRepository<Exercise> exerciseRepository,
             IGenericRepository<TrainGroup> trainGroupRepository,
             IGenericRepository<UserStatus> userStatusesRepository,
+            IGenericRepository<TrainGroupCategory> trainGroupCategoriesRepository,
             IGenericRepository<WorkoutPlan> workoutPlanRepository,
             IGenericRepository<WorkoutPlanRule> workoutPlanRuleRepository,
             IGenericRepository<WorkoutPlanRuleWeek> workoutPlanRuleWeekRepository,
@@ -75,6 +77,7 @@ namespace Business.Services
             WorkoutPlanRecordings = workoutPlanRecordingRepository;
             Subscriptions = subscriptionRepository;
             UserStatuses = userStatusesRepository;
+            TrainGroupCategories = trainGroupCategoriesRepository;
             ExerciseHistories = exerciseHistoriesRepository;
 
             // TrainGroup.
@@ -104,6 +107,8 @@ namespace Business.Services
                 return (IGenericRepository<TEntity>)TrainGroups;
             if (typeof(TEntity) == typeof(UserStatus))
                 return (IGenericRepository<TEntity>)UserStatuses;
+            if (typeof(TEntity) == typeof(TrainGroupCategory))
+                return (IGenericRepository<TEntity>)TrainGroupCategories;
             if (typeof(TEntity) == typeof(WorkoutPlan))
                 return (IGenericRepository<TEntity>)WorkoutPlans;
             if (typeof(TEntity) == typeof(WorkoutPlanRule))

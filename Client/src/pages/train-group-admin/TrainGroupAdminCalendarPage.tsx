@@ -1,6 +1,8 @@
 import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { Card } from "primereact/card";
+import { Badge } from "primereact/badge";
+import { TabPanel, TabView } from "primereact/tabview";
 import { useEffect, useState } from "react";
 import { TokenService } from "../../services/TokenService";
 import { FormMode } from "../../enum/FormMode";
@@ -19,6 +21,13 @@ import { TrainGroupUnavailableDateDto } from "../../model/entities/train-group-u
 import TrainGroupAttendanceFormComponent from "../train-group-attendance/TrainGroupAttendanceFormComponent";
 import { useTrainGroupAttendanceStore } from "../../stores/TrainGroupAttendanceStore";
 import { TrainGroupAttendanceDto } from "../../model/entities/train-group-attendance/TrainGroupAttendanceDto";
+import { LookupDto } from "../../model/lookup/LookupDto";
+import { formatClock } from "../train-group-booking/BookingDates";
+
+interface CategoryTab {
+  id?: number;
+  name: string;
+}
 
 // The day the calendar is on, with no time of day. Local parts on purpose: the
 // admin means the date they can see, not whatever day it is in UTC at the time.
@@ -48,10 +57,25 @@ export default function TrainGroupAdminCalendarPage() {
   const [selectedTrainGroupId, setSelectedTrainGroupId] = useState<number>(0);
   const [timeSlots, setTimeSlots] = useState<TimeSlotResponseDto[]>([]);
 
+  // One tab per category the admin has set up, after "All".
+  const [categories, setCategories] = useState<CategoryTab[]>([]);
+  const [activeTab, setActiveTab] = useState(0);
+
   useEffect(() => {
     resetTrainGroupDto();
     resetSelectedTrainGroupDate();
     handleChangeDate(new Date());
+
+    const lookupDto = new LookupDto();
+    lookupDto.take = 1000;
+    apiService.getDataLookup("TrainGroupCategories", lookupDto).then((response) => {
+      if (response?.data)
+        setCategories(
+          response.data
+            .filter((x) => x.id)
+            .map((x) => ({ id: +x.id!, name: x.value ?? "" }))
+        );
+    });
   }, []);
 
   const handleChangeDate = (value: Date) => {
@@ -178,80 +202,69 @@ export default function TrainGroupAdminCalendarPage() {
         {/*                  */}
         {/*     Timeslots    */}
         {/*                  */}
-        <div className=" col-12  lg:col-6 xl:col-6">
-          <Card
-            header={
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "1rem",
-                }}
-              >
-                <h2 style={{ margin: 0 }}>{t("Available Timeslots")}</h2>
-              </div>
-            }
-          >
-            {timeSlots.length === 0 ? (
-              <p className="text-gray-500">
-                {t("No time slots available for this date")}.
-              </p>
-            ) : (
-              <div>
-                <div>
-                  {timeSlots
-                    .map((x) => x.trainGroupId)
+        <div className="col-12 lg:col-6 xl:col-6">
+          <Card title={t("Available Timeslots")}>
+            {/* The day's groups, all together and then one tab per category. A
+                group with no category is only under All. */}
+            <TabView
+              scrollable
+              activeIndex={activeTab <= categories.length ? activeTab : 0}
+              onTabChange={(e) => setActiveTab(e.index)}
+            >
+              {[{ id: undefined, name: t("All") } as CategoryTab, ...categories].map(
+                (tab) => {
+                  const tabSlots = [...timeSlots]
                     .filter(
-                      (value, index, array) => array.indexOf(value) === index // Distinct
+                      (x) => tab.id === undefined || x.trainGroupCategoryId === tab.id
                     )
-                    .map((x) => (
-                      <div></div> // display a list of trainers
-                    ))}
-                </div>
+                    .sort((a, b) =>
+                      formatClock(a.startOn).localeCompare(formatClock(b.startOn))
+                    );
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {timeSlots
-                    ?.sort(
-                      (a, b) =>
-                        new Date(b.startOn).getTime() -
-                        new Date(a.startOn).getTime()
-                    )
-                    ?.map((slot) => (
-                      <Button
-                        key={slot.trainGroupDateId}
-                        label={
-                          new Date(slot.startOn)
-                            .getUTCHours()
-                            .toString()
-                            .padStart(2, "0") +
-                          ":" +
-                          new Date(slot.startOn)
-                            .getUTCMinutes()
-                            .toString()
-                            .padStart(2, "0") +
-                          " - " +
-                          slot.title
-                        }
-                        onClick={() => {
-                          apiService
-                            .get<TrainGroupDto>(
-                              "TrainGroups",
-                              slot.trainGroupId
-                            )
-                            .then((x) => {
-                              if (x) {
-                                setTrainGroupDto(x);
-                                setViewModalVisibility(true);
-                                setSelectedTrainGroupId(slot.trainGroupId);
-                              }
-                            });
-                        }}
-                      />
-                    ))}
-                </div>
-              </div>
-            )}
+                  return (
+                    <TabPanel
+                      key={tab.id ?? "all"}
+                      header={
+                        <span className="flex align-items-center gap-2">
+                          {tab.name}
+                          <Badge
+                            value={tabSlots.length}
+                            severity={tabSlots.length > 0 ? undefined : "secondary"}
+                          />
+                        </span>
+                      }
+                    >
+                      {tabSlots.length === 0 ? (
+                        <p className="m-0 text-color-secondary">
+                          {t("No time slots available for this date")}.
+                        </p>
+                      ) : (
+                        <div className="flex flex-column gap-2">
+                          {tabSlots.map((slot) => (
+                            <Button
+                              key={slot.trainGroupId}
+                              className="w-full"
+                              label={`${formatClock(slot.startOn)} - ${slot.title}`}
+                              onClick={() => {
+                                apiService
+                                  .get<TrainGroupDto>("TrainGroups", slot.trainGroupId)
+                                  .then((x) => {
+                                    if (x) {
+                                      setTrainGroupDto(x);
+                                      setViewModalVisibility(true);
+                                      setSelectedTrainGroupId(slot.trainGroupId);
+                                    }
+                                  });
+                              }}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </TabPanel>
+                  );
+                }
+              )}
+            </TabView>
           </Card>
         </div>
       </div>

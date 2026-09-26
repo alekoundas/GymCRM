@@ -11,6 +11,7 @@ export interface TimeSlotResponseDto {
   // or the group behind it is gone.
   trainerFullName: string;
   trainGroupId: number;
+  trainGroupCategoryId?: number;
   trainGroupDateId: number;
   duration: string;
   startOn: string;

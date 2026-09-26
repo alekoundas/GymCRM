@@ -402,5 +402,11 @@
   "until you stop it": "μέχρι να τη σταματήσετε",
   "Recurring bookings": "Επαναλαμβανόμενες κρατήσεις",
   "Stop permanently": "Οριστική διακοπή",
-  "You can book it again any time from the Book tab": "Μπορείτε να την κλείσετε ξανά όποτε θέλετε από την καρτέλα Κράτηση"
+  "You can book it again any time from the Book tab": "Μπορείτε να την κλείσετε ξανά όποτε θέλετε από την καρτέλα Κράτηση",
+  "All": "Όλα",
+  "Categories": "Κατηγορίες",
+  "Category": "Κατηγορία",
+  "New category": "Νέα κατηγορία",
+  "The train groups in this category will be left without one": "Οι ομάδες εκπαίδευσης αυτής της κατηγορίας θα μείνουν χωρίς κατηγορία",
+  "Train group categories": "Κατηγορίες ομάδων εκπαίδευσης"
 }
