@@ -68,6 +68,8 @@ export default function SubscriptionMemberTabComponent({
     rows: 10,
     // Capital U: the server converts this one to a Guid by name.
     filters: [{ fieldName: "UserId", value: userId, filterType: "equals" }],
+    // sorts is what the server orders by; dataTableSorts only draws the arrow.
+    sorts: [{ fieldName: "createdOn", order: -1 }],
     dataTableSorts: [{ field: "createdOn", order: -1 }],
   });
 

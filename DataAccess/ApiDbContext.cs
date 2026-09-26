@@ -34,6 +34,9 @@ namespace DataAccess
         public DbSet<TrainGroup> TrainGroups { get; set; }
         public DbSet<UserStatus> UserStatuses { get; set; }
         public DbSet<TrainGroupCategory> TrainGroupCategories { get; set; }
+        public DbSet<Questionnaire> Questionnaires { get; set; }
+        public DbSet<QuestionnaireQuestion> QuestionnaireQuestions { get; set; }
+        public DbSet<QuestionnaireAnswer> QuestionnaireAnswers { get; set; }
         public DbSet<WorkoutPlan> WorkoutPlans { get; set; }
         public DbSet<PhoneNumber> PhoneNumbers { get; set; }
         public DbSet<TrainGroupDate> TrainGroupDates { get; set; }
@@ -80,6 +83,9 @@ namespace DataAccess
             builder.ApplyConfiguration(new ExerciseConfiguration());
             builder.ApplyConfiguration(new UserStatusConfiguration());
             builder.ApplyConfiguration(new TrainGroupCategoryConfiguration());
+            builder.ApplyConfiguration(new QuestionnaireConfiguration());
+            builder.ApplyConfiguration(new QuestionnaireQuestionConfiguration());
+            builder.ApplyConfiguration(new QuestionnaireAnswerConfiguration());
             builder.ApplyConfiguration(new TrainGroupConfiguration());
             builder.ApplyConfiguration(new PhoneNumberConfiguration());
             builder.ApplyConfiguration(new WorkoutPlanConfiguration());

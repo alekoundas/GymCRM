@@ -62,6 +62,8 @@ export default function SubscriptionsPage() {
       { fieldName: "userId", filterType: "in" },
       { fieldName: "createdOn", filterType: "between" },
     ],
+    // sorts is what the server orders by; dataTableSorts only draws the arrow.
+    sorts: [{ fieldName: "createdOn", order: -1 }],
     dataTableSorts: [{ field: "createdOn", order: -1 }],
   });
 

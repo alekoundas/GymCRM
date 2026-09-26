@@ -6,6 +6,8 @@ export interface WorkoutPlanDto {
   title: string;
   description: string;
   isCircular: boolean;
+  // Hidden from the member. Changed through Deactivate / Activate only.
+  isInactive?: boolean;
   userId: string;
   user: UserDto;
   exercises: ExerciseDto[];
@@ -33,6 +35,7 @@ export class WorkoutPlanDto {
   title: string = "";
   description: string = "";
   isCircular: boolean = false;
+  isInactive?: boolean = false;
   userId: string = "";
   user: UserDto = new UserDto();
   exercises: ExerciseDto[] = [];

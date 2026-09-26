@@ -19,6 +19,11 @@ import GenericDialogComponent, {
 } from "../../components/core/dialog/GenericDialogComponent";
 import WorkoutPlanRecordingGridComponent from "../workout-plan-recording/WorkoutPlanRecordingGridComponent";
 import WorkoutPlanRecordingActionsComponent from "../workout-plan-recording/WorkoutPlanRecordingActionsComponent";
+import { Tag } from "primereact/tag";
+import { TokenService } from "../../services/TokenService";
+import WorkoutPlanActivationDialogComponent, {
+  WorkoutPlanActivationMode,
+} from "./WorkoutPlanActivationDialogComponent";
 
 interface IField {
   formMode: FormMode;
@@ -37,6 +42,14 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
   const [isRecordingsDialogVisible, setRecordingsDialogVisibility] =
     useState(false);
   const [isEditDialogVisible, setEditDialogVisibility] = useState(false);
+  const [activationMode, setActivationMode] = useState<
+    WorkoutPlanActivationMode | undefined
+  >(undefined);
+
+  // A member may deactivate their own plan; an admin may also make it active again.
+  const canChangeActivation = isAdminPage
+    ? TokenService.isUserAllowed("WorkoutPlansAdmin_Edit")
+    : TokenService.isUserAllowed("WorkoutPlans_Edit") && !workoutPlanDto.isInactive;
   // Counts the times the plan came back from the server, so anything reading its
   // own data knows to look again.
   const [planVersion, setPlanVersion] = useState(0);
@@ -189,6 +202,30 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
             <WorkoutPlanHeaderFooter
               onOpenRecordings={() => dialogControlRecordings.showDialog()}
             />
+
+            {canChangeActivation && workoutPlanDto.id > 0 && (
+              <div className="flex flex-wrap align-items-center justify-content-between gap-2 pt-3 mt-3 border-top-1 surface-border">
+                {workoutPlanDto.isInactive ? (
+                  <Tag
+                    severity="secondary"
+                    icon="pi pi-eye-slash"
+                    value={t("Inactive")}
+                  />
+                ) : (
+                  <span />
+                )}
+                <Button
+                  label={workoutPlanDto.isInactive ? t("Activate") : t("Deactivate")}
+                  icon={workoutPlanDto.isInactive ? "pi pi-eye" : "pi pi-eye-slash"}
+                  severity={workoutPlanDto.isInactive ? "success" : "danger"}
+                  size="small"
+                  outlined
+                  onClick={() =>
+                    setActivationMode(workoutPlanDto.isInactive ? "ACTIVATE" : "DEACTIVATE")
+                  }
+                />
+              </div>
+            )}
           </Card>
         </div>
 
@@ -215,6 +252,19 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
           isAdminPage={isAdminPage}
         />
       </GenericDialogComponent>
+
+      <WorkoutPlanActivationDialogComponent
+        plan={activationMode ? workoutPlanDto : undefined}
+        mode={activationMode ?? "DEACTIVATE"}
+        isAdminPage={isAdminPage}
+        onHide={() => setActivationMode(undefined)}
+        onDone={() => {
+          setActivationMode(undefined);
+          // A member's deactivated plan is gone from their list, so back to it.
+          if (isAdminPage) loadWorkoutPlan();
+          else navigate("/workout-plans");
+        }}
+      />
 
       {/*                              */}
       {/*       Edit workout plan      */}

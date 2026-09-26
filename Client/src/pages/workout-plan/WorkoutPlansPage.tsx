@@ -21,6 +21,9 @@ import { Card } from "primereact/card";
 import { Tag } from "primereact/tag";
 import { ColumnFilterElementTemplateOptions } from "primereact/column";
 import DataTableFilterDateComponent from "../../components/core/datatable/DataTableFilterDateComponent";
+import WorkoutPlanActivationDialogComponent, {
+  WorkoutPlanActivationMode,
+} from "./WorkoutPlanActivationDialogComponent";
 
 export default function WorkoutPlansPage() {
   const { t } = useTranslator();
@@ -32,6 +35,11 @@ export default function WorkoutPlansPage() {
     useWorkoutPlanStore();
 
   const [isDeleteDialogVisible, setDeleteDialogVisibility] = useState(false); // Dialog visibility
+
+  // The plan being deactivated or activated, and which of the two.
+  const [activationPlan, setActivationPlan] = useState<WorkoutPlanDto | undefined>(undefined);
+  const [activationMode, setActivationMode] =
+    useState<WorkoutPlanActivationMode>("DEACTIVATE");
 
   const dialogControlDelete: DialogControl = {
     showDialog: () => setDeleteDialogVisibility(true),
@@ -69,7 +77,7 @@ export default function WorkoutPlansPage() {
         : { fieldName: "userId", filterType: "in" as const }
       : {
           fieldName: "userId",
-          values: [TokenService.getUserId()],
+          values: [TokenService.getUserId() ?? ""],
           filterType: "in" as const,
         };
 
@@ -77,7 +85,9 @@ export default function WorkoutPlansPage() {
       ...new DataTableDto(),
       filters: [...baseFilters, userIdFilter],
       // Plans are never retired, so a member can hold dozens. Most recently trained
-      // first beats most recently written by the trainer.
+      // first beats most recently written by the trainer. sorts is what the server
+      // orders by; dataTableSorts only draws the arrow.
+      sorts: [{ fieldName: "lastRecordingOn", order: -1 }],
       dataTableSorts: [{ field: "lastRecordingOn", order: -1 }],
     };
   });
@@ -93,6 +103,8 @@ export default function WorkoutPlansPage() {
       if (isAdd) result.push(ButtonTypeEnum.CLONE);
       const isEdit = TokenService.isUserAllowed("WorkoutPlansAdmin_Edit");
       if (isEdit) result.push(ButtonTypeEnum.EDIT);
+      if (isEdit) result.push(ButtonTypeEnum.DEACTIVATE);
+      if (isEdit) result.push(ButtonTypeEnum.ACTIVATE);
       const isDelete = TokenService.isUserAllowed("WorkoutPlansAdmin_Delete");
       if (isDelete) result.push(ButtonTypeEnum.DELETE);
       return result;
@@ -100,7 +112,18 @@ export default function WorkoutPlansPage() {
 
     const isEdit = TokenService.isUserAllowed("WorkoutPlans_Edit");
     if (isEdit) result.push(ButtonTypeEnum.EDIT);
+    if (isEdit) result.push(ButtonTypeEnum.DEACTIVATE);
     return result;
+  };
+
+  // Deactivate on an active plan, Activate on an inactive one.
+  const isGridRowButtonVisible = (
+    buttonType: ButtonTypeEnum,
+    rowData: WorkoutPlanDto
+  ): boolean => {
+    if (buttonType === ButtonTypeEnum.DEACTIVATE) return !rowData.isInactive;
+    if (buttonType === ButtonTypeEnum.ACTIVATE) return !!rowData.isInactive;
+    return true;
   };
 
   // Custom chip template for selected users
@@ -232,6 +255,33 @@ export default function WorkoutPlansPage() {
         return <span className="text-color-secondary">—</span>;
       },
     },
+    // Only the admin ever sees an inactive plan, so only the admin needs the column.
+    ...(isAdminPage
+      ? [
+          {
+            field: "isInactive",
+            header: t("Active"),
+            sortable: true,
+            filter: false,
+            filterPlaceholder: "",
+            style: { width: "8%" },
+            body: (rowData: WorkoutPlanDto) =>
+              rowData.isInactive ? (
+                <Tag
+                  severity="secondary"
+                  icon="pi pi-eye-slash"
+                  value={t("Inactive")}
+                />
+              ) : (
+                <Tag
+                  severity="success"
+                  icon="pi pi-check"
+                  value={t("Active")}
+                />
+              ),
+          } as DataTableColumns<WorkoutPlanDto>,
+        ]
+      : []),
     {
       field: "createdOn",
       header: t("CreatedOn"),
@@ -321,6 +371,15 @@ export default function WorkoutPlansPage() {
           dialogControlDelete.showDialog();
         }
         break;
+      case ButtonTypeEnum.DEACTIVATE:
+      case ButtonTypeEnum.ACTIVATE:
+        if (rowData) {
+          setActivationMode(
+            buttonType === ButtonTypeEnum.ACTIVATE ? "ACTIVATE" : "DEACTIVATE"
+          );
+          setActivationPlan(rowData);
+        }
+        break;
 
       default:
         break;
@@ -354,8 +413,21 @@ export default function WorkoutPlansPage() {
           dataTableColumns={dataTableColumns}
           triggerRefreshData={triggerRefreshDataTable}
           availableGridRowButtons={availableGridRowButtons()}
+          isGridRowButtonVisible={isGridRowButtonVisible}
         />
       </Card>
+
+      <WorkoutPlanActivationDialogComponent
+        plan={activationPlan}
+        mode={activationMode}
+        isAdminPage={isAdminPage}
+        onHide={() => setActivationPlan(undefined)}
+        onDone={() => {
+          setActivationPlan(undefined);
+          if (triggerRefreshDataTable.current)
+            triggerRefreshDataTable.current(datatableDto);
+        }}
+      />
 
       {/*                                       */}
       {/*          Delete Train Group           */}

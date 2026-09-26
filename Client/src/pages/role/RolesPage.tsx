@@ -48,6 +48,9 @@ export default function RolesPage() {
 
   const [datatableDto, setDatatableDto] = useState<DataTableDto<RoleDto>>({
     ...new DataTableDto(),
+    // A gym has a handful of roles, so one page of a hundred shows them all and the
+    // paging - which never worked on this grid - never comes into it.
+    rows: 100,
     filters: [
       { fieldName: "name", filterType: "contains" },
       { fieldName: "normalizedName", filterType: "contains" },

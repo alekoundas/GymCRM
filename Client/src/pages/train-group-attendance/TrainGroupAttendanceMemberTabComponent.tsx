@@ -34,6 +34,8 @@ export default function TrainGroupAttendanceMemberTabComponent({
     // gets their own rows back anyway, but an administrator looking at somebody's
     // profile would otherwise see everyone's.
     filters: [{ fieldName: "UserId", value: userId, filterType: "equals" }],
+    // sorts is what the server orders by; dataTableSorts only draws the arrow.
+    sorts: [{ fieldName: "attendanceDate", order: -1 }],
     dataTableSorts: [{ field: "attendanceDate", order: -1 }],
   });
 

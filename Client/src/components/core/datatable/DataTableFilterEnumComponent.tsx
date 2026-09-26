@@ -16,11 +16,11 @@ export default function DataTableFilterEnumComponent({
   const { t } = useTranslator();
   const [value, setValue] = useState<string | undefined>();
 
-  // Clear filter value where user presses clear.
+  // Follows the grid's value: cleared, or restored from the url on coming back to
+  // the page - where it would otherwise still filter the rows while showing nothing.
   useEffect(() => {
-    if (options.value === null) {
-      setValue(undefined);
-    }
+    if (options.value === null || options.value === undefined) setValue(undefined);
+    else setValue(String(options.value));
   }, [options.value]);
 
   const onChange = (e: DropdownChangeEvent) => {

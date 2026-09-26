@@ -72,6 +72,8 @@ export default function TrainGroupAttendancesPage() {
       { fieldName: "trainGroupTitle", filterType: "contains" },
       { fieldName: "trainerFullName", filterType: "contains" },
     ],
+    // sorts is what the server orders by; dataTableSorts only draws the arrow.
+    sorts: [{ fieldName: "attendanceDate", order: -1 }],
     dataTableSorts: [{ field: "attendanceDate", order: -1 }],
   });
 

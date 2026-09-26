@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using Business.Repository;
 using Business.Services;
 using Business.Services.Email;
 using Core.Dtos;
+using Core.Dtos.DataTable;
 using Core.Dtos.Exercise;
 using Core.Models;
+using Core.System;
 using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -72,6 +75,61 @@ namespace API.Controllers
 
             _dataService.Update(entity);
             return new ApiResponse<Exercise>().SetSuccessResponse(entity, _localizer[TranslationKeys._0_updated_successfully, className]);
+        }
+
+
+        //
+        //      The grid behind the admin's exercise history page. A member only ever
+        //      reads the exercises of their own plans.
+        //
+
+        private const string UserIdField = "userId";
+        private const string WorkoutPlanTitleField = "workoutPlanTitle";
+
+        protected override void DataTableQueryUpdate(IGenericRepository<Exercise> query, DataTableDto<ExerciseDto> dataTable)
+        {
+            query = query.Include(x => x.WorkoutPlan).ThenInclude<WorkoutPlan, User>(x => x.User);
+
+            Guid? scopeUserId = GetScopeToCallerId("WorkoutPlansAdmin_View");
+            if (scopeUserId != null)
+                query = query.Where(x => x.WorkoutPlan.UserId == scopeUserId.Value);
+
+            List<Guid> userIds = dataTable.Filters
+                .Where(x => string.Equals(x.FieldName, UserIdField, StringComparison.OrdinalIgnoreCase))
+                .SelectMany(x => x.Values)
+                .Select(x => Guid.TryParse(x, out Guid id) ? id : Guid.Empty)
+                .Where(x => x != Guid.Empty)
+                .ToList();
+            if (userIds.Count > 0)
+                query = query.Where(x => userIds.Contains(x.WorkoutPlan.UserId));
+
+            string? title = dataTable.Filters
+                .FirstOrDefault(x => string.Equals(x.FieldName, WorkoutPlanTitleField, StringComparison.OrdinalIgnoreCase))?.Value;
+            if (!string.IsNullOrWhiteSpace(title))
+            {
+                string normalized = TextNormalizer.Normalize(title);
+                query = query.Where(x => TextNormalizer.Normalize(x.WorkoutPlan.Title).Contains(normalized));
+            }
+        }
+
+        protected override HashSet<string> GetHandledDataTableFields() =>
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { UserIdField, WorkoutPlanTitleField };
+
+        protected override Task DataTableResultUpdate(List<Exercise> entities, List<ExerciseDto> entityDtos)
+        {
+            for (int i = 0; i < entities.Count && i < entityDtos.Count; i++)
+            {
+                WorkoutPlan? plan = entities[i].WorkoutPlan;
+                if (plan == null)
+                    continue;
+
+                entityDtos[i].WorkoutPlanTitle = plan.Title;
+                entityDtos[i].IsWorkoutPlanInactive = plan.IsInactive;
+                entityDtos[i].UserId = plan.UserId.ToString();
+                entityDtos[i].User = _mapper.Map<Core.Dtos.User.UserDto>(plan.User);
+            }
+
+            return Task.CompletedTask;
         }
 
 

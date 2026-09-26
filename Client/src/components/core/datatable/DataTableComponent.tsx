@@ -3,6 +3,7 @@ import { Column, ColumnBodyOptions } from "primereact/column";
 import {
   DataTable,
   DataTableFilterMeta,
+  DataTableRowClickEvent,
   DataTableRowEditCompleteEvent,
   DataTableSelectionSingleChangeEvent,
   DataTableValue,
@@ -58,6 +59,13 @@ interface IField<TEntity> {
     e: DataTableSelectionSingleChangeEvent<DataTableValueArray>
   ) => void;
   selectedObject?: TEntity | undefined;
+
+  // What a click on a row does, when it should not open the row's edit or view -
+  // the users grid, say, which goes to the member's profile.
+  onRowClick?: (rowData: TEntity) => void;
+
+  // Per row: hide a row action that makes no sense for that row.
+  isGridRowButtonVisible?: (buttonType: ButtonTypeEnum, rowData: TEntity) => boolean;
 }
 
 export default function DataTableComponent<TEntity extends DataTableValue>({
@@ -82,6 +90,8 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
   urlStateExcludedFields = [],
   onSelect,
   selectedObject,
+  onRowClick,
+  isGridRowButtonVisible,
 }: IField<TEntity>) {
   const { t } = useTranslator();
   const [loading, setLoading] = useState(true);
@@ -303,6 +313,36 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
     return columns;
   };
 
+  // A click on a row opens it: its edit when the user may edit it, its view
+  // otherwise - the same two actions, with the same checks, as the row's menu.
+  const isRowActionAllowed = (button: ButtonTypeEnum, action: string): boolean =>
+    availableGridRowButtons.includes(button) &&
+    (!authorize || TokenService.isUserAllowed(controller + "_" + action));
+
+  const rowClickAction: ButtonTypeEnum | undefined = isRowActionAllowed(
+    ButtonTypeEnum.EDIT,
+    "Edit"
+  )
+    ? ButtonTypeEnum.EDIT
+    : isRowActionAllowed(ButtonTypeEnum.VIEW, "View")
+      ? ButtonTypeEnum.VIEW
+      : undefined;
+
+  // Grids that edit in place, or where a click picks the row, keep that.
+  const isRowClickable =
+    onRowClick !== undefined ||
+    (editMode === undefined && onSelect === undefined && rowClickAction !== undefined);
+
+  const handleRowClick = (event: DataTableRowClickEvent) => {
+    // The row's own controls - its actions menu, links, inputs - do their own thing.
+    const target = event.originalEvent.target as HTMLElement;
+    if (target.closest("button, a, input, textarea, .p-checkbox, .p-dropdown")) return;
+
+    const rowData = event.data as TEntity;
+    if (onRowClick) onRowClick(rowData);
+    else if (rowClickAction !== undefined) onButtonClick(rowClickAction, rowData);
+  };
+
   const gridRowActions = (rowData: TEntity, _options: ColumnBodyOptions) => (
     <DataTableGridRowActionsComponent
       rowData={rowData}
@@ -310,6 +350,7 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
       authorize={authorize}
       controller={controller}
       availableGridRowButtons={availableGridRowButtons}
+      isButtonVisible={isGridRowButtonVisible}
     />
   );
 
@@ -371,6 +412,8 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         selectionMode="single"
         selection={selectedObject ?? undefined}
         onSelectionChange={onSelect}
+        onRowClick={isRowClickable ? handleRowClick : undefined}
+        rowClassName={() => (isRowClickable ? "cursor-pointer" : "")}
         // Loading.
         loading={loading}
         // Pagging.
@@ -382,9 +425,10 @@ export default function DataTableComponent<TEntity extends DataTableValue>({
         rowsPerPageOptions={[5, 10, 25, 50, 100]}
         paginatorRight={
           <>
-            {dataTableDto.first + 1} to{" "}
-            {dataTableDto.rows * (dataTableDto.page + 1)} out of{" "}
-            {dataTableDto.totalRecords}
+            {/* Capped at the total, or a short last page claims rows it does not have. */}
+            {Math.min(dataTableDto.first + 1, dataTableDto.totalRecords)} to{" "}
+            {Math.min(dataTableDto.rows * (dataTableDto.page + 1), dataTableDto.totalRecords)}{" "}
+            out of {dataTableDto.totalRecords}
           </>
         }
         paginatorLeft={<></>}

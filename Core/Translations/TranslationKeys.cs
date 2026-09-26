@@ -84,6 +84,10 @@ namespace Core.Translations // Adjust to match your project's namespace
         public const string This_date_is_not_part_of_the_booking = "This_date_is_not_part_of_the_booking";
         public const string Booking_saved = "Booking_saved";
         public const string Booking_removed = "Booking_removed";
+        public const string Workout_plan_deactivated = "Workout_plan_deactivated";
+        public const string Workout_plan_activated = "Workout_plan_activated";
+        public const string Questionnaire_saved = "Questionnaire_saved";
+        public const string Answers_saved = "Answers_saved";
         public const string Calendar_Integration = "Calendar_Integration";
         public const string Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar = "Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar";
         public const string Add_to_Calendar = "Add_to_Calendar";

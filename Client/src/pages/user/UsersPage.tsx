@@ -235,6 +235,8 @@ export default function UsersPage() {
           dataTableDto={datatableDto}
           setDataTableDto={setDatatableDto}
           formMode={FormMode.EDIT}
+          // A member row opens their profile rather than the edit form.
+          onRowClick={(row) => navigate("/administrator/users/" + row.id + "/profile")}
           onButtonClick={onDataTableClick}
           filterDisplay={DataTableFilterDisplayEnum.ROW}
           dataTableColumns={dataTableColumns}

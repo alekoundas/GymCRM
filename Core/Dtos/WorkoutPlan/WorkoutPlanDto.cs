@@ -20,6 +20,9 @@ namespace Core.Dtos.WorkoutPlan
 
         public bool IsCircular { get; set; }
 
+        // Read only here: changed through the Deactivate and Activate endpoints.
+        public bool IsInactive { get; set; }
+
 
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]

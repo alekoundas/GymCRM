@@ -11,6 +11,9 @@ interface IField<TEntity> {
   authorize: boolean;
   controller: string;
   availableGridRowButtons: ButtonTypeEnum[];
+  // Per row: hide a button that makes no sense for this row, like Activate on a
+  // row that is already active.
+  isButtonVisible?: (buttonType: ButtonTypeEnum, rowData: TEntity) => boolean;
 }
 
 export default function DataTableGridRowActionsComponent<TEntity>({
@@ -19,6 +22,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
   authorize,
   controller,
   availableGridRowButtons,
+  isButtonVisible,
 }: IField<TEntity>) {
   const { t } = useTranslator();
   const menuRef = useRef<Menu>(null);
@@ -28,6 +32,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
 
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.PROFILE))
       menuItems.push({
+        data: ButtonTypeEnum.PROFILE,
         label: t("Profile"),
         icon: "pi pi-user-edit",
         command: () => onButtonClick(ButtonTypeEnum.PROFILE, rowData),
@@ -38,6 +43,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
 
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.ATTENDANCES))
       menuItems.push({
+        data: ButtonTypeEnum.ATTENDANCES,
         label: t("Attendances"),
         icon: "pi pi-address-book",
         command: () => onButtonClick(ButtonTypeEnum.ATTENDANCES, rowData),
@@ -48,6 +54,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
 
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.RECORDINGS))
       menuItems.push({
+        data: ButtonTypeEnum.RECORDINGS,
         label: t("Recordings"),
         icon: "pi pi-history",
         command: () => onButtonClick(ButtonTypeEnum.RECORDINGS, rowData),
@@ -58,6 +65,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
 
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.VIEW))
       menuItems.push({
+        data: ButtonTypeEnum.VIEW,
         label: t("View"),
         icon: "pi pi-eye",
         command: () => onButtonClick(ButtonTypeEnum.VIEW, rowData),
@@ -68,6 +76,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
 
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.EDIT))
       menuItems.push({
+        data: ButtonTypeEnum.EDIT,
         label: t("Edit"),
         icon: "pi pi-pencil",
         command: () => onButtonClick(ButtonTypeEnum.EDIT, rowData),
@@ -78,6 +87,7 @@ export default function DataTableGridRowActionsComponent<TEntity>({
 
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.CLONE))
       menuItems.push({
+        data: ButtonTypeEnum.CLONE,
         label: t("Clone"),
         icon: "pi pi-copy",
         command: () => onButtonClick(ButtonTypeEnum.CLONE, rowData),
@@ -86,8 +96,27 @@ export default function DataTableGridRowActionsComponent<TEntity>({
           : true,
       });
 
+    if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.DEACTIVATE))
+      menuItems.push({
+        data: ButtonTypeEnum.DEACTIVATE,
+        label: t("Deactivate"),
+        icon: "pi pi-eye-slash",
+        command: () => onButtonClick(ButtonTypeEnum.DEACTIVATE, rowData),
+        visible: authorize ? TokenService.isUserAllowed(controller + "_Edit") : true,
+      });
+
+    if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.ACTIVATE))
+      menuItems.push({
+        data: ButtonTypeEnum.ACTIVATE,
+        label: t("Activate"),
+        icon: "pi pi-eye",
+        command: () => onButtonClick(ButtonTypeEnum.ACTIVATE, rowData),
+        visible: authorize ? TokenService.isUserAllowed(controller + "_Edit") : true,
+      });
+
     if (availableGridRowButtons.some((x) => x === ButtonTypeEnum.DELETE))
       menuItems.push({
+        data: ButtonTypeEnum.DELETE,
         label: t("Delete"),
         icon: "pi pi-trash",
         command: () => onButtonClick(ButtonTypeEnum.DELETE, rowData),
@@ -95,6 +124,12 @@ export default function DataTableGridRowActionsComponent<TEntity>({
           ? TokenService.isUserAllowed(controller + "_Delete")
           : true,
         style: { color: "red" }, // Optional: Red text for delete (Menu doesn't have built-in severity)
+      });
+
+    // Buttons the page says do not apply to this particular row.
+    if (isButtonVisible)
+      menuItems.forEach((item) => {
+        if (!isButtonVisible(item.data as ButtonTypeEnum, rowData)) item.visible = false;
       });
 
     return menuItems;

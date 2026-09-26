@@ -415,6 +415,46 @@
   'New category': string;
   'The train groups in this category will be left without one': string;
   'Train group categories': string;
+  'Activate': string;
+  'Active': string;
+  'Add question': string;
+  'Answer placeholder': string;
+  'Current exercises': string;
+  'Deactivate': string;
+  'Deactivate workout plan': string;
+  'Edit answers': string;
+  'Edit question': string;
+  'Exercise': string;
+  'Exercise history': string;
+  'Health questionnaire': string;
+  'Health questions': string;
+  'Hide question': string;
+  'History': string;
+  'Image': string;
+  'Inactive': string;
+  'Load': string;
+  'Member': string;
+  'New question': string;
+  'No questions yet. Add the first one': string;
+  'Not answered': string;
+  'Optional. For example a body chart with numbered areas the member can refer to': string;
+  'Question': string;
+  'Questionnaire name': string;
+  'Remove image': string;
+  'Show question': string;
+  'Shown faded in the answer box until the member types': string;
+  'The answers members gave to this question will be deleted too': string;
+  'The image is too large. Please use one under 3 MB': string;
+  'The member will no longer see this plan': string;
+  'The member will see this plan again': string;
+  'There are no health questions yet': string;
+  'This plan will be removed from your workout plans': string;
+  'Upload image': string;
+  'You cannot undo this yourself. To use the plan again, ask the gym to activate it for you': string;
+  'answered': string;
+  'e.g. 18 knee pain': string;
+  'question': string;
+  'questions': string;
     }
 
 

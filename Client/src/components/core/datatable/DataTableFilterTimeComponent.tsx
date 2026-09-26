@@ -17,12 +17,21 @@ export default function DataTableFilterTimeComponent({ options }: IField) {
   const [endTime, setEndTime] = useState<Date>(emptyDate);
   const overlayPanel = useRef<OverlayPanel>(null);
 
-  // Clear filter value where user presses clear.
+  // Follows the grid's value: cleared, or a range restored from the url on coming
+  // back to the page - where it would otherwise still filter the rows while showing
+  // an empty box.
   useEffect(() => {
-    if (options.value === null) {
-      setStartTime(emptyDate);
-      setEndTime(emptyDate);
+    if (Array.isArray(options.value) && options.value.length === 2) {
+      const start = new Date(options.value[0]);
+      const end = new Date(options.value[1]);
+      if (!Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime())) {
+        setStartTime(start);
+        setEndTime(end);
+        return;
+      }
     }
+    setStartTime(emptyDate);
+    setEndTime(emptyDate);
   }, [options.value]);
 
   const onHide = () => {

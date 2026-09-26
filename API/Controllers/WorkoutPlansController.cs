@@ -66,6 +66,57 @@ namespace API.Controllers
             return new ApiResponse<WorkoutPlanDto>().SetSuccessResponse(entityDto);
         }
 
+        // PUT: api/WorkoutPlans/5
+        // Whether a plan is active changes through Deactivate and Activate only. The form
+        // sends the whole plan back, so without this a save would quietly re-activate it.
+        public override async Task<ActionResult<ApiResponse<WorkoutPlan>>> Put(string? id, [FromBody] WorkoutPlanDto entityDto)
+        {
+            if (int.TryParse(id, out int planId))
+            {
+                using ApiDbContext context = _dataService.GetDbContext();
+                bool? isInactive = await context.WorkoutPlans
+                    .Where(x => x.Id == planId)
+                    .Select(x => (bool?)x.IsInactive)
+                    .FirstOrDefaultAsync();
+
+                if (isInactive != null)
+                    entityDto.IsInactive = isInactive.Value;
+            }
+
+            return await base.Put(id, entityDto);
+        }
+
+        // POST: api/WorkoutPlans/5/Deactivate
+        // Hides the plan from the member's list. A member may do it to their own plan and
+        // cannot undo it; the admin can, with Activate.
+        [HttpPost("{id}/Deactivate")]
+        public async Task<ActionResult<ApiResponse<bool>>> Deactivate(int id) => await SetInactiveAsync(id, true);
+
+        // POST: api/WorkoutPlans/5/Activate
+        [HttpPost("{id}/Activate")]
+        public async Task<ActionResult<ApiResponse<bool>>> Activate(int id) => await SetInactiveAsync(id, false);
+
+        private async Task<ActionResult<ApiResponse<bool>>> SetInactiveAsync(int id, bool isInactive)
+        {
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            WorkoutPlan? plan = await context.WorkoutPlans.FirstOrDefaultAsync(x => x.Id == id);
+            if (plan == null)
+                return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(WorkoutPlan)]));
+
+            bool isAdmin = User.HasClaim("Permission", "WorkoutPlansAdmin_Edit");
+            bool isOwnPlan = plan.UserId == GetCallerId();
+
+            if (!isAdmin && !(isInactive && isOwnPlan))
+                return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]));
+
+            plan.IsInactive = isInactive;
+            await context.SaveChangesAsync();
+
+            return new ApiResponse<bool>().SetSuccessResponse(true,
+                _localizer[isInactive ? TranslationKeys.Workout_plan_deactivated : TranslationKeys.Workout_plan_activated]);
+        }
+
         // The week and the rule have to agree, and only the server can be sure of it.
         // The dialog fetches the rule's weeks to build its dropdown, so there is a
         // moment where the form still holds the previous rule's week - saving inside
@@ -109,7 +160,12 @@ namespace API.Controllers
 
             Guid? scopeUserId = GetScopeToCallerId(AdminViewClaim);
             if (scopeUserId != null)
+            {
                 query = query.Where(x => x.UserId == scopeUserId.Value);
+
+                // A member does not see the plans they have deactivated.
+                query = query.Where(x => !x.IsInactive);
+            }
 
             // "Is a recording live for this plan" is an EXISTS over the children, so the
             // reflection-based helpers in GetDataTable cannot express it. Same for the
