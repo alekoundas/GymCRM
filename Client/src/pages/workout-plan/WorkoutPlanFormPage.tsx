@@ -261,8 +261,9 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
         onDone={() => {
           setActivationMode(undefined);
           // A member's deactivated plan is gone from their list, so back to it.
+          // Replacing this page means the browser's back button cannot reopen it.
           if (isAdminPage) loadWorkoutPlan();
-          else navigate("/workout-plans");
+          else navigate("/workout-plans", { replace: true });
         }}
       />
 
