@@ -59,14 +59,7 @@ namespace DataAccess
                 //
                 var claims = new List<Claim>
                 {
-                    new Claim("Permission", "TrainGroupCategories_View"),
-                    new Claim("Permission", "TrainGroupCategories_Add"),
-                    new Claim("Permission", "TrainGroupCategories_Edit"),
-                    new Claim("Permission", "TrainGroupCategories_Delete"),
-                    new Claim("Permission", "Questionnaires_View"),
-                    new Claim("Permission", "Questionnaires_Add"),
-                    new Claim("Permission", "Questionnaires_Edit"),
-                    new Claim("Permission", "Questionnaires_Delete"),
+
                 };
 
                 var role = await roleManager.FindByNameAsync("Administrator");

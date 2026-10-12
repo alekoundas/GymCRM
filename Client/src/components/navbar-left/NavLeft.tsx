@@ -170,9 +170,18 @@ export default function NavLeft() {
       }));
 
   return (
-    <Card className="h-full ">
+    // The card is as tall as the screen; its body and content are made flex columns
+    // so the menu below the toggle takes what is left and scrolls on a short screen,
+    // instead of running past the bottom and being cut off.
+    <Card
+      className="h-full"
+      pt={{
+        body: { className: "h-full flex flex-column" },
+        content: { className: "flex-1 flex flex-column min-h-0" },
+      }}
+    >
       {/* Toggle Button at the top */}
-      <div className="p-3 border-bottom-2 border-top-2 surface-border">
+      <div className="flex-none p-3 border-bottom-2 border-top-2 surface-border">
         <Button
           icon={expanded ? "pi pi-chevron-left" : "pi pi-chevron-right"}
           onClick={() => setExpanded(!expanded)}
@@ -183,7 +192,7 @@ export default function NavLeft() {
       </div>
 
       {/* Menu */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto">
         <Menu
           model={menuItems}
           className={expanded ? "w-full" : "w-4rem"} // 64px when collapsed

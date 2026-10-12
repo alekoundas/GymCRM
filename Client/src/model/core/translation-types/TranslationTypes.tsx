@@ -450,7 +450,7 @@
   'There are no health questions yet': string;
   'This plan will be removed from your workout plans': string;
   'Upload image': string;
-  'You cannot undo this yourself. To use the plan again, ask the gym to activate it for you': string;
+  'This cannot be undone. To use this plan again, contact your trainer': string;
   'answered': string;
   'e.g. 18 knee pain': string;
   'question': string;
