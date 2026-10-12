@@ -98,6 +98,9 @@ namespace API.Controllers
 
 
             dataTable.Data = identityClaimsDto;
+            // Everything goes back in one page, so the grid's "x to y out of z" has to say so.
+            dataTable.TotalRecords = identityClaimsDto.Count;
+            dataTable.PageCount = 1;
             return new ApiResponse<DataTableDto<IdentityClaimDto>>().SetSuccessResponse(dataTable);
         }
     }

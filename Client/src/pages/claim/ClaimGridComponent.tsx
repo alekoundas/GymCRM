@@ -22,6 +22,9 @@ export default function ClaimGridComponent({
 
   const [datatableDto, setDatatableDto] = useState<DataTableDto<ClaimDto>>({
     ...new DataTableDto(),
+    // The server sends every permission group at once. At the default ten a page,
+    // the newest groups sat past the end of the list where they could not be ticked.
+    rows: 100,
     filters: [
       { fieldName: "RoleName", filterType: "contains", value: roleDto.name },
     ],

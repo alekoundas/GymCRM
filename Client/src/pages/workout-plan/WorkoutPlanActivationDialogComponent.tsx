@@ -105,7 +105,7 @@ function ActivationContent({
       <Message
         severity="warn"
         className="w-full justify-content-start"
-        text={`${t("You cannot undo this yourself. To use the plan again, ask the gym to activate it for you")}.`}
+        text={`${t("This cannot be undone. To use this plan again, contact your trainer")}.`}
       />
     </div>
   );
