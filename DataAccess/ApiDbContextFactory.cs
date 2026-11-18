@@ -16,7 +16,8 @@ namespace DataAccess
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApiDbContext>();
             optionsBuilder.UseSqlite(_configuration.GetConnectionString("DefaultConnection"));
-            optionsBuilder.EnableSensitiveDataLogging();
+            if (ApiDbContext.LogsParameterValues)
+                optionsBuilder.EnableSensitiveDataLogging();
             optionsBuilder.EnableDetailedErrors();
             return new ApiDbContext(optionsBuilder.Options, _configuration);
         }

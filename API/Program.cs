@@ -322,15 +322,21 @@ var app = builder.Build();
 
 
 
+// Request headers carry the caller's login token (Authorization: Bearer ...), so they
+// are only written out on a developer's machine, never into the live server's logs.
+bool logHeaders = app.Environment.IsDevelopment();
+
 // Log all requests at the start of the pipeline
 app.Use(async (context, next) =>
 {
     Console.WriteLine($"[START] Request: {context.Request.Method} {context.Request.Path}");
     Console.WriteLine($"Origin: {context.Request.Headers["Origin"]}");
-    Console.WriteLine($"Headers: {string.Join(", ", context.Request.Headers.Select(h => $"{h.Key}: {h.Value}"))}");
+    if (logHeaders)
+        Console.WriteLine($"Headers: {string.Join(", ", context.Request.Headers.Select(h => $"{h.Key}: {h.Value}"))}");
     await next();
     Console.WriteLine($"[END] Response: {context.Response.StatusCode}");
-    Console.WriteLine($"Response Headers: {string.Join(", ", context.Response.Headers.Select(h => $"{h.Key}: {h.Value}"))}");
+    if (logHeaders)
+        Console.WriteLine($"Response Headers: {string.Join(", ", context.Response.Headers.Select(h => $"{h.Key}: {h.Value}"))}");
 });
 
 // Exception handling

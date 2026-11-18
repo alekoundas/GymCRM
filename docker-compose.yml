@@ -4,6 +4,16 @@ services:
   api:
     container_name: Api
     image: ${docker_registry-}api
+    # Without a restart policy a single crash left the API down until the next publish.
+    # unless-stopped also brings every container back after the droplet reboots.
+    restart: unless-stopped
+    # Docker keeps container logs forever by default. Three files of 10 MB is plenty to
+    # read back what happened before a crash, without slowly filling the disk.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     build:
       context: .
       dockerfile: API/Dockerfile
@@ -20,6 +30,12 @@ services:
   client:
     container_name: Client
     image: IMAGE_CLIENT  # Placeholder: sed-replaced with e.g., yourusername/myapp-client:sha123
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     # build:
     #   context: .
     #   dockerfile: Client/Dockerfile
@@ -39,7 +55,13 @@ services:
 
   nginx:
     container_name: Nginx
-    image: nginx:stable-alpine 
+    image: nginx:stable-alpine
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
         - "80:80"    # External HTTP
         - 443:443    # External HTTPS
@@ -68,6 +90,12 @@ services:
   certbot:
     container_name: Certbot
     image: certbot/certbot
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     volumes: 
       - /etc/letsencrypt:/etc/letsencrypt/:rw
       - /root/app/API/Certbot/www:/var/www/certbot/:rw

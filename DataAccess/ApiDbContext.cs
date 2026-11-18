@@ -62,9 +62,16 @@ namespace DataAccess
             optionsBuilder.AddInterceptors(new SqliteFunctionInterceptor());
 
 
-            optionsBuilder.EnableSensitiveDataLogging();
+            if (LogsParameterValues)
+                optionsBuilder.EnableSensitiveDataLogging();
             optionsBuilder.EnableDetailedErrors();
         }
+
+        // Sensitive data logging writes every query's values to the log - emails,
+        // password hashes, the Gmail token. Fine on a developer's machine, never on the
+        // live server, whose logs end up sitting on the droplet's disk.
+        internal static bool LogsParameterValues =>
+            string.Equals(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), "Development", StringComparison.OrdinalIgnoreCase);
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
