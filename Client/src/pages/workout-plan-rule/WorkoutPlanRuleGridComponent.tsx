@@ -13,7 +13,10 @@ import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
 import { TokenService } from "../../services/TokenService";
 import { useWorkoutPlanRuleStore } from "../../stores/WorkoutPlanRuleStore";
-import { WorkoutPlanRuleDto } from "../../model/entities/workout-plan-rule/WorkoutPlanRuleDto";
+import {
+  DEFAULT_AWAY_GAP_DAYS,
+  WorkoutPlanRuleDto,
+} from "../../model/entities/workout-plan-rule/WorkoutPlanRuleDto";
 import WorkoutPlanRuleFormComponent from "./WorkoutPlanRuleFormComponent";
 
 const CONTROLLER = "WorkoutPlanRules";
@@ -87,11 +90,12 @@ export default function WorkoutPlanRuleGridComponent() {
       body: (rowData: WorkoutPlanRuleDto) => (
         <div className="flex align-items-center gap-2 flex-wrap">
           <span>{rowData.name}</span>
+          {/* Editing stays open; only Delete waits until the workout ends. */}
           {rowData.isLocked && (
             <Tag
-              severity="warning"
-              icon="pi pi-lock"
-              value={t("Locked")}
+              severity="info"
+              icon="pi pi-stopwatch"
+              value={t("Workout in progress")}
             />
           )}
         </div>
@@ -124,9 +128,14 @@ export default function WorkoutPlanRuleGridComponent() {
   ];
 
   const onSaveAdd = async (): Promise<void> => {
+    // The form turns Save off while the number of days is empty; this covers a
+    // click that lands in the same moment.
+    if (workoutPlanRuleDto.awayGapDays == null) return;
+
     const response = await apiService.create(CONTROLLER, {
       name: workoutPlanRuleDto.name,
       weeks: workoutPlanRuleDto.weeks,
+      awayGapDays: workoutPlanRuleDto.awayGapDays,
     });
 
     if (response) {
@@ -138,7 +147,8 @@ export default function WorkoutPlanRuleGridComponent() {
   };
 
   const onSaveEdit = async (): Promise<void> => {
-    if (!workoutPlanRuleDto.id) return;
+    if (!workoutPlanRuleDto.id || workoutPlanRuleDto.awayGapDays == null)
+      return;
 
     const response = await apiService.update(
       CONTROLLER,
@@ -163,14 +173,21 @@ export default function WorkoutPlanRuleGridComponent() {
       triggerRefreshDataTable.current(datatableDto);
   };
 
-  // The grid row carries the weeks already, but re-fetching keeps the lock state fresh.
+  // The grid row carries the weeks already, but re-fetching keeps the
+  // "a member is training" note fresh.
   const loadRule = async (rowData: WorkoutPlanRuleDto) => {
     if (!rowData.id) return;
     const response = await apiService.get<WorkoutPlanRuleDto>(
       CONTROLLER,
       rowData.id,
     );
-    setWorkoutPlanRuleDto(response ?? rowData);
+    const rule = response ?? rowData;
+    // Older rules have no number of days saved and use the default, so the
+    // form shows that number rather than an empty box.
+    setWorkoutPlanRuleDto({
+      ...rule,
+      awayGapDays: rule.awayGapDays ?? DEFAULT_AWAY_GAP_DAYS,
+    });
   };
 
   const onDataTableClick = (

@@ -74,6 +74,9 @@ namespace API.Controllers
                 if (await context.WorkoutPlanRules.AnyAsync(x => x.Name == entityDto.Name))
                     return new ApiResponse<List<WorkoutPlanRule>>().SetErrorResponse(_localizer[TranslationKeys._0_already_exists, entityDto.Name]);
 
+                if (!IsAwayGapDaysValid(entityDto.AwayGapDays))
+                    return new ApiResponse<List<WorkoutPlanRule>>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]);
+
                 WorkoutPlanRule rule = _mapper.Map<WorkoutPlanRule>(entityDto);
                 rule.CreatedOn = DateTime.UtcNow;
                 rule.CreatedBy_Id = GetCallerId()?.ToString() ?? string.Empty;
@@ -105,14 +108,18 @@ namespace API.Controllers
                 return new ApiResponse<WorkoutPlanRule>().SetErrorResponse(
                     _localizer[TranslationKeys.Requested_0_not_found, nameof(WorkoutPlanRule)]);
 
-            // A rule may not change while any plan using it has a live recording.
-            if (await IsRuleLockedAsync(context, rule.Id))
-                return new ApiResponse<WorkoutPlanRule>().SetErrorResponse(_localizer[TranslationKeys.The_rule_is_in_use_by_a_running_recording]);
-
+            // Editing is allowed while a member is training with the rule. The rule is only
+            // read when a workout starts, and a running recording keeps its own week number,
+            // so a change applies from each member's next start. A member whose week was
+            // removed starts again from week 1 (the Orphaned start scenario).
             if (await context.WorkoutPlanRules.AnyAsync(x => x.Name == entityDto.Name && x.Id != rule.Id))
                 return new ApiResponse<WorkoutPlanRule>().SetErrorResponse(_localizer[TranslationKeys._0_already_exists, entityDto.Name]);
 
+            if (!IsAwayGapDaysValid(entityDto.AwayGapDays))
+                return new ApiResponse<WorkoutPlanRule>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]);
+
             rule.Name = entityDto.Name;
+            rule.AwayGapDays = entityDto.AwayGapDays;
 
             // Reconcile the week rows rather than replacing them, so untouched weeks keep their ids.
             List<int> keptWeekNumbers = entityDto.Weeks.Select(x => x.WeekNumber).ToList();
@@ -165,6 +172,7 @@ namespace API.Controllers
             if (rule == null)
                 return new ApiResponse<WorkoutPlanRule>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(WorkoutPlanRule)]);
 
+            // Deleting still waits until nobody is training with the rule.
             if (await IsRuleLockedAsync(context, rule.Id))
                 return new ApiResponse<WorkoutPlanRule>().SetErrorResponse(_localizer[TranslationKeys.The_rule_is_in_use_by_a_running_recording]);
 
@@ -246,6 +254,13 @@ namespace API.Controllers
                 entityDtos[i].IsLocked = lockedRuleIds.Contains(ruleId);
                 entityDtos[i].Weeks = entityDtos[i].Weeks.OrderBy(x => x.WeekNumber).ToList();
             }
+        }
+
+        // The form always sends a number of days now. Null is still accepted and means the
+        // default (WorkoutPlanRecordingService.AwayGapDays), as it does for older rules.
+        private static bool IsAwayGapDaysValid(int? awayGapDays)
+        {
+            return awayGapDays == null || (awayGapDays >= 1 && awayGapDays <= 365);
         }
 
         private static async Task<bool> IsRuleLockedAsync(ApiDbContext context, int ruleId)

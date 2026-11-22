@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
@@ -14,15 +14,27 @@ const MAX_RECORDINGS = 5;
 
 interface IField {
   formMode: FormMode;
+  // Passed in by GenericDialogComponent.
+  toggleDialogSave?: (isEnabled: boolean) => void;
 }
 
-export default function WorkoutPlanRuleFormComponent({ formMode }: IField) {
+export default function WorkoutPlanRuleFormComponent({
+  formMode,
+  toggleDialogSave,
+}: IField) {
   const { t } = useTranslator();
   const { workoutPlanRuleDto, updateWorkoutPlanRuleDto } =
     useWorkoutPlanRuleStore();
 
-  const isReadOnly =
-    formMode === FormMode.VIEW || workoutPlanRuleDto.isLocked === true;
+  const isReadOnly = formMode === FormMode.VIEW;
+
+  // The number of days is required. Save stays off while the box is empty.
+  const isAwayGapDaysMissing =
+    !isReadOnly && workoutPlanRuleDto.awayGapDays == null;
+
+  useEffect(() => {
+    if (!isReadOnly) toggleDialogSave?.(!isAwayGapDaysMissing);
+  }, [isReadOnly, isAwayGapDaysMissing]);
 
   const weekCountOptions = useMemo(
     () =>
@@ -87,11 +99,27 @@ export default function WorkoutPlanRuleFormComponent({ formMode }: IField) {
 
   return (
     <div className="w-full">
-      {workoutPlanRuleDto.isLocked && (
+      {/* The rule is read only when a workout starts, so editing it while someone
+          trains is safe. The note says so, in place of the old lock. */}
+      {workoutPlanRuleDto.isLocked && formMode === FormMode.EDIT && (
         <Message
-          severity="warn"
-          className="w-full mb-3"
-          text={t("This rule is locked while a recording that uses it is running")}
+          severity="info"
+          className="w-full mb-3 justify-content-start"
+          content={
+            <div className="flex align-items-start gap-2">
+              <i className="pi pi-info-circle mt-1" />
+              <div className="flex flex-column gap-1">
+                <span className="font-medium">
+                  {t("A member is training with this rule right now")}
+                </span>
+                <span>
+                  {t(
+                    "Changes apply the next time each member starts a workout, and the workout already running carries on as normal",
+                  )}
+                </span>
+              </div>
+            </div>
+          }
         />
       )}
 
@@ -143,18 +171,31 @@ export default function WorkoutPlanRuleFormComponent({ formMode }: IField) {
           <InputNumber
             inputId="rule-away-gap-days"
             value={workoutPlanRuleDto.awayGapDays ?? null}
+            // onChange follows each keystroke, so an emptied box turns red and
+            // Save goes off straight away; onValueChange brings in the value
+            // clamped to 1-365 when the box loses focus.
+            onChange={(e) =>
+              updateWorkoutPlanRuleDto({ awayGapDays: e.value ?? null })
+            }
             onValueChange={(e) =>
-              updateWorkoutPlanRuleDto({ awayGapDays: e.value ?? undefined })
+              updateWorkoutPlanRuleDto({ awayGapDays: e.value ?? null })
             }
             min={1}
             max={365}
             showButtons
             className="w-full"
+            invalid={isAwayGapDaysMissing}
             disabled={isReadOnly}
           />
-          <small className="block mt-1 text-color-secondary">
-            {t("Leave empty for the default")}
-          </small>
+          {isAwayGapDaysMissing ? (
+            <small className="block mt-1 p-error">
+              {t("Enter a number of days")}
+            </small>
+          ) : (
+            <small className="block mt-1 text-color-secondary">
+              {t("The default is 12 days")}
+            </small>
+          )}
         </div>
       </div>
 

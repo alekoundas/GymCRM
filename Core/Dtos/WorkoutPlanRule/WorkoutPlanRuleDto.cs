@@ -22,7 +22,8 @@ namespace Core.Dtos.WorkoutPlanRule
         // How many plans point at this rule. Drives the grid's "in use" column.
         public int WorkoutPlanCount { get; set; }
 
-        // True while any plan using this rule has a live recording - edit and delete are blocked.
+        // True while any plan using this rule has a live recording. Delete is blocked then;
+        // edit is allowed and applies from each member's next start.
         public bool IsLocked { get; set; }
 
         public DateTime CreatedOn { get; set; }

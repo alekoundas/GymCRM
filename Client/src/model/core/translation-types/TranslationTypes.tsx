@@ -227,8 +227,9 @@
   'Number of weeks': string;
   'Select the number of weeks to continue': string;
   'Reducing the weeks will delete the text of the removed weeks': string;
-  'This rule is locked while a recording that uses it is running': string;
-  'Locked': string;
+  'A member is training with this rule right now': string;
+  'Changes apply the next time each member starts a workout, and the workout already running carries on as normal': string;
+  'Workout in progress': string;
   'In use': string;
   'Rule': string;
   'Current week': string;
@@ -284,7 +285,8 @@
   'No record': string;
   'Already recorded': string;
   'Days away before asking for the week': string;
-  'Leave empty for the default': string;
+  'The default is 12 days': string;
+  'Enter a number of days': string;
   'Subscriptions': string;
   'Subscription requests': string;
   'Subscription request': string;
