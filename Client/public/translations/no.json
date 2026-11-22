@@ -453,5 +453,9 @@
   "Please choose a JPG, PNG or WebP image": "Please choose a JPG, PNG or WebP image",
   "The image is too large. Please use one under 10 MB": "The image is too large. Please use one under 10 MB",
   "This file could not be read as an image": "This file could not be read as an image",
-  "Change image": "Change image"
+  "Change image": "Change image",
+  "Something went wrong": "Something went wrong",
+  "The page stopped because of an error. If it happens again, send us a screenshot of this screen": "The page stopped because of an error. If it happens again, send us a screenshot of this screen",
+  "Reload page": "Reload page",
+  "Go back": "Go back"
 }

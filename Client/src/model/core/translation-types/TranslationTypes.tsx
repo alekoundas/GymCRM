@@ -459,6 +459,10 @@
   'The image is too large. Please use one under 10 MB': string;
   'This file could not be read as an image': string;
   'Change image': string;
+  'Something went wrong': string;
+  'The page stopped because of an error. If it happens again, send us a screenshot of this screen': string;
+  'Reload page': string;
+  'Go back': string;
     }
 
 

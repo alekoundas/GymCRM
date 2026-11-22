@@ -452,5 +452,9 @@
   "Please choose a JPG, PNG or WebP image": "Επιλέξτε εικόνα JPG, PNG ή WebP",
   "The image is too large. Please use one under 10 MB": "Η εικόνα είναι πολύ μεγάλη. Χρησιμοποιήστε μία κάτω από 10 MB",
   "This file could not be read as an image": "Το αρχείο δεν μπορεί να διαβαστεί ως εικόνα",
-  "Change image": "Αλλαγή εικόνας"
+  "Change image": "Αλλαγή εικόνας",
+  "Something went wrong": "Κάτι πήγε στραβά",
+  "The page stopped because of an error. If it happens again, send us a screenshot of this screen": "Η σελίδα σταμάτησε λόγω σφάλματος. Αν συμβεί ξανά, στείλτε μας ένα στιγμιότυπο αυτής της οθόνης",
+  "Reload page": "Επαναφόρτωση σελίδας",
+  "Go back": "Επιστροφή"
 }

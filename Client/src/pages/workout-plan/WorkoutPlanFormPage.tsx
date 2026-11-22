@@ -20,6 +20,7 @@ import GenericDialogComponent, {
 import WorkoutPlanRecordingGridComponent from "../workout-plan-recording/WorkoutPlanRecordingGridComponent";
 import WorkoutPlanRecordingActionsComponent from "../workout-plan-recording/WorkoutPlanRecordingActionsComponent";
 import { Tag } from "primereact/tag";
+import { ProgressSpinner } from "primereact/progressspinner";
 import { TokenService } from "../../services/TokenService";
 import WorkoutPlanActivationDialogComponent, {
   WorkoutPlanActivationMode,
@@ -100,22 +101,40 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
     }
   };
 
+  // The plan this page is showing, cleared when the page goes. The store is shared by
+  // every visit, so an answer that arrives after the member has moved on to another
+  // plan would otherwise land on that plan's page and replace it.
+  const activePlanId = useRef<string | undefined>(params["id"]);
+  const [isLoadFailed, setIsLoadFailed] = useState(false);
+
   const loadWorkoutPlan = () => {
-    if (params["id"]) {
-      const id = params["id"];
-      apiService.get<WorkoutPlanDto>("WorkoutPlans", id).then((response) => {
-        if (response) {
-          setWorkoutPlanDto(response);
-          setPlanVersion((previous) => previous + 1);
-        }
-      });
-    }
+    const id = params["id"];
+    if (!id) return;
+
+    apiService.get<WorkoutPlanDto>("WorkoutPlans", id).then((response) => {
+      if (activePlanId.current !== id) return;
+
+      if (response) {
+        setWorkoutPlanDto(response);
+        setPlanVersion((previous) => previous + 1);
+      } else setIsLoadFailed(true);
+    });
   };
 
   // Load Initial data
   useEffect(() => {
+    activePlanId.current = params["id"];
+    setIsLoadFailed(false);
     loadWorkoutPlan();
-  }, []);
+
+    return () => {
+      activePlanId.current = undefined;
+    };
+  }, [params["id"]]);
+
+  // Until this plan arrives the store still holds whichever plan was open before, and
+  // everything below would draw that one - and fetch its recordings - under this url.
+  const isPlanLoaded = workoutPlanDto.id === Number(params["id"]);
 
   const onSave = async () => {
     if (formMode === FormMode.ADD) {
@@ -176,6 +195,27 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
       </div>
     );
   }
+
+  if (!isPlanLoaded)
+    return (
+      <div className="flex flex-column align-items-center gap-3 p-5">
+        {isLoadFailed ? (
+          <>
+            <span className="text-color-secondary">{t("No data found.")}</span>
+            <Button
+              label={t("All plans")}
+              icon="pi pi-angle-left"
+              className="p-button-text p-button-sm"
+              onClick={() =>
+                navigate(isAdminPage ? "/administrator/workout-plans" : "/workout-plans")
+              }
+            />
+          </>
+        ) : (
+          <ProgressSpinner style={{ width: "3rem", height: "3rem" }} />
+        )}
+      </div>
+    );
 
   return (
     <div className="mx-auto" style={pageStyle}>
