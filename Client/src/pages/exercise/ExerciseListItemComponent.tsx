@@ -332,35 +332,44 @@ export default function ExerciseListItemComponent({
     return currGroupIdx < allGroupNums.length - 1;
   };
 
+  const hasEditPermission =
+    TokenService.isUserAllowed("WorkoutPlansAdmin_Edit") ||
+    TokenService.isUserAllowed("WorkoutPlans_Edit");
+
+  // The form edits a copy, so Cancel leaves the plan as it was.
+  const openDialog = (id: number, dialogControl: DialogControl) => {
+    const exercise = workoutPlanDto.exercises.find((x) => x.id === id);
+    if (exercise) {
+      updateNewExerciseDto({ ...exercise });
+    }
+    dialogControl.showDialog();
+  };
+
+  // Tapping the exercise opens it for editing when that's allowed. On a page
+  // opened for viewing the Edit form would be all greyed out with a Save that
+  // saves nothing, so it opens read-only instead.
+  const onExerciseClick = () =>
+    openDialog(
+      exerciseDto.id,
+      hasEditPermission && formMode !== FormMode.VIEW
+        ? dialogControlEdit
+        : dialogControlView,
+    );
+
   const getMenuItems: (id: number) => MenuItem[] = (id) => {
     const menuItems: MenuItem[] = [];
 
     menuItems.push({
       label: t("View"),
       icon: "pi pi-eye",
-      command: () => {
-        const exercise = workoutPlanDto.exercises.find((x) => x.id === id);
-        if (exercise) {
-          updateNewExerciseDto({ ...exercise });
-        }
-        dialogControlView.showDialog();
-      },
+      command: () => openDialog(id, dialogControlView),
       visible: TokenService.isUserAllowed("WorkoutPlansAdmin_View"),
     });
     menuItems.push({
       label: t("Edit"),
       icon: "pi pi-pencil",
-      command: () => {
-        const exercise = workoutPlanDto.exercises.find((x) => x.id === id);
-        if (exercise) {
-          updateNewExerciseDto({ ...exercise });
-        }
-        dialogControlEdit.showDialog();
-      },
-
-      visible:
-        TokenService.isUserAllowed("WorkoutPlansAdmin_Edit") ||
-        TokenService.isUserAllowed("WorkoutPlans_Edit"),
+      command: () => openDialog(id, dialogControlEdit),
+      visible: hasEditPermission,
     });
     menuItems.push({
       label: t("Move up"),
@@ -413,60 +422,79 @@ export default function ExerciseListItemComponent({
   return (
     <>
       <div className="flex align-items-start gap-2">
-        <span
-          className="flex-none flex align-items-center justify-content-center border-round surface-100 text-color-secondary text-xs font-semibold"
-          style={{ width: "1.5rem", height: "1.5rem" }}
+        {/* The ⋮ menu stays outside this area. It renders in a portal, and React
+            passes clicks from a portal up to its parent, so a menu choice
+            would also open the form. */}
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={onExerciseClick}
+          onKeyDown={(e) => {
+            if (e.target !== e.currentTarget) return;
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onExerciseClick();
+            }
+          }}
+          className="flex-1 min-w-0 flex align-items-start gap-2 p-2 -m-2 border-round cursor-pointer hover:surface-hover transition-colors transition-duration-150"
         >
-          {index}
-        </span>
-
-        <div className="flex-1 min-w-0">
-          <div className="font-medium line-height-3">{exerciseDto.name}</div>
-
-          {compactMetrics.length > 0 && (
-            <div className="flex flex-wrap gap-3 mt-2">
-              {compactMetrics.map((metric) => (
-                <div key={metric.label}>
-                  <div className="text-xs uppercase text-color-secondary">
-                    {metric.label}
+          <span
+            className="flex-none flex align-items-center justify-content-center border-round surface-100 text-color-secondary text-xs font-semibold"
+            style={{ width: "1.5rem", height: "1.5rem" }}
+          >
+            {index}
+          </span>
+  
+          <div className="flex-1 min-w-0">
+            <div className="font-medium line-height-3">{exerciseDto.name}</div>
+  
+            {compactMetrics.length > 0 && (
+              <div className="flex flex-wrap gap-3 mt-2">
+                {compactMetrics.map((metric) => (
+                  <div key={metric.label}>
+                    <div className="text-xs uppercase text-color-secondary">
+                      {metric.label}
+                    </div>
+                    <div className="font-semibold">{metric.value}</div>
                   </div>
-                  <div className="font-semibold">{metric.value}</div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {noteMetrics.map((metric) => (
-            <div key={metric.label} className="mt-2">
-              <span className="inline-flex align-items-baseline gap-2 p-2 border-round surface-100">
-                <span className="flex-none text-xs uppercase text-color-secondary">
-                  {metric.label}
+                ))}
+              </div>
+            )}
+  
+            {noteMetrics.map((metric) => (
+              <div key={metric.label} className="mt-2">
+                <span className="inline-flex align-items-baseline gap-2 p-2 border-round surface-100">
+                  <span className="flex-none text-xs uppercase text-color-secondary">
+                    {metric.label}
+                  </span>
+                  <span className="text-sm line-height-3">{metric.value}</span>
                 </span>
-                <span className="text-sm line-height-3">{metric.value}</span>
-              </span>
-            </div>
-          ))}
-
-          {exerciseDto.description.length > 0 && (
-            <div className="flex gap-2 mt-2 pt-2 border-top-1 surface-border">
-              <i className="pi pi-info-circle text-color-secondary text-sm mt-1" />
-              <span className="text-sm text-color-secondary line-height-3">
-                {exerciseDto.description}
-              </span>
-            </div>
-          )}
-
-          {exerciseDto.videoUrl.length > 0 && (
-            <a
-              href={exerciseDto.videoUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex align-items-center gap-2 mt-2 text-sm text-primary no-underline"
-            >
-              <i className="pi pi-video" />
-              <span>{t("Watch video")}</span>
-            </a>
-          )}
+              </div>
+            ))}
+  
+            {exerciseDto.description.length > 0 && (
+              <div className="flex gap-2 mt-2 pt-2 border-top-1 surface-border">
+                <i className="pi pi-info-circle text-color-secondary text-sm mt-1" />
+                <span className="text-sm text-color-secondary line-height-3">
+                  {exerciseDto.description}
+                </span>
+              </div>
+            )}
+  
+            {exerciseDto.videoUrl.length > 0 && (
+              <a
+                href={exerciseDto.videoUrl}
+                target="_blank"
+                rel="noreferrer"
+                // Opens the video only, not the form as well.
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex align-items-center gap-2 mt-2 text-sm text-primary no-underline"
+              >
+                <i className="pi pi-video" />
+                <span>{t("Watch video")}</span>
+              </a>
+            )}
+          </div>
         </div>
 
         <Button
