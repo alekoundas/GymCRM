@@ -3,6 +3,13 @@ import { initReactI18next } from "react-i18next";
 import Backend from "i18next-http-backend";
 import { LocalStorageService } from "../services/LocalStorageService";
 
+// The page's declared language has to follow the one the member picked. Browsers
+// decide what to auto-translate from it, so a Greek page marked as English gets
+// "translated" word by word ("Ραντεβού" came out as "Παντεβου").
+i18n.on("languageChanged", (lng) => {
+  document.documentElement.lang = lng;
+});
+
 i18n
   .use(Backend)
   .use(initReactI18next)
