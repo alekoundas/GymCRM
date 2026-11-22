@@ -27,7 +27,8 @@ namespace Core.Dtos.WorkoutPlan
 
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public string UserId { get; set; } = "";
-        public UserDto? User { get; set; }
+        // Only what the plan screens show of the member, never their whole record.
+        public WorkoutPlanOwnerDto? User { get; set; }
 
 
 

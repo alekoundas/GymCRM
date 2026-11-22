@@ -8,8 +8,10 @@ using Core.Dtos.Exercise;
 using Core.Models;
 using Core.System;
 using Core.Translations;
+using DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
 namespace API.Controllers
@@ -18,6 +20,9 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class ExercisesController : GenericController<Exercise, ExerciseDto, ExerciseAddDto>
     {
+        private const string AdminViewClaim = "WorkoutPlansAdmin_View";
+        private const string AdminEditClaim = "WorkoutPlansAdmin_Edit";
+
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
@@ -51,6 +56,19 @@ namespace API.Controllers
             if (existingEntity == null)
                 return new ApiResponse<Exercise>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, className]);
 
+            // Members hold WorkoutPlans_Edit to change their weights. It gives them their own
+            // plans' exercises only; somebody else's answers like a missing one.
+            bool isPlansAdmin = User.HasClaim("Permission", AdminEditClaim);
+            if (!isPlansAdmin && await GetPlanOwnerIdAsync(existingEntity.WorkoutPlanId) != GetCallerId())
+                return new ApiResponse<Exercise>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, className]);
+
+            // And the weight is all a member changes - the trainer writes the rest, and the
+            // form already locks it. Built from the stored row rather than the request, so
+            // a hand-made request cannot rename the exercise, move it into another plan, or
+            // send a different id in the body from the one that was checked above.
+            if (!isPlansAdmin)
+                entity = WithWeight(existingEntity, entityDto.Weight);
+
             if (
                 existingEntity.Name != entity.Name ||
                 existingEntity.Description != entity.Description ||
@@ -75,6 +93,51 @@ namespace API.Controllers
 
             _dataService.Update(entity);
             return new ApiResponse<Exercise>().SetSuccessResponse(entity, _localizer[TranslationKeys._0_updated_successfully, className]);
+        }
+
+        // GET: api/Exercises/5 - same rule as Put: the plan's member or a plans admin.
+        public override async Task<ActionResult<ApiResponse<ExerciseDto>>> Get(string? id)
+        {
+            if (!IsUserAuthorized("View"))
+                return new ApiResponse<ExerciseDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            Exercise? entity = await _dataService.GetGenericRepository<Exercise>().FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
+
+            if (entity == null
+                || (!User.HasClaim("Permission", AdminViewClaim) && await GetPlanOwnerIdAsync(entity.WorkoutPlanId) != GetCallerId()))
+                return new ApiResponse<ExerciseDto>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, typeof(Exercise).Name]);
+
+            return new ApiResponse<ExerciseDto>().SetSuccessResponse(_mapper.Map<ExerciseDto>(entity));
+        }
+
+        private async Task<Guid?> GetPlanOwnerIdAsync(int workoutPlanId)
+        {
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            return await context.WorkoutPlans
+                .Where(x => x.Id == workoutPlanId)
+                .Select(x => (Guid?)x.UserId)
+                .FirstOrDefaultAsync();
+        }
+
+        private static Exercise WithWeight(Exercise stored, string weight)
+        {
+            return new Exercise
+            {
+                Id = stored.Id,
+                CreatedBy_Id = stored.CreatedBy_Id,
+                CreatedBy_FullName = stored.CreatedBy_FullName,
+                CreatedOn = stored.CreatedOn,
+                Name = stored.Name,
+                Description = stored.Description,
+                Sets = stored.Sets,
+                Reps = stored.Reps,
+                Weight = weight ?? string.Empty,
+                VideoUrl = stored.VideoUrl,
+                GroupNumber = stored.GroupNumber,
+                GroupExerciseOrderNumber = stored.GroupExerciseOrderNumber,
+                WorkoutPlanId = stored.WorkoutPlanId
+            };
         }
 
 

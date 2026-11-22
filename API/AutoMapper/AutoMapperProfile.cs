@@ -142,9 +142,13 @@ namespace API.AutoMapper
                 .ForMember(x => x.LastRecordingOn, o => o.Ignore())
                 .ForMember(x => x.RecordingCount, o => o.Ignore())
                 .ForMember(x => x.LastRecordingDurationSeconds, o => o.Ignore());
+            // The plan's owner goes out as a short WorkoutPlanOwnerDto and is never written
+            // back through a plan - saving a plan must not touch the member's record.
             CreateMap<WorkoutPlanDto, WorkoutPlan>()
                 .ForMember(x => x.WorkoutPlanRule, o => o.Ignore())
-                .ForMember(x => x.Recordings, o => o.Ignore());
+                .ForMember(x => x.Recordings, o => o.Ignore())
+                .ForMember(x => x.User, o => o.Ignore());
+            CreateMap<User, WorkoutPlanOwnerDto>();
 
             CreateMap<WorkoutPlan, WorkoutPlanAddDto>();
             CreateMap<WorkoutPlanAddDto, WorkoutPlan>();

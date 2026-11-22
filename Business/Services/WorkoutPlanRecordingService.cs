@@ -102,7 +102,7 @@ namespace Business.Services
             return currentWeek.Value >= weekCount ? 1 : currentWeek.Value + 1;
         }
 
-        public async Task<WorkoutPlanStartContextDto?> GetStartContextAsync(int workoutPlanId)
+        public async Task<WorkoutPlanStartContextDto?> GetStartContextAsync(int workoutPlanId, Guid callerId, bool callerIsAdmin)
         {
             using ApiDbContext context = _dataService.GetDbContext();
 
@@ -112,6 +112,11 @@ namespace Business.Services
                 .FirstOrDefaultAsync(x => x.Id == workoutPlanId);
 
             if (plan == null)
+                return null;
+
+            // Same people as Start and Stop. Somebody else's plan reads as not found, so
+            // the answer does not even confirm that it exists.
+            if (plan.UserId != callerId && !callerIsAdmin)
                 return null;
 
             DateTime nowUtc = DateTime.UtcNow;
@@ -203,7 +208,7 @@ namespace Business.Services
             return startContext;
         }
 
-        public async Task<WorkoutPlanRecordingResult> StartAsync(int workoutPlanId, int weekNumber, Guid callerId)
+        public async Task<WorkoutPlanRecordingResult> StartAsync(int workoutPlanId, int weekNumber, Guid callerId, bool callerIsAdmin)
         {
             using ApiDbContext context = _dataService.GetDbContext();
             DateTime nowUtc = DateTime.UtcNow;
@@ -215,9 +220,9 @@ namespace Business.Services
             if (plan == null)
                 return Fail(TranslationKeys.Requested_0_not_found, nameof(WorkoutPlan));
 
-            // Only the member the plan belongs to may record against it - an admin pressing
-            // Start would otherwise file a recording under their own name.
-            if (plan.UserId != callerId)
+            // The member the plan belongs to, or an admin starting it for them. Either way the
+            // recording is filed under the member (UserId below); CreatedBy_Id keeps who pressed Start.
+            if (plan.UserId != callerId && !callerIsAdmin)
                 return Fail(TranslationKeys.User_is_not_authorized_to_perform_this_action);
 
             if (plan.WorkoutPlanRule == null)
@@ -255,7 +260,7 @@ namespace Business.Services
             return new WorkoutPlanRecordingResult { IsSucceed = true, Recording = recording };
         }
 
-        public async Task<WorkoutPlanRecordingResult> StopAsync(int recordingId, Guid callerId)
+        public async Task<WorkoutPlanRecordingResult> StopAsync(int recordingId, Guid callerId, bool callerIsAdmin)
         {
             using ApiDbContext context = _dataService.GetDbContext();
             DateTime nowUtc = DateTime.UtcNow;
@@ -266,7 +271,7 @@ namespace Business.Services
             if (recording == null)
                 return Fail(TranslationKeys.Requested_0_not_found, nameof(WorkoutPlanRecording));
 
-            if (recording.UserId != callerId)
+            if (recording.UserId != callerId && !callerIsAdmin)
                 return Fail(TranslationKeys.User_is_not_authorized_to_perform_this_action);
 
             // Past the cut-off the recording is frozen: it keeps its start, never gets a

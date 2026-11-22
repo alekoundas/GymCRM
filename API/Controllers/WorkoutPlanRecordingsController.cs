@@ -43,7 +43,12 @@ namespace API.Controllers
             if (!IsUserAuthorized("View"))
                 return new ApiResponse<WorkoutPlanStartContextDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
-            WorkoutPlanStartContextDto? startContext = await _recordingService.GetStartContextAsync(workoutPlanId);
+            Guid? callerId = GetCallerId();
+            if (callerId == null)
+                return new ApiResponse<WorkoutPlanStartContextDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_loged_in]);
+
+            WorkoutPlanStartContextDto? startContext = await _recordingService.GetStartContextAsync(
+                workoutPlanId, callerId.Value, IsRecordingsAdmin());
 
             if (startContext == null)
                 return new ApiResponse<WorkoutPlanStartContextDto>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(WorkoutPlan)]);
@@ -61,7 +66,8 @@ namespace API.Controllers
             if (callerId == null)
                 return new ApiResponse<WorkoutPlanRecordingDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_loged_in]);
 
-            WorkoutPlanRecordingResult result = await _recordingService.StartAsync(request.WorkoutPlanId, request.WeekNumber, callerId.Value);
+            WorkoutPlanRecordingResult result = await _recordingService.StartAsync(
+                request.WorkoutPlanId, request.WeekNumber, callerId.Value, IsRecordingsAdmin());
 
             if (!result.IsSucceed || result.Recording == null)
                 return new ApiResponse<WorkoutPlanRecordingDto>().SetErrorResponse(_localizer[result.ErrorKey, result.ErrorArgument]);
@@ -80,12 +86,46 @@ namespace API.Controllers
             if (callerId == null)
                 return new ApiResponse<WorkoutPlanRecordingDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_loged_in]);
 
-            WorkoutPlanRecordingResult result = await _recordingService.StopAsync(id, callerId.Value);
+            WorkoutPlanRecordingResult result = await _recordingService.StopAsync(id, callerId.Value, IsRecordingsAdmin());
 
             if (!result.IsSucceed || result.Recording == null)
                 return new ApiResponse<WorkoutPlanRecordingDto>().SetErrorResponse(_localizer[result.ErrorKey, result.ErrorArgument]);
 
             return new ApiResponse<WorkoutPlanRecordingDto>().SetSuccessResponse(_recordingService.ToDto(result.Recording, DateTime.UtcNow));
+        }
+
+        // GET: api/WorkoutPlanRecordings/5 - the member's own, or anyone's for a recordings admin.
+        public override async Task<ActionResult<ApiResponse<WorkoutPlanRecordingDto>>> Get(string? id)
+        {
+            if (!IsUserAuthorized("View"))
+                return new ApiResponse<WorkoutPlanRecordingDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            WorkoutPlanRecording? entity = await _dataService.GetGenericRepository<WorkoutPlanRecording>()
+                .FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
+
+            if (entity == null || (entity.UserId != GetCallerId() && !IsRecordingsAdmin()))
+                return new ApiResponse<WorkoutPlanRecordingDto>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(WorkoutPlanRecording)]);
+
+            return new ApiResponse<WorkoutPlanRecordingDto>().SetSuccessResponse(_recordingService.ToDto(entity, DateTime.UtcNow));
+        }
+
+        // Recordings are only ever created by Start, which checks the plan, the week, the
+        // caller and that nothing is running. The generic create would skip all of that,
+        // and members hold the Add permission so that they can press Start.
+        public override Task<ActionResult<ApiResponse<List<WorkoutPlanRecording>>>> Post([FromBody] List<WorkoutPlanRecordingAddDto> entityDtos)
+        {
+            ActionResult<ApiResponse<List<WorkoutPlanRecording>>> refused =
+                new ApiResponse<List<WorkoutPlanRecording>>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            return Task.FromResult(refused);
+        }
+
+        // Whoever may see every member's recordings may also read a member's start
+        // context and start and stop their workout for them. Start and Stop still
+        // need the Add permission as well.
+        private bool IsRecordingsAdmin()
+        {
+            return User.HasClaim("Permission", AdminViewClaim);
         }
 
         protected override void DataTableQueryUpdate(IGenericRepository<WorkoutPlanRecording> query, DataTableDto<WorkoutPlanRecordingDto> dataTable)

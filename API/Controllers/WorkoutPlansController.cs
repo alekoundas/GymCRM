@@ -21,6 +21,7 @@ namespace API.Controllers
     {
         // Sort/filter names that are computed from the recordings, not columns on WorkoutPlan.
         private const string AdminViewClaim = "WorkoutPlansAdmin_View";
+        private const string AdminEditClaim = "WorkoutPlansAdmin_Edit";
 
         private const string LastRecordingOnField = "lastRecordingOn";
         private const string IsRunningField = "isRunning";
@@ -50,14 +51,19 @@ namespace API.Controllers
 
         public override async Task<ActionResult<ApiResponse<WorkoutPlanDto>>> Get(string? id)
         {
+            if (!IsUserAuthorized("View"))
+                return new ApiResponse<WorkoutPlanDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
             WorkoutPlan? entity = await _dataService.GetGenericRepository<WorkoutPlan>()
                 .Include(x => x.User)
                 .Include(x => x.Exercises)
                 .Include(x => x.WorkoutPlanRule!).ThenInclude<WorkoutPlanRule, ICollection<WorkoutPlanRuleWeek>>(x => x.Weeks)
                 .FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
 
+            // A member reads their own plans only. Someone else's plan answers exactly like
+            // a missing one, so plan numbers cannot be probed for who owns what.
             WorkoutPlanDto entityDto = _mapper.Map<WorkoutPlanDto>(entity);
-            if (entityDto == null || entity == null)
+            if (entityDto == null || entity == null || !CanAccessPlan(entity.UserId, AdminViewClaim))
             {
                 string className = typeof(WorkoutPlan).Name;
                 return new ApiResponse<WorkoutPlanDto>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, className]);
@@ -73,6 +79,12 @@ namespace API.Controllers
         // sends the whole plan back, so without this a save would quietly re-activate it.
         public override async Task<ActionResult<ApiResponse<WorkoutPlan>>> Put(string? id, [FromBody] WorkoutPlanDto entityDto)
         {
+            // Saving the whole plan is the trainer's job. Members hold WorkoutPlans_Edit
+            // only to change their weights, which goes through Exercises instead; without
+            // this, one member could rewrite or reassign another member's plan.
+            if (!User.HasClaim("Permission", AdminEditClaim))
+                return new ApiResponse<WorkoutPlan>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
             if (int.TryParse(id, out int planId))
             {
                 using ApiDbContext context = _dataService.GetDbContext();
@@ -219,6 +231,12 @@ namespace API.Controllers
         protected override async Task DataTableResultUpdate(List<WorkoutPlan> entities, List<WorkoutPlanDto> entityDtos)
         {
             await FillRecordingFieldsAsync(entities, entityDtos);
+        }
+
+        // The plan's member or a plans admin (adminClaim says which kind of admin).
+        private bool CanAccessPlan(Guid planUserId, string adminClaim)
+        {
+            return User.HasClaim("Permission", adminClaim) || planUserId == GetCallerId();
         }
 
         // Fills the plan fields that come from the rule and the recordings - the week message,

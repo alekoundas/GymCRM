@@ -242,6 +242,7 @@
   'No duration was recorded': string;
   'The trainer has not set a rule for this plan yet': string;
   'Only the member can start and stop the timer': string;
+  'The workout is recorded for the member': string;
   'Started': string;
   'Finished': string;
   'Completed': string;

@@ -2,12 +2,16 @@
 using Business.Repository;
 using Business.Services;
 using Business.Services.Email;
+using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.ExerciseHistory;
 using Core.Models;
 using Core.System;
+using Core.Translations;
+using DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
 namespace API.Controllers
@@ -89,6 +93,38 @@ namespace API.Controllers
             return Task.CompletedTask;
         }
 
+
+        // GET: api/ExerciseHistories/5 - the plan's member or a plans admin.
+        public override async Task<ActionResult<ApiResponse<ExerciseHistoryDto>>> Get(string? id)
+        {
+            if (!IsUserAuthorized("View"))
+                return new ApiResponse<ExerciseHistoryDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            int.TryParse(id, out int historyId);
+            using ApiDbContext context = _dataService.GetDbContext();
+
+            ExerciseHistory? entity = await context.ExerciseHistories
+                .Include(x => x.Exercise).ThenInclude(x => x.WorkoutPlan)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == historyId);
+
+            if (entity == null
+                || (!User.HasClaim("Permission", "WorkoutPlansAdmin_View") && entity.Exercise?.WorkoutPlan?.UserId != GetCallerId()))
+                return new ApiResponse<ExerciseHistoryDto>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(ExerciseHistory)]);
+
+            return new ApiResponse<ExerciseHistoryDto>().SetSuccessResponse(_mapper.Map<ExerciseHistoryDto>(entity));
+        }
+
+        // The history is written by Exercises Put whenever an exercise changes, and the
+        // app only ever reads it. Members hold WorkoutPlans_Edit for their weights, which
+        // on its own let any of them rewrite anybody's history rows here.
+        public override async Task<ActionResult<ApiResponse<ExerciseHistory>>> Put(string? id, [FromBody] ExerciseHistoryDto entityDto)
+        {
+            if (!User.HasClaim("Permission", "WorkoutPlansAdmin_Edit"))
+                return new ApiResponse<ExerciseHistory>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            return await base.Put(id, entityDto);
+        }
 
         protected override bool IsUserAuthorized(string action)
         {

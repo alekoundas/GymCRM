@@ -14,11 +14,15 @@ namespace Business.Services
     public interface IWorkoutPlanRecordingService
     {
         // Everything the Start dialog needs, resolved server-side in one round trip.
-        Task<WorkoutPlanStartContextDto?> GetStartContextAsync(int workoutPlanId);
+        // Null when the plan does not exist, or is not the caller's and the caller is
+        // not an admin.
+        Task<WorkoutPlanStartContextDto?> GetStartContextAsync(int workoutPlanId, Guid callerId, bool callerIsAdmin);
 
-        Task<WorkoutPlanRecordingResult> StartAsync(int workoutPlanId, int weekNumber, Guid callerId);
+        // The plan's member may start and stop their own workout. So may an admin
+        // (callerIsAdmin), at the desk for a member; the recording still goes under the member.
+        Task<WorkoutPlanRecordingResult> StartAsync(int workoutPlanId, int weekNumber, Guid callerId, bool callerIsAdmin);
 
-        Task<WorkoutPlanRecordingResult> StopAsync(int recordingId, Guid callerId);
+        Task<WorkoutPlanRecordingResult> StopAsync(int recordingId, Guid callerId, bool callerIsAdmin);
 
         // True while the recording is open and still inside the cut-off.
         bool IsRunning(WorkoutPlanRecording recording, DateTime nowUtc);

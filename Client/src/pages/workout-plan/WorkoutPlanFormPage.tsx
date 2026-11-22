@@ -236,6 +236,11 @@ export default function WorkoutPlanFormPage({ formMode }: IField) {
               workoutPlanId={workoutPlanDto.id}
               planVersion={planVersion}
               isAdminPage={isAdminPage}
+              memberName={
+                [workoutPlanDto.user?.firstName, workoutPlanDto.user?.lastName]
+                  .filter(Boolean)
+                  .join(" ") || workoutPlanDto.user?.userName
+              }
               onChanged={loadWorkoutPlan}
             />
 

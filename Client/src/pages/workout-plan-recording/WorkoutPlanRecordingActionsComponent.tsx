@@ -16,8 +16,11 @@ interface IField {
   // the bar. The plan fields themselves are no good as a signal - the edit dialog
   // writes them to the store while typing, long before the server knows about them.
   planVersion?: number;
-  // The admin sees the timer but never drives it - a recording belongs to the member.
+  // On the admin page the timer is driven for the member, by someone allowed to see
+  // every member's recordings. The recording still belongs to the member.
   isAdminPage: boolean;
+  // Who the workout is recorded for, shown to the admin in the Start dialog.
+  memberName?: string;
   onChanged?: () => void;
 }
 
@@ -25,6 +28,7 @@ export default function WorkoutPlanRecordingActionsComponent({
   workoutPlanId,
   planVersion,
   isAdminPage,
+  memberName,
   onChanged,
 }: IField) {
   const { t } = useTranslator();
@@ -44,8 +48,15 @@ export default function WorkoutPlanRecordingActionsComponent({
   // firing intervals and every tick missed that way would be lost for good.
   const startedAtRef = useRef<number>(Date.now());
 
-  const isPlanOwner =
-    !isAdminPage && TokenService.isUserAllowed("WorkoutPlanRecordings_Add");
+  // The server shows the timer to the plan's member, or on the admin page to someone
+  // allowed to see every member's recordings. Anyone else there would only get an
+  // error, so the bar is left out for them.
+  const canSeeTimer =
+    !isAdminPage ||
+    TokenService.isUserAllowed("WorkoutPlanRecordingsAdmin_View");
+
+  const canDriveTimer =
+    canSeeTimer && TokenService.isUserAllowed("WorkoutPlanRecordings_Add");
 
   const loadStartContext = useCallback(async () => {
     const response = await apiService.getWorkoutPlanStartContext(workoutPlanId);
@@ -56,11 +67,12 @@ export default function WorkoutPlanRecordingActionsComponent({
     startedAtRef.current = Date.now() - elapsed * 1000;
     setElapsedSeconds(elapsed);
     setSelectedWeek(response?.currentWeek ?? response?.nextWeek ?? 1);
+    return response;
   }, [apiService, workoutPlanId]);
 
   useEffect(() => {
-    if (workoutPlanId) loadStartContext();
-  }, [workoutPlanId, planVersion]);
+    if (workoutPlanId && canSeeTimer) loadStartContext();
+  }, [workoutPlanId, planVersion, canSeeTimer]);
 
   // Ticks locally between refreshes; the server value stays the source of truth.
   useEffect(() => {
@@ -99,22 +111,27 @@ export default function WorkoutPlanRecordingActionsComponent({
       document.removeEventListener("visibilitychange", onVisibilityChange);
   }, [startContext?.scenario, loadStartContext]);
 
-  const onStartClick = () => {
-    if (!startContext) return;
-    setSelectedWeek(startContext.currentWeek ?? startContext.nextWeek);
+  // Two devices can now drive the same plan: the member's phone and the admin's
+  // desk. So Start asks the server first, and a workout the other one started in
+  // the meantime shows up as running instead of offering a second Start.
+  const onStartClick = async () => {
+    setBusy(true);
+    const fresh = await loadStartContext();
+    setBusy(false);
+
+    if (!fresh || fresh.scenario === WorkoutPlanStartScenario.Running) return;
+
+    setSelectedWeek(fresh.currentWeek ?? fresh.nextWeek);
     setDialogVisibility(true);
   };
 
   const onConfirmStart = async (weekNumber: number) => {
     setBusy(true);
-    const response = await apiService.startWorkoutPlanRecording(
-      workoutPlanId,
-      weekNumber,
-    );
+    await apiService.startWorkoutPlanRecording(workoutPlanId, weekNumber);
     setBusy(false);
 
-    if (!response) return;
-
+    // On failure the error is already on screen. Either way the plan is shown as
+    // it is now, rather than leaving the dialog open on what may no longer be true.
     setDialogVisibility(false);
     await loadStartContext();
     if (onChanged) onChanged();
@@ -125,11 +142,11 @@ export default function WorkoutPlanRecordingActionsComponent({
     if (!recordingId) return;
 
     setBusy(true);
-    const response = await apiService.stopWorkoutPlanRecording(recordingId);
+    await apiService.stopWorkoutPlanRecording(recordingId);
     setBusy(false);
 
-    if (!response) return;
-
+    // Also refreshed when Stop fails, which is usually because the other
+    // device stopped it already.
     await loadStartContext();
     if (onChanged) onChanged();
   };
@@ -170,7 +187,7 @@ export default function WorkoutPlanRecordingActionsComponent({
             </div>
           </div>
 
-          {isPlanOwner ? (
+          {canDriveTimer ? (
             <Button
               label={t("Finish")}
               icon="pi pi-stop-circle"
@@ -194,7 +211,7 @@ export default function WorkoutPlanRecordingActionsComponent({
         icon="pi pi-play"
         className="w-full md:w-auto"
         size="large"
-        disabled={!isPlanOwner || isBusy}
+        disabled={!canDriveTimer || isBusy}
         onClick={onStartClick}
       />
     );
@@ -351,6 +368,15 @@ export default function WorkoutPlanRecordingActionsComponent({
         footer={renderDialogFooter()}
         onHide={() => setDialogVisibility(false)}
       >
+        {/* The dialog speaks to the member, so the admin is told whose workout
+            this is before the usual text. */}
+        {isAdminPage && memberName && (
+          <Message
+            severity="info"
+            className="w-full justify-content-start mb-3"
+            text={`${t("The workout is recorded for the member")}: ${memberName}`}
+          />
+        )}
         {renderDialogBody()}
       </Dialog>
     </>
