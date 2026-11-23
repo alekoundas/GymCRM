@@ -524,6 +524,11 @@ namespace DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy_FullName")
                         .IsRequired()
                         .HasColumnType("TEXT");

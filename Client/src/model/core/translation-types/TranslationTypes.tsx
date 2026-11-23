@@ -418,6 +418,12 @@
   'New category': string;
   'The train groups in this category will be left without one': string;
   'Train group categories': string;
+  'No category': string;
+  'Filter by category': string;
+  'No sessions in this category on this day': string;
+  'Pick a color or choose your own': string;
+  'Custom color': string;
+  'How it shows on the calendar': string;
   'Activate': string;
   'Active': string;
   'Add question': string;

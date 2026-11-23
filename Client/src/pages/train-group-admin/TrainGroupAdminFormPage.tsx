@@ -42,6 +42,9 @@ export default function TrainGroupAdminFormPage({ formMode }: IField) {
           updateTrainGroupDto({ maxParticipants: response.maxParticipants });
           updateTrainGroupDto({ trainer: response.trainer });
           updateTrainGroupDto({ trainerId: response.trainerId });
+          // Saving any field sends the whole group back, so a category left out here
+          // was wiped by the next save when the page was opened by its link.
+          updateTrainGroupDto({ trainGroupCategoryId: response.trainGroupCategoryId });
           updateTrainGroupDto({ description: response.description });
         }
       });

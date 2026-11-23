@@ -29,7 +29,12 @@ import BookingMyBookingsComponent, {
   isRunning,
   isUpcoming,
 } from "./BookingMyBookingsComponent";
-import BookingSessionListComponent from "./BookingSessionListComponent";
+import BookingSessionListComponent, {
+  BookingCategory,
+  BookingCategoryFilter,
+} from "./BookingSessionListComponent";
+import { LookupDto } from "../../model/lookup/LookupDto";
+import { categoryColorOf } from "../../services/CategoryColorService";
 import BookingWeekStripComponent from "./BookingWeekStripComponent";
 import {
   endClock,
@@ -145,6 +150,28 @@ export default function TrainGroupsBookingCalendarPage() {
   const refresh = () => setRefreshKey((x) => x + 1);
 
   const [isSaving, setIsSaving] = useState(false);
+
+  // The gym's categories, for the filter above the day's sessions. The filter stays
+  // put as the member moves from day to day.
+  const [categories, setCategories] = useState<BookingCategory[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<BookingCategoryFilter>("ALL");
+
+  useEffect(() => {
+    const lookupDto = new LookupDto();
+    lookupDto.take = 1000;
+    apiService.getDataLookup("TrainGroupCategories", lookupDto).then((response) => {
+      if (response?.data)
+        setCategories(
+          response.data
+            .filter((x) => x.id)
+            .map((x) => ({
+              id: +x.id!,
+              name: x.value ?? "",
+              color: categoryColorOf({ id: +x.id!, color: x.color }),
+            }))
+        );
+    });
+  }, []);
 
   const [bookSlot, setBookSlot] = useState<TimeSlotResponseDto | undefined>(undefined);
   const [selection, setSelection] = useState<BookSelection>({
@@ -419,6 +446,9 @@ export default function TrainGroupsBookingCalendarPage() {
             <BookingSessionListComponent
               day={selectedDay}
               slots={slots}
+              categories={categories}
+              categoryFilter={categoryFilter}
+              onCategoryFilterChange={setCategoryFilter}
               isActingForOther={isActingForOther}
               onBook={openBook}
               onChange={onSlotChange}

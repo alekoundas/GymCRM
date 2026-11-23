@@ -10,6 +10,8 @@ import { LookupOptionDto } from "../../../model/lookup/LookupOptionDto";
 import { useApiService } from "../../../services/ApiService";
 import { useTranslator } from "../../../services/TranslatorService";
 import UserChipComponent from "../user/UserChipComponent";
+import { CategoryDotComponent } from "../category/CategoryTagComponent";
+import { categoryColorOf } from "../../../services/CategoryColorService";
 
 interface IField {
   controller: string;
@@ -132,6 +134,8 @@ export default function LookupComponent({
   // Members read "First Last (username)" with their picture, like every member
   // column. A lookup option carries the username as its value.
   const isUserLookup = controller.toLowerCase() === "users";
+  // Train group categories show their colour, as on the calendars.
+  const isCategoryLookup = controller.toLowerCase() === "traingroupcategories";
 
   const template = (data: LookupOptionDto, props?: any): JSX.Element => {
     if (!data) return <span>{props.placeholder}</span>;
@@ -148,6 +152,16 @@ export default function LookupComponent({
           }}
           isStatusColorShown
         />
+      );
+
+    if (isCategoryLookup)
+      return (
+        <span className="flex align-items-center gap-2">
+          <CategoryDotComponent
+            color={categoryColorOf({ id: Number(data.id), color: data.color })}
+          />
+          {data.value}
+        </span>
       );
 
     return <span>{data.value}</span>;

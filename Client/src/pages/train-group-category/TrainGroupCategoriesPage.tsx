@@ -14,9 +14,15 @@ import { useApiService } from "../../services/ApiService";
 import { TokenService } from "../../services/TokenService";
 import { useTranslator } from "../../services/TranslatorService";
 import TrainGroupCategoryFormComponent from "./TrainGroupCategoryFormComponent";
+import { CategoryDotComponent } from "../../components/core/category/CategoryTagComponent";
+import { LookupDto } from "../../model/lookup/LookupDto";
+import {
+  categoryColorOf,
+  nextFreeCategoryColor,
+} from "../../services/CategoryColorService";
 
 // The categories train groups can be put in. Each one becomes a tab on the admin
-// calendar, next to "All".
+// calendar and a filter on the booking page, in its own colour.
 export default function TrainGroupCategoriesPage() {
   const { t } = useTranslator();
   const apiService = useApiService();
@@ -70,7 +76,24 @@ export default function TrainGroupCategoriesPage() {
       sortable: true,
       filter: true,
       filterPlaceholder: t("Search"),
-      style: { width: "100%" },
+      style: { width: "75%" },
+    },
+    {
+      field: "color",
+      header: t("Color"),
+      body: (rowData: TrainGroupCategoryDto) => {
+        const color = categoryColorOf(rowData);
+        return (
+          <span className="flex align-items-center gap-2">
+            <CategoryDotComponent
+              color={color}
+              size="1rem"
+            />
+            <span className="text-sm text-color-secondary">{color}</span>
+          </span>
+        );
+      },
+      style: { width: "25%" },
     },
   ];
 
@@ -103,8 +126,7 @@ export default function TrainGroupCategoriesPage() {
         dialogControlView.showDialog();
         break;
       case ButtonTypeEnum.ADD:
-        setDto(new TrainGroupCategoryDto());
-        dialogControlAdd.showDialog();
+        openAdd();
         break;
       case ButtonTypeEnum.EDIT:
         dialogControlEdit.showDialog();
@@ -117,9 +139,24 @@ export default function TrainGroupCategoriesPage() {
     }
   };
 
+  // A new category starts on a colour none of the others has, so two of them are not
+  // told apart by name alone unless the admin wants it that way.
+  const openAdd = async () => {
+    const lookupDto = new LookupDto();
+    lookupDto.take = 1000;
+    const response = await apiService.getDataLookup("TrainGroupCategories", lookupDto);
+    const used = (response?.data ?? []).map((x) =>
+      categoryColorOf({ id: Number(x.id), color: x.color })
+    );
+
+    setDto({ ...new TrainGroupCategoryDto(), color: nextFreeCategoryColor(used) });
+    dialogControlAdd.showDialog();
+  };
+
   const onSaveAdd = async (): Promise<void> => {
     const response = await apiService.create("TrainGroupCategories", {
       name: dto.name.trim(),
+      color: categoryColorOf(dto),
     });
 
     if (response) {
@@ -131,7 +168,8 @@ export default function TrainGroupCategoriesPage() {
   const onSaveEdit = async (): Promise<void> => {
     const response = await apiService.update(
       "TrainGroupCategories",
-      { ...dto, name: dto.name.trim() },
+      // A category made before colours is saved with the preset it was showing.
+      { ...dto, name: dto.name.trim(), color: categoryColorOf(dto) },
       dto.id
     );
 

@@ -31,7 +31,8 @@ namespace API.Controllers
         }
 
         // POST: api/TrainGroupCategories/Lookup
-        // The train group form's dropdown and the admin calendar's tabs.
+        // The train group form's dropdown, the admin calendar's tabs and the booking page's
+        // filter - members read it too, which is fine: a name and a colour.
         [HttpPost("Lookup")]
         public async Task<ApiResponse<LookupDto>> Lookup([FromBody] LookupDto lookupDto)
         {
@@ -51,17 +52,28 @@ namespace API.Controllers
                 .OrderBy(x => x.Name)
                 .Skip(lookupDto.Skip)
                 .Take(lookupDto.Take)
-                .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.Name })
+                .Select(x => new LookupOptionDto() { Id = x.Id.ToString(), Value = x.Name, Color = x.Color })
                 .ToListAsync();
 
             return new ApiResponse<LookupDto>().SetSuccessResponse(lookupDto);
         }
 
-        protected override bool CustomValidatePOST(TrainGroupCategoryAddDto entityDto, out string[] errors) =>
-            IsDuplicate(entityDto.Name, null, out errors);
+        protected override bool CustomValidatePOST(TrainGroupCategoryAddDto entityDto, out string[] errors)
+        {
+            entityDto.Color = NormalizeColor(entityDto.Color);
+            return IsDuplicate(entityDto.Name, null, out errors);
+        }
 
-        protected override bool CustomValidatePUT(TrainGroupCategoryDto entityDto, out string[] errors) =>
-            IsDuplicate(entityDto.Name, entityDto.Id, out errors);
+        protected override bool CustomValidatePUT(TrainGroupCategoryDto entityDto, out string[] errors)
+        {
+            entityDto.Color = NormalizeColor(entityDto.Color);
+            return IsDuplicate(entityDto.Name, entityDto.Id, out errors);
+        }
+
+        // The DTO has already checked the shape ("#rrggbb" or empty). A missing value
+        // would break the NOT NULL column, and one case keeps the stored values alike.
+        private static string NormalizeColor(string? color) =>
+            (color ?? string.Empty).Trim().ToLowerInvariant();
 
         // Two tabs with the same name on the calendar would be no use to anybody.
         private bool IsDuplicate(string name, int? excludeId, out string[] errors)

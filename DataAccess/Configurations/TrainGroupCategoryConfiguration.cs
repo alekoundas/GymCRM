@@ -14,6 +14,10 @@ namespace DataAccess.Configurations
             builder.Property(x => x.Name)
                 .IsRequired(true)
                 .HasMaxLength(100);
+
+            builder.Property(x => x.Color)
+                .IsRequired(true)
+                .HasMaxLength(7);
         }
     }
 }

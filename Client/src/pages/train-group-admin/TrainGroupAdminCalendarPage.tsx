@@ -23,10 +23,18 @@ import { useTrainGroupAttendanceStore } from "../../stores/TrainGroupAttendanceS
 import { TrainGroupAttendanceDto } from "../../model/entities/train-group-attendance/TrainGroupAttendanceDto";
 import { LookupDto } from "../../model/lookup/LookupDto";
 import { formatClock } from "../train-group-booking/BookingDates";
+import { CategoryDotComponent } from "../../components/core/category/CategoryTagComponent";
+import {
+  NO_CATEGORY_COLOR,
+  categoryColorOf,
+  categoryTintStyle,
+} from "../../services/CategoryColorService";
 
 interface CategoryTab {
-  id?: number;
+  // Undefined for "All", null for the groups in no category.
+  id?: number | null;
   name: string;
+  color?: string;
 }
 
 // The day the calendar is on, with no time of day. Local parts on purpose: the
@@ -73,7 +81,11 @@ export default function TrainGroupAdminCalendarPage() {
         setCategories(
           response.data
             .filter((x) => x.id)
-            .map((x) => ({ id: +x.id!, name: x.value ?? "" }))
+            .map((x) => ({
+              id: +x.id!,
+              name: x.value ?? "",
+              color: categoryColorOf({ id: +x.id!, color: x.color }),
+            }))
         );
     });
   }, []);
@@ -177,6 +189,29 @@ export default function TrainGroupAdminCalendarPage() {
     }
   };
 
+  // A group's category, if it still has one that exists.
+  const categoryOf = (slot: TimeSlotResponseDto): CategoryTab | undefined =>
+    categories.find((x) => x.id === slot.trainGroupCategoryId);
+
+  const noCategoryIndex = categories.length + 1;
+  const hasUncategorised = timeSlots.some((x) => !categoryOf(x));
+  const tabs: CategoryTab[] = [
+    { id: undefined, name: t("All") },
+    ...categories,
+    ...(categories.length > 0 && (hasUncategorised || activeTab === noCategoryIndex)
+      ? [{ id: null, name: t("No category"), color: NO_CATEGORY_COLOR }]
+      : []),
+  ];
+
+  // Each group in its category's colour. A gym with no categories keeps the plain
+  // buttons - there would be nothing to tell apart.
+  const slotStyle = (slot: TimeSlotResponseDto) => {
+    if (categories.length === 0) return undefined;
+
+    const color = categoryOf(slot)?.color ?? NO_CATEGORY_COLOR;
+    return { ...categoryTintStyle(color), borderLeft: `4px solid ${color}` };
+  };
+
   return (
     <>
       {/*                  */}
@@ -204,18 +239,23 @@ export default function TrainGroupAdminCalendarPage() {
         {/*                  */}
         <div className="col-12 lg:col-6 xl:col-6">
           <Card title={t("Available Timeslots")}>
-            {/* The day's groups, all together and then one tab per category. A
-                group with no category is only under All. */}
+            {/* The day's groups, all together, then one tab per category in its
+                colour, then the groups in none - grey, and only on a day that has
+                some (or while that tab is open). */}
             <TabView
               scrollable
-              activeIndex={activeTab <= categories.length ? activeTab : 0}
+              activeIndex={activeTab < tabs.length ? activeTab : 0}
               onTabChange={(e) => setActiveTab(e.index)}
             >
-              {[{ id: undefined, name: t("All") } as CategoryTab, ...categories].map(
+              {tabs.map(
                 (tab) => {
                   const tabSlots = [...timeSlots]
                     .filter(
-                      (x) => tab.id === undefined || x.trainGroupCategoryId === tab.id
+                      (x) =>
+                        tab.id === undefined ||
+                        (tab.id === null
+                          ? !categoryOf(x)
+                          : x.trainGroupCategoryId === tab.id)
                     )
                     .sort((a, b) =>
                       formatClock(a.startOn).localeCompare(formatClock(b.startOn))
@@ -223,9 +263,10 @@ export default function TrainGroupAdminCalendarPage() {
 
                   return (
                     <TabPanel
-                      key={tab.id ?? "all"}
+                      key={tab.id === undefined ? "all" : (tab.id ?? "none")}
                       header={
                         <span className="flex align-items-center gap-2">
+                          {tab.color && <CategoryDotComponent color={tab.color} />}
                           {tab.name}
                           <Badge
                             value={tabSlots.length}
@@ -243,8 +284,9 @@ export default function TrainGroupAdminCalendarPage() {
                           {tabSlots.map((slot) => (
                             <Button
                               key={slot.trainGroupId}
-                              className="w-full"
+                              className="w-full text-left"
                               label={`${formatClock(slot.startOn)} - ${slot.title}`}
+                              style={slotStyle(slot)}
                               onClick={() => {
                                 apiService
                                   .get<TrainGroupDto>("TrainGroups", slot.trainGroupId)
