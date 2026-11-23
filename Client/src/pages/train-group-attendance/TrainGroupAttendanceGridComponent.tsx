@@ -11,7 +11,6 @@ import { DataTableColumns } from "../../model/datatable/DataTableColumns";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { TokenService } from "../../services/TokenService";
 import { ColumnBodyOptions } from "primereact/column";
-import { Tag } from "primereact/tag";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
 import { useTrainGroupAttendanceStore } from "../../stores/TrainGroupAttendanceStore";
@@ -19,8 +18,8 @@ import { TrainGroupAttendanceDto } from "../../model/entities/train-group-attend
 import DataTableFilterDateComponent from "../../components/core/datatable/DataTableFilterDateComponent";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 import { UserDto } from "../../model/entities/user/UserDto";
-import { Avatar } from "primereact/avatar";
 import { DataTableFilterDto } from "../../model/datatable/DataTableFilterDto";
+import UserChipComponent from "../../components/core/user/UserChipComponent";
 
 interface IField extends DialogChildProps {
   userId?: string;
@@ -137,31 +136,9 @@ export default function TrainGroupAttendanceGridComponent({
   ];
 
   // Custom chip template for selected users
-  const chipTemplate = (user: UserDto | undefined) => {
-    if (user) {
-      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
-        0
-      )}`.toUpperCase();
-      const imageSrc = "data:image/png;base64," + user.profileImage;
-      return (
-        <div className="flex m-0 p-0 align-items-center">
-          <Avatar
-            image={user.profileImage ? imageSrc : ""}
-            label={user.profileImage ? undefined : initials}
-            shape="circle"
-            size="normal"
-            className=" mr-2 "
-          />
-          {" " +
-            user.firstName[0].toUpperCase() +
-            user.firstName.slice(1, user.firstName.length) +
-            " " +
-            user.lastName[0].toUpperCase() +
-            user.lastName.slice(1, user.lastName.length)}
-        </div>
-      );
-    }
-  };
+  const chipTemplate = (user: UserDto | undefined) => (
+    <UserChipComponent user={user} />
+  );
 
   const onDelete = async (): Promise<void> => {
     if (trainGroupAttendanceDto.id) {

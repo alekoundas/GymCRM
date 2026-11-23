@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import { Card } from "primereact/card";
-import { Avatar } from "primereact/avatar";
 import { Tag } from "primereact/tag";
 import { Button } from "primereact/button";
 import { TokenService } from "../../services/TokenService";
@@ -23,6 +22,8 @@ import TrainGroupAttendanceAddFormComponent, {
 import { UserDto } from "../../model/entities/user/UserDto";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
+import UserChipComponent from "../../components/core/user/UserChipComponent";
+import { formatUserName } from "../../services/UserNameService";
 
 export default function TrainGroupAttendancesPage() {
   const { t } = useTranslator();
@@ -94,28 +95,9 @@ export default function TrainGroupAttendancesPage() {
     );
   };
 
-  const memberTemplate = (user: UserDto | undefined) => {
-    if (!user) return <></>;
-
-    const initials = `${user.firstName?.charAt(0) ?? ""}${
-      user.lastName?.charAt(0) ?? ""
-    }`.toUpperCase();
-
-    return (
-      <div className="flex m-0 p-0 align-items-center">
-        <Avatar
-          image={
-            user.profileImage ? "data:image/png;base64," + user.profileImage : ""
-          }
-          label={user.profileImage ? undefined : initials}
-          shape="circle"
-          size="normal"
-          className="mr-2"
-        />
-        {user.firstName} {user.lastName}
-      </div>
-    );
-  };
+  const memberTemplate = (user: UserDto | undefined) => (
+    <UserChipComponent user={user} />
+  );
 
   const dataTableColumns: DataTableColumns<TrainGroupAttendanceDto>[] = [
     {
@@ -328,7 +310,7 @@ export default function TrainGroupAttendancesPage() {
         footer={<></>}
       >
         <div className="grid">
-          {viewRow(t("User"), `${selected.user?.firstName ?? ""} ${selected.user?.lastName ?? ""}`.trim())}
+          {viewRow(t("User"), formatUserName(selected.user))}
           {viewRow(t("Attendance date"), formatDate(selected.attendanceDate))}
           {viewRow(t("Start On"), formatClock(selected.trainGroupStartOn))}
           {viewRow(t("Duration"), formatClock(selected.trainGroupDuration))}

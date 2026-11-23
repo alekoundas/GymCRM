@@ -17,6 +17,7 @@ import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
 import { TokenService } from "../../services/TokenService";
 import { WorkoutPlanRecordingDto } from "../../model/entities/workout-plan-recording/WorkoutPlanRecordingDto";
+import { formatUserName } from "../../services/UserNameService";
 
 const CONTROLLER = "WorkoutPlanRecordings";
 
@@ -196,11 +197,7 @@ export default function WorkoutPlanRecordingGridComponent({
               />
             ),
             body: (rowData: WorkoutPlanRecordingDto) => (
-              <span>
-                {rowData.user
-                  ? `${rowData.user.firstName} ${rowData.user.lastName}`
-                  : ""}
-              </span>
+              <span>{formatUserName(rowData.user)}</span>
             ),
             style: { width: "15%" },
           } as DataTableColumns<WorkoutPlanRecordingDto>,

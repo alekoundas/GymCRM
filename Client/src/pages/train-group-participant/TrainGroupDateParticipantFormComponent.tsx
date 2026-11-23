@@ -56,6 +56,8 @@ export default function TrainGroupDateParticipantFormComponent({
                       ...new UserDto(),
                       firstName: x.firstName,
                       lastName: x.lastName,
+                      // The lookup's value is the username; the grid shows it too.
+                      userName: x.value ?? "",
                       profileImage: x.profileImage ?? "",
                     } as UserDto)
                   : undefined,

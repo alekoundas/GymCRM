@@ -1,7 +1,6 @@
 import { TokenService } from "../../services/TokenService";
 import { useRef, useState } from "react";
 import { Card } from "primereact/card";
-import { Avatar } from "primereact/avatar";
 import { ButtonTypeEnum } from "../../enum/ButtonTypeEnum";
 import { FormMode } from "../../enum/FormMode";
 import { DataTableColumns } from "../../model/datatable/DataTableColumns";
@@ -22,6 +21,7 @@ import { UserDto } from "../../model/entities/user/UserDto";
 import SubscriptionStatusTag from "./SubscriptionStatusTag";
 import SubscriptionAddFormComponent from "./SubscriptionAddFormComponent";
 import { Button } from "primereact/button";
+import UserChipComponent from "../../components/core/user/UserChipComponent";
 
 export default function SubscriptionsPage() {
   const { t } = useTranslator();
@@ -68,24 +68,9 @@ export default function SubscriptionsPage() {
   });
 
   // Same face-and-name treatment the other grids use for a participant.
-  const memberTemplate = (user: UserDto | undefined) => {
-    if (!user) return <></>;
-
-    const initials = `${user.firstName?.charAt(0) ?? ""}${user.lastName?.charAt(0) ?? ""}`.toUpperCase();
-
-    return (
-      <div className="flex m-0 p-0 align-items-center">
-        <Avatar
-          image={user.profileImage ? "data:image/png;base64," + user.profileImage : ""}
-          label={user.profileImage ? undefined : initials}
-          shape="circle"
-          size="normal"
-          className="mr-2"
-        />
-        {user.firstName} {user.lastName}
-      </div>
-    );
-  };
+  const memberTemplate = (user: UserDto | undefined) => (
+    <UserChipComponent user={user} />
+  );
 
   const formatDate = (value: string | undefined): string => {
     if (!value) return "";

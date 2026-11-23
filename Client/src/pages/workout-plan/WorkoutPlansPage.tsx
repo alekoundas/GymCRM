@@ -14,7 +14,6 @@ import { useTranslator } from "../../services/TranslatorService";
 import { useWorkoutPlanStore } from "../../stores/WorkoutPlanStore";
 import { WorkoutPlanDto } from "../../model/entities/workout-plan/WorkoutPlanDto";
 import { UserDto } from "../../model/entities/user/UserDto";
-import { Avatar } from "primereact/avatar";
 import DataTableFilterIdComponent from "../../components/core/datatable/DataTableFilterIdComponent";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Card } from "primereact/card";
@@ -24,6 +23,7 @@ import DataTableFilterDateComponent from "../../components/core/datatable/DataTa
 import WorkoutPlanActivationDialogComponent, {
   WorkoutPlanActivationMode,
 } from "./WorkoutPlanActivationDialogComponent";
+import UserChipComponent from "../../components/core/user/UserChipComponent";
 
 export default function WorkoutPlansPage() {
   const { t } = useTranslator();
@@ -132,38 +132,9 @@ export default function WorkoutPlansPage() {
   };
 
   // Custom chip template for selected users
-  const chipTemplate = (user: UserDto | undefined) => {
-    if (user) {
-      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
-        0,
-      )}`.toUpperCase();
-      const imageSrc = "data:image/png;base64," + user.profileImage;
-      return (
-        <div className="flex m-0 p-0 align-items-center">
-          <Avatar
-            image={user.profileImage ? imageSrc : ""}
-            label={user.profileImage ? undefined : initials}
-            shape="circle"
-            size="normal"
-            className=" mr-2 "
-          />
-          <Tag
-            className="opacity-100"
-            style={{
-              backgroundColor: "#" + user.userStatus?.color,
-            }}
-          >
-            {" " +
-              user.firstName[0].toUpperCase() +
-              user.firstName.slice(1, user.firstName.length) +
-              " " +
-              user.lastName[0].toUpperCase() +
-              user.lastName.slice(1, user.lastName.length)}
-          </Tag>
-        </div>
-      );
-    }
-  };
+  const chipTemplate = (user: UserDto | undefined) => (
+    <UserChipComponent user={user} isStatusColorShown />
+  );
 
   const dataTableColumns: DataTableColumns<WorkoutPlanDto>[] = [
     {

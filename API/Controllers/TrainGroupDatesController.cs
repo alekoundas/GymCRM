@@ -135,7 +135,7 @@ namespace API.Controllers
                 Duration = trainGroup.Duration,
                 StartOn = trainGroup.StartOn,
                 TrainerId = trainGroup.TrainerId,
-                Trainer = _mapper.Map<UserDto>(trainGroup.Trainer),
+                Trainer = TrainerDto.From(trainGroup.Trainer)!,
                 TrainerFullName = (trainGroup.Trainer.FirstName + " " + trainGroup.Trainer.LastName).Trim(),
                 TrainGroupId = trainGroup.Id,
                 TrainGroupCategoryId = trainGroup.TrainGroupCategoryId,

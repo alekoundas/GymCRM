@@ -15,6 +15,8 @@ import {
 import { classNames } from "primereact/utils";
 import { Skeleton } from "primereact/skeleton";
 import { useApiService } from "../../../services/ApiService";
+import { formatUserName } from "../../../services/UserNameService";
+import UserChipComponent from "../user/UserChipComponent";
 
 interface IField {
   options: ColumnFilterElementTemplateOptions;
@@ -46,12 +48,31 @@ export default function DataTableFilterIdComponent({
     return result;
   };
 
+  // Members read "First Last (username)", the same as their grid column. The username
+  // also keeps two people with the same name apart, which matters here: a selection
+  // is held by its label. Other lookups show their value as before.
+  const isUserLookup = controller.toLowerCase() === "users";
+  const labelOf = (option: LookupOptionDto): string =>
+    isUserLookup
+      ? formatUserName({
+          firstName: option.firstName,
+          lastName: option.lastName,
+          userName: option.value,
+        })
+      : (option.value ?? "");
+
   // Everything the dropdown can show: the paged list, plus anything restored that
   // the list has not reached yet.
-  const allOptions: LookupOptionDto[] = [
+  //
+  // The server has already searched, word by word and without accents. Primereact
+  // sieves the options a second time with a plain "contains" on `filterBy`, which
+  // threw those answers away - "γιαν παπ" is not a substring of "Γιάννης
+  // Παπαδόπουλος". Each option carries the search itself in that field, so the
+  // second pass keeps what the server found.
+  const allOptions: (LookupOptionDto & { label: string; searchKey: string })[] = [
     ...restoredOptions.filter((x) => !(lookupDto.data ?? []).some((y) => y.id === x.id)),
     ...(lookupDto.data ?? []),
-  ];
+  ].map((x) => ({ ...x, label: labelOf(x), searchKey: searchValue }));
 
   // The grid holds the ids; this dropdown shows names. When the grid's value comes
   // from somewhere else - the url, on coming back to the page - the names for those
@@ -99,11 +120,13 @@ export default function DataTableFilterIdComponent({
         ...found,
       ]);
 
-      const matched = [...known, ...found];
+      const matched: LookupOptionDto[] = [...known, ...found];
       setSelectedEntities(
         ids
-          .map((id) => matched.find((x) => x.id === id)?.value)
-          .filter((x): x is string => !!x)
+          .map((id) => matched.find((x) => x.id === id))
+          .filter((x): x is LookupOptionDto => !!x)
+          .map(labelOf)
+          .filter((x) => x.length > 0)
       );
     };
 
@@ -163,25 +186,28 @@ export default function DataTableFilterIdComponent({
 
   const itemTemplate: (option: LookupOptionDto) => React.ReactNode = (
     option,
-  ) => (
-    <div className="flex align-items-center gap-2">
-      {option.profileImage && (
-        <img
-          alt={getDisplayImageSrc(option.profileImage ?? "")}
-          src={getDisplayImageSrc(option.profileImage ?? "")}
-          width="32"
-        />
-        // <Avatar
-        //   image={getDisplayImageSrc(option.profileImage ?? "")}
-        //   label={getDisplayImageSrc(option.profileImage ?? "")}
-        //   shape="circle"
-        //   size="normal"
-        //   className=" mr-2 "
-        // />
-      )}
-      <span>{option.value}</span>
-    </div>
-  );
+  ) =>
+    isUserLookup ? (
+      <UserChipComponent
+        user={{
+          firstName: option.firstName,
+          lastName: option.lastName,
+          userName: option.value,
+          profileImage: option.profileImage,
+        }}
+      />
+    ) : (
+      <div className="flex align-items-center gap-2">
+        {option.profileImage && (
+          <img
+            alt={getDisplayImageSrc(option.profileImage ?? "")}
+            src={getDisplayImageSrc(option.profileImage ?? "")}
+            width="32"
+          />
+        )}
+        <span>{option.value}</span>
+      </div>
+    );
 
   const loadingTemplate = (options: VirtualScrollerLoadingTemplateOptions) => {
     const className = classNames("flex align-items-center p-2", {
@@ -208,7 +234,7 @@ export default function DataTableFilterIdComponent({
       onChange={(e: MultiSelectChangeEvent) => {
         setSelectedEntities(e.value);
         const ids = allOptions
-          .filter((x) => (e.value as string[]).some((y) => y === x.value))
+          .filter((x) => (e.value as string[]).some((y) => y === x.label))
           .map((x) => x.id ?? "");
         lastAppliedIds.current = ids;
         options.filterApplyCallback(ids);
@@ -226,7 +252,9 @@ export default function DataTableFilterIdComponent({
       filter
       filterDelay={400} // TODO: Why dis dont work
       onFilter={search}
-      optionLabel="value"
+      filterBy="searchKey"
+      optionLabel="label"
+      optionValue="label"
       placeholder="Any"
       className="p-column-filter"
       maxSelectedLabels={1}

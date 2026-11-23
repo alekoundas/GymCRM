@@ -6,6 +6,7 @@ import { Message } from "primereact/message";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { useSubscriptionStore } from "../../stores/SubscriptionStore";
 import { useTranslator } from "../../services/TranslatorService";
+import { formatUserName } from "../../services/UserNameService";
 
 interface IField extends DialogChildProps {}
 
@@ -14,9 +15,7 @@ export default function SubscriptionDecideFormComponent({}: IField) {
   const { subscriptionDto, subscriptionDecideDto, updateSubscriptionDecideDto } =
     useSubscriptionStore();
 
-  const memberName = subscriptionDto.user
-    ? `${subscriptionDto.user.firstName ?? ""} ${subscriptionDto.user.lastName ?? ""}`.trim()
-    : "";
+  const memberName = formatUserName(subscriptionDto.user);
 
   return (
     <div className="flex flex-column gap-3">

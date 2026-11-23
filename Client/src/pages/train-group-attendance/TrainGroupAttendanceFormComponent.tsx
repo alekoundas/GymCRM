@@ -5,6 +5,7 @@ import { useTrainGroupAttendanceStore } from "../../stores/TrainGroupAttendanceS
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
+import { formatUserName } from "../../services/UserNameService";
 
 interface IField extends DialogChildProps {
   // participants: TrainGroupParticipantDto[];
@@ -76,7 +77,7 @@ export default function TrainGroupAttendanceFormComponent({}: IField) {
             htmlFor={`participant-${participant.id}`}
             className="flex-1"
           >
-            {participant.user?.firstName} {participant.user?.lastName}
+            {formatUserName(participant.user)}
           </label>
 
           <SubscriptionBalanceTag balance={participant.subscriptionBalance} />

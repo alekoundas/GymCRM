@@ -10,6 +10,7 @@ using Core.Enums;
 using Core.Models;
 using Core.System;
 using Core.Translations;
+using DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +30,29 @@ namespace API.Controllers
         // The page shrinks a profile picture to a few tens of KB before sending it; this
         // is the ceiling for anything that arrives some other way.
         private const int MaxProfileImageBytes = 1024 * 1024;
+
+        // Every screen that has a member picker or a member filter is behind one of these.
+        // Holding one lets the lookup search every member; anyone else - a member - only
+        // ever gets themselves back. Members hold none of them.
+        private static readonly string[] MemberPickerClaims =
+        {
+            "Users_View",
+            "TrainGroups_View",
+            "TrainGroupParticipants_View",
+            "WorkoutPlansAdmin_View",
+            "WorkoutPlanRecordingsAdmin_View",
+            "SubscriptionsAdmin_View",
+            "SubscriptionsAdmin_Edit",
+            "Mails_View",
+            "Mails_Add",
+        };
+
+        private bool HasPermission(string claim) => User.HasClaim("Permission", claim);
+
+        private bool CanPickAnyMember() => MemberPickerClaims.Any(HasPermission);
+
+        private Guid? GetCallerId() =>
+            Guid.TryParse(User.FindFirst("Id")?.Value, out Guid callerId) ? callerId : null;
 
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
@@ -62,7 +86,12 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<ApiResponse<UserDto>> Get(string? id)
         {
-            if (id == null)
+            if (id == null || !Guid.TryParse(id, out Guid userId))
+                return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
+
+            // Your own profile, or anybody's from the Users page. Somebody else's record
+            // answers like a missing one.
+            if (userId != GetCallerId() && !HasPermission("Users_View"))
                 return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
 
             User? user = await _dataService.Users
@@ -84,13 +113,21 @@ namespace API.Controllers
 
         public async Task<ApiResponse<UserDto>> Update(string id, UserDto request)
         {
-            if (id != request.Id)
+            if (id != request.Id || !Guid.TryParse(id, out Guid userId))
                 return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
 
-            if (request.UserRoles.Count() == 0)
+            // Users_Edit edits anybody, roles and email included. Without it you may only
+            // edit your own profile, and only the parts that are yours to change.
+            bool canEditAnyone = HasPermission("Users_Edit");
+            bool isOwnProfile = userId == GetCallerId();
+
+            if (!canEditAnyone && !isOwnProfile)
+                return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            if (canEditAnyone && request.UserRoles.Count() == 0)
                 return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_is_required, "Role"]);
 
-            User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == new Guid(request.Id));
+            User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
             if (user == null)
                 return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
 
@@ -101,6 +138,29 @@ namespace API.Controllers
                 .SequenceEqual(user.ProfileImage ?? Array.Empty<byte>());
             if (isNewImage && !ImageValidator.IsAllowed(request.ProfileImage, MaxProfileImageBytes))
                 return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys.Image_must_be_a_JPG_PNG_or_WebP_of_up_to_0_MB, MaxProfileImageBytes / (1024 * 1024)]);
+
+            // A member's own profile: what the profile page lets them change, and nothing
+            // else from the request - not the role, email, username or status.
+            if (!canEditAnyone)
+            {
+                user.FirstName = request.FirstName;
+                user.LastName = request.LastName;
+                user.Address = request.Address;
+                user.MedicalHistory = request.MedicalHistory;
+                user.ProfileImage = request.ProfileImage;
+
+                IdentityResult ownResult = await _userManager.UpdateAsync(user);
+                if (!ownResult.Succeeded)
+                    return new ApiResponse<UserDto>().SetErrorResponse(ownResult.Errors.First().Description);
+
+                User ownUser = await _dataService.Users
+                    .Include(x => x.UserStatus)
+                    .Include(x => x.UserRoles)
+                    .ThenInclude<UserRole, Role>(x => x.Role)
+                    .FirstOrDefaultAsync(x => x.Id == userId) ?? user;
+
+                return new ApiResponse<UserDto>().SetSuccessResponse(_mapper.Map<UserDto>(ownUser), _localizer[TranslationKeys._0_updated_successfully, "User"]);
+            }
 
             string? roleName = request.UserRoles[0].Role.Name;
             bool roleExists = await _dataService.Roles.AnyAsync(x => x.Name == roleName);
@@ -135,6 +195,9 @@ namespace API.Controllers
         [HttpDelete("{id}")]
         public async Task<ApiResponse<IdentityUser>> Delete(string? id)
         {
+            if (!HasPermission("Users_Delete"))
+                return new ApiResponse<IdentityUser>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
             if (id == null || id.Count() == 0)
                 return new ApiResponse<IdentityUser>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, $"User"]);
 
@@ -157,6 +220,10 @@ namespace API.Controllers
         [HttpPost("GetDataTable")]
         public async Task<ApiResponse<DataTableDto<UserDto>>> GetDataTable([FromBody] DataTableDto<UserDto> dataTable)
         {
+            // The Users page, and nothing else, reads this: everybody's full record.
+            if (!HasPermission("Users_View"))
+                return new ApiResponse<DataTableDto<UserDto>>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
             List<Expression<Func<User, bool>>>? filterQuery = new List<Expression<Func<User, bool>>>();
 
             var query = _dataService.Users
@@ -301,106 +368,136 @@ namespace API.Controllers
 
         }
 
-        // POST: api/Users/lookup
+        // POST: api/Users/Lookup
+        // Behind every member dropdown and grid filter.
         [HttpPost("Lookup")]
         public async Task<ApiResponse<LookupDto>> Lookup([FromBody] LookupDto lookupDto)
         {
+            using ApiDbContext context = _dataService.GetDbContext();
+            IQueryable<User> query = MembersVisibleToCaller(context);
 
-            var query = _dataService.GetGenericRepository<User>()
-                .Include(x => x.UserStatus);
+            // One member by id: how a dropdown shows the member already chosen.
+            string filterId = lookupDto.Filter.Id ?? string.Empty;
+            if (filterId.Length > 0)
+            {
+                Guid.TryParse(filterId, out Guid userId);
+                query = query.Where(x => x.Id == userId);
+            }
 
-            // Both sides normalised, so "ελενη" finds "Ελένη". Sqlite's own lower()
-            // leaves Greek untouched, which is why this cannot just be ToLower().
-            string searchValue = TextNormalizer.Normalize(lookupDto.Filter.Value);
+            query = WhereEveryWordMatches(query, lookupDto.Filter.Value);
 
-            if (lookupDto.Filter.Id.Length > 0)
-                query.Where(x => x.Id == new Guid(lookupDto.Filter.Id));
-
-            if (lookupDto.Filter.Value.Length > 0)
-                query.Where(x =>
-                TextNormalizer.Normalize(x.FirstName).Contains(searchValue) ||
-                TextNormalizer.Normalize(x.LastName).Contains(searchValue) ||
-                TextNormalizer.Normalize(x.Email).Contains(searchValue) ||
-                x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
-                TextNormalizer.Normalize(x.UserName!).Contains(searchValue)
-            );
-
-            // Handle Pagging.
-            query.AddPagging(lookupDto.Skip, lookupDto.Take);
-
-            // Retrieve Data.
-            List<User> result = await query.ToListAsync();
-            lookupDto.Data = result
-              .Select(x =>
-                  new LookupOptionDto()
-                  {
-                      Id = x.Id.ToString(),
-                      Value = x.UserName,
-                      FirstName = x.FirstName,
-                      LastName = x.LastName,
-                      ProfileImage = x.ProfileImage,
-                      UserColor = x.UserStatus?.Color
-                  })
-              .ToList();
-
-
-
-
-            if (lookupDto.Filter.Id.Length > 0)
-                query.Where(x => x.Id == new Guid(lookupDto.Filter.Id));
-
-            if (lookupDto.Filter.Value.Length > 0)
-                query.Where(x =>
-                TextNormalizer.Normalize(x.FirstName).Contains(searchValue) ||
-                TextNormalizer.Normalize(x.LastName).Contains(searchValue) ||
-                TextNormalizer.Normalize(x.Email).Contains(searchValue) ||
-                x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
-                TextNormalizer.Normalize(x.UserName!).Contains(searchValue)
-            );
             lookupDto.TotalRecords = await query.CountAsync();
 
+            var rows = await OrderByName(query)
+                .Skip(lookupDto.Skip)
+                .Take(lookupDto.Take)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.UserName,
+                    x.FirstName,
+                    x.LastName,
+                    x.ProfileImage,
+                    Color = x.UserStatus != null ? x.UserStatus.Color : null
+                })
+                .ToListAsync();
+
+            lookupDto.Data = rows
+                .Select(x => new LookupOptionDto()
+                {
+                    Id = x.Id.ToString(),
+                    Value = x.UserName,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    ProfileImage = x.ProfileImage,
+                    UserColor = x.Color
+                })
+                .ToList();
 
             return new ApiResponse<LookupDto>().SetSuccessResponse(lookupDto);
         }
 
 
-        // POST: api/users/AutoComplete
+        // POST: api/Users/AutoComplete
+        // Behind the email recipients box.
         [HttpPost("AutoComplete")]
         public async Task<ApiResponse<AutoCompleteDto<UserDto>>> AutoComplete([FromBody] AutoCompleteDto<UserDto> autoCompleteDto)
         {
-            var query = _dataService.GetGenericRepository<User>();
-            // Both sides normalised, so "ελενη" finds "Ελένη". Sqlite's own lower()
-            // leaves Greek untouched, which is why this cannot just be ToLower().
-            string searchValue = TextNormalizer.Normalize(autoCompleteDto.SearchValue);
-            if (autoCompleteDto.SearchValue.Length > 0)
-                query.Where(x =>
-                    TextNormalizer.Normalize(x.FirstName).Contains(searchValue) ||
-                    TextNormalizer.Normalize(x.LastName).Contains(searchValue) ||
-                    TextNormalizer.Normalize(x.Email).Contains(searchValue) ||
-                    x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
-                    TextNormalizer.Normalize(x.UserName!).Contains(searchValue)
-                );
+            using ApiDbContext context = _dataService.GetDbContext();
+            IQueryable<User> query = WhereEveryWordMatches(MembersVisibleToCaller(context), autoCompleteDto.SearchValue);
 
-            // Handle Pagging.
-            query.AddPagging(autoCompleteDto.Skip, autoCompleteDto.Take);
-
-            // Retrieve Data.
-            List<User> result = await query.ToListAsync();
-            List<UserDto> customerDto = _mapper.Map<List<UserDto>>(result);
-
-            if (autoCompleteDto.SearchValue.Length > 0)
-                query.Where(x =>
-                    TextNormalizer.Normalize(x.FirstName).Contains(searchValue) ||
-                    TextNormalizer.Normalize(x.LastName).Contains(searchValue) ||
-                    TextNormalizer.Normalize(x.Email).Contains(searchValue) ||
-                    x.PhoneNumbers.Any(y => y.Number.Contains(searchValue)) ||
-                    TextNormalizer.Normalize(x.UserName!).Contains(searchValue)
-                );
-
-            autoCompleteDto.Suggestions = customerDto;
             autoCompleteDto.TotalRecords = await query.CountAsync();
 
+            // What the box shows and the email needs - not the member's whole record,
+            // which used to come along with every suggestion, medical history included.
+            var rows = await OrderByName(query)
+                .Skip(autoCompleteDto.Skip)
+                .Take(autoCompleteDto.Take)
+                .Select(x => new { x.Id, x.UserName, x.FirstName, x.LastName, x.Email, x.ProfileImage, x.UserStatusId })
+                .ToListAsync();
+
+            autoCompleteDto.Suggestions = rows
+                .Select(x => new UserDto
+                {
+                    Id = x.Id.ToString(),
+                    UserName = x.UserName ?? string.Empty,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    Email = x.Email ?? string.Empty,
+                    ProfileImage = x.ProfileImage,
+                    UserStatusId = x.UserStatusId
+                })
+                .ToList();
+
             return new ApiResponse<AutoCompleteDto<UserDto>>().SetSuccessResponse(autoCompleteDto);
+        }
+
+        // Everybody for staff who pick members; for anyone else, only themselves.
+        private IQueryable<User> MembersVisibleToCaller(ApiDbContext context)
+        {
+            IQueryable<User> query = context.Users.AsNoTracking();
+
+            if (CanPickAnyMember())
+                return query;
+
+            Guid callerId = GetCallerId() ?? Guid.Empty;
+            return query.Where(x => x.Id == callerId);
+        }
+
+        // Every word typed has to match somewhere - first name, last name, username,
+        // email or a phone number - so "Γιάννης Παπ" finds Γιάννης Παπαδόπουλος and not
+        // every Γιάννης. Brackets are dropped, so a pasted "Name (username)" still finds
+        // the member. Both sides normalised, so "ελενη" finds "Ελένη": sqlite's own
+        // lower() leaves Greek untouched, which is why this cannot just be ToLower().
+        private static IQueryable<User> WhereEveryWordMatches(IQueryable<User> query, string? search)
+        {
+            IEnumerable<string> words = (search ?? string.Empty)
+                .Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim('(', ')', ','))
+                .Where(x => x.Length > 0);
+
+            foreach (string word in words)
+            {
+                string normalized = TextNormalizer.Normalize(word);
+
+                query = query.Where(x =>
+                    TextNormalizer.Normalize(x.FirstName).Contains(normalized) ||
+                    TextNormalizer.Normalize(x.LastName).Contains(normalized) ||
+                    TextNormalizer.Normalize(x.UserName!).Contains(normalized) ||
+                    TextNormalizer.Normalize(x.Email!).Contains(normalized) ||
+                    x.PhoneNumbers.Any(y => y.Number.Contains(word)));
+            }
+
+            return query;
+        }
+
+        // The order the dropdowns read in: "First Last (username)".
+        private static IQueryable<User> OrderByName(IQueryable<User> query)
+        {
+            return query
+                .OrderBy(x => x.FirstName)
+                .ThenBy(x => x.LastName)
+                .ThenBy(x => x.UserName);
         }
 
         // POST: api/Users/TimeSlots
@@ -640,7 +737,7 @@ namespace API.Controllers
                             Duration = group.Duration,
                             StartOn = group.StartOn,
                             TrainerId = group.TrainerId,
-                            Trainer = _mapper.Map<UserDto>(group.Trainer),
+                            Trainer = TrainerDto.From(group.Trainer)!,
                             TrainerFullName = (group.Trainer.FirstName + " " + group.Trainer.LastName).Trim(),
                             TrainGroupId = group.Id,
                             MaxParticipants = group.MaxParticipants
@@ -684,7 +781,7 @@ namespace API.Controllers
                 StartOn = a.TrainGroupStartOn,
                 Duration = a.TrainGroupDuration,
                 TrainerId = a.TrainerId ?? Guid.Empty,
-                Trainer = _mapper.Map<UserDto>(trainers.FirstOrDefault(u => u.Id == a.TrainerId)),
+                Trainer = TrainerDto.From(trainers.FirstOrDefault(u => u.Id == a.TrainerId))!,
                 TrainerFullName = a.TrainerFullName,
                 IsUnavailableTrainGroup = false,
                 SpotsLeft = 0,

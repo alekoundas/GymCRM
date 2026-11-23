@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Avatar } from "primereact/avatar";
 import { Card } from "primereact/card";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Tag } from "primereact/tag";
@@ -15,6 +14,7 @@ import { ExerciseDto } from "../../model/entities/exercise/ExerciseDto";
 import { ExerciseHistoryDto } from "../../model/entities/exercise-history/ExerciseHistoryDto";
 import { UserDto } from "../../model/entities/user/UserDto";
 import { useTranslator } from "../../services/TranslatorService";
+import UserChipComponent from "../../components/core/user/UserChipComponent";
 
 // What members train with, for the trainer writing their next plan: the exercises in
 // their plans now, and every change made to an exercise's sets, reps or weight. A row
@@ -52,23 +52,9 @@ export default function ExerciseHistoryAdminPage() {
     dataTableSorts: [{ field: "createdOn", order: -1 }],
   });
 
-  const memberTemplate = (user: UserDto | undefined) => {
-    if (!user) return <></>;
-    const initials = `${user.firstName?.charAt(0) ?? ""}${user.lastName?.charAt(0) ?? ""}`.toUpperCase();
-
-    return (
-      <div className="flex align-items-center gap-2">
-        <Avatar
-          image={user.profileImage ? "data:image/png;base64," + user.profileImage : undefined}
-          label={user.profileImage ? undefined : initials}
-          shape="circle"
-        />
-        <span>
-          {user.firstName} {user.lastName}
-        </span>
-      </div>
-    );
-  };
+  const memberTemplate = (user: UserDto | undefined) => (
+    <UserChipComponent user={user} />
+  );
 
   const formatDate = (value: string | undefined): string => {
     if (!value) return "";

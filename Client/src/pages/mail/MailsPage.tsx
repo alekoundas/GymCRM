@@ -20,12 +20,12 @@ import DataTableFilterEnumComponent from "../../components/core/datatable/DataTa
 import { MailStatusEnum } from "../../enum/MailStatusEnum";
 import { Tag } from "primereact/tag";
 import { UserDto } from "../../model/entities/user/UserDto";
-import { Avatar } from "primereact/avatar";
 import MailSendFormComponent from "./MailSendFormComponent";
 import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
 import MailSendPage from "./MailSendPage";
 import { Button } from "primereact/button";
+import UserChipComponent from "../../components/core/user/UserChipComponent";
 
 export default function MailsPage() {
   const { t } = useTranslator();
@@ -89,31 +89,9 @@ export default function MailsPage() {
   };
 
   // Custom chip template for selected users
-  const chipTemplate = (user: UserDto | undefined) => {
-    if (user) {
-      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
-        0,
-      )}`.toUpperCase();
-      const imageSrc = "data:image/png;base64," + user.profileImage;
-      return (
-        <div className="flex m-0 p-0 align-items-center">
-          <Avatar
-            image={user.profileImage ? imageSrc : ""}
-            label={user.profileImage ? undefined : initials}
-            shape="circle"
-            size="normal"
-            className=" mr-2 "
-          />
-          {" " +
-            user.firstName[0].toUpperCase() +
-            user.firstName.slice(1, user.firstName.length) +
-            " " +
-            user.lastName[0].toUpperCase() +
-            user.lastName.slice(1, user.lastName.length)}
-        </div>
-      );
-    }
-  };
+  const chipTemplate = (user: UserDto | undefined) => (
+    <UserChipComponent user={user} />
+  );
   // Queued, gone out, or refused by Gmail. Failed carries the reason with it,
   // which is the one people actually need to see.
   const statusTemplate = (status: MailStatusEnum | undefined) => {

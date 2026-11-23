@@ -19,7 +19,6 @@ import { useApiService } from "../../services/ApiService";
 import { useTranslator } from "../../services/TranslatorService";
 import { LocalStorageService } from "../../services/LocalStorageService";
 import { UserDto } from "../../model/entities/user/UserDto";
-import { Avatar } from "primereact/avatar";
 import { useParams } from "react-router-dom";
 import {
   CHANGE_WINDOW_HOURS,
@@ -29,6 +28,7 @@ import {
   sessionStart,
   startOfDay,
 } from "../train-group-booking/BookingDates";
+import UserChipComponent from "../../components/core/user/UserChipComponent";
 
 // What a date on the calendar is. Past and future are decided here, against the
 // member's own today - the server only says booked, skipped or attended.
@@ -265,31 +265,9 @@ export default function UserProfileTimeslotsComponent() {
     );
   };
 
-  const chipTemplate = (user: UserDto | undefined) => {
-    if (user) {
-      const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
-        0
-      )}`.toUpperCase();
-      const imageSrc = "data:image/png;base64," + user.profileImage;
-      return (
-        <div className="flex m-0 p-0 pl-3 align-items-center ">
-          <Avatar
-            image={user.profileImage ? imageSrc : ""}
-            label={user.profileImage ? undefined : initials}
-            shape="circle"
-            size="normal"
-            className=" mr-2 "
-          />
-          {" " +
-            user.firstName[0].toUpperCase() +
-            user.firstName.slice(1, user.firstName.length) +
-            " " +
-            user.lastName[0].toUpperCase() +
-            user.lastName.slice(1, user.lastName.length)}
-        </div>
-      );
-    }
-  };
+  const chipTemplate = (user: UserDto | undefined) => (
+    <UserChipComponent user={user} className="pl-3" />
+  );
 
   const status = entryStatus(selectedEntry);
   const statusLabel =

@@ -3,7 +3,7 @@ import { InputText } from "primereact/inputtext";
 import { DialogChildProps } from "../../components/core/dialog/GenericDialogComponent";
 import { UserDto } from "../../model/entities/user/UserDto";
 import AutoCompleteComponent from "../../components/core/auto-complete/AutoCompleteComponent";
-import { Avatar } from "primereact/avatar";
+import UserChipComponent from "../../components/core/user/UserChipComponent";
 import RichTextAreaComponent from "../../components/core/text-area/RichTextAreaComponent";
 import { useMailStore } from "../../stores/MailStore";
 import { useTranslator } from "../../services/TranslatorService";
@@ -14,68 +14,22 @@ export default function MailSendFormComponent({ formMode }: IField) {
   const { t } = useTranslator();
   const { mailSendDto, updateMailSendDto } = useMailStore();
 
-  const getDisplayImageSrc = (
-    profileImage: string | undefined
-  ): string | undefined => {
-    if (!profileImage) return undefined;
-    if (profileImage.startsWith("data:")) return profileImage;
-    return `data:image/png;base64,${profileImage}`;
-  };
+  // A suggestion: the member as everywhere else, with the address the email will go
+  // to beside it, since that is what this box is for. One line - the list's rows
+  // have a fixed height, and a second line was cut off.
+  const userTemplate = (user: UserDto) => (
+    <div className="flex align-items-center justify-content-between gap-3 w-full">
+      <UserChipComponent user={user} className="flex-none" />
+      {user.email && (
+        <small className="min-w-0 text-color-secondary white-space-nowrap overflow-hidden text-overflow-ellipsis">
+          {user.email}
+        </small>
+      )}
+    </div>
+  );
 
-  // Custom suggestion template for AutoComplete
-  const userTemplate = (user: UserDto) => {
-    const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
-      0
-    )}`.toUpperCase();
-    const imageSrc = getDisplayImageSrc(user.profileImage ?? "");
-
-    const avatar = (
-      <Avatar
-        image={imageSrc ?? ""}
-        label={imageSrc ? undefined : initials}
-        shape="circle"
-        size="normal"
-        className=" mr-2 "
-      />
-    );
-
-    return (
-      <div className="flex">
-        {user.profileImage ? avatar : <i className="pi pi-user mr-2" />}
-        <div>
-          {user.firstName} {user.lastName} ({user.email})
-        </div>
-      </div>
-    );
-  };
-
-  // Custom chip template for selected users
-  const chipTemplate = (user: UserDto) => {
-    const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
-      0
-    )}`.toUpperCase();
-    const imageSrc = getDisplayImageSrc(user.profileImage ?? "");
-    return (
-      <p className="flex m-0 p-0 align-items-center">
-        <Avatar
-          image={imageSrc ?? ""}
-          label={imageSrc ? undefined : initials}
-          shape="circle"
-          size="normal"
-          className=" mr-2 "
-        />
-        {" " +
-          user.firstName[0].toUpperCase() +
-          "." +
-          " " +
-          user.lastName[0].toUpperCase() +
-          user.lastName.slice(1, user.lastName.length) +
-          "(" +
-          user.email +
-          ")"}
-      </p>
-    );
-  };
+  // A chosen recipient.
+  const chipTemplate = (user: UserDto) => <UserChipComponent user={user} />;
 
   return (
     <div className="flex flex-column gap-3">
