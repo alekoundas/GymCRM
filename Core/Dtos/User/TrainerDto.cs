@@ -18,5 +18,16 @@
                 ProfileImage = trainer.ProfileImage
             };
         }
+
+        // The same for staff screens, which show everyone as "First Last (username)".
+        // Still nothing private: staff can already read usernames in every member picker.
+        public static UserDto? ForStaff(Models.User? trainer)
+        {
+            UserDto? trainerDto = From(trainer);
+            if (trainerDto != null)
+                trainerDto.UserName = trainer!.UserName ?? "";
+
+            return trainerDto;
+        }
     }
 }

@@ -67,6 +67,9 @@ export default function TrainGroupFormComponent({ formMode }: IField) {
     const updatedDto = {
       ...trainGroupDto,
       [field]: trainGroupDto[field],
+      // trainerId says who the trainer is. The trainer itself is never saved through a
+      // group, and the grid's copy is only a name and photo, which would not validate.
+      trainer: undefined,
     };
     const response = await apiService.update<TrainGroupDto>(
       "TrainGroups",

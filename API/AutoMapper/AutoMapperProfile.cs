@@ -29,7 +29,10 @@ namespace API.AutoMapper
         {
             // TrainGroup mappings.
             CreateMap<TrainGroup, TrainGroupDto>();
-            CreateMap<TrainGroupDto, TrainGroup>();
+            // The trainer is never written back through a train group: TrainerId says who
+            // it is, and saving a group must not touch anyone's user record.
+            CreateMap<TrainGroupDto, TrainGroup>()
+                .ForMember(x => x.Trainer, o => o.Ignore());
 
             CreateMap<TrainGroup, TrainGroupAddDto>();
             CreateMap<TrainGroupAddDto, TrainGroup>()

@@ -5,6 +5,7 @@ using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.Lookup;
 using Core.Dtos.TrainGroup;
+using Core.Dtos.User;
 using Core.Enums;
 using Core.Models;
 using Core.System;
@@ -164,9 +165,32 @@ namespace API.Controllers
         }
 
 
+        // POST: api/TrainGroups/GetDataTable
+        // The admin train-groups list, so staff only - the same claim that opens a group.
+        // Members never call it (their calendar reads TrainGroupDates/TimeSlots), but it
+        // used to answer anyone who was logged in.
+        public override async Task<ApiResponse<DataTableDto<TrainGroupDto>>> GetDataTable([FromBody] DataTableDto<TrainGroupDto> dataTable)
+        {
+            if (!IsUserAuthorized("View"))
+                return new ApiResponse<DataTableDto<TrainGroupDto>>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            return await base.GetDataTable(dataTable);
+        }
+
         protected override void DataTableQueryUpdate(IGenericRepository<TrainGroup> query, DataTableDto<TrainGroupDto> dataTable)
         {
             query = query.Include(x => x.Trainer);
+        }
+
+        // The grid shows the trainer as a chip, so that is all it gets: name, username and
+        // photo. Each row used to carry the trainer's whole record - email, address,
+        // medical history.
+        protected override Task DataTableResultUpdate(List<TrainGroup> entities, List<TrainGroupDto> entityDtos)
+        {
+            for (int i = 0; i < entities.Count && i < entityDtos.Count; i++)
+                entityDtos[i].Trainer = TrainerDto.ForStaff(entities[i].Trainer);
+
+            return Task.CompletedTask;
         }
     }
 }
