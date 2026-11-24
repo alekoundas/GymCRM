@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Databases hold real member data: they never go into git, whatever folder they are in.
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
