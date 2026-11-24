@@ -7,10 +7,12 @@ using Core.Models;
 using Core.System;
 using Core.Translations;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System.Data;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace API.Controllers
@@ -19,6 +21,10 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        // The gym's mail leaves through whichever account is connected here, so connecting one
+        // is for whoever the menu shows the page to.
+        private const string GooglePermission = "Roles_Edit";
+
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly ILogger<AuthController> _logger;
@@ -30,6 +36,7 @@ namespace API.Controllers
         private readonly IStringLocalizer _localizer;
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
+        private readonly ITimeLimitedDataProtector _googleState;
 
         public AuthController(
             IDataService dataService,
@@ -42,7 +49,8 @@ namespace API.Controllers
             TokenSettings tokenSettings,
             IConfiguration configuration,
             IHttpClientFactory clientFactory,
-            IStringLocalizer localizer)
+            IStringLocalizer localizer,
+            IDataProtectionProvider dataProtectionProvider)
         {
             _dataService = dataService;
             _logger = logger;
@@ -56,6 +64,7 @@ namespace API.Controllers
             _localizer = localizer;
 
             _httpClient = clientFactory.CreateClient();
+            _googleState = dataProtectionProvider.CreateProtector("Auth.GoogleState").ToTimeLimitedDataProtector();
         }
 
 
@@ -125,8 +134,13 @@ namespace API.Controllers
             //if (!ModelState.IsValid)
             //    return new ApiResponse<bool>().SetErrorResponse("Invalid model state.");
 
-            // Get current user from claims
-            User? user = await _userManager.FindByIdAsync(request.UserId);
+            // Your own and nobody else's. The form names the account, and a wrong old password
+            // is not counted here the way it is at sign-in - so any member could have gone on
+            // guessing at an administrator's.
+            if (!Guid.TryParse(request.UserId, out Guid userId) || userId != GetCallerId())
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            User? user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
                 return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "User"]);
 
@@ -236,21 +250,28 @@ namespace API.Controllers
 
 
 
+        private Guid? GetCallerId() => Guid.TryParse(User.FindFirst("Id")?.Value, out Guid callerId) ? callerId : null;
+
+
         // Step 1: Admin clicks this to start auth (generates Google URL)
         [HttpGet("google")]
+        [Authorize]
         public ApiResponse<string> StartGoogleAuth()
         {
+            if (GetCallerId() is not Guid callerId || !User.HasClaim("Permission", GooglePermission))
+                return new ApiResponse<string>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
             var clientId = _configuration["Gmail:ClientId"];
             var redirectUri = _configuration["Gmail:RedirectUri"]; // e.g., "http://localhost:5000/auth/google/callback"
             var scope = "https://www.googleapis.com/auth/gmail.send";
-            var state = "random-state-for-csrf"; // Add randomness in prod
+            var state = _googleState.Protect(callerId.ToString(), TimeSpan.FromMinutes(10));
 
             var authUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
                           $"client_id={Uri.EscapeDataString(clientId)}&" +
                           $"redirect_uri={Uri.EscapeDataString(redirectUri)}&" +
                           $"scope={Uri.EscapeDataString(scope)}&" +
                           $"response_type=code&" +
-                          $"state={state}&" +
+                          $"state={Uri.EscapeDataString(state)}&" +
                           $"access_type=offline&prompt=consent"; // 'offline' for refresh token, 'consent' forces token every time
 
             return new ApiResponse<string>().SetSuccessResponse(authUrl, ""); // Or return { url: authUrl } for a frontend link
@@ -258,11 +279,14 @@ namespace API.Controllers
 
         // Step 2: Google redirects here with 'code' param
         [HttpGet("googlecallback")]
+        [Authorize]
         public async Task<ApiResponse<bool>> GoogleCallback([FromQuery]string code, [FromQuery]string state)
         {
+            if (GetCallerId() is not Guid callerId || !User.HasClaim("Permission", GooglePermission))
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
-            // Verify state for CSRF (simple check; enhance in prod)
-            if (state != "random-state-for-csrf") return new ApiResponse<bool>().SetErrorResponse("Invalid state");
+            if (!IsGoogleState(state, callerId))
+                return new ApiResponse<bool>().SetErrorResponse("Invalid state");
 
             var clientId = _configuration["Gmail:ClientId"];
             var clientSecret = _configuration["Gmail:ClientSecret"];
@@ -306,9 +330,25 @@ namespace API.Controllers
                 _dataService.Update(existingToken);
 
             }
-            Console.WriteLine($"Refresh Token: {tokens?.refresh_token}");
 
             return new ApiResponse<bool>().SetSuccessResponse("");
+        }
+
+
+        // Google hands back the state it was sent off with, and it has to be one that this
+        // person was given a moment ago. Without that a link is enough: an administrator who
+        // opened it would connect the account of whoever sent it, and every mail would leave
+        // through that one from then on - links to choose a new password among them.
+        private bool IsGoogleState(string state, Guid callerId)
+        {
+            try
+            {
+                return _googleState.Unprotect(state) == callerId.ToString();
+            }
+            catch (CryptographicException)
+            {
+                return false;
+            }
         }
     }
 

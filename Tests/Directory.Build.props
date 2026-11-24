@@ -1,0 +1,38 @@
+<Project>
+
+  <!--
+    Applies to everything under Tests/ and to nothing else: the app's own projects are outside this folder.
+    The same libraries and versions as StepinFlow's backend tests.
+  -->
+  <PropertyGroup>
+    <!-- The same framework as the app, so the tests run on what the server runs on. -->
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+
+    <!-- xUnit v3: every test project is its own executable. -->
+    <OutputType>Exe</OutputType>
+
+    <!-- xUnit generates Main and blocks on a Task in it. This silences warnings in that generated
+         file and nowhere else. -->
+    <DefineConstants>$(DefineConstants);XUNIT_GENERATED_DISABLE_WARNINGS</DefineConstants>
+
+    <!-- Exit code 8 is "no tests ran". A project whose tests are all filtered out is not a failure. -->
+    <TestingPlatformCommandLineArguments>$(TestingPlatformCommandLineArguments) --ignore-exit-code 8</TestingPlatformCommandLineArguments>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit.v3" Version="4.0.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" PrivateAssets="all" />
+    <PackageReference Include="Shouldly" Version="4.3.0" />
+    <!-- coverlet.collector is VSTest only; this is coverlet for the test platform dotnet test uses now. -->
+    <PackageReference Include="coverlet.MTP" Version="10.1.0" PrivateAssets="all" />
+
+    <Using Include="Xunit" />
+    <Using Include="Shouldly" />
+  </ItemGroup>
+
+</Project>

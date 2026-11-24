@@ -16,10 +16,6 @@ export default function GooglePage() {
   useEffect(() => {
     const state: string = searchParams.get("state") ?? "";
     const code: string = searchParams.get("code") ?? "";
-    const scope: string = searchParams.get("scope") ?? "";
-    console.log("state:" + state);
-    console.log("code:" + code);
-    console.log("scope:" + scope);
 
     const encodedCode = encodeURIComponent(code);
     const encodedState = encodeURIComponent(state);

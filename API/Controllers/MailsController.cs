@@ -49,6 +49,11 @@ namespace API.Controllers
         [HttpPost("Send")]
         public async Task<ApiResponse<bool>> Send([FromBody] MailSendDto dto)
         {
+            // The page that sends is behind this claim in the menu. It goes out in the gym's
+            // name, to anybody.
+            if (!IsUserAuthorized("Add"))
+                return new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
             List<Guid> userIds = dto.UserIds.Select(y => new Guid(y)).ToList();
             List<User> users = await _dataService.Users
                 .Where(x => userIds.Any(y => y == x.Id))

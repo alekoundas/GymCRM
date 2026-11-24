@@ -16,6 +16,9 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class PhoneNumbersController : GenericController<PhoneNumber, PhoneNumberDto, PhoneNumberAddDto>
     {
+        private const string ViewClaim = "Users_View";
+        private const string EditClaim = "Users_Edit";
+
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly IStringLocalizer _localizer;
@@ -33,11 +36,25 @@ namespace API.Controllers
         }
 
 
+        // GET: api/PhoneNumbers/5
+        // Somebody else's number answers like a missing one.
+        public override async Task<ActionResult<ApiResponse<PhoneNumberDto>>> Get(string? id)
+        {
+            PhoneNumber? entity = await _dataService.PhoneNumbers.FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
+
+            if (entity == null || !CanAccess(entity.UserId, ViewClaim))
+                return new ApiResponse<PhoneNumberDto>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(PhoneNumber)]);
+
+            return new ApiResponse<PhoneNumberDto>().SetSuccessResponse(_mapper.Map<PhoneNumberDto>(entity));
+        }
+
         // PUT: api/controller/5
         [HttpPut("{id}")]
         public override async Task<ActionResult<ApiResponse<PhoneNumber>>> Put(string? id, [FromBody] PhoneNumberDto entityDto)
         {
-            if (!IsUserAuthorized("Edit"))
+            // The number is looked for below among those of the member the form names, so
+            // asking after that member is asking after the number.
+            if (!CanAccess(new Guid(entityDto.UserId), EditClaim))
                 return new ApiResponse<PhoneNumber>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
             //if (!ModelState.IsValid)
@@ -75,8 +92,25 @@ namespace API.Controllers
             return new ApiResponse<PhoneNumber>().SetSuccessResponse(entity);
         }
 
+        protected override bool CustomValidatePOST(PhoneNumberAddDto entityDto, out string[] errors)
+        {
+            errors = Array.Empty<string>();
+
+            if (CanAccess(new Guid(entityDto.UserId), EditClaim))
+                return false;
+
+            errors = [_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]];
+            return true;
+        }
+
         protected override bool CustomValidateDELETE(PhoneNumber entity, out string[] errors)
         {
+            if (!CanAccess(entity.UserId, EditClaim))
+            {
+                errors = [_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]];
+                return true;
+            }
+
             if(entity.IsPrimary)
             {
                 errors = new string[] { _localizer[TranslationKeys.Primary_phone_number_cannot_be_deleted]};
@@ -88,15 +122,20 @@ namespace API.Controllers
         }
 
 
+        // Members keep their own numbers without holding any claim for this controller, so
+        // the fence is on the row instead: the number has to be the caller's own, or the
+        // caller one of the staff who may view or edit members.
         protected override bool IsUserAuthorized(string action)
         {
             return true;
         }
 
+        private bool CanAccess(Guid userId, string staffClaim) => userId == GetCallerId() || User.HasClaim("Permission", staffClaim);
+
         protected override void DataTableQueryUpdate(IGenericRepository<PhoneNumber> query, DataTableDto<PhoneNumberDto> dataTable)
         {
             // Anyone who can list users can see their numbers; everybody else gets theirs.
-            Guid? scopeUserId = GetScopeToCallerId("Users_View");
+            Guid? scopeUserId = GetScopeToCallerId(ViewClaim);
             if (scopeUserId != null)
                 query = query.Where(x => x.UserId == scopeUserId.Value);
         }

@@ -1,0 +1,396 @@
+POST api/Auth/Login  OPEN TO ANYBODY
+  takes body UserLoginRequestDto request
+  gives ApiResponse<UserLoginResponseDto>
+POST api/Auth/Logout
+  gives ApiResponse<yes or no>
+POST api/Auth/PasswordChange
+  takes body UserPasswordChangeDto request
+  gives ApiResponse<yes or no>
+POST api/Auth/PasswordForgot  OPEN TO ANYBODY
+  takes body UserPasswordForgotDto dto
+  gives ApiResponse<yes or no>
+POST api/Auth/PasswordReset  OPEN TO ANYBODY
+  takes body UserPasswordResetDto request
+  gives ApiResponse<yes or no>
+POST api/Auth/RefreshToken  OPEN TO ANYBODY
+  takes body UserRefreshRequestDto request
+  gives ApiResponse<UserRefreshResponseDto>
+POST api/Auth/Register  OPEN TO ANYBODY
+  takes body UserRegisterRequestDto request
+  gives ApiResponse<yes or no>
+GET api/Auth/google
+  gives ApiResponse<text>
+GET api/Auth/googlecallback
+  takes query text code, query text state
+  gives ApiResponse<yes or no>
+GET api/Charts
+  gives ApiResponse<ChartDataDto>
+POST api/Claims/GetDataTable
+  takes body DataTableDto<IdentityClaimDto> dataTable
+  gives ApiResponse<DataTableDto<IdentityClaimDto>>
+POST api/ExerciseHistories
+  takes body ExerciseHistoryDto[] entityDtos
+  gives ApiResponse<ExerciseHistory[]>
+POST api/ExerciseHistories/GetDataTable
+  takes body DataTableDto<ExerciseHistoryDto> dataTable
+  gives ApiResponse<DataTableDto<ExerciseHistoryDto>>
+DELETE api/ExerciseHistories/{id}
+  takes path text id
+  gives ApiResponse<ExerciseHistory>
+GET api/ExerciseHistories/{id}
+  takes path text id
+  gives ApiResponse<ExerciseHistoryDto>
+PUT api/ExerciseHistories/{id}
+  takes path text id, body ExerciseHistoryDto entityDto
+  gives ApiResponse<ExerciseHistory>
+POST api/Exercises
+  takes body ExerciseAddDto[] entityDtos
+  gives ApiResponse<Exercise[]>
+POST api/Exercises/GetDataTable
+  takes body DataTableDto<ExerciseDto> dataTable
+  gives ApiResponse<DataTableDto<ExerciseDto>>
+DELETE api/Exercises/{id}
+  takes path text id
+  gives ApiResponse<Exercise>
+GET api/Exercises/{id}
+  takes path text id
+  gives ApiResponse<ExerciseDto>
+PUT api/Exercises/{id}
+  takes path text id, body ExerciseDto entityDto
+  gives ApiResponse<Exercise>
+POST api/Mails
+  takes body MailAddDto[] entityDtos
+  gives ApiResponse<Mail[]>
+POST api/Mails/DeleteAll
+  gives ApiResponse<yes or no>
+POST api/Mails/GetDataTable
+  takes body DataTableDto<MailDto> dataTable
+  gives ApiResponse<DataTableDto<MailDto>>
+POST api/Mails/Send
+  takes body MailSendDto dto
+  gives ApiResponse<yes or no>
+DELETE api/Mails/{id}
+  takes path text id
+  gives ApiResponse<Mail>
+GET api/Mails/{id}
+  takes path text id
+  gives ApiResponse<MailDto>
+PUT api/Mails/{id}
+  takes path text id, body MailDto entityDto
+  gives ApiResponse<Mail>
+POST api/PhoneNumbers
+  takes body PhoneNumberAddDto[] entityDtos
+  gives ApiResponse<PhoneNumber[]>
+POST api/PhoneNumbers/GetDataTable
+  takes body DataTableDto<PhoneNumberDto> dataTable
+  gives ApiResponse<DataTableDto<PhoneNumberDto>>
+DELETE api/PhoneNumbers/{id}
+  takes path text id
+  gives ApiResponse<PhoneNumber>
+GET api/PhoneNumbers/{id}
+  takes path text id
+  gives ApiResponse<PhoneNumberDto>
+PUT api/PhoneNumbers/{id}
+  takes path text id, body PhoneNumberDto entityDto
+  gives ApiResponse<PhoneNumber>
+GET api/Questionnaires
+  gives ApiResponse<QuestionnaireDto>
+GET api/Questionnaires/Answers
+  takes query text userId
+  gives ApiResponse<QuestionnaireAnswerDto[]>
+PUT api/Questionnaires/Answers
+  takes body QuestionnaireAnswersSaveDto dto
+  gives ApiResponse<QuestionnaireAnswerDto[]>
+PUT api/Questionnaires/Name
+  takes body QuestionnaireNameDto dto
+  gives ApiResponse<QuestionnaireDto>
+POST api/Questionnaires/Questions
+  takes body QuestionnaireQuestionDto dto
+  gives ApiResponse<QuestionnaireDto>
+DELETE api/Questionnaires/Questions/{id}
+  takes anywhere number id
+  gives ApiResponse<QuestionnaireDto>
+PUT api/Questionnaires/Questions/{id}
+  takes anywhere number id, body QuestionnaireQuestionDto dto
+  gives ApiResponse<QuestionnaireDto>
+POST api/Questionnaires/Questions/{id}/Move
+  takes anywhere number id, body QuestionnaireMoveDto dto
+  gives ApiResponse<QuestionnaireDto>
+POST api/Roles
+  takes body RoleDto[] roleDto
+  gives ApiResponse<Role[]>
+POST api/Roles/GetDataTable
+  takes body DataTableDto<RoleDto> dataTable
+  gives ApiResponse<DataTableDto<RoleDto>>
+POST api/Roles/Lookup
+  takes body LookupDto lookupDto
+  gives ApiResponse<LookupDto>
+DELETE api/Roles/{id}
+  takes path text id
+  gives ApiResponse<Role>
+GET api/Roles/{id}
+  takes path text id
+  gives ApiResponse<RoleDto>
+PUT api/Roles/{id}
+  takes path text id, body RoleDto identityRoleDto
+  gives ApiResponse<Role>
+POST api/Subscriptions
+  takes body SubscriptionAddDto[] entityDtos
+  gives ApiResponse<Subscription[]>
+POST api/Subscriptions/Add
+  takes body SubscriptionAddDto dto
+  gives ApiResponse<SubscriptionDto>
+GET api/Subscriptions/Balance
+  takes query text userId
+  gives ApiResponse<number>
+POST api/Subscriptions/Decide
+  takes body SubscriptionDecideDto dto
+  gives ApiResponse<SubscriptionDto>
+POST api/Subscriptions/GetDataTable
+  takes body DataTableDto<SubscriptionDto> dataTable
+  gives ApiResponse<DataTableDto<SubscriptionDto>>
+POST api/Subscriptions/Remove
+  takes body SubscriptionRemoveDto dto
+  gives ApiResponse<yes or no>
+POST api/Subscriptions/Request
+  takes body SubscriptionRequestDto dto
+  gives ApiResponse<SubscriptionDto>
+POST api/Subscriptions/SeedInitialBalances
+  gives ApiResponse<number>
+DELETE api/Subscriptions/{id}
+  takes path text id
+  gives ApiResponse<Subscription>
+GET api/Subscriptions/{id}
+  takes path text id
+  gives ApiResponse<SubscriptionDto>
+PUT api/Subscriptions/{id}
+  takes path text id, body SubscriptionDto entityDto
+  gives ApiResponse<Subscription>
+POST api/TrainGroupAttendances
+  takes body TrainGroupΑttendanceAddDto[] entityDtos
+  gives ApiResponse<TrainGroupΑttendance[]>
+POST api/TrainGroupAttendances/GetDataTable
+  takes body DataTableDto<TrainGroupΑttendanceDto> dataTable
+  gives ApiResponse<DataTableDto<TrainGroupΑttendanceDto>>
+DELETE api/TrainGroupAttendances/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupΑttendance>
+GET api/TrainGroupAttendances/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupΑttendanceDto>
+PUT api/TrainGroupAttendances/{id}
+  takes path text id, body TrainGroupΑttendanceDto entityDto
+  gives ApiResponse<TrainGroupΑttendance>
+POST api/TrainGroupCategories
+  takes body TrainGroupCategoryAddDto[] entityDtos
+  gives ApiResponse<TrainGroupCategory[]>
+POST api/TrainGroupCategories/GetDataTable
+  takes body DataTableDto<TrainGroupCategoryDto> dataTable
+  gives ApiResponse<DataTableDto<TrainGroupCategoryDto>>
+POST api/TrainGroupCategories/Lookup
+  takes body LookupDto lookupDto
+  gives ApiResponse<LookupDto>
+DELETE api/TrainGroupCategories/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupCategory>
+GET api/TrainGroupCategories/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupCategoryDto>
+PUT api/TrainGroupCategories/{id}
+  takes path text id, body TrainGroupCategoryDto entityDto
+  gives ApiResponse<TrainGroupCategory>
+POST api/TrainGroupDates
+  takes body TrainGroupDateAddDto[] entityDtos
+  gives ApiResponse<TrainGroupDate[]>
+POST api/TrainGroupDates/GetDataTable
+  takes body DataTableDto<TrainGroupDateDto> dataTable
+  gives ApiResponse<DataTableDto<TrainGroupDateDto>>
+POST api/TrainGroupDates/TimeSlots
+  takes body TimeSlotRequestDto timeSlotRequestDto
+  gives ApiResponse<TimeSlotResponseDto[]>
+DELETE api/TrainGroupDates/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupDate>
+GET api/TrainGroupDates/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupDateDto>
+PUT api/TrainGroupDates/{id}
+  takes path text id, body TrainGroupDateDto entityDto
+  gives ApiResponse<TrainGroupDate>
+POST api/TrainGroupParticipantUnavailableDates
+  takes body TrainGroupParticipantUnavailableDateAddDto[] entityDtos
+  gives ApiResponse<TrainGroupParticipantUnavailableDate[]>
+POST api/TrainGroupParticipantUnavailableDates/GetDataTable
+  takes body DataTableDto<TrainGroupParticipantUnavailableDateDto> dataTable
+  gives ApiResponse<DataTableDto<TrainGroupParticipantUnavailableDateDto>>
+DELETE api/TrainGroupParticipantUnavailableDates/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupParticipantUnavailableDate>
+GET api/TrainGroupParticipantUnavailableDates/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupParticipantUnavailableDateDto>
+PUT api/TrainGroupParticipantUnavailableDates/{id}
+  takes path text id, body TrainGroupParticipantUnavailableDateDto entityDto
+  gives ApiResponse<TrainGroupParticipantUnavailableDate>
+POST api/TrainGroupParticipants
+  takes body TrainGroupParticipantAddDto[] entityDtos
+  gives ApiResponse<TrainGroupParticipant[]>
+POST api/TrainGroupParticipants/Book
+  takes body TrainGroupParticipantBookDto dto
+  gives ApiResponse<date[]>
+POST api/TrainGroupParticipants/Bookings
+  takes body TrainGroupParticipantBookingsRequestDto dto
+  gives ApiResponse<TrainGroupParticipantBookingDto[]>
+POST api/TrainGroupParticipants/GetDataTable
+  takes body DataTableDto<TrainGroupParticipantDto> dataTable
+  gives ApiResponse<DataTableDto<TrainGroupParticipantDto>>
+DELETE api/TrainGroupParticipants/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupParticipant>
+GET api/TrainGroupParticipants/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupParticipantDto>
+PUT api/TrainGroupParticipants/{id}
+  takes path text id, body TrainGroupParticipantDto entityDto
+  gives ApiResponse<TrainGroupParticipant>
+POST api/TrainGroupParticipants/{id}/Cancel
+  takes path number id, body TrainGroupParticipantRemoveDto dto
+  gives ApiResponse<yes or no>
+POST api/TrainGroupParticipants/{id}/End
+  takes path number id, body TrainGroupParticipantRemoveDto dto
+  gives ApiResponse<yes or no>
+POST api/TrainGroupUnavailableDates
+  takes body TrainGroupUnavailableDateAddDto[] entityDtos
+  gives ApiResponse<TrainGroupUnavailableDate[]>
+POST api/TrainGroupUnavailableDates/GetDataTable
+  takes body DataTableDto<TrainGroupUnavailableDateDto> dataTable
+  gives ApiResponse<DataTableDto<TrainGroupUnavailableDateDto>>
+DELETE api/TrainGroupUnavailableDates/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupUnavailableDate>
+GET api/TrainGroupUnavailableDates/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupUnavailableDateDto>
+PUT api/TrainGroupUnavailableDates/{id}
+  takes path text id, body TrainGroupUnavailableDateDto entityDto
+  gives ApiResponse<TrainGroupUnavailableDate>
+POST api/TrainGroups
+  takes body TrainGroupAddDto[] entityDtos
+  gives ApiResponse<TrainGroup[]>
+POST api/TrainGroups/GetDataTable
+  takes body DataTableDto<TrainGroupDto> dataTable
+  gives ApiResponse<DataTableDto<TrainGroupDto>>
+POST api/TrainGroups/Lookup
+  takes body LookupDto lookupDto
+  gives ApiResponse<LookupDto>
+DELETE api/TrainGroups/{id}
+  takes path text id
+  gives ApiResponse<TrainGroup>
+GET api/TrainGroups/{id}
+  takes path text id
+  gives ApiResponse<TrainGroupDto>
+PUT api/TrainGroups/{id}
+  takes path text id, body TrainGroupDto entityDto
+  gives ApiResponse<TrainGroup>
+POST api/UserStatuses
+  takes body UserStatusAddDto[] entityDtos
+  gives ApiResponse<UserStatus[]>
+POST api/UserStatuses/GetDataTable
+  takes body DataTableDto<UserStatusDto> dataTable
+  gives ApiResponse<DataTableDto<UserStatusDto>>
+POST api/UserStatuses/Lookup
+  takes body LookupDto lookupDto
+  gives ApiResponse<LookupDto>
+DELETE api/UserStatuses/{id}
+  takes path text id
+  gives ApiResponse<UserStatus>
+GET api/UserStatuses/{id}
+  takes path text id
+  gives ApiResponse<UserStatusDto>
+PUT api/UserStatuses/{id}
+  takes path text id, body UserStatusDto entityDto
+  gives ApiResponse<UserStatus>
+POST api/Users/AutoComplete
+  takes body AutoCompleteDto<UserDto> autoCompleteDto
+  gives ApiResponse<AutoCompleteDto<UserDto>>
+POST api/Users/GetDataTable
+  takes body DataTableDto<UserDto> dataTable
+  gives ApiResponse<DataTableDto<UserDto>>
+POST api/Users/Lookup
+  takes body LookupDto lookupDto
+  gives ApiResponse<LookupDto>
+POST api/Users/TimeSlots
+  takes body TimeSlotRequestDto timeSlotRequestDto
+  gives ApiResponse<TimeSlotResponseDto[]>
+DELETE api/Users/{id}
+  takes path text id
+  gives ApiResponse<IdentityUser>
+GET api/Users/{id}
+  takes path text id
+  gives ApiResponse<UserDto>
+PUT api/Users/{id}
+  takes path text id, body UserDto request
+  gives ApiResponse<UserDto>
+POST api/WorkoutPlanRecordings
+  takes body WorkoutPlanRecordingAddDto[] entityDtos
+  gives ApiResponse<WorkoutPlanRecording[]>
+POST api/WorkoutPlanRecordings/GetDataTable
+  takes body DataTableDto<WorkoutPlanRecordingDto> dataTable
+  gives ApiResponse<DataTableDto<WorkoutPlanRecordingDto>>
+POST api/WorkoutPlanRecordings/Start
+  takes body WorkoutPlanStartRequestDto request
+  gives ApiResponse<WorkoutPlanRecordingDto>
+GET api/WorkoutPlanRecordings/StartContext/{workoutPlanId}
+  takes path number workoutPlanId
+  gives ApiResponse<WorkoutPlanStartContextDto>
+POST api/WorkoutPlanRecordings/Stop/{id}
+  takes path number id
+  gives ApiResponse<WorkoutPlanRecordingDto>
+DELETE api/WorkoutPlanRecordings/{id}
+  takes path text id
+  gives ApiResponse<WorkoutPlanRecording>
+GET api/WorkoutPlanRecordings/{id}
+  takes path text id
+  gives ApiResponse<WorkoutPlanRecordingDto>
+PUT api/WorkoutPlanRecordings/{id}
+  takes path text id, body WorkoutPlanRecordingDto entityDto
+  gives ApiResponse<WorkoutPlanRecording>
+POST api/WorkoutPlanRules
+  takes body WorkoutPlanRuleAddDto[] entityDtos
+  gives ApiResponse<WorkoutPlanRule[]>
+POST api/WorkoutPlanRules/GetDataTable
+  takes body DataTableDto<WorkoutPlanRuleDto> dataTable
+  gives ApiResponse<DataTableDto<WorkoutPlanRuleDto>>
+POST api/WorkoutPlanRules/Lookup
+  takes body LookupDto lookupDto
+  gives ApiResponse<LookupDto>
+DELETE api/WorkoutPlanRules/{id}
+  takes path text id
+  gives ApiResponse<WorkoutPlanRule>
+GET api/WorkoutPlanRules/{id}
+  takes path text id
+  gives ApiResponse<WorkoutPlanRuleDto>
+PUT api/WorkoutPlanRules/{id}
+  takes path text id, body WorkoutPlanRuleDto entityDto
+  gives ApiResponse<WorkoutPlanRule>
+POST api/WorkoutPlans
+  takes body WorkoutPlanAddDto[] entityDtos
+  gives ApiResponse<WorkoutPlan[]>
+POST api/WorkoutPlans/GetDataTable
+  takes body DataTableDto<WorkoutPlanDto> dataTable
+  gives ApiResponse<DataTableDto<WorkoutPlanDto>>
+DELETE api/WorkoutPlans/{id}
+  takes path text id
+  gives ApiResponse<WorkoutPlan>
+GET api/WorkoutPlans/{id}
+  takes path text id
+  gives ApiResponse<WorkoutPlanDto>
+PUT api/WorkoutPlans/{id}
+  takes path text id, body WorkoutPlanDto entityDto
+  gives ApiResponse<WorkoutPlan>
+POST api/WorkoutPlans/{id}/Activate
+  takes path number id
+  gives ApiResponse<yes or no>
+POST api/WorkoutPlans/{id}/Deactivate
+  takes path number id
+  gives ApiResponse<yes or no>

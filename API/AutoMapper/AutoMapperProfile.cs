@@ -164,11 +164,19 @@ namespace API.AutoMapper
             CreateMap<TrainGroupCategoryAddDto, TrainGroupCategory>();
 
             // UserStatus mappings.
-            CreateMap<UserStatus, UserStatusDto>();
-            CreateMap<UserStatusDto, UserStatus>();
+            // A status goes out without the members it is the status of. Every grid that shows a
+            // member with their status sent the member's whole record again inside it - email,
+            // address and medical history - also where the member themselves is only a name and
+            // a photo. And members are never written through a status.
+            CreateMap<UserStatus, UserStatusDto>()
+                .ForMember(x => x.Users, o => o.Ignore());
+            CreateMap<UserStatusDto, UserStatus>()
+                .ForMember(x => x.Users, o => o.Ignore());
 
-            CreateMap<UserStatus, UserStatusAddDto>();
-            CreateMap<UserStatusAddDto, UserStatus>();
+            CreateMap<UserStatus, UserStatusAddDto>()
+                .ForMember(x => x.Users, o => o.Ignore());
+            CreateMap<UserStatusAddDto, UserStatus>()
+                .ForMember(x => x.Users, o => o.Ignore());
 
 
             // ExerciseHistory mappings.

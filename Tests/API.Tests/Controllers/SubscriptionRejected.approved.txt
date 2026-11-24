@@ -1,0 +1,18 @@
+
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        h2 { color: #2c3e50; }
+                        .section { margin-bottom: 20px; }
+                        ul { list-style-type: none; padding: 0; }
+                        li { padding: 5px 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <h2>About your subscription request</h2><div class='section'><p>Your request was not approved this time.</p><ul><li><strong>Subscriptions requested:</strong> 10</li><li><strong>Missing subscriptions:</strong> 1</li></ul></div><div class='section'><p><strong>Note from your trainer:</strong></p><p>Not now</p></div><div class='section'><p>Talk to your trainer, or send a new request from your profile whenever you are ready.</p></div>
+                    </div>
+                </body>
+                </html>

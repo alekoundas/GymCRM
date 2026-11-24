@@ -178,6 +178,7 @@ builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddSingleton(appSettings); // appsettings.json
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IEmailService, GmailEmailService>();
 builder.Services.AddScoped<IMailQueueService, MailQueueService>();
 builder.Services.AddHostedService<MailQueueBackgroundService>();
@@ -212,7 +213,7 @@ builder.Services.AddIdentityCore<User>(options =>
     .AddRoleManager<RoleManager<Role>>()
     .AddSignInManager()
     .AddEntityFrameworkStores<ApiDbContext>()
-    .AddTokenProvider<DataProtectorTokenProvider<User>>("REFRESHTOKENPROVIDER")
+    .AddTokenProvider<RefreshTokenProvider>("REFRESHTOKENPROVIDER")
     .AddTokenProvider<DataProtectorTokenProvider<User>>("Default"); // Added for password reset tokens
 
 
@@ -226,7 +227,7 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
     options.Name = "Default"; // For password reset tokens
     options.TokenLifespan = TimeSpan.FromHours(24); // Reset tokens valid for 24 hours
 });
-builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+builder.Services.Configure<RefreshTokenProviderOptions>(opt =>
 {
     opt.Name = "REFRESHTOKENPROVIDER";
     opt.TokenLifespan = TimeSpan.FromSeconds(appSettings.RefreshTokenExpireSeconds);

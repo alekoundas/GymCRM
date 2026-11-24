@@ -144,6 +144,10 @@ export default function TrainGroupAdminCalendarPage() {
         }
       });
   };
+
+  // Calling a session off and back on.
+  const canEdit = TokenService.isUserAllowed("TrainGroups_Edit");
+
   const onDateDisable = async (): Promise<void> => {
     if (selectedTrainGroupId) {
       const trainGroupUnavailableDateDto: TrainGroupUnavailableDateDto = {
@@ -332,6 +336,7 @@ export default function TrainGroupAdminCalendarPage() {
               onClick={() => dialogControlDelete.showDialog()}
               severity="danger"
               visible={
+                canEdit &&
                 !timeSlots.find((x) => x.trainGroupId === selectedTrainGroupId)
                   ?.isUnavailableTrainGroup
               }
@@ -341,6 +346,7 @@ export default function TrainGroupAdminCalendarPage() {
               onClick={() => onDateEnable()}
               severity="success"
               visible={
+                canEdit &&
                 timeSlots.find((x) => x.trainGroupId === selectedTrainGroupId)
                   ?.isUnavailableTrainGroup
               }

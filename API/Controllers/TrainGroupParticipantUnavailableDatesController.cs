@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Business.Repository;
 using Business.Services;
 using Core.Dtos;
+using Core.Dtos.DataTable;
 using Core.Dtos.TrainGroupParticipantUnavailableDate;
 using Core.Enums;
 using Core.Models;
@@ -38,6 +40,30 @@ namespace API.Controllers
         protected override bool IsUserAuthorized(string action)
         {
             return true;
+        }
+
+        // GET: api/TrainGroupParticipantUnavailableDates/5
+        // Somebody else's date answers like a missing one.
+        public override async Task<ActionResult<ApiResponse<TrainGroupParticipantUnavailableDateDto>>> Get(string? id)
+        {
+            TrainGroupParticipantUnavailableDate? entity = await _dataService.GetGenericRepository<TrainGroupParticipantUnavailableDate>()
+                .Include(x => x.TrainGroupParticipant)
+                .FilterByColumnEquals("Id", id)
+                .FirstOrDefaultAsync();
+
+            if (entity == null || !CanChange(entity.TrainGroupParticipant))
+                return new ApiResponse<TrainGroupParticipantUnavailableDateDto>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(TrainGroupParticipantUnavailableDate)]);
+
+            return new ApiResponse<TrainGroupParticipantUnavailableDateDto>().SetSuccessResponse(_mapper.Map<TrainGroupParticipantUnavailableDateDto>(entity));
+        }
+
+        // A date is skipped and taken back, never edited. The generic PUT would move one past
+        // everything POST and DELETE look at: whose it is, the 12 hours, whether there is a place.
+        public override Task<ActionResult<ApiResponse<TrainGroupParticipantUnavailableDate>>> Put(string? id, [FromBody] TrainGroupParticipantUnavailableDateDto entityDto)
+        {
+            return Task.FromResult<ActionResult<ApiResponse<TrainGroupParticipantUnavailableDate>>>(
+                new ApiResponse<TrainGroupParticipantUnavailableDate>().SetErrorResponse(
+                    _localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]));
         }
 
         protected override bool CustomValidatePOST(TrainGroupParticipantUnavailableDateAddDto entityDto, out string[] errors)
@@ -127,6 +153,14 @@ namespace API.Controllers
             }
 
             return false;
+        }
+
+
+        protected override void DataTableQueryUpdate(IGenericRepository<TrainGroupParticipantUnavailableDate> query, DataTableDto<TrainGroupParticipantUnavailableDateDto> dataTable)
+        {
+            Guid? scopeUserId = GetScopeToCallerId(BookingRules.StaffPermission);
+            if (scopeUserId != null)
+                query = query.Where(x => x.TrainGroupParticipant.UserId == scopeUserId.Value);
         }
 
 

@@ -61,7 +61,7 @@ namespace Business.Services.Email
                 // A missing token row used to return quietly, which reported success for
                 // mail that never left. It has to be loud so the queue can record it.
                 _logger.LogError("Gmail API configuration is incomplete: ClientId={ClientId}, ClientSecret={ClientSecret}, RefreshToken={RefreshToken}, Username={Username}, TokenRows={TokenRows}",
-                    clientId, clientSecret, refreshToken != null ? "[REDACTED]" : null, username, dbtokens.Count);
+                    clientId, string.IsNullOrWhiteSpace(clientSecret) ? clientSecret : "[REDACTED]", refreshToken != null ? "[REDACTED]" : null, username, dbtokens.Count);
                 throw new InvalidOperationException("Gmail API configuration is incomplete.");
             }
 

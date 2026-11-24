@@ -1,0 +1,18 @@
+
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        h2 { color: #2c3e50; }
+                        .section { margin-bottom: 20px; }
+                        ul { list-style-type: none; padding: 0; }
+                        li { padding: 5px 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <h2>Your subscriptions have been renewed</h2><div class='section'><p>Your subscriptions have been topped up. See you at training!</p><ul><li><strong>Subscriptions added:</strong> 10</li><li><strong>Remaining subscriptions:</strong> 9</li></ul></div><div class='section'><p><strong>Note from your trainer:</strong></p><p>See &lt;b&gt;you&lt;/b&gt; &amp; yours</p></div>
+                    </div>
+                </body>
+                </html>

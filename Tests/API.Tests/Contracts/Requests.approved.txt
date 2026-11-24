@@ -1,0 +1,492 @@
+AutoCompleteDto<TEntity>
+  searchValue: text
+  skip: number
+  suggestions: TEntity[]
+  take: number
+  totalRecords: number
+
+DataTableDto<TEntity>
+  data: TEntity[]
+  filters: DataTableFilterDto[]
+  first: number
+  page: number
+  pageCount: number
+  rows: number
+  sorts: DataTableSortDto[]
+  totalRecords: number
+
+DataTableFilterDto
+  fieldName: text
+  filterType: DataTableFiltersEnum
+  value: text
+  values: text[]
+
+DataTableFiltersEnum
+  startsWith, contains, notContains, endsWith, equals, notEquals, notIn, lt, lte, gt, gte, between, dateIs, dateIsNot, dateBefore, dateAfter, custom, in
+
+DataTableSortDto
+  fieldName: text
+  order: number
+
+DayOfWeek
+  Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
+
+ExerciseAddDto
+  description: text
+  groupExerciseOrderNumber: number
+  groupNumber: number
+  name: text
+  reps: text
+  sets: text
+  videoUrl: text
+  weight: text
+  workoutPlanId: number
+
+ExerciseDto
+  description: text
+  groupExerciseOrderNumber: number
+  groupNumber: number
+  id: number?
+  isWorkoutPlanInactive: yes or no
+  name: text
+  reps: text
+  sets: text
+  user: UserDto
+  userId: text
+  videoUrl: text
+  weight: text
+  workoutPlanId: number
+  workoutPlanTitle: text
+
+ExerciseHistoryDto
+  createdOn: date
+  description: text
+  exerciseId: number
+  groupExerciseOrderNumber: number
+  groupNumber: number
+  id: number?
+  name: text
+  reps: text
+  sets: text
+  user: UserDto
+  userId: text
+  videoUrl: text
+  weight: text
+  workoutPlanId: number
+  workoutPlanTitle: text
+
+IdentityClaimDto
+  add: yes or no
+  controller: text
+  delete: yes or no
+  edit: yes or no
+  view: yes or no
+
+LookupDto
+  data: LookupOptionDto[]
+  filter: LookupFilterDto
+  skip: number
+  take: number
+  totalRecords: number
+
+LookupFilterDto
+  id: text
+  parentId: text
+  value: text
+
+LookupOptionDto
+  color: text
+  firstName: text
+  id: text
+  lastName: text
+  profileImage: base64
+  userColor: text
+  value: text
+
+MailAddDto
+  body: text
+  subject: text
+  userId: text
+
+MailDto
+  body: text
+  createdOn: date
+  error: text
+  id: number
+  sentOn: date?
+  status: MailStatusEnum
+  subject: text
+  user: UserDto
+  userId: text
+
+MailSendDto
+  body: text
+  createdOn: text
+  subject: text
+  userIds: text[]
+
+MailStatusEnum
+  PENDING, SENT, FAILED
+
+PhoneNumberAddDto
+  isPrimary: yes or no
+  number: text
+  userId: text
+
+PhoneNumberDto
+  id: number?
+  isPrimary: yes or no
+  number: text
+  userId: text
+
+QuestionnaireAnswerDto
+  answer: text
+  questionnaireQuestionId: number
+
+QuestionnaireAnswersSaveDto
+  answers: QuestionnaireAnswerDto[]
+  userId: text
+
+QuestionnaireMoveDto
+  direction: number
+
+QuestionnaireNameDto
+  name: text
+
+QuestionnaireQuestionDto
+  answerPlaceholder: text
+  details: text
+  id: number
+  image: text
+  orderNumber: number
+  title: text
+
+RoleDto
+  claims: IdentityClaimDto[]
+  id: text
+  name: text
+  normalizedName: text
+
+SubscriptionAddDto
+  adminComment: text
+  amount: number
+  notifyUser: yes or no
+  userId: text
+
+SubscriptionDecideDto
+  adminComment: text
+  amount: number
+  id: number
+  isApproved: yes or no
+  notifyUser: yes or no
+
+SubscriptionDto
+  adminComment: text
+  amount: number
+  createdOn: date
+  decidedOn: date?
+  id: number
+  memberComment: text
+  requestedAmount: number?
+  status: SubscriptionStatusEnum
+  user: UserDto
+  userId: text
+
+SubscriptionRemoveDto
+  id: number
+  notifyUser: yes or no
+
+SubscriptionRequestDto
+  memberComment: text
+  requestedAmount: number
+
+SubscriptionStatusEnum
+  PENDING, APPROVED, REJECTED
+
+TimeSlotRequestDto
+  selectedDate: date
+  userId: text
+
+TrainGroupAddDto
+  description: text
+  duration: date
+  maxParticipants: number
+  startOn: date
+  title: text
+  trainGroupCategoryId: number?
+  trainGroupDates: TrainGroupDateAddDto[]
+  trainGroupParticipants: TrainGroupParticipantAddDto[]
+  trainerId: text
+
+TrainGroupCategoryAddDto
+  color: text
+  name: text
+
+TrainGroupCategoryDto
+  color: text
+  id: number
+  name: text
+
+TrainGroupDateAddDto
+  fixedDay: date?
+  recurrenceDayOfMonth: number?
+  recurrenceDayOfWeek: DayOfWeek?
+  trainGroupDateType: TrainGroupDateTypeEnum
+  trainGroupId: number?
+  trainGroupParticipants: TrainGroupParticipantAddDto[]
+
+TrainGroupDateDto
+  fixedDay: date?
+  id: number
+  recurrenceDayOfMonth: number?
+  recurrenceDayOfWeek: DayOfWeek?
+  trainGroupDateParticipants: TrainGroupParticipantDto[]
+  trainGroupDateType: TrainGroupDateTypeEnum
+  trainGroupId: number
+
+TrainGroupDateTypeEnum
+  DAY_OF_WEEK, DAY_OF_MONTH, FIXED_DAY
+
+TrainGroupDto
+  description: text
+  duration: date
+  id: number
+  maxParticipants: number
+  startOn: date
+  title: text
+  trainGroupCategoryId: number?
+  trainGroupDates: TrainGroupDateDto[]
+  trainGroupParticipants: TrainGroupParticipantDto[]
+  trainer: UserDto
+  trainerId: text
+
+TrainGroupParticipantAddDto
+  recurringStartOnDate: date?
+  selectedDate: date?
+  trainGroupDateId: number
+  trainGroupId: number
+  userId: text
+
+TrainGroupParticipantBookDto
+  clientTimezoneOffsetMinutes: number
+  isOneOff: yes or no
+  recurringTrainGroupDateIds: number[]
+  selectedDate: date
+  trainGroupId: number
+  userId: text
+
+TrainGroupParticipantBookingsRequestDto
+  clientTimezoneOffsetMinutes: number
+  userId: text
+
+TrainGroupParticipantDto
+  hasAttendance: yes or no
+  id: number
+  recurringStartOnDate: date?
+  selectedDate: date?
+  subscriptionBalance: number
+  trainGroupDateId: number
+  trainGroupId: number
+  user: UserDto
+  userId: text
+
+TrainGroupParticipantRemoveDto
+  clientTimezoneOffsetMinutes: number
+  fromDate: date?
+  isAdminPage: yes or no
+
+TrainGroupParticipantUnavailableDateAddDto
+  clientTimezoneOffsetMinutes: number
+  isAdminPage: yes or no
+  trainGroupParticipantId: number
+  unavailableDate: date
+
+TrainGroupParticipantUnavailableDateDto
+  id: number
+  trainGroupParticipantId: number
+  unavailableDate: date
+
+TrainGroupUnavailableDateAddDto
+  trainGroupId: number
+  unavailableDate: date
+
+TrainGroupUnavailableDateDto
+  id: number
+  trainGroupId: number
+  unavailableDate: date
+
+TrainGroupΑttendanceAddDto
+  attendanceDate: date
+  trainGroupDescription: text
+  trainGroupDuration: date
+  trainGroupId: number?
+  trainGroupStartOn: date
+  trainGroupTitle: text
+  trainerFullName: text
+  userId: text
+
+TrainGroupΑttendanceDto
+  attendanceDate: date
+  createdOn: date
+  id: number?
+  trainGroup: TrainGroupDto
+  trainGroupDescription: text
+  trainGroupDuration: date
+  trainGroupId: number?
+  trainGroupStartOn: date
+  trainGroupTitle: text
+  trainerFullName: text
+  trainerId: id?
+  user: UserDto
+  userId: text
+
+UserDto
+  address: text
+  email: text
+  firstName: text
+  id: text
+  lastName: text
+  medicalHistory: text
+  profileImage: base64
+  subscriptionBalance: number
+  userName: text
+  userRoles: UserRoleDto[]
+  userStatus: UserStatusDto
+  userStatusId: number?
+
+UserLoginRequestDto
+  password: text
+  userNameOrEmail: text
+
+UserPasswordChangeDto
+  confirmNewPassword: text
+  newPassword: text
+  oldPassword: text
+  userId: text
+
+UserPasswordForgotDto
+  email: text
+
+UserPasswordResetDto
+  confirmNewPassword: text
+  email: text
+  newPassword: text
+  token: text
+
+UserRefreshRequestDto
+  accessToken: text
+  refreshToken: text
+
+UserRegisterRequestDto
+  address: text
+  email: text
+  firstName: text
+  lastName: text
+  medicalHistory: text
+  password: text
+  phoneNumbers: PhoneNumberAddDto[]
+  userName: text
+
+UserRoleDto
+  role: RoleDto
+
+UserStatusAddDto
+  color: text
+  name: text
+  users: UserDto[]
+
+UserStatusDto
+  color: text
+  id: number?
+  name: text
+  users: UserDto[]
+
+WorkoutPlanAddDto
+  currentWeek: number?
+  description: text
+  exercises: ExerciseAddDto[]
+  isCircular: yes or no
+  title: text
+  userId: text
+  workoutPlanRuleId: number?
+
+WorkoutPlanDto
+  createdOn: date
+  currentWeek: number?
+  currentWeekMessage: text
+  description: text
+  elapsedSeconds: number?
+  exercises: ExerciseDto[]
+  hasIncompleteRecording: yes or no
+  id: number?
+  isCircular: yes or no
+  isInactive: yes or no
+  isRunning: yes or no
+  lastRecordingDurationSeconds: number?
+  lastRecordingOn: date?
+  recordingCount: number
+  title: text
+  user: WorkoutPlanOwnerDto
+  userId: text
+  weekCount: number
+  workoutPlanRuleId: number?
+  workoutPlanRuleName: text
+
+WorkoutPlanOwnerDto
+  firstName: text
+  id: text
+  lastName: text
+  profileImage: base64
+  userName: text
+  userStatus: UserStatusDto
+  userStatusId: number?
+
+WorkoutPlanRecordingAddDto
+  weekNumber: number
+  workoutPlanId: number
+
+WorkoutPlanRecordingDto
+  completedOn: date?
+  createdOn: date
+  durationSeconds: number?
+  elapsedSeconds: number?
+  id: number?
+  isIncomplete: yes or no
+  isRunning: yes or no
+  startedOn: date
+  user: UserDto
+  userId: text
+  weekNumber: number
+  workoutPlanId: number?
+  workoutPlanTitle: text
+
+WorkoutPlanRuleAddDto
+  awayGapDays: number?
+  name: text
+  weeks: WorkoutPlanRuleWeekAddDto[]
+
+WorkoutPlanRuleDto
+  awayGapDays: number?
+  createdOn: date
+  id: number?
+  isLocked: yes or no
+  name: text
+  weekCount: number
+  weeks: WorkoutPlanRuleWeekDto[]
+  workoutPlanCount: number
+
+WorkoutPlanRuleWeekAddDto
+  maxRecordings: number
+  message: text
+  weekNumber: number
+
+WorkoutPlanRuleWeekDto
+  id: number?
+  maxRecordings: number
+  message: text
+  weekNumber: number
+  workoutPlanRuleId: number
+
+WorkoutPlanStartRequestDto
+  weekNumber: number
+  workoutPlanId: number

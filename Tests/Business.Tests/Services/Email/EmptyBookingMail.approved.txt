@@ -1,0 +1,21 @@
+
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        h2 { color: #2c3e50; }
+                        .section { margin-bottom: 20px; }
+                        ul { list-style-type: none; padding: 0; }
+                        li { padding: 5px 0; }
+                        .added { color: #27ae60; }
+                        .removed { color: #c0392b; }
+                        .no-changes { font-style: italic; color: #7f8c8d; }
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <h2>[Booking_Information]</h2><div class='section'><h3>[Added_Bookings]</h3><p class='no-changes'>[No_bookings_were_added]</p></div><div class='section'><h3>[Removed_Bookings]</h3><p class='no-changes'>[No_bookings_were_removed]</p></div>
+            </div>
+        </body>
+        </html>

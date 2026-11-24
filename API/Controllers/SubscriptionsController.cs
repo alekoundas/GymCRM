@@ -71,6 +71,22 @@ namespace API.Controllers
         }
 
 
+        // GET: api/Subscriptions/5 - the member's own, or anybody's for an administrator.
+        // Somebody else's answers like a missing one.
+        public override async Task<ActionResult<ApiResponse<SubscriptionDto>>> Get(string? id)
+        {
+            if (!IsUserAuthorized("View"))
+                return new ApiResponse<SubscriptionDto>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
+            Subscription? subscription = await _dataService.Subscriptions.FilterByColumnEquals("Id", id).FirstOrDefaultAsync();
+
+            if (subscription == null || (subscription.UserId != GetCallerId() && !User.HasClaim("Permission", AdminViewClaim)))
+                return new ApiResponse<SubscriptionDto>().SetErrorResponse(_localizer[TranslationKeys.Requested_0_not_found, nameof(Subscription)]);
+
+            return new ApiResponse<SubscriptionDto>().SetSuccessResponse(_mapper.Map<SubscriptionDto>(subscription));
+        }
+
+
         // POST: api/Subscriptions/Add - an administrator granting lessons outright.
         [HttpPost("Add")]
         public async Task<ApiResponse<SubscriptionDto>> Add([FromBody] SubscriptionAddDto dto)

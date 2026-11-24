@@ -256,12 +256,15 @@ export default function UserProfilePage() {
                   isAdminView={isAdminView}
                 />
               </div>
-              <Button
-                label={t("Change Password")}
-                icon="pi pi-key"
-                className="p-button-outlined"
-                onClick={() => setShowChangePasswordDialog(true)}
-              />
+              {/* Your own and nobody else's: the server refuses any other. */}
+              {!isAdminView && (
+                <Button
+                  label={t("Change Password")}
+                  icon="pi pi-key"
+                  className="p-button-outlined"
+                  onClick={() => setShowChangePasswordDialog(true)}
+                />
+              )}
             </div>
           </div>
 

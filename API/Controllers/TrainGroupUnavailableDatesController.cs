@@ -27,9 +27,11 @@ namespace API.Controllers
             _localizer = localizer;
         }
 
+        // Calling a session off, or back on, is a change to the group: whoever may edit
+        // groups may do it. It used to be open to every member.
         protected override bool IsUserAuthorized(string action)
         {
-            return true;
+            return User.HasClaim("Permission", action == "View" ? "TrainGroups_View" : "TrainGroups_Edit");
         }
     }
 }

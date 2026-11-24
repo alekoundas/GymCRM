@@ -1,0 +1,18 @@
+
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        h2 { color: #2c3e50; }
+                        .section { margin-bottom: 20px; }
+                        ul { list-style-type: none; padding: 0; }
+                        li { padding: 5px 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <h2>You have one subscription left</h2><div class='section'><p>Your attendance was recorded. See you at the next session!</p><ul><li><strong>Train group:</strong> Pilates</li><li><strong>Date:</strong> 05/03/2031</li><li><strong>Remaining subscriptions:</strong> 1</li></ul></div><div class='section'><p>That was the last lesson on your account.</p><p>Talk to your trainer, or send a new request from your profile whenever you are ready.</p></div>
+                    </div>
+                </body>
+                </html>

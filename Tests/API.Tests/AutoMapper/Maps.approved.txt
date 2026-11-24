@@ -1,0 +1,768 @@
+Exercise -> ExerciseAddDto
+  Description: Description
+  GroupExerciseOrderNumber: GroupExerciseOrderNumber
+  GroupNumber: GroupNumber
+  Name: Name
+  Reps: Reps
+  Sets: Sets
+  VideoUrl: VideoUrl
+  Weight: Weight
+  WorkoutPlanId: WorkoutPlanId
+
+Exercise -> ExerciseDto
+  Description: Description
+  GroupExerciseOrderNumber: GroupExerciseOrderNumber
+  GroupNumber: GroupNumber
+  Id: Id
+  Name: Name
+  Reps: Reps
+  Sets: Sets
+  VideoUrl: VideoUrl
+  Weight: Weight
+  WorkoutPlanId: WorkoutPlanId
+  WorkoutPlanTitle: WorkoutPlan.Title
+  IsWorkoutPlanInactive: not set
+  User: not set
+  UserId: not set
+
+ExerciseAddDto -> Exercise
+  Description: Description
+  GroupExerciseOrderNumber: GroupExerciseOrderNumber
+  GroupNumber: GroupNumber
+  Name: Name
+  Reps: Reps
+  Sets: Sets
+  VideoUrl: VideoUrl
+  Weight: Weight
+  WorkoutPlanId: WorkoutPlanId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  ExerciseHistories: not set
+  Id: not set
+  WorkoutPlan: not set
+
+ExerciseDto -> Exercise
+  Description: Description
+  GroupExerciseOrderNumber: GroupExerciseOrderNumber
+  GroupNumber: GroupNumber
+  Id: Id
+  Name: Name
+  Reps: Reps
+  Sets: Sets
+  VideoUrl: VideoUrl
+  Weight: Weight
+  WorkoutPlanId: WorkoutPlanId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  ExerciseHistories: not set
+  WorkoutPlan: not set
+
+ExerciseHistory -> ExerciseHistoryDto
+  CreatedOn: CreatedOn
+  Description: Description
+  ExerciseId: ExerciseId
+  GroupExerciseOrderNumber: GroupExerciseOrderNumber
+  GroupNumber: GroupNumber
+  Id: Id
+  Name: Name
+  Reps: Reps
+  Sets: Sets
+  Weight: Weight
+  User: not set
+  UserId: not set
+  VideoUrl: not set
+  WorkoutPlanId: not set
+  WorkoutPlanTitle: not set
+
+ExerciseHistoryDto -> ExerciseHistory
+  CreatedOn: CreatedOn
+  Description: Description
+  ExerciseId: ExerciseId
+  GroupExerciseOrderNumber: GroupExerciseOrderNumber
+  GroupNumber: GroupNumber
+  Id: Id
+  Name: Name
+  Reps: Reps
+  Sets: Sets
+  Weight: Weight
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  Exercise: not set
+
+Mail -> MailAddDto
+  Body: Body
+  Subject: Subject
+  UserId: UserId
+
+Mail -> MailDto
+  Body: Body
+  CreatedOn: CreatedOn
+  Error: Error
+  Id: Id
+  SentOn: SentOn
+  Status: Status
+  Subject: Subject
+  User: User
+  UserId: UserId
+
+MailAddDto -> Mail
+  Body: Body
+  Subject: Subject
+  UserId: UserId
+  Attachments: not set
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Error: not set
+  Id: not set
+  SentOn: not set
+  Status: not set
+  User: not set
+
+MailDto -> Mail
+  Body: Body
+  CreatedOn: CreatedOn
+  Error: Error
+  Id: Id
+  SentOn: SentOn
+  Status: Status
+  Subject: Subject
+  User: User
+  UserId: UserId
+  Attachments: not set
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+
+PhoneNumber -> PhoneNumberAddDto
+  IsPrimary: IsPrimary
+  Number: Number
+  UserId: UserId
+
+PhoneNumber -> PhoneNumberDto
+  Id: Id
+  IsPrimary: IsPrimary
+  Number: Number
+  UserId: UserId
+
+PhoneNumberAddDto -> PhoneNumber
+  IsPrimary: IsPrimary
+  Number: Number
+  UserId: UserId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Id: not set
+  User: not set
+
+PhoneNumberDto -> PhoneNumber
+  Id: Id
+  IsPrimary: IsPrimary
+  Number: Number
+  UserId: UserId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  User: not set
+
+Role -> RoleDto
+  Id: Id
+  Name: Name
+  NormalizedName: NormalizedName
+  Claims: not set
+
+RoleDto -> Role
+  Id: Id
+  Name: Name
+  NormalizedName: NormalizedName
+  ConcurrencyStamp: not set
+  CreatedOn: not set
+  UserRoles: not set
+
+Subscription -> SubscriptionDto
+  AdminComment: AdminComment
+  Amount: Amount
+  CreatedOn: CreatedOn
+  DecidedOn: DecidedOn
+  Id: Id
+  MemberComment: MemberComment
+  RequestedAmount: RequestedAmount
+  Status: Status
+  User: User
+  UserId: UserId
+
+SubscriptionDto -> Subscription
+  AdminComment: AdminComment
+  Amount: Amount
+  CreatedOn: CreatedOn
+  DecidedOn: DecidedOn
+  Id: Id
+  MemberComment: MemberComment
+  RequestedAmount: RequestedAmount
+  Status: Status
+  User: User
+  UserId: UserId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+
+TrainGroup -> TrainGroupAddDto
+  Description: Description
+  Duration: Duration
+  MaxParticipants: MaxParticipants
+  StartOn: StartOn
+  Title: Title
+  TrainGroupCategoryId: TrainGroupCategoryId
+  TrainGroupDates: TrainGroupDates
+  TrainGroupParticipants: TrainGroupParticipants
+  TrainerId: TrainerId
+
+TrainGroup -> TrainGroupDto
+  Description: Description
+  Duration: Duration
+  Id: Id
+  MaxParticipants: MaxParticipants
+  StartOn: StartOn
+  Title: Title
+  TrainGroupCategoryId: TrainGroupCategoryId
+  TrainGroupDates: TrainGroupDates
+  TrainGroupParticipants: TrainGroupParticipants
+  Trainer: Trainer
+  TrainerId: TrainerId
+
+TrainGroupAddDto -> TrainGroup
+  Description: Description
+  Duration: Duration
+  MaxParticipants: MaxParticipants
+  StartOn: StartOn
+  Title: Title
+  TrainGroupCategoryId: TrainGroupCategoryId
+  TrainGroupDates: TrainGroupDates
+  TrainGroupParticipants: TrainGroupParticipants
+  TrainerId: TrainerId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Id: not set
+  TrainGroupCategory: not set
+  TrainGroupUnavailableDates: not set
+  TrainGroupΑttendances: not set
+  Trainer: not set
+
+TrainGroupCategory -> TrainGroupCategoryAddDto
+  Color: Color
+  Name: Name
+
+TrainGroupCategory -> TrainGroupCategoryDto
+  Color: Color
+  Id: Id
+  Name: Name
+
+TrainGroupCategoryAddDto -> TrainGroupCategory
+  Color: Color
+  Name: Name
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Id: not set
+  TrainGroups: not set
+
+TrainGroupCategoryDto -> TrainGroupCategory
+  Color: Color
+  Id: Id
+  Name: Name
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  TrainGroups: not set
+
+TrainGroupDate -> TrainGroupDateAddDto
+  FixedDay: FixedDay
+  RecurrenceDayOfMonth: RecurrenceDayOfMonth
+  RecurrenceDayOfWeek: RecurrenceDayOfWeek
+  TrainGroupDateType: TrainGroupDateType
+  TrainGroupId: TrainGroupId
+  TrainGroupParticipants: TrainGroupParticipants
+
+TrainGroupDate -> TrainGroupDateDto
+  FixedDay: FixedDay
+  Id: Id
+  RecurrenceDayOfMonth: RecurrenceDayOfMonth
+  RecurrenceDayOfWeek: RecurrenceDayOfWeek
+  TrainGroupDateType: TrainGroupDateType
+  TrainGroupId: TrainGroupId
+  TrainGroupDateParticipants: not set
+
+TrainGroupDateAddDto -> TrainGroupDate
+  FixedDay: FixedDay
+  RecurrenceDayOfMonth: RecurrenceDayOfMonth
+  RecurrenceDayOfWeek: RecurrenceDayOfWeek
+  TrainGroupDateType: TrainGroupDateType
+  TrainGroupId: TrainGroupId
+  TrainGroupParticipants: TrainGroupParticipants
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Id: not set
+  TrainGroup: not set
+
+TrainGroupDateDto -> TrainGroupDate
+  FixedDay: FixedDay
+  Id: Id
+  RecurrenceDayOfMonth: RecurrenceDayOfMonth
+  RecurrenceDayOfWeek: RecurrenceDayOfWeek
+  TrainGroupDateType: TrainGroupDateType
+  TrainGroupId: TrainGroupId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  TrainGroup: not set
+  TrainGroupParticipants: not set
+
+TrainGroupDto -> TrainGroup
+  Description: Description
+  Duration: Duration
+  Id: Id
+  MaxParticipants: MaxParticipants
+  StartOn: StartOn
+  Title: Title
+  TrainGroupCategoryId: TrainGroupCategoryId
+  TrainGroupDates: TrainGroupDates
+  TrainGroupParticipants: TrainGroupParticipants
+  Trainer: ignored
+  TrainerId: TrainerId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  TrainGroupCategory: not set
+  TrainGroupUnavailableDates: not set
+  TrainGroupΑttendances: not set
+
+TrainGroupParticipant -> TrainGroupParticipantAddDto
+  RecurringStartOnDate: RecurringStartOnDate
+  SelectedDate: SelectedDate
+  TrainGroupDateId: TrainGroupDateId
+  TrainGroupId: TrainGroupId
+  UserId: UserId
+
+TrainGroupParticipant -> TrainGroupParticipantDto
+  Id: Id
+  RecurringStartOnDate: RecurringStartOnDate
+  SelectedDate: SelectedDate
+  TrainGroupDateId: TrainGroupDateId
+  TrainGroupId: TrainGroupId
+  User: User
+  UserId: UserId
+  HasAttendance: not set
+  SubscriptionBalance: not set
+
+TrainGroupParticipantAddDto -> TrainGroupParticipant
+  RecurringStartOnDate: RecurringStartOnDate
+  SelectedDate: SelectedDate
+  TrainGroupDateId: TrainGroupDateId
+  TrainGroupId: TrainGroupId
+  UserId: UserId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Id: not set
+  RecurringEndOnDate: not set
+  RemovedBy_FullName: not set
+  RemovedBy_Id: not set
+  RemovedOn: not set
+  TrainGroup: not set
+  TrainGroupDate: not set
+  TrainGroupParticipantUnavailableDates: not set
+  User: not set
+
+TrainGroupParticipantDto -> TrainGroupParticipant
+  Id: Id
+  RecurringStartOnDate: RecurringStartOnDate
+  SelectedDate: SelectedDate
+  TrainGroupDateId: TrainGroupDateId
+  TrainGroupId: TrainGroupId
+  User: User
+  UserId: UserId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  RecurringEndOnDate: not set
+  RemovedBy_FullName: not set
+  RemovedBy_Id: not set
+  RemovedOn: not set
+  TrainGroup: not set
+  TrainGroupDate: not set
+  TrainGroupParticipantUnavailableDates: not set
+
+TrainGroupParticipantUnavailableDate -> TrainGroupParticipantUnavailableDateAddDto
+  TrainGroupParticipantId: TrainGroupParticipantId
+  UnavailableDate: UnavailableDate
+  ClientTimezoneOffsetMinutes: not set
+  IsAdminPage: not set
+
+TrainGroupParticipantUnavailableDate -> TrainGroupParticipantUnavailableDateDto
+  Id: Id
+  TrainGroupParticipantId: TrainGroupParticipantId
+  UnavailableDate: UnavailableDate
+
+TrainGroupParticipantUnavailableDateAddDto -> TrainGroupParticipantUnavailableDate
+  TrainGroupParticipantId: TrainGroupParticipantId
+  UnavailableDate: UnavailableDate
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Id: not set
+  TrainGroupParticipant: not set
+
+TrainGroupParticipantUnavailableDateDto -> TrainGroupParticipantUnavailableDate
+  Id: Id
+  TrainGroupParticipantId: TrainGroupParticipantId
+  UnavailableDate: UnavailableDate
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  TrainGroupParticipant: not set
+
+TrainGroupUnavailableDate -> TrainGroupUnavailableDateAddDto
+  TrainGroupId: TrainGroupId
+  UnavailableDate: UnavailableDate
+
+TrainGroupUnavailableDate -> TrainGroupUnavailableDateDto
+  Id: Id
+  TrainGroupId: TrainGroupId
+  UnavailableDate: UnavailableDate
+
+TrainGroupUnavailableDateAddDto -> TrainGroupUnavailableDate
+  TrainGroupId: TrainGroupId
+  UnavailableDate: UnavailableDate
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Id: not set
+  TrainGroup: not set
+
+TrainGroupUnavailableDateDto -> TrainGroupUnavailableDate
+  Id: Id
+  TrainGroupId: TrainGroupId
+  UnavailableDate: UnavailableDate
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  TrainGroup: not set
+
+TrainGroupΑttendance -> TrainGroupΑttendanceAddDto
+  AttendanceDate: AttendanceDate
+  TrainGroupDescription: TrainGroupDescription
+  TrainGroupDuration: TrainGroupDuration
+  TrainGroupId: TrainGroupId
+  TrainGroupStartOn: TrainGroupStartOn
+  TrainGroupTitle: TrainGroupTitle
+  TrainerFullName: TrainerFullName
+  UserId: UserId
+
+TrainGroupΑttendance -> TrainGroupΑttendanceDto
+  AttendanceDate: AttendanceDate
+  CreatedOn: CreatedOn
+  Id: Id
+  TrainGroup: TrainGroup
+  TrainGroupDescription: TrainGroupDescription
+  TrainGroupDuration: TrainGroupDuration
+  TrainGroupId: TrainGroupId
+  TrainGroupStartOn: TrainGroupStartOn
+  TrainGroupTitle: TrainGroupTitle
+  TrainerFullName: TrainerFullName
+  TrainerId: TrainerId
+  User: User
+  UserId: UserId
+
+TrainGroupΑttendanceAddDto -> TrainGroupΑttendance
+  AttendanceDate: AttendanceDate
+  TrainGroupDescription: TrainGroupDescription
+  TrainGroupDuration: TrainGroupDuration
+  TrainGroupId: TrainGroupId
+  TrainGroupStartOn: TrainGroupStartOn
+  TrainGroupTitle: TrainGroupTitle
+  TrainerFullName: TrainerFullName
+  UserId: UserId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Id: not set
+  TrainGroup: not set
+  TrainerId: not set
+  User: not set
+
+TrainGroupΑttendanceDto -> TrainGroupΑttendance
+  AttendanceDate: AttendanceDate
+  CreatedOn: CreatedOn
+  Id: Id
+  TrainGroup: TrainGroup
+  TrainGroupDescription: TrainGroupDescription
+  TrainGroupDuration: TrainGroupDuration
+  TrainGroupId: TrainGroupId
+  TrainGroupStartOn: TrainGroupStartOn
+  TrainGroupTitle: TrainGroupTitle
+  TrainerFullName: TrainerFullName
+  TrainerId: TrainerId
+  User: User
+  UserId: UserId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+
+User -> UserDto
+  Address: Address
+  Email: Email
+  FirstName: FirstName
+  Id: Id
+  LastName: LastName
+  MedicalHistory: MedicalHistory
+  ProfileImage: ProfileImage
+  UserName: UserName
+  UserRoles: UserRoles
+  UserStatus: UserStatus
+  UserStatusId: UserStatusId
+  SubscriptionBalance: not set
+
+User -> WorkoutPlanOwnerDto
+  FirstName: FirstName
+  Id: Id
+  LastName: LastName
+  ProfileImage: ProfileImage
+  UserName: UserName
+  UserStatus: UserStatus
+  UserStatusId: UserStatusId
+
+UserDto -> User
+  Address: Address
+  Email: Email
+  FirstName: FirstName
+  Id: Id
+  LastName: LastName
+  MedicalHistory: MedicalHistory
+  ProfileImage: ProfileImage
+  UserName: UserName
+  UserRoles: UserRoles
+  UserStatus: UserStatus
+  UserStatusId: UserStatusId
+  AccessFailedCount: not set
+  ConcurrencyStamp: not set
+  CreatedOn: not set
+  EmailConfirmed: not set
+  LockoutEnabled: not set
+  LockoutEnd: not set
+  Mails: not set
+  NormalizedEmail: not set
+  NormalizedUserName: not set
+  PasswordHash: not set
+  PhoneNumber: not set
+  PhoneNumberConfirmed: not set
+  PhoneNumbers: not set
+  SecurityStamp: not set
+  Subscriptions: not set
+  TrainGroupParticipants: not set
+  TrainGroups: not set
+  TrainGroupΑttendances: not set
+  TwoFactorEnabled: not set
+  WorkoutPlans: not set
+
+UserRole -> UserRoleDto
+  Role: Role
+
+UserRoleDto -> UserRole
+  Role: Role
+  RoleId: Role.Id
+  User: not set
+  UserId: not set
+
+UserStatus -> UserStatusAddDto
+  Color: Color
+  Name: Name
+  Users: ignored
+
+UserStatus -> UserStatusDto
+  Color: Color
+  Id: Id
+  Name: Name
+  Users: ignored
+
+UserStatusAddDto -> UserStatus
+  Color: Color
+  Name: Name
+  Users: ignored
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Id: not set
+
+UserStatusDto -> UserStatus
+  Color: Color
+  Id: Id
+  Name: Name
+  Users: ignored
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+
+WorkoutPlan -> WorkoutPlanAddDto
+  CurrentWeek: CurrentWeek
+  Description: Description
+  Exercises: Exercises
+  IsCircular: IsCircular
+  Title: Title
+  UserId: UserId
+  WorkoutPlanRuleId: WorkoutPlanRuleId
+
+WorkoutPlan -> WorkoutPlanDto
+  CreatedOn: CreatedOn
+  CurrentWeek: CurrentWeek
+  CurrentWeekMessage: ignored
+  Description: Description
+  ElapsedSeconds: ignored
+  Exercises: Exercises
+  HasIncompleteRecording: ignored
+  Id: Id
+  IsCircular: IsCircular
+  IsInactive: IsInactive
+  IsRunning: ignored
+  LastRecordingDurationSeconds: ignored
+  LastRecordingOn: ignored
+  RecordingCount: ignored
+  Title: Title
+  User: User
+  UserId: UserId
+  WeekCount: IIF((x.WorkoutPlanRule != null), x.WorkoutPlanRule.Weeks.Count, 0)
+  WorkoutPlanRuleId: WorkoutPlanRuleId
+  WorkoutPlanRuleName: IIF((x.WorkoutPlanRule != null), x.WorkoutPlanRule.Name, String.Empty)
+
+WorkoutPlanAddDto -> WorkoutPlan
+  CurrentWeek: CurrentWeek
+  Description: Description
+  Exercises: Exercises
+  IsCircular: IsCircular
+  Title: Title
+  UserId: UserId
+  WorkoutPlanRuleId: WorkoutPlanRuleId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Id: not set
+  IsInactive: not set
+  Recordings: not set
+  User: not set
+  WorkoutPlanRule: not set
+
+WorkoutPlanDto -> WorkoutPlan
+  CreatedOn: CreatedOn
+  CurrentWeek: CurrentWeek
+  Description: Description
+  Exercises: Exercises
+  Id: Id
+  IsCircular: IsCircular
+  IsInactive: IsInactive
+  Recordings: ignored
+  Title: Title
+  User: ignored
+  UserId: UserId
+  WorkoutPlanRule: ignored
+  WorkoutPlanRuleId: WorkoutPlanRuleId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+
+WorkoutPlanRecording -> WorkoutPlanRecordingDto
+  CompletedOn: CompletedOn
+  CreatedOn: CreatedOn
+  DurationSeconds: DurationSeconds
+  ElapsedSeconds: ignored
+  Id: Id
+  IsIncomplete: ignored
+  IsRunning: ignored
+  StartedOn: StartedOn
+  User: User
+  UserId: UserId
+  WeekNumber: WeekNumber
+  WorkoutPlanId: WorkoutPlanId
+  WorkoutPlanTitle: WorkoutPlanTitle
+
+WorkoutPlanRecordingDto -> WorkoutPlanRecording
+  CompletedOn: CompletedOn
+  CreatedOn: CreatedOn
+  DurationSeconds: DurationSeconds
+  Id: Id
+  StartedOn: StartedOn
+  User: ignored
+  UserId: UserId
+  WeekNumber: WeekNumber
+  WorkoutPlan: ignored
+  WorkoutPlanId: WorkoutPlanId
+  WorkoutPlanTitle: WorkoutPlanTitle
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+
+WorkoutPlanRule -> WorkoutPlanRuleAddDto
+  AwayGapDays: AwayGapDays
+  Name: Name
+  Weeks: Weeks
+
+WorkoutPlanRule -> WorkoutPlanRuleDto
+  AwayGapDays: AwayGapDays
+  CreatedOn: CreatedOn
+  Id: Id
+  IsLocked: ignored
+  Name: Name
+  WeekCount: x.Weeks.Count
+  Weeks: Weeks
+  WorkoutPlanCount: x.WorkoutPlans.Count
+
+WorkoutPlanRuleAddDto -> WorkoutPlanRule
+  AwayGapDays: AwayGapDays
+  Name: Name
+  Weeks: Weeks
+  WorkoutPlans: ignored
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Id: not set
+
+WorkoutPlanRuleDto -> WorkoutPlanRule
+  AwayGapDays: AwayGapDays
+  CreatedOn: CreatedOn
+  Id: Id
+  Name: Name
+  Weeks: Weeks
+  WorkoutPlans: ignored
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+
+WorkoutPlanRuleWeek -> WorkoutPlanRuleWeekAddDto
+  MaxRecordings: MaxRecordings
+  Message: Message
+  WeekNumber: WeekNumber
+
+WorkoutPlanRuleWeek -> WorkoutPlanRuleWeekDto
+  Id: Id
+  MaxRecordings: MaxRecordings
+  Message: Message
+  WeekNumber: WeekNumber
+  WorkoutPlanRuleId: WorkoutPlanRuleId
+
+WorkoutPlanRuleWeekAddDto -> WorkoutPlanRuleWeek
+  MaxRecordings: MaxRecordings
+  Message: Message
+  WeekNumber: WeekNumber
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  Id: not set
+  WorkoutPlanRule: not set
+  WorkoutPlanRuleId: not set
+
+WorkoutPlanRuleWeekDto -> WorkoutPlanRuleWeek
+  Id: Id
+  MaxRecordings: MaxRecordings
+  Message: Message
+  WeekNumber: WeekNumber
+  WorkoutPlanRuleId: WorkoutPlanRuleId
+  CreatedBy_FullName: not set
+  CreatedBy_Id: not set
+  CreatedOn: not set
+  WorkoutPlanRule: not set

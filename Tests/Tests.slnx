@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="coverage.ps1" />
+    <File Path="Directory.Build.props" />
+    <File Path="dotnet-tools.json" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/App/">
+    <Project Path="../API/API.csproj" />
+    <Project Path="../Business/Business.csproj" />
+    <Project Path="../Core/Core.csproj" />
+    <Project Path="../DataAccess/DataAccess.csproj" />
+  </Folder>
+  <Project Path="API.Tests/API.Tests.csproj" />
+  <Project Path="Architecture.Tests/Architecture.Tests.csproj" />
+  <Project Path="Business.Tests/Business.Tests.csproj" />
+  <Project Path="Core.Tests/Core.Tests.csproj" />
+  <Project Path="DataAccess.Tests/DataAccess.Tests.csproj" />
+</Solution>

@@ -13,21 +13,21 @@ namespace Business.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
-        private readonly IDataService _dataService;
+        private readonly IRefreshTokenService _refreshTokenService;
         private readonly TokenSettings _tokenSettings;
         private readonly SignInManager<User> _signInManager;
 
         public UserService(
             UserManager<User> userManager,
             RoleManager<Role> roleManager,
-            IDataService dataService,
+            IRefreshTokenService refreshTokenService,
             TokenSettings tokenSettings,
             SignInManager<User> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
-            _dataService = dataService;
+            _refreshTokenService = refreshTokenService;
             _tokenSettings = tokenSettings;
         }
 
@@ -48,6 +48,7 @@ namespace Business.Services
             if (!result.Succeeded)
                 return "Logout unsuccessful!";
 
+            await _refreshTokenService.EndAllAsync(user);
             return null;
         }
 
@@ -75,6 +76,15 @@ namespace Business.Services
 
         public async Task<UserLoginResponseDto> GenerateUserToken(User user)
         {
+            return new UserLoginResponseDto
+            {
+                AccessToken = await GenerateAccessTokenAsync(user),
+                RefreshToken = await _refreshTokenService.StartAsync(user)
+            };
+        }
+
+        private async Task<string> GenerateAccessTokenAsync(User user)
+        {
             // Get user claims 
             List<Claim> claims = (await _userManager.GetClaimsAsync(user)).ToList();
 
@@ -101,12 +111,7 @@ namespace Business.Services
 
             //claims.AddRange(roleClaims);
 
-            string token = GetToken(_tokenSettings, user, claims, userRoles);
-            await _userManager.RemoveAuthenticationTokenAsync(user, "REFRESHTOKENPROVIDER", "RefreshToken");
-            string refreshToken = await _userManager.GenerateUserTokenAsync(user, "REFRESHTOKENPROVIDER", "RefreshToken");
-            await _userManager.SetAuthenticationTokenAsync(user, "REFRESHTOKENPROVIDER", "RefreshToken", refreshToken);
-
-            return new UserLoginResponseDto { AccessToken = token, RefreshToken = refreshToken };
+            return GetToken(_tokenSettings, user, claims, userRoles);
         }
 
         public async Task<ApiResponse<UserRefreshResponseDto>> RefreshToken(UserRefreshRequestDto request)
@@ -125,12 +130,12 @@ namespace Business.Services
                 }
                 else
                 {
-                    if (!await _userManager.VerifyUserTokenAsync(user, "REFRESHTOKENPROVIDER", "RefreshToken", request.RefreshToken))
+                    string? refreshToken = await _refreshTokenService.RenewAsync(user, request.RefreshToken);
+                    if (refreshToken == null)
                         return new ApiResponse<UserRefreshResponseDto>().SetErrorResponse("Please Login again.");
 
-                    var token = await GenerateUserToken(user);
                     return new ApiResponse<UserRefreshResponseDto>()
-                        .SetSuccessResponse(new UserRefreshResponseDto() { AccessToken = token.AccessToken, RefreshToken = token.RefreshToken });
+                        .SetSuccessResponse(new UserRefreshResponseDto() { AccessToken = await GenerateAccessTokenAsync(user), RefreshToken = refreshToken });
                 }
             }
         }

@@ -50,9 +50,15 @@ namespace DataAccess
                 await TrySeedTrainerRolesAndClaimsAsync(roleManager);
                 await TrySeedSimpleUserRolesAndClaimsAsync(roleManager);
 
-                await TrySeedAdminUserAsync(userManager, roleManager);
-                await TrySeedTrainerUserAsync(userManager, roleManager);
-                await TrySeedSimpleUserUserAsync(userManager, roleManager);
+                // Only where there is nobody yet, so that somebody can sign in. Their password
+                // stands below for everybody to read: one of them that was deleted or renamed
+                // must not be back at the next start.
+                if (!await userManager.Users.AnyAsync())
+                {
+                    await TrySeedAdminUserAsync(userManager, roleManager);
+                    await TrySeedTrainerUserAsync(userManager, roleManager);
+                    await TrySeedSimpleUserUserAsync(userManager, roleManager);
+                }
 
 
                 // Claims added by THIS publish, and nothing else.
@@ -158,6 +164,7 @@ namespace DataAccess
                    new Claim("Permission", "SubscriptionsAdmin_Add"),
                    new Claim("Permission", "SubscriptionsAdmin_Edit"),
                    new Claim("Permission", "SubscriptionsAdmin_Delete"),
+
                    new Claim("Permission", "Subscriptions_View"),
                    new Claim("Permission", "Subscriptions_Add"),
                    new Claim("Permission", "Subscriptions_Delete"),
@@ -166,6 +173,7 @@ namespace DataAccess
                     new Claim("Permission", "TrainGroupCategories_Add"),
                     new Claim("Permission", "TrainGroupCategories_Edit"),
                     new Claim("Permission", "TrainGroupCategories_Delete"),
+
                     new Claim("Permission", "Questionnaires_View"),
                     new Claim("Permission", "Questionnaires_Add"),
                     new Claim("Permission", "Questionnaires_Edit"),
@@ -228,7 +236,9 @@ namespace DataAccess
                 {
                     new Claim("Permission", "WorkoutPlans_View"),
                     new Claim("Permission", "WorkoutPlans_Edit"),
+
                     new Claim("Permission", "TrainGroupParticipants_Delete"),
+
                     new Claim("Permission", "WorkoutPlanRecordings_View"),
                     new Claim("Permission", "WorkoutPlanRecordings_Add"),
 

@@ -1,0 +1,21 @@
+
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        h2 { color: #2c3e50; }
+                        .section { margin-bottom: 20px; }
+                        ul { list-style-type: none; padding: 0; }
+                        li { padding: 5px 0; }
+                        .added { color: #27ae60; }
+                        .removed { color: #c0392b; }
+                        .no-changes { font-style: italic; color: #7f8c8d; }
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <h2>[Booking_Information]</h2><div class='section'><h3>[Added_Bookings]</h3><ul><li class='added'>Monday</li><li class='added'>2031-03-05</li></ul></div><div class='section'><h3>[Removed_Bookings]</h3><ul><li class='removed'>2031-12-24</li></ul></div><div class='section'><div class='calendar-note'><h3>[Calendar_Integration]</h3><p>[Attached_are_ics_files_for_the_changes_above_Open_the_attachments_in_Gmail_or_download_them_to_add_remove_events_from_your_Google_Calendar]</p><p><strong>[Add_to_Calendar]:</strong> [Click_the_attached_add_ics_files_and_select_Add_to_Calendar]</p><p><strong>[Remove_from_Calendar]:</strong> [Click_the_attached_cancel_ics_files_to_remove_the_events]</p></div></div>
+            </div>
+        </body>
+        </html>

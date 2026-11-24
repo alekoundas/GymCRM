@@ -45,6 +45,8 @@ namespace API.Controllers
         [HttpPost]
         public override async Task<ActionResult<ApiResponse<List<Role>>>> Post([FromBody] List<RoleDto> roleDto)
         {
+            if (!IsUserAuthorized("Add"))
+                return new ApiResponse<List<Role>>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
 
             foreach (var role in roleDto)
             {
@@ -86,6 +88,11 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public override async Task<ActionResult<ApiResponse<Role>>> Put(string? id, [FromBody] RoleDto identityRoleDto)
         {
+            // A role's permissions are everybody's who holds it. Without this a member could
+            // give their own role every one of them.
+            if (!IsUserAuthorized("Edit"))
+                return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
             // Checks.
             if (id == null)
                 return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys._0_is_required, "RoleId"]);
@@ -133,6 +140,9 @@ namespace API.Controllers
         [HttpDelete("{id}")]
         public override async Task<ActionResult<ApiResponse<Role>>> Delete(string? id)
         {
+            if (!IsUserAuthorized("Delete"))
+                return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys.User_is_not_authorized_to_perform_this_action]);
+
             if (id == null)
                 return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys._0_is_required, "RoleId"]);
 

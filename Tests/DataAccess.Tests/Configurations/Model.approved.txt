@@ -1,0 +1,404 @@
+AspNetRoleClaims
+  ClaimType: TEXT, may be empty
+  ClaimValue: TEXT, may be empty
+  Id: INTEGER, made OnAdd
+  RoleId: TEXT
+  key (Id)
+  index (RoleId)
+  RoleId -> AspNetRoles, Cascade, required
+
+AspNetRoles
+  ConcurrencyStamp: TEXT, may be empty, checked when saved
+  CreatedOn: TEXT
+  Id: TEXT, made OnAdd
+  Name: TEXT, may be empty, at most 256
+  NormalizedName: TEXT, may be empty, at most 256
+  key (Id)
+  unique (NormalizedName)
+
+AspNetUserClaims
+  ClaimType: TEXT, may be empty
+  ClaimValue: TEXT, may be empty
+  Id: INTEGER, made OnAdd
+  UserId: TEXT
+  key (Id)
+  index (UserId)
+  UserId -> AspNetUsers, Cascade, required
+
+AspNetUserLogins
+  LoginProvider: TEXT
+  ProviderDisplayName: TEXT, may be empty
+  ProviderKey: TEXT
+  UserId: TEXT
+  key (LoginProvider, ProviderKey)
+  index (UserId)
+  UserId -> AspNetUsers, Cascade, required
+
+AspNetUserRoles
+  RoleId: TEXT
+  UserId: TEXT
+  key (UserId, RoleId)
+  index (RoleId)
+  RoleId -> AspNetRoles, Cascade, required
+  UserId -> AspNetUsers, Cascade, required
+
+AspNetUserTokens
+  LoginProvider: TEXT
+  Name: TEXT
+  UserId: TEXT
+  Value: TEXT, may be empty
+  key (UserId, LoginProvider, Name)
+  UserId -> AspNetUsers, Cascade, required
+
+AspNetUsers
+  AccessFailedCount: INTEGER
+  Address: TEXT, at most 300
+  ConcurrencyStamp: TEXT, may be empty, checked when saved
+  CreatedOn: TEXT
+  Email: TEXT, at most 256
+  EmailConfirmed: INTEGER
+  FirstName: TEXT, at most 100
+  Id: TEXT, made OnAdd
+  LastName: TEXT, at most 100
+  LockoutEnabled: INTEGER
+  LockoutEnd: TEXT, may be empty
+  MedicalHistory: TEXT
+  NormalizedEmail: TEXT, may be empty, at most 256
+  NormalizedUserName: TEXT, may be empty, at most 256
+  PasswordHash: TEXT, may be empty
+  PhoneNumber: TEXT, may be empty
+  PhoneNumberConfirmed: INTEGER
+  ProfileImage: BLOB, may be empty
+  SecurityStamp: TEXT, may be empty
+  TwoFactorEnabled: INTEGER
+  UserName: TEXT, at most 256
+  UserStatusId: INTEGER, may be empty
+  key (Id)
+  unique (Email)
+  unique (Id)
+  index (NormalizedEmail)
+  unique (NormalizedUserName)
+  index (UserStatusId)
+  UserStatusId -> UserStatuses, Restrict
+
+DataProtectionKeys
+  FriendlyName: TEXT, may be empty
+  Id: INTEGER, made OnAdd
+  Xml: TEXT, may be empty
+  key (Id)
+
+ExerciseHistories
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Description: TEXT, may be empty, at most 500
+  ExerciseId: INTEGER
+  GroupExerciseOrderNumber: INTEGER
+  GroupNumber: INTEGER
+  Id: INTEGER, made OnAdd
+  Name: TEXT, at most 500
+  Reps: TEXT, at most 500
+  Sets: TEXT, at most 500
+  Weight: TEXT, at most 500
+  key (Id)
+  index (ExerciseId)
+  unique (Id)
+  ExerciseId -> Exercises, Cascade, required
+
+Exercises
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Description: TEXT, may be empty, at most 500
+  GroupExerciseOrderNumber: INTEGER
+  GroupNumber: INTEGER
+  Id: INTEGER, made OnAdd
+  Name: TEXT, at most 500
+  Reps: TEXT, at most 500
+  Sets: TEXT, at most 500
+  VideoUrl: TEXT
+  Weight: TEXT, at most 500
+  WorkoutPlanId: INTEGER
+  key (Id)
+  unique (Id)
+  index (WorkoutPlanId)
+  WorkoutPlanId -> WorkoutPlans, Cascade, required
+
+GoogleRefreshTokens
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  ExpiresIn: INTEGER
+  Id: INTEGER, made OnAdd
+  RefreshToken: TEXT
+  key (Id)
+  unique (Id)
+
+Mails
+  Attachments: TEXT
+  Body: TEXT
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Error: TEXT
+  Id: INTEGER, made OnAdd
+  SentOn: TEXT, may be empty
+  Status: INTEGER
+  Subject: TEXT
+  UserId: TEXT
+  key (Id)
+  unique (Id)
+  index (UserId)
+  UserId -> AspNetUsers, Cascade, required
+
+PhoneNumbers
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Id: INTEGER, made OnAdd
+  IsPrimary: INTEGER
+  Number: TEXT, at most 20
+  UserId: TEXT
+  key (Id)
+  unique (Id)
+  index (UserId)
+  UserId -> AspNetUsers, Cascade, required
+
+QuestionnaireAnswers
+  Answer: TEXT, at most 2000
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Id: INTEGER, made OnAdd
+  QuestionnaireQuestionId: INTEGER
+  UpdatedOn: TEXT
+  UserId: TEXT
+  key (Id)
+  unique (Id)
+  unique (QuestionnaireQuestionId, UserId)
+  index (UserId)
+  QuestionnaireQuestionId -> QuestionnaireQuestions, Cascade, required
+  UserId -> AspNetUsers, Cascade, required
+
+QuestionnaireQuestions
+  AnswerPlaceholder: TEXT, at most 300
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Details: TEXT
+  Id: INTEGER, made OnAdd
+  Image: TEXT
+  OrderNumber: INTEGER
+  QuestionnaireId: INTEGER
+  Title: TEXT, at most 300
+  key (Id)
+  unique (Id)
+  index (QuestionnaireId)
+  QuestionnaireId -> Questionnaires, Cascade, required
+
+Questionnaires
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Id: INTEGER, made OnAdd
+  Name: TEXT, at most 200
+  key (Id)
+  unique (Id)
+
+Subscriptions
+  AdminComment: TEXT, may be empty, at most 1000
+  Amount: INTEGER
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  DecidedOn: TEXT, may be empty
+  Id: INTEGER, made OnAdd
+  MemberComment: TEXT, may be empty, at most 1000
+  RequestedAmount: INTEGER, may be empty
+  Status: INTEGER
+  UserId: TEXT
+  key (Id)
+  index (UserId, Status)
+  UserId -> AspNetUsers, Cascade, required
+
+TrainGroupCategories
+  Color: TEXT, at most 7
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Id: INTEGER, made OnAdd
+  Name: TEXT, at most 100
+  key (Id)
+  unique (Id)
+
+TrainGroupDates
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  FixedDay: TEXT, may be empty
+  Id: INTEGER, made OnAdd
+  RecurrenceDayOfMonth: INTEGER, may be empty
+  RecurrenceDayOfWeek: INTEGER, may be empty
+  TrainGroupDateType: TEXT
+  TrainGroupId: INTEGER
+  key (Id)
+  unique (Id)
+  index (TrainGroupId)
+  TrainGroupId -> TrainGroups, Cascade, required
+
+TrainGroupParticipantUnavailableDates
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Id: INTEGER, made OnAdd
+  TrainGroupParticipantId: INTEGER
+  UnavailableDate: TEXT
+  key (Id)
+  unique (Id)
+  index (TrainGroupParticipantId)
+  TrainGroupParticipantId -> TrainGroupParticipants, Cascade, required
+
+TrainGroupParticipants
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Id: INTEGER, made OnAdd
+  RecurringEndOnDate: TEXT, may be empty
+  RecurringStartOnDate: TEXT, may be empty
+  RemovedBy_FullName: TEXT
+  RemovedBy_Id: TEXT
+  RemovedOn: TEXT, may be empty
+  SelectedDate: TEXT, may be empty
+  TrainGroupDateId: INTEGER
+  TrainGroupId: INTEGER
+  UserId: TEXT
+  key (Id)
+  unique (Id)
+  index (TrainGroupDateId)
+  index (TrainGroupId)
+  index (UserId)
+  TrainGroupDateId -> TrainGroupDates, Cascade, required
+  TrainGroupId -> TrainGroups, Cascade, required
+  UserId -> AspNetUsers, Cascade, required
+
+TrainGroupUnavailableDates
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Id: INTEGER, made OnAdd
+  TrainGroupId: INTEGER
+  UnavailableDate: TEXT
+  key (Id)
+  unique (Id)
+  index (TrainGroupId)
+  TrainGroupId -> TrainGroups, Cascade, required
+
+TrainGroups
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Description: TEXT, may be empty, at most 2000
+  Duration: TEXT
+  Id: INTEGER, made OnAdd
+  MaxParticipants: INTEGER
+  StartOn: TEXT
+  Title: TEXT, at most 500
+  TrainGroupCategoryId: INTEGER, may be empty
+  TrainerId: TEXT
+  key (Id)
+  unique (Id)
+  index (TrainGroupCategoryId)
+  index (TrainerId)
+  TrainGroupCategoryId -> TrainGroupCategories, SetNull
+  TrainerId -> AspNetUsers, Restrict, required
+
+TrainGroupΑttendances
+  AttendanceDate: TEXT
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Id: INTEGER, made OnAdd
+  TrainGroupDescription: TEXT, at most 500
+  TrainGroupDuration: TEXT
+  TrainGroupId: INTEGER, may be empty
+  TrainGroupStartOn: TEXT
+  TrainGroupTitle: TEXT, at most 100
+  TrainerFullName: TEXT, at most 200
+  TrainerId: TEXT, may be empty
+  UserId: TEXT
+  key (Id)
+  unique (Id)
+  index (TrainGroupId)
+  index (UserId)
+  TrainGroupId -> TrainGroups, SetNull
+  UserId -> AspNetUsers, Cascade, required
+
+UserStatuses
+  Color: TEXT
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Id: INTEGER, made OnAdd
+  Name: TEXT
+  key (Id)
+  unique (Id)
+
+WorkoutPlanRecordings
+  CompletedOn: TEXT, may be empty
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  DurationSeconds: INTEGER, may be empty
+  Id: INTEGER, made OnAdd
+  StartedOn: TEXT
+  UserId: TEXT
+  WeekNumber: INTEGER
+  WorkoutPlanId: INTEGER, may be empty
+  WorkoutPlanTitle: TEXT, may be empty, at most 500
+  key (Id)
+  index (UserId)
+  index (WorkoutPlanId, StartedOn)
+  UserId -> AspNetUsers, Cascade, required
+  WorkoutPlanId -> WorkoutPlans, SetNull
+
+WorkoutPlanRuleWeeks
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Id: INTEGER, made OnAdd
+  MaxRecordings: INTEGER
+  Message: TEXT, may be empty, at most 1000
+  WeekNumber: INTEGER
+  WorkoutPlanRuleId: INTEGER
+  key (Id)
+  unique (WorkoutPlanRuleId, WeekNumber)
+  WorkoutPlanRuleId -> WorkoutPlanRules, Cascade, required
+
+WorkoutPlanRules
+  AwayGapDays: INTEGER, may be empty
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  Id: INTEGER, made OnAdd
+  Name: TEXT, at most 200
+  key (Id)
+  unique (Name)
+
+WorkoutPlans
+  CreatedBy_FullName: TEXT
+  CreatedBy_Id: TEXT
+  CreatedOn: TEXT
+  CurrentWeek: INTEGER, may be empty
+  Description: TEXT, may be empty, at most 500
+  Id: INTEGER, made OnAdd
+  IsCircular: INTEGER
+  IsInactive: INTEGER
+  Title: TEXT, at most 500
+  UserId: TEXT
+  WorkoutPlanRuleId: INTEGER, may be empty
+  key (Id)
+  unique (Id)
+  index (UserId)
+  index (WorkoutPlanRuleId)
+  UserId -> AspNetUsers, Cascade, required
+  WorkoutPlanRuleId -> WorkoutPlanRules, SetNull
