@@ -41,14 +41,15 @@ namespace API.Tests.Controllers.TrainGroupParticipants
             DateTime? now = null,
             int? groupId = null)
         {
+            AtTheGym(now ?? Now);
+
             return PostAsync<List<DateTime>>(caller, "api/TrainGroupParticipants/Book", new
             {
                 trainGroupId = groupId ?? _group.Id,
                 selectedDate = day ?? Day,
                 isOneOff,
                 recurringTrainGroupDateIds = (recurring ?? []).Select(x => x.Id),
-                userId,
-                clientTimezoneOffsetMinutes = OffsetFor(now ?? Now)
+                userId
             });
         }
 
@@ -200,9 +201,9 @@ namespace API.Tests.Controllers.TrainGroupParticipants
             (await EveryAsync(_wednesday, Day.AddDays(days))).ShouldBeBad(English.Of(TranslationKeys.Participant_selected_date_doesnt_match_any_of_the_train_group_dates));
         }
 
-        // The clock is the member's, to the minute: two before, and the moment itself.
+        // To the minute: the last before, and the moment itself. Whose clock it is, is in GymClockTests.
         [Theory]
-        [InlineData(-2, true)]
+        [InlineData(-1, true)]
         [InlineData(0, false)]
         [InlineData(1, false)]
         [InlineData(60 * 24, false)]

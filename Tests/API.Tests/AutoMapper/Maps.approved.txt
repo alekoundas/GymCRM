@@ -397,7 +397,6 @@ TrainGroupParticipantDto -> TrainGroupParticipant
 TrainGroupParticipantUnavailableDate -> TrainGroupParticipantUnavailableDateAddDto
   TrainGroupParticipantId: TrainGroupParticipantId
   UnavailableDate: UnavailableDate
-  ClientTimezoneOffsetMinutes: not set
   IsAdminPage: not set
 
 TrainGroupParticipantUnavailableDate -> TrainGroupParticipantUnavailableDateDto

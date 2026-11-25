@@ -2,9 +2,9 @@
 
 The libraries and versions of StepinFlow's backend tests, on .NET 8 like the app. They pin what the
 code does today: a test that reads oddly may be pinning a bug, and its comment says so. The app was
-changed for one thing they found, the security holes below.
+changed for some of what they found: the security holes and the bugs under "and fixed" below.
 
-3,897 tests, half a minute. Run from this folder, or from Visual Studio's Test Explorer (`GymCRM.sln`,
+3,992 tests, half a minute. Run from this folder, or from Visual Studio's Test Explorer (`GymCRM.sln`,
 folder Tests):
 
 ```powershell
@@ -21,7 +21,8 @@ Coverage, with a page to read it on (`coveragereport/index.html`):
 
 - **`Shared/Process`**: every test process runs in UTC (as the server does), in English and with no network.
 - **`Shared/Database`**: a real SQLite database in memory per test, built by the real migrations. Never `API/sqlite.db`.
-- **`API.Tests/Host`**: starts the real `Program.cs` on a free local port. Mails are kept, Google is a stub.
+- **`API.Tests/Host`**: starts the real `Program.cs` on a free local port. Mails are kept, Google is a stub, and a
+  test may say what time it is at the gym.
 - **`*.approved.txt`**: text a person approved. When it changes the test writes `.received.txt` beside it; if the
   change is meant, replace the approved file with it.
 
@@ -39,10 +40,10 @@ every mapping (`AutoMapper/Maps`) and every column (`DataAccess.Tests/Configurat
 
 ## Not covered
 
-6,036 of 6,038 lines and 2,123 of 2,154 branches. The two lines:
+6,120 of 6,122 lines and 2,156 of 2,188 branches. The two lines:
 
 - `Translator.cs:96` needs a file in `\src\Core\Translations` at the root of the drive.
-- `UsersController.cs:329` cannot be reached: line 288 throws on the same filter first.
+- `UsersController.cs:328` cannot be reached: line 286 throws on the same filter first.
 
 The branches are the other halves of checks for something that cannot be missing there.
 
@@ -52,7 +53,8 @@ The code was broken on purpose 1,865 times in a copy, one small change at a time
 number one off, a line or an attribute taken away. 1,711 of them failed a test. The other 154 were read one by
 one: some twenty were gaps and have a test now, the rest change nothing anybody could see (a default that is set
 twice, a field nobody reads). The lines the security fixes changed were broken 175 times more: four gaps, which have
-a test now, and one that changes nothing.
+a test now, and one that changes nothing. Those of the fixes after them 120 times: one gap, which has a test now, a
+step that was not needed and is gone, and two that change nothing.
 
 ## Security: found on the way, and closed
 
@@ -71,6 +73,7 @@ a test now, and one that changes nothing.
 | A deleted `Admin` came back with the password in the source | The three accounts are made where there is nobody at all |
 | The Gmail client secret and refresh token were in the log and on the console | Neither is written out |
 | The Google callback needed no sign-in and its state was fixed | It takes `Roles_Edit`, and its state is signed, for one person and ten minutes |
+| The 12-hour rule went by the clock the browser sent | It goes by the gym's own (`BookingRules.GymNow`), and so does coming back to a skipped session |
 | MailKit 4.13.0 and MimeKit 4.13.0, one advisory each | 4.16.0 |
 
 Left as it is:
@@ -80,14 +83,21 @@ Left as it is:
 - Of the packages that come with others, `dotnet list package --vulnerable --include-transitive` names SQLite's own
   library, WebUtilities, and System.Security.Cryptography `Xml` and `Pkcs`.
 
+## Bugs: found on the way, and fixed
+
+| It was | It is |
+| --- | --- |
+| Saving a role waited for nothing: a database that was busy took the whole server down | Each permission is waited for, and one that cannot be saved is said so |
+| No role could be deleted, it answered 500 | One that nobody has is deleted, one that somebody has is not |
+| A change to a member that was refused had already changed their role | The role is given last |
+| Stopping a booking from a later date took its every session out of the member's own calendar (Google, phone) | The calendar file ends the series at the last session that is kept |
+| A calendar entry had one name in Greek and another in English, so a file in the other language did not find it | One name in every language, the Greek one |
+
 ## Bugs: found on the way, pinned as they are
 
 - In Danish and in Finnish every date is sent as `18.30.15` and no page can read it.
-- A role can be neither read by its id nor deleted: both answer 500.
+- A role cannot be read by its id: it answers 500. No page does.
 - A weekday of a group that also names a day of the month makes the booking page answer 500, for everybody, on that date.
-- A calendar entry's id is written with the number format of the request's language, so a booking made in
-  Greek and cancelled in English stays in the member's calendar.
-- An admin's change to a member that is refused (a name that is taken) has already changed their role.
 - Assigning a role that does not exist takes the old one away first.
 - An edit through the generic controller writes the row the body names, not the one in the address, and
   empties what the form leaves out: who created it and when, and of an attendance which session it was.

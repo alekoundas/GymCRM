@@ -20,7 +20,5 @@ namespace Core.Models
 
         // Only staff may name somebody else. Left empty, the booking is the caller's.
         public string? UserId { get; set; }
-
-        public int ClientTimezoneOffsetMinutes { get; set; } = 0;
     }
 }

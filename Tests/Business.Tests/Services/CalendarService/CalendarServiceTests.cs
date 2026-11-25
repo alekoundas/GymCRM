@@ -1,3 +1,4 @@
+using System.Globalization;
 using Business.Services.CalendarService;
 using Core.Enums;
 using Core.Models;
@@ -7,7 +8,7 @@ namespace Business.Tests.Services.CalendarServices
 {
     /// <summary>
     /// The calendar files a booking mail carries: what a member's calendar shows, and that the file
-    /// of a cancelled booking names the same entry the file of the booking made.
+    /// of a booking that is stopped or cancelled names the same entry the file of the booking made.
     /// </summary>
     public sealed class CalendarServiceTests
     {
@@ -63,6 +64,11 @@ namespace Business.Tests.Services.CalendarServices
             return Service.GenerateCancelIcsContents(bookings.ToList(), "gym@gym.test", "maria@gym.test", UserId);
         }
 
+        internal static List<(string IcsContent, string FileName)> End(params TrainGroupParticipant[] bookings)
+        {
+            return Service.GenerateEndIcsContents(bookings.ToList(), "gym@gym.test", "maria@gym.test", UserId);
+        }
+
         // The lines of a file by their name, the long ones put back together.
         internal static Dictionary<string, string> Read(string icsContent)
         {
@@ -82,6 +88,11 @@ namespace Business.Tests.Services.CalendarServices
             return Read(Cancel(booking).ShouldHaveSingleItem().IcsContent);
         }
 
+        private static Dictionary<string, string> Ended(TrainGroupParticipant booking)
+        {
+            return Read(End(booking).ShouldHaveSingleItem().IcsContent);
+        }
+
 
         // ================================================================
         // The whole file
@@ -99,8 +110,10 @@ namespace Business.Tests.Services.CalendarServices
             file["DTEND"].ShouldBe("20310303T194500");
             file["ORGANIZER"].ShouldBe("MAILTO:gym@gym.test");
             file["ATTENDEE"].ShouldBe("RSVP=TRUE:mailto:maria@gym.test");
-            file["UID"].ShouldBe("tg-3--7.000-11111111222233334444555555555555");
+            file["UID"].ShouldBe("tg-3--7\\,000-11111111222233334444555555555555");
+            file["SEQUENCE"].ShouldBe("0");
             file.Keys.ShouldNotContain("RRULE");
+            file.Keys.ShouldNotContain("EXDATE");
         }
 
         [Fact]
@@ -113,7 +126,7 @@ namespace Business.Tests.Services.CalendarServices
             file["DTSTART"].ShouldBe("20310303T183000");
             file["ORGANIZER"].ShouldBe("MAILTO:gym@gym.test");
             file["ATTENDEE"].ShouldBe("RSVP=TRUE:mailto:maria@gym.test");
-            file["UID"].ShouldBe("tg-3--7.000-11111111222233334444555555555555");
+            file["UID"].ShouldBe("tg-3--7\\,000-11111111222233334444555555555555");
             file.Keys.ShouldNotContain("DTEND");
             file.Keys.ShouldNotContain("RRULE");
         }
@@ -123,7 +136,7 @@ namespace Business.Tests.Services.CalendarServices
         {
             DateTime before = DateTime.UtcNow.AddSeconds(-1);
 
-            foreach (Dictionary<string, string> file in new[] { Added(Booking(Fixed(new DateTime(2031, 3, 5)))), Cancelled(Booking(Fixed(new DateTime(2031, 3, 5)))) })
+            foreach (Dictionary<string, string> file in new[] { Added(Booking(Fixed(new DateTime(2031, 3, 5)))), Cancelled(Booking(Fixed(new DateTime(2031, 3, 5)))), Ended(Stopped(new DateTime(2031, 4, 2))) })
                 foreach (string stamp in new[] { "CREATED", "LAST-MODIFIED" })
                     DateTime.ParseExact(file[stamp], "yyyyMMdd'T'HHmmss'Z'", null).ShouldBeInRange(before, DateTime.UtcNow);
         }
@@ -223,6 +236,211 @@ namespace Business.Tests.Services.CalendarServices
 
 
         // ================================================================
+        // Stopped from a later date
+        // ================================================================
+
+        // Every Wednesday from the 5th of March on, up to a date that is not theirs any more.
+        private static TrainGroupParticipant Stopped(DateTime end, params DateTime[] skipped)
+        {
+            TrainGroupParticipant booking = Booking(Weekly(DayOfWeek.Wednesday), from: new DateTime(2031, 3, 5));
+            booking.RecurringEndOnDate = end;
+
+            foreach (DateTime day in skipped)
+                booking.TrainGroupParticipantUnavailableDates.Add(new TrainGroupParticipantUnavailableDate { UnavailableDate = day });
+
+            return booking;
+        }
+
+        [Fact]
+        public void A_booking_stopped_from_a_later_date_is_written_again_up_to_its_last_session()
+        {
+            TrainGroupParticipant booking = Stopped(new DateTime(2031, 4, 2));
+
+            Dictionary<string, string> file = Ended(booking);
+
+            file["METHOD"].ShouldBe("PUBLISH");
+            file["VERSION"].ShouldBe("2.0");
+            file["SUMMARY"].ShouldBe("Pilates");
+            file["DTSTART"].ShouldBe("20310305T183000");
+            file["DTEND"].ShouldBe("20310305T194500");
+            file["RRULE"].ShouldBe("FREQ=WEEKLY;UNTIL=20310326T183000;BYDAY=WE");
+            file["ORGANIZER"].ShouldBe("MAILTO:gym@gym.test");
+            file["ATTENDEE"].ShouldBe("RSVP=TRUE:mailto:maria@gym.test");
+            file.Keys.ShouldNotContain("EXDATE");
+        }
+
+        // The entry it was booked with, which is not taken out.
+        [Fact]
+        public void It_is_the_same_entry_and_is_not_cancelled()
+        {
+            TrainGroupParticipant booking = Stopped(new DateTime(2031, 4, 2));
+
+            Ended(booking)["UID"].ShouldBe(Added(booking)["UID"]);
+            End(booking).Single().FileName.ShouldBe(Add(booking).Single().FileName);
+            Cancel(booking).ShouldBeEmpty();
+        }
+
+        // The date it ends on is the first that is not theirs, whatever the hour.
+        [Theory]
+        [InlineData("2031-03-06", "20310305")]
+        [InlineData("2031-03-12", "20310305")]
+        [InlineData("2031-03-12 23:59", "20310305")]
+        [InlineData("2031-03-13", "20310312")]
+        [InlineData("2031-04-02", "20310326")]
+        [InlineData("2033-03-02", "20330223")]
+        public void Its_last_session_is_the_one_before_the_end(string end, string last)
+        {
+            TrainGroupParticipant booking = Stopped(DateTime.Parse(end, CultureInfo.InvariantCulture));
+
+            Ended(booking)["RRULE"].ShouldBe($"FREQ=WEEKLY;UNTIL={last}T183000;BYDAY=WE");
+            Cancel(booking).ShouldBeEmpty();
+        }
+
+        // Nothing was kept, so nothing stays.
+        [Theory]
+        [InlineData("2031-03-05")]
+        [InlineData("2031-03-05 23:59")]
+        [InlineData("2031-02-01")]
+        public void A_booking_stopped_before_its_first_session_is_cancelled(string end)
+        {
+            TrainGroupParticipant booking = Stopped(DateTime.Parse(end, CultureInfo.InvariantCulture));
+
+            End(booking).ShouldBeEmpty();
+            Cancelled(booking)["METHOD"].ShouldBe("CANCEL");
+        }
+
+        // Written again without them the series would bring them back.
+        [Fact]
+        public void The_dates_that_were_skipped_stay_out()
+        {
+            Dictionary<string, string> file = Ended(Stopped(new DateTime(2031, 4, 16),
+                new DateTime(2031, 3, 19, 5, 0, 0), new DateTime(2031, 3, 5), new DateTime(2031, 3, 19)));
+
+            file["DTSTART"].ShouldBe("20310305T183000");
+            file["EXDATE"].ShouldBe("20310305T183000,20310319T183000");
+            file["RRULE"].ShouldBe("FREQ=WEEKLY;UNTIL=20310409T183000;BYDAY=WE");
+        }
+
+        // The last session is one that is kept; what is skipped after it needs no mention.
+        [Fact]
+        public void The_last_session_is_not_a_skipped_one()
+        {
+            Dictionary<string, string> file = Ended(Stopped(new DateTime(2031, 4, 2),
+                new DateTime(2031, 3, 12), new DateTime(2031, 3, 26), new DateTime(2031, 4, 2), new DateTime(2031, 2, 26)));
+
+            file["RRULE"].ShouldBe("FREQ=WEEKLY;UNTIL=20310319T183000;BYDAY=WE");
+            file["EXDATE"].ShouldBe("20310312T183000");
+        }
+
+        [Fact]
+        public void With_every_session_skipped_it_is_cancelled()
+        {
+            TrainGroupParticipant booking = Stopped(new DateTime(2031, 3, 19), new DateTime(2031, 3, 5), new DateTime(2031, 3, 12));
+
+            End(booking).ShouldBeEmpty();
+            Cancelled(booking)["DTSTART"].ShouldBe("20310305T183000");
+        }
+
+        [Fact]
+        public void A_monthly_booking_ends_the_same_way()
+        {
+            TrainGroupParticipant booking = Booking(Monthly(31), from: new DateTime(2031, 3, 5));
+            booking.RecurringEndOnDate = new DateTime(2031, 8, 31);
+
+            Ended(booking)["DTSTART"].ShouldBe("20310331T183000");
+            Ended(booking)["RRULE"].ShouldBe("FREQ=MONTHLY;UNTIL=20310731T183000;BYMONTHDAY=31");
+            Cancel(booking).ShouldBeEmpty();
+        }
+
+        // From before the start was kept. The day it was made counts, whatever the hour.
+        [Theory]
+        [InlineData(6, "2025-04-02", "20250312", "20250326")]
+        [InlineData(5, "2025-04-02", "20250305", "20250326")]
+        [InlineData(5, "2025-03-06", "20250305", "20250305")]
+        public void One_with_no_start_begins_the_day_it_was_made(int dayOfMarch, string end, string first, string last)
+        {
+            TrainGroupParticipant booking = Booking(Weekly(DayOfWeek.Wednesday));
+            booking.CreatedOn = new DateTime(2025, 3, dayOfMarch, 15, 0, 0);
+            booking.RecurringEndOnDate = DateTime.Parse(end, CultureInfo.InvariantCulture);
+
+            Ended(booking)["DTSTART"].ShouldBe(first + "T183000");
+            Ended(booking)["RRULE"].ShouldBe($"FREQ=WEEKLY;UNTIL={last}T183000;BYDAY=WE");
+        }
+
+        [Fact]
+        public void A_booking_that_goes_on_does_not_end()
+        {
+            TrainGroupParticipant booking = Booking(Weekly(DayOfWeek.Wednesday), from: new DateTime(2031, 3, 5));
+
+            End(booking).ShouldBeEmpty();
+            Cancelled(booking)["DTSTART"].ShouldBe("20310305T183000");
+        }
+
+        // There is nothing of them to keep, whatever else the row says.
+        [Fact]
+        public void A_single_session_is_cancelled_and_never_ends()
+        {
+            TrainGroupParticipant oneOff = Booking(Weekly(DayOfWeek.Wednesday), selectedDate: new DateTime(2031, 3, 5));
+            TrainGroupParticipant fixedDay = Booking(Fixed(new DateTime(2031, 3, 5)));
+
+            foreach (TrainGroupParticipant booking in new[] { oneOff, fixedDay })
+            {
+                booking.RecurringEndOnDate = new DateTime(2031, 4, 2);
+
+                End(booking).ShouldBeEmpty();
+                Cancelled(booking)["DTSTART"].ShouldBe("20310305T183000");
+            }
+        }
+
+        // A weekday that names a day of the month and no weekday covers a date, and never comes up.
+        [Fact]
+        public void One_that_falls_on_no_day_has_no_file()
+        {
+            TrainGroupDate date = Weekly(null);
+            date.RecurrenceDayOfMonth = 5;
+            TrainGroupParticipant booking = Booking(date, from: new DateTime(2031, 3, 5));
+            booking.RecurringEndOnDate = new DateTime(2031, 4, 2);
+
+            End(booking).ShouldBeEmpty();
+            Cancel(booking).ShouldBeEmpty();
+        }
+
+        // A calendar takes a change whose number is higher than that of the entry it has, and an entry
+        // may be changed more than once.
+        [Fact]
+        public void A_change_has_a_higher_number_than_the_entry_and_than_any_before_it()
+        {
+            int since2020 = (int)(DateTime.UtcNow - new DateTime(2020, 1, 1)).TotalMinutes;
+
+            foreach (Dictionary<string, string> file in new[] { Ended(Stopped(new DateTime(2031, 4, 2))), Cancelled(Stopped(new DateTime(2031, 3, 5))), Cancelled(Booking(Fixed(new DateTime(2031, 3, 5)))) })
+                int.Parse(file["SEQUENCE"], CultureInfo.InvariantCulture).ShouldBeInRange(since2020, since2020 + 1);
+
+            Added(Stopped(new DateTime(2031, 4, 2)))["SEQUENCE"].ShouldBe("0");
+        }
+
+        [Fact]
+        public void Of_several_each_is_in_one_file_or_the_other()
+        {
+            TrainGroupParticipant[] bookings =
+            [
+                Booking(Fixed(new DateTime(2031, 3, 5)), id: 1),
+                Stopped(new DateTime(2031, 4, 2)),
+                Booking(Fixed(null), id: 2),
+                Stopped(new DateTime(2031, 3, 5))
+            ];
+            bookings[1].Id = 11;
+            bookings[3].Id = 12;
+
+            End(bookings).Select(x => x.FileName).ShouldBe(["add-tg-11--7_000-11111111222233334444555555555555.ics"]);
+            Cancel(bookings).Select(x => x.FileName).ShouldBe(
+            [
+                "cancel-tg-1--9_000-11111111222233334444555555555555.ics",
+                "cancel-tg-12--7_000-11111111222233334444555555555555.ics"
+            ]);
+        }
+
+
+        // ================================================================
         // Nothing to show
         // ================================================================
 
@@ -240,6 +458,7 @@ namespace Business.Tests.Services.CalendarServices
         public void No_bookings_have_no_files()
         {
             Add().ShouldBeEmpty();
+            End().ShouldBeEmpty();
             Cancel().ShouldBeEmpty();
         }
 
@@ -284,23 +503,34 @@ namespace Business.Tests.Services.CalendarServices
             new[] { first, second, otherDate }.Select(x => Added(x)["UID"]).Distinct().Count().ShouldBe(3);
         }
 
-        // The number of the group's day is written the way the language of the request writes
-        // numbers, so the same booking has one name in English and another in Greek: cancelled in a
-        // language other than it was made in, it stays in the member's calendar.
-        [Theory]
-        [InlineData("en", "tg-3--1\\,234.000-11111111222233334444555555555555", "add-tg-3--1_234_000-11111111222233334444555555555555.ics")]
-        [InlineData("el", "tg-3--1.234\\,000-11111111222233334444555555555555", "add-tg-3--1_234_000-11111111222233334444555555555555.ics")]
-        public void The_entrys_name_depends_on_the_language(string language, string uid, string fileName)
+        // The languages the app is in.
+        public static TheoryData<string> Languages
         {
-            TrainGroupDate date = Weekly(DayOfWeek.Monday);
+            get
+            {
+                return ["ar", "cs", "da", "de", "el", "en", "es", "fi", "fr", "it", "ja", "ko", "nl", "no", "pl", "pt", "ru", "sq", "sv", "tr", "zh"];
+            }
+        }
+
+        // It used to be written the way the language of the request writes numbers, so what was booked in
+        // Greek was not found again in English. It is the Greek way: nearly every entry that is out there
+        // was made in Greek, and is found by it.
+        [Theory]
+        [MemberData(nameof(Languages))]
+        public void An_entry_has_one_name_in_every_language(string language)
+        {
+            TrainGroupDate date = Weekly(DayOfWeek.Wednesday);
             date.Id = 1234;
+            TrainGroupParticipant single = Booking(date, selectedDate: new DateTime(2031, 3, 5), id: 5678);
+            TrainGroupParticipant stopped = Booking(date, from: new DateTime(2031, 3, 5), id: 5678);
+            stopped.RecurringEndOnDate = new DateTime(2031, 4, 2);
 
             using (Culture.Use(language))
             {
-                (string content, string name) = Add(Booking(date, selectedDate: new DateTime(2031, 3, 3))).Single();
+                foreach (Dictionary<string, string> file in new[] { Added(single), Cancelled(single), Ended(stopped) })
+                    file["UID"].ShouldBe("tg-5678--1.234\\,000-11111111222233334444555555555555");
 
-                Read(content)["UID"].ShouldBe(uid);
-                name.ShouldBe(fileName);
+                Add(single).Single().FileName.ShouldBe("add-tg-5678--1_234_000-11111111222233334444555555555555.ics");
             }
         }
 

@@ -122,13 +122,27 @@ namespace API.Controllers
                     formClaims.Add(new Claim("Permission", identityClaimDto.Controller + "_Delete"));
             });
 
+            // Each one is waited for. List.ForEach waits for nothing: the answer said updated
+            // whatever became of them, and one that could not be saved was an error nobody
+            // was left to catch, which takes the whole server down.
+
             // Get claims to delete from role, and remove them.
             List<Claim> deleteClaims = roleClaims.Where(x => !formClaims.Any(y => x.Value == y.Value)).ToList();
-            deleteClaims.ForEach(async claim => await _roleManager.RemoveClaimAsync(identityRole, claim));
+            foreach (Claim claim in deleteClaims)
+            {
+                IdentityResult removed = await _roleManager.RemoveClaimAsync(identityRole, claim);
+                if (!removed.Succeeded)
+                    return new ApiResponse<Role>().SetErrorResponse(removed.Errors.First().Description);
+            }
 
             // Get claims to add in role, and add them.
             List<Claim> addClaims = formClaims.Where(x => !roleClaims.Any(y => x.Value == y.Value)).ToList();
-            addClaims.ForEach(async claim => await _roleManager.AddClaimAsync(identityRole, claim));
+            foreach (Claim claim in addClaims)
+            {
+                IdentityResult added = await _roleManager.AddClaimAsync(identityRole, claim);
+                if (!added.Succeeded)
+                    return new ApiResponse<Role>().SetErrorResponse(added.Errors.First().Description);
+            }
 
 
             Role updatedRole = _mapper.Map<Role>(identityRoleDto);
@@ -146,16 +160,21 @@ namespace API.Controllers
             if (id == null)
                 return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys._0_is_required, "RoleId"]);
 
-            var role = await _dataService.Roles.FindAsync(id);
+            // Asked for with the text of its id, no role was ever found: every delete broke.
+            Role? role = Guid.TryParse(id, out Guid roleId) ? await _roleManager.FindByIdAsync(roleId.ToString()) : null;
             if (role == null)
                 return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "Role"]);
 
+            // Deleting it takes it from everybody who has it, and they could do nothing at all.
+            bool isInUse = await _dataService.UserRoles.AnyAsync(x => x.RoleId == roleId);
+            if (isInUse)
+                return new ApiResponse<Role>().SetErrorResponse(_localizer[TranslationKeys.The_role_is_in_use_by_members]);
 
-            var result = await _roleManager.DeleteAsync(role);
+            IdentityResult result = await _roleManager.DeleteAsync(role);
             if (result.Succeeded)
                 return new ApiResponse<Role>().SetSuccessResponse(_localizer[TranslationKeys._0_deleted_successfully, $"Role {role.Name}"]);
 
-            return new ApiResponse<Role>().SetErrorResponse(result.Errors.ToString() ?? "");
+            return new ApiResponse<Role>().SetErrorResponse(result.Errors.First().Description);
         }
 
 

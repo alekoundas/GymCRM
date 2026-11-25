@@ -23,15 +23,18 @@ namespace API.Controllers
         private readonly IDataService _dataService;
         private readonly IMapper _mapper;
         private readonly IStringLocalizer _localizer;
+        private readonly TimeProvider _timeProvider;
 
         public TrainGroupParticipantUnavailableDatesController(
             IDataService dataService,
             IMapper mapper,
-            IStringLocalizer localizer) : base(dataService, mapper, localizer)
+            IStringLocalizer localizer,
+            TimeProvider timeProvider) : base(dataService, mapper, localizer)
         {
             _dataService = dataService;
             _mapper = mapper;
             _localizer = localizer;
+            _timeProvider = timeProvider;
         }
 
         // Members skip and rejoin their own dates without holding any claim for this
@@ -94,16 +97,16 @@ namespace API.Controllers
             // A page may say it is an admin page; only a staff caller makes it count.
             if (!(entityDto.IsAdminPage && IsStaff()))
             {
-                DateTime clientNow = BookingRules.ClientNow(entityDto.ClientTimezoneOffsetMinutes);
+                DateTime gymNow = BookingRules.GymNow(_timeProvider);
                 DateTime sessionStart = BookingRules.SessionStart(participant.TrainGroup, day);
 
-                if (sessionStart <= clientNow)
+                if (sessionStart <= gymNow)
                 {
                     errors = [_localizer[TranslationKeys.This_session_has_already_started]];
                     return true;
                 }
 
-                if (sessionStart <= clientNow.AddHours(BookingRules.MemberChangeWindowHours))
+                if (sessionStart <= gymNow.AddHours(BookingRules.MemberChangeWindowHours))
                 {
                     errors = [_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]];
                     return true;
@@ -131,9 +134,9 @@ namespace API.Controllers
                 return true;
             }
 
-            // A date that has been and gone stays as it was for a member.
+            // A session that has started stays as it was for a member.
             DateTime day = entity.UnavailableDate.Date;
-            if (!IsStaff() && day < DateTime.UtcNow.Date)
+            if (!IsStaff() && BookingRules.SessionStart(participant.TrainGroup, day) <= BookingRules.GymNow(_timeProvider))
             {
                 errors = [_localizer[TranslationKeys.This_session_has_already_started]];
                 return true;

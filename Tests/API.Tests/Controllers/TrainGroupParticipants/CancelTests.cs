@@ -30,7 +30,9 @@ namespace API.Tests.Controllers.TrainGroupParticipants
 
         private Task<ApiResult<bool>> CancelAsync(Caller caller, DateTime? now = null, bool isAdminPage = false, int? id = null)
         {
-            return PostAsync<bool>(caller, $"api/TrainGroupParticipants/{id ?? _booking.Id}/Cancel", new { clientTimezoneOffsetMinutes = OffsetFor(now ?? Now), isAdminPage });
+            AtTheGym(now ?? Now);
+
+            return PostAsync<bool>(caller, $"api/TrainGroupParticipants/{id ?? _booking.Id}/Cancel", new { isAdminPage });
         }
 
         private TrainGroupParticipant Read(int? id = null)
@@ -113,9 +115,9 @@ namespace API.Tests.Controllers.TrainGroupParticipants
 
         [Theory]
         [InlineData(-24 * 60, null)]
-        [InlineData(-12 * 60 - 2, null)]
+        [InlineData(-12 * 60 - 1, null)]
         [InlineData(-12 * 60, TranslationKeys.Cannot_remove_a_session_starting_within_12_hours)]
-        [InlineData(-2, TranslationKeys.Cannot_remove_a_session_starting_within_12_hours)]
+        [InlineData(-1, TranslationKeys.Cannot_remove_a_session_starting_within_12_hours)]
         [InlineData(0, TranslationKeys.This_session_has_already_started)]
         [InlineData(60 * 24 * 30, TranslationKeys.This_session_has_already_started)]
         public async Task A_member_has_until_twelve_hours_before(int minutesFromStart, string? error)

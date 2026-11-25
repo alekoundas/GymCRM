@@ -12,6 +12,8 @@ namespace Business.Tests.Fakes
 
         public int AddFiles { get; set; }
 
+        public int EndFiles { get; set; }
+
         public int CancelFiles { get; set; }
 
         /// <summary>
@@ -24,6 +26,13 @@ namespace Business.Tests.Fakes
             Lines.Add($"add {trainGroupParticipants.Count} from {organizerEmail} for {attendeeEmail} {userId}");
 
             return IsBroken ? null! : Enumerable.Range(1, AddFiles).Select(x => ($"content of add {x}", $"add-{x}.ics")).ToList();
+        }
+
+        public List<(string IcsContent, string FileName)> GenerateEndIcsContents(List<TrainGroupParticipant> trainGroupParticipants, string organizerEmail, string attendeeEmail, Guid userId)
+        {
+            Lines.Add($"end {trainGroupParticipants.Count} from {organizerEmail} for {attendeeEmail} {userId}");
+
+            return IsBroken ? null! : Enumerable.Range(1, EndFiles).Select(x => ($"content of end {x}", $"add-end-{x}.ics")).ToList();
         }
 
         public List<(string IcsContent, string FileName)> GenerateCancelIcsContents(List<TrainGroupParticipant> trainGroupParticipants, string organizerEmail, string attendeeEmail, Guid userId)

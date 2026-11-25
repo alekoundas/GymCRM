@@ -497,16 +497,18 @@ namespace Business.Tests.Services.Email
         public async Task What_was_booked_and_what_was_given_up_are_listed()
         {
             _calendar.AddFiles = 2;
+            _calendar.EndFiles = 1;
             _calendar.CancelFiles = 1;
 
             Mail mail = await SendAsync([Booking(Weekly()), Booking(Weekly(), Selected)], [Booking(FixedDay())]);
 
             ApprovedFile.ShouldMatch(mail.Body, "BookingMail");
             mail.Attachments.ShouldBe(
-                """[{"FileName":"add-1.ics","Content":"content of add 1"},{"FileName":"add-2.ics","Content":"content of add 2"},{"FileName":"cancel-1.ics","Content":"content of cancel 1"}]""");
+                """[{"FileName":"add-1.ics","Content":"content of add 1"},{"FileName":"add-2.ics","Content":"content of add 2"},{"FileName":"add-end-1.ics","Content":"content of end 1"},{"FileName":"cancel-1.ics","Content":"content of cancel 1"}]""");
             _calendar.Lines.ShouldBe(
             [
                 "add 2 from gym@gym.test for maria@gym.test 11111111-2222-3333-4444-555555555555",
+                "end 1 from gym@gym.test for maria@gym.test 11111111-2222-3333-4444-555555555555",
                 "cancel 1 from gym@gym.test for maria@gym.test 11111111-2222-3333-4444-555555555555"
             ]);
         }
@@ -572,15 +574,19 @@ namespace Business.Tests.Services.Email
             Listed(mail.Body, "added").ShouldBe(["", "Monday", "Monday"]);
         }
 
-        // How to use the files, only as far as there are any.
+        // How to use the files, only as far as there are any. A booking that was stopped from a later date
+        // is added again, with its end.
         [Theory]
-        [InlineData(0, 0, false, false)]
-        [InlineData(1, 0, true, false)]
-        [InlineData(0, 1, false, true)]
-        [InlineData(2, 2, true, true)]
-        public async Task The_calendar_is_explained_for_the_files_there_are(int addFiles, int cancelFiles, bool explainsAdding, bool explainsRemoving)
+        [InlineData(0, 0, 0, false, false)]
+        [InlineData(1, 0, 0, true, false)]
+        [InlineData(0, 1, 0, true, false)]
+        [InlineData(0, 0, 1, false, true)]
+        [InlineData(0, 1, 1, true, true)]
+        [InlineData(2, 2, 2, true, true)]
+        public async Task The_calendar_is_explained_for_the_files_there_are(int addFiles, int endFiles, int cancelFiles, bool explainsAdding, bool explainsRemoving)
         {
             _calendar.AddFiles = addFiles;
+            _calendar.EndFiles = endFiles;
             _calendar.CancelFiles = cancelFiles;
 
             Mail mail = await SendAsync([Booking(Weekly())], [Booking(Weekly())]);

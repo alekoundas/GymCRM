@@ -321,7 +321,6 @@ export default function TrainGroupsBookingCalendarPage() {
       isOneOff: selection.isOneOff,
       recurringTrainGroupDateIds: selection.recurringTrainGroupDateIds,
       userId: isActingForOther ? userId : undefined,
-      clientTimezoneOffsetMinutes: new Date().getTimezoneOffset(),
     });
     setIsSaving(false);
 
@@ -347,12 +346,10 @@ export default function TrainGroupsBookingCalendarPage() {
               trainGroupParticipantId: changeBooking.id,
               unavailableDate: changeDate,
               isAdminPage: isActingForOther,
-              clientTimezoneOffsetMinutes: new Date().getTimezoneOffset(),
             }
           )
         : await apiService.endBooking(changeBooking.id, {
             fromDate: changeDate,
-            clientTimezoneOffsetMinutes: new Date().getTimezoneOffset(),
             isAdminPage: isActingForOther,
           });
     setIsSaving(false);
@@ -368,7 +365,6 @@ export default function TrainGroupsBookingCalendarPage() {
 
     setIsSaving(true);
     const response = await apiService.cancelBooking(cancelBooking.id, {
-      clientTimezoneOffsetMinutes: new Date().getTimezoneOffset(),
       isAdminPage: isActingForOther,
     });
     setIsSaving(false);

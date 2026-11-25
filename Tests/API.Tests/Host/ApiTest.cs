@@ -39,6 +39,11 @@ namespace API.Tests.Host
             get { return _api.Google; }
         }
 
+        protected StubClock Clock
+        {
+            get { return _api.Clock; }
+        }
+
         protected IServiceProvider Services
         {
             get { return _api.Services; }
@@ -110,16 +115,12 @@ namespace API.Tests.Host
         }
 
 
-        // A member's clock. Every endpoint that asks what time it is where the member is takes it
-        // from the minutes the browser is off UTC, so any time at all can be had that way.
-
         /// <summary>
-        /// The offset that makes it <c>now</c> for the member, or up to a minute after. A test of a moment
-        /// stays two minutes off it on the near side.
+        /// It is that time by the clock on the gym's wall, until the test is over.
         /// </summary>
-        protected static int OffsetFor(DateTime now)
+        protected void AtTheGym(DateTime now)
         {
-            return (int)Math.Floor((DateTime.UtcNow - now).TotalMinutes);
+            Clock.SetAtTheGym(now);
         }
 
         protected static Caller Staff(User user)

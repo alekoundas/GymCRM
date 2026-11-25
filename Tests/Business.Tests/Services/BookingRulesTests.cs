@@ -1,5 +1,7 @@
+using System.Globalization;
 using System.Linq.Expressions;
 using Business.Services;
+using Business.Tests.Fakes;
 using Core.Enums;
 using Core.Models;
 using DataAccess;
@@ -427,19 +429,33 @@ namespace Business.Tests.Services
             BookingRules.SessionStart(group, Day.AddHours(21)).ShouldBe(new DateTime(2031, 3, 5, hour, minute, 0));
         }
 
+        // Two hours ahead of UTC in winter and three in summer, changing on the last Sundays of March
+        // and October at one in the night in UTC.
         [Theory]
-        [InlineData(0)]
-        [InlineData(-120)]
-        [InlineData(-180)]
-        [InlineData(300)]
-        [InlineData(1)]
-        public void A_members_clock_is_utc_less_the_minutes_their_browser_is_behind(int offset)
+        [InlineData("2026-11-24T10:00:00Z", "2026-11-24 12:00:00")]
+        [InlineData("2026-11-24T21:59:59Z", "2026-11-24 23:59:59")]
+        [InlineData("2026-11-24T22:00:00Z", "2026-11-25 00:00:00")]
+        [InlineData("2026-12-31T23:00:00Z", "2027-01-01 01:00:00")]
+        [InlineData("2026-07-01T10:00:00Z", "2026-07-01 13:00:00")]
+        [InlineData("2026-07-01T21:00:00Z", "2026-07-02 00:00:00")]
+        [InlineData("2026-03-29T00:59:59Z", "2026-03-29 02:59:59")]
+        [InlineData("2026-03-29T01:00:00Z", "2026-03-29 04:00:00")]
+        [InlineData("2026-10-25T00:59:59Z", "2026-10-25 03:59:59")]
+        [InlineData("2026-10-25T01:00:00Z", "2026-10-25 03:00:00")]
+        [InlineData("2031-03-05T04:00:00Z", "2031-03-05 06:00:00")]
+        public void The_gyms_clock_is_the_one_in_Athens(string utc, string atTheGym)
         {
-            DateTime before = DateTime.UtcNow;
-            DateTime now = BookingRules.ClientNow(offset);
-            DateTime after = DateTime.UtcNow;
+            Clock clock = new Clock { Now = DateTimeOffset.Parse(utc, CultureInfo.InvariantCulture) };
 
-            now.ShouldBeInRange(before.AddMinutes(-offset), after.AddMinutes(-offset));
+            BookingRules.GymNow(clock).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture).ShouldBe(atTheGym);
+        }
+
+        [Fact]
+        public void With_the_machines_own_clock_it_is_the_real_time()
+        {
+            TimeSpan ahead = BookingRules.GymNow(TimeProvider.System) - DateTime.UtcNow;
+
+            ahead.ShouldBeInRange(TimeSpan.FromHours(2) - TimeSpan.FromMinutes(1), TimeSpan.FromHours(3) + TimeSpan.FromMinutes(1));
         }
 
         [Fact]
@@ -458,6 +474,17 @@ namespace Business.Tests.Services
     public sealed class BookingRulesZoneTests
     {
         private static readonly DateTime Day = new DateTime(2031, 3, 5);
+
+        // Wherever the server is.
+        [Fact]
+        public void The_gyms_clock_is_the_same_on_every_machine()
+        {
+            Clock clock = new Clock { Now = new DateTimeOffset(2026, 11, 24, 22, 30, 0, TimeSpan.Zero) };
+
+            foreach (TimeZoneInfo zone in new[] { LocalTimeZone.Utc, LocalTimeZone.Athens, LocalTimeZone.NewYork })
+                using (LocalTimeZone.Use(zone))
+                    BookingRules.GymNow(clock).ShouldBe(new DateTime(2026, 11, 25, 0, 30, 0));
+        }
 
         // The offset is the one on the date the hour was saved with, winter or summer.
         [Theory]

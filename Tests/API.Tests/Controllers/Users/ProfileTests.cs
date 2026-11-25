@@ -336,8 +336,12 @@ namespace API.Tests.Controllers.Users
             changed.PhoneNumber.ShouldBe("2101234567");
             RolesOf().ShouldBe("Trainer");
 
+            // The page goes on with what comes back.
             result.Value.UserName.ShouldBe("changed");
             result.Value.Email.ShouldBe("changed@gym.test");
+            result.Value.MedicalHistory.ShouldBe("Back");
+            result.Value.UserStatusId.ShouldBe(other.Id);
+            result.Value.UserRoles.Single().Role.Name.ShouldBe("Trainer");
         }
 
         [Fact]
@@ -390,9 +394,9 @@ namespace API.Tests.Controllers.Users
             RolesOf(_nikos.Id).ShouldBe("Trainer");
         }
 
-        // The role is given before the account is saved, and stays given when that is refused.
+        // All of it or nothing: the role is given last.
         [Fact]
-        public async Task A_change_that_is_refused_has_already_given_the_role()
+        public async Task A_change_that_is_refused_gives_no_role_either()
         {
             (await SaveAsync(Admin, Form(x =>
             {
@@ -402,7 +406,19 @@ namespace API.Tests.Controllers.Users
             }))).ShouldFail("Username 'nikos' is already taken.");
 
             Read().FirstName.ShouldBe("Maria");
-            RolesOf().ShouldBe("Trainer");
+            RolesOf().ShouldBe("SimpleUser");
+        }
+
+        [Fact]
+        public async Task Nor_does_one_that_breaks()
+        {
+            (await SaveAsync(Admin, Form(x =>
+            {
+                x.UserStatusId = 99;
+                x.UserRoles = [new UserRoleDto { Role = new RoleDto { Name = "Trainer" } }];
+            }))).ShouldBreak();
+
+            RolesOf().ShouldBe("SimpleUser");
         }
 
         [Fact]

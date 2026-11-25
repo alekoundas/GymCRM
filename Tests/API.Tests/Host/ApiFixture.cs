@@ -13,9 +13,9 @@ namespace API.Tests.Host
 {
     /// <summary>
     /// The app running on a database of its own, for one class of tests. It is the real one but for
-    /// four things: mails are kept instead of sent, Google is a stub, the background sender is left
-    /// out, which would otherwise send a queued mail under the test that looks for it, and passwords
-    /// are hashed quickly.
+    /// five things: mails are kept instead of sent, Google is a stub, the clock can be set, the
+    /// background sender is left out, which would otherwise send a queued mail under the test that
+    /// looks for it, and passwords are hashed quickly.
     /// </summary>
     public sealed class ApiFixture : IAsyncLifetime
     {
@@ -27,6 +27,8 @@ namespace API.Tests.Host
         public RecordingEmailService Emails { get; } = new RecordingEmailService();
 
         public StubGoogle Google { get; } = new StubGoogle();
+
+        public StubClock Clock { get; } = new StubClock();
 
         public IServiceProvider Services
         {
@@ -62,6 +64,7 @@ namespace API.Tests.Host
             Database.Reset();
             Emails.Reset();
             Google.Reset();
+            Clock.Reset();
         }
 
         public async Task<HttpResponseMessage> SendAsync(HttpMethod method, string url, object? body, Caller caller, string? language = null)
@@ -97,6 +100,9 @@ namespace API.Tests.Host
 
             services.RemoveAll<IEmailService>();
             services.AddSingleton<IEmailService>(Emails);
+
+            services.RemoveAll<TimeProvider>();
+            services.AddSingleton<TimeProvider>(Clock);
 
             services.ConfigureHttpClientDefaults(x => x.ConfigurePrimaryHttpMessageHandler(() => Google));
         }

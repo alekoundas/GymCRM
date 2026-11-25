@@ -30,7 +30,9 @@ namespace API.Tests.Controllers.TrainGroupParticipants
 
         private Task<ApiResult<bool>> EndAsync(Caller caller, DateTime? from, DateTime? now = null, bool isAdminPage = false, int? id = null)
         {
-            return PostAsync<bool>(caller, $"api/TrainGroupParticipants/{id ?? _booking.Id}/End", new { fromDate = from, clientTimezoneOffsetMinutes = OffsetFor(now ?? Now), isAdminPage });
+            AtTheGym(now ?? Now);
+
+            return PostAsync<bool>(caller, $"api/TrainGroupParticipants/{id ?? _booking.Id}/End", new { fromDate = from, isAdminPage });
         }
 
         private TrainGroupParticipant Read()
@@ -117,7 +119,7 @@ namespace API.Tests.Controllers.TrainGroupParticipants
         // ================================================================
 
         [Fact]
-        public async Task With_no_date_it_ends_today_where_the_member_is()
+        public async Task With_no_date_it_ends_today()
         {
             ShouldBeEnded(await EndAsync(Caller.Of(_member), null), Now.Date);
         }
@@ -168,9 +170,9 @@ namespace API.Tests.Controllers.TrainGroupParticipants
         // page, and on the admin's.
         [Theory]
         [InlineData(-24 * 60, null)]
-        [InlineData(-12 * 60 - 2, null)]
+        [InlineData(-12 * 60 - 1, null)]
         [InlineData(-12 * 60, TranslationKeys.Cannot_remove_a_session_starting_within_12_hours)]
-        [InlineData(-2, TranslationKeys.Cannot_remove_a_session_starting_within_12_hours)]
+        [InlineData(-1, TranslationKeys.Cannot_remove_a_session_starting_within_12_hours)]
         [InlineData(0, TranslationKeys.This_session_has_already_started)]
         [InlineData(5 * 60, TranslationKeys.This_session_has_already_started)]
         public async Task The_first_session_given_up_has_to_be_more_than_twelve_hours_off(int minutesFromStart, string? error)

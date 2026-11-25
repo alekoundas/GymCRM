@@ -12,9 +12,6 @@ namespace Core.Dtos.TrainGroupParticipantUnavailableDate
         [Required(ErrorMessage = TranslationKeys._0_is_required)]
         public int TrainGroupParticipantId { get; set; }
 
-
-        public int ClientTimezoneOffsetMinutes { get; set; } = 0;
-
         public bool IsAdminPage { get; set; }
     }
 }

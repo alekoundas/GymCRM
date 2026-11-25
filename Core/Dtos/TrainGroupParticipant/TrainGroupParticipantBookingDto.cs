@@ -6,8 +6,6 @@ namespace Core.Models
     {
         // Only staff may ask after somebody else. Left empty, it is the caller.
         public string? UserId { get; set; }
-
-        public int ClientTimezoneOffsetMinutes { get; set; } = 0;
     }
 
     // One of a member's bookings as the booking page lists it: running, coming up,

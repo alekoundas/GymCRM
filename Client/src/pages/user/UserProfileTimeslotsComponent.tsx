@@ -202,8 +202,6 @@ export default function UserProfileTimeslotsComponent() {
     }
   };
 
-  const offset = () => new Date().getTimezoneOffset();
-
   // Stop a recurring booking from this date on, or cancel a one-off. Neither deletes
   // anything: the dates before stay on the calendar.
   const onStop = async () => {
@@ -212,7 +210,6 @@ export default function UserProfileTimeslotsComponent() {
 
     const dto = {
       fromDate: selectedEntry.date,
-      clientTimezoneOffsetMinutes: offset(),
       isAdminPage: isAdminPage,
     };
     const response = selectedEntry.isOneOff
@@ -232,7 +229,6 @@ export default function UserProfileTimeslotsComponent() {
       trainGroupParticipantId: selectedEntry.trainGroupParticipantId ?? 0,
       unavailableDate: selectedEntry.date,
       isAdminPage: isAdminPage,
-      clientTimezoneOffsetMinutes: offset(),
     } as TrainGroupParticipantUnavailableDateDto);
 
     if (response) {

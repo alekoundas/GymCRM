@@ -310,8 +310,13 @@ namespace Business.Services.Email
             if (organizerEmail != null)
             {
 
+                // A booking stopped from a later date is added again with its end, and what
+                // nothing is left of is taken out.
                 addIcsList = _calendarService.GenerateAddIcsContents(
-                    emailParticipantsAdd, organizerEmail, user.Email, user.Id);
+                    emailParticipantsAdd, organizerEmail, user.Email, user.Id)
+                    .Concat(_calendarService.GenerateEndIcsContents(
+                        emailParticipantsRemove, organizerEmail, user.Email, user.Id))
+                    .ToList();
 
                 cancelIcsList = _calendarService.GenerateCancelIcsContents(
                     emailParticipantsRemove, organizerEmail, user.Email, user.Id);

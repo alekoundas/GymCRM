@@ -26,6 +26,8 @@ namespace Business.Services
 
         public const int MemberChangeWindowHours = 12;
 
+        private static readonly TimeZoneInfo GymTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Athens");
+
         // countSkipped: true asks "is this one of the booking's days at all", which the
         // calendar needs to show a skipped date; false asks whether it takes a place.
         private static readonly Expression<Func<TrainGroupParticipant, DateTime, bool, bool>> Rule =
@@ -93,9 +95,12 @@ namespace Business.Services
         public static DateTime SessionStart(TrainGroup trainGroup, DateTime day) =>
             day.Date + trainGroup.StartOn.ToUniversalTime().TimeOfDay;
 
-        // The member's own wall clock, from the offset their browser reports.
-        public static DateTime ClientNow(int clientTimezoneOffsetMinutes) =>
-            DateTime.UtcNow.AddMinutes(-clientTimezoneOffsetMinutes);
+        // The clock on the gym's wall. A session's hour is the gym's, so this is what says
+        // whether it has started and whether it is less than 12 hours off. It used to be
+        // worked out from how far the request said its browser was off UTC, and whoever
+        // sent another number could change a session at the last minute, or one long over.
+        public static DateTime GymNow(TimeProvider timeProvider) =>
+            TimeZoneInfo.ConvertTimeFromUtc(timeProvider.GetUtcNow().UtcDateTime, GymTimeZone);
 
         private static Expression<Func<TrainGroupParticipant, bool>> Bind(DateTime date, bool countSkipped)
         {

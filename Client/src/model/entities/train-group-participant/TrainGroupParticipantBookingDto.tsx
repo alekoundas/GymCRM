@@ -9,13 +9,11 @@ export interface TrainGroupParticipantBookDto {
   recurringTrainGroupDateIds: number[];
   // Staff only. Left out, the booking is the caller's own.
   userId?: string;
-  clientTimezoneOffsetMinutes: number;
 }
 
 // Ending a recurring booking from a date, or cancelling a one-off.
 export interface TrainGroupParticipantRemoveDto {
   fromDate?: string;
-  clientTimezoneOffsetMinutes: number;
   isAdminPage: boolean;
 }
 

@@ -35,9 +35,11 @@ namespace API.Tests.Controllers
 
         private Task<ApiResult<List<TrainGroupParticipantUnavailableDate>>> SkipAsync(Caller caller, int participantId, DateTime day, DateTime now, bool isAdminPage = false)
         {
+            AtTheGym(now);
+
             return PostAsync<List<TrainGroupParticipantUnavailableDate>>(caller, Url, new[]
             {
-                new { trainGroupParticipantId = participantId, unavailableDate = day, clientTimezoneOffsetMinutes = OffsetFor(now), isAdminPage }
+                new { trainGroupParticipantId = participantId, unavailableDate = day, isAdminPage }
             });
         }
 
@@ -61,14 +63,14 @@ namespace API.Tests.Controllers
             Skips().ShouldBe(["2031-03-05"]);
         }
 
-        // Twelve hours before and a moment more, up to the start itself; for the member, for staff on
-        // the members' page, and for staff on the admin's. The clock is the member's, to the minute.
+        // Twelve hours before and a minute more, up to the start itself; for the member, for staff on
+        // the members' page, and for staff on the admin's. Whose clock it is, is in GymClockTests.
         [Theory]
         [InlineData(-24 * 60, null)]
-        [InlineData(-12 * 60 - 2, null)]
+        [InlineData(-12 * 60 - 1, null)]
         [InlineData(-12 * 60, TranslationKeys.Cannot_remove_a_session_starting_within_12_hours)]
         [InlineData(-11 * 60, TranslationKeys.Cannot_remove_a_session_starting_within_12_hours)]
-        [InlineData(-2, TranslationKeys.Cannot_remove_a_session_starting_within_12_hours)]
+        [InlineData(-1, TranslationKeys.Cannot_remove_a_session_starting_within_12_hours)]
         [InlineData(0, TranslationKeys.This_session_has_already_started)]
         [InlineData(60, TranslationKeys.This_session_has_already_started)]
         [InlineData(60 * 24 * 30, TranslationKeys.This_session_has_already_started)]
@@ -159,9 +161,11 @@ namespace API.Tests.Controllers
         [Fact]
         public async Task Several_dates_go_together_or_not_at_all()
         {
+            AtTheGym(Day.AddDays(-1));
+
             object At(DateTime day)
             {
-                return new { trainGroupParticipantId = _booking.Id, unavailableDate = day, clientTimezoneOffsetMinutes = OffsetFor(Day.AddDays(-1)) };
+                return new { trainGroupParticipantId = _booking.Id, unavailableDate = day };
             }
 
             (await PostAsync<List<TrainGroupParticipantUnavailableDate>>(Caller.Of(_member), Url, new[] { At(Day), At(Day.AddDays(1)) }))
@@ -178,29 +182,22 @@ namespace API.Tests.Controllers
         // Taking it back
         // ================================================================
 
-        // The real next Wednesday, or the last: this end of it reads the server's own date.
-        private static DateTime Wednesday(int weeks)
-        {
-            DateTime today = Midnight.Today();
-            DateTime next = today.AddDays(((int)DayOfWeek.Wednesday - (int)today.DayOfWeek + 7) % 7);
-
-            return next.AddDays(7 * weeks);
-        }
-
         private TrainGroupParticipantUnavailableDate SkipOf(User member, DateTime day)
         {
             return Seed.Skip(Seed.Recurring(_wednesday, member, day.AddDays(-70)), day);
         }
 
-        private Task<ApiResult<TrainGroupParticipantUnavailableDate>> RejoinAsync(Caller caller, int id)
+        private Task<ApiResult<TrainGroupParticipantUnavailableDate>> RejoinAsync(Caller caller, int id, DateTime? now = null)
         {
+            AtTheGym(now ?? Day.AddDays(-1));
+
             return DeleteAsync<TrainGroupParticipantUnavailableDate>(caller, $"{Url}/{id}");
         }
 
         [Fact]
         public async Task A_member_takes_a_date_back()
         {
-            TrainGroupParticipantUnavailableDate skip = SkipOf(_other, Wednesday(1));
+            TrainGroupParticipantUnavailableDate skip = SkipOf(_other, Day);
 
             (await RejoinAsync(Caller.Of(_other), skip.Id)).ShouldSucceed(English.Deleted("TrainGroupParticipantUnavailableDate"));
 
@@ -210,13 +207,13 @@ namespace API.Tests.Controllers
         [Fact]
         public async Task Staff_take_anybodys_date_back()
         {
-            (await RejoinAsync(Staff(_member), SkipOf(_other, Wednesday(1)).Id)).ShouldSucceed(English.Deleted("TrainGroupParticipantUnavailableDate"));
+            (await RejoinAsync(Staff(_member), SkipOf(_other, Day).Id)).ShouldSucceed(English.Deleted("TrainGroupParticipantUnavailableDate"));
         }
 
         [Fact]
         public async Task Somebody_elses_date_cannot_be_taken_back()
         {
-            TrainGroupParticipantUnavailableDate skip = SkipOf(_other, Wednesday(1));
+            TrainGroupParticipantUnavailableDate skip = SkipOf(_other, Day);
 
             (await RejoinAsync(Caller.Of(_member), skip.Id)).ShouldBeBad(English.NotAuthorized);
             (await RejoinAsync(Caller.WithNoId(), skip.Id)).ShouldBeBad(English.NotAuthorized);
@@ -224,20 +221,28 @@ namespace API.Tests.Controllers
             Skips().Count.ShouldBe(1);
         }
 
-        // A date that has passed stays as it was for a member; today is not past yet.
-        [Fact]
-        public async Task A_date_that_has_passed_is_only_for_staff_to_take_back()
+        // Minutes from the start. A session that has started stays as it was for a member; there is no
+        // twelve hours about coming to one after all.
+        [Theory]
+        [InlineData(-24 * 60, true)]
+        [InlineData(-60, true)]
+        [InlineData(-1, true)]
+        [InlineData(0, false)]
+        [InlineData(5 * 60, false)]
+        [InlineData(24 * 60, false)]
+        public async Task A_session_that_has_started_is_only_for_staff_to_take_back(int minutesFromStart, bool isForMembers)
         {
-            DateTime today = Midnight.Today();
-            TrainGroupDate everyDay = Seed.Weekly(_group, today.DayOfWeek);
-            TrainGroupDate yesterday = Seed.Weekly(_group, today.AddDays(-1).DayOfWeek);
+            DateTime now = Day.AddHours(18).AddMinutes(minutesFromStart);
 
-            TrainGroupParticipantUnavailableDate past = Seed.Skip(Seed.Recurring(yesterday, _other, today.AddDays(-70)), today.AddDays(-1));
-            TrainGroupParticipantUnavailableDate now = Seed.Skip(Seed.Recurring(everyDay, _other, today.AddDays(-70)), today);
+            ApiResult<TrainGroupParticipantUnavailableDate> result = await RejoinAsync(Caller.Of(_other), SkipOf(_other, Day).Id, now);
 
-            (await RejoinAsync(Caller.Of(_other), past.Id)).ShouldBeBad(English.Of(TranslationKeys.This_session_has_already_started));
-            (await RejoinAsync(Caller.Of(_other), now.Id)).ShouldSucceed(English.Deleted("TrainGroupParticipantUnavailableDate"));
-            (await RejoinAsync(Staff(_member), past.Id)).ShouldSucceed(English.Deleted("TrainGroupParticipantUnavailableDate"));
+            if (isForMembers)
+                result.ShouldSucceed(English.Deleted("TrainGroupParticipantUnavailableDate"));
+            else
+                result.ShouldBeBad(English.Of(TranslationKeys.This_session_has_already_started));
+
+            Database.Execute("DELETE FROM TrainGroupParticipants");
+            (await RejoinAsync(Staff(_member), SkipOf(_other, Day).Id, now)).ShouldSucceed(English.Deleted("TrainGroupParticipantUnavailableDate"));
         }
 
         // Two places. Whoever holds one that day is counted: recurring, one-off, of any of the days.
@@ -252,7 +257,7 @@ namespace API.Tests.Controllers
         public async Task A_date_can_be_taken_back_while_there_is_a_place(int taken, bool isStaff, bool isTakenBack)
         {
             Database.Execute("DELETE FROM TrainGroupParticipants");
-            DateTime day = Wednesday(1);
+            DateTime day = Day;
             TrainGroupParticipantUnavailableDate skip = SkipOf(_other, day);
 
             for (int i = 0; i < taken; i++)

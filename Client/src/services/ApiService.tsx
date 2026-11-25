@@ -575,12 +575,9 @@ export const useApiService = () => {
     async (userId?: string): Promise<TrainGroupParticipantBookingDto[] | null> => {
       const url = buildUrl("TrainGroupParticipants", "Bookings");
       return apiRequest<
-        { userId?: string; clientTimezoneOffsetMinutes: number },
+        { userId?: string },
         TrainGroupParticipantBookingDto[]
-      >(url, "POST", {
-        userId,
-        clientTimezoneOffsetMinutes: new Date().getTimezoneOffset(),
-      });
+      >(url, "POST", { userId });
     },
     [buildUrl, apiRequest],
   );

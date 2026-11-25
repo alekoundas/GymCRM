@@ -95,6 +95,7 @@
   "A_recording_is_already_running_for_this_plan": "A recording is already running for this workout plan.",
   "The_recording_can_no_longer_be_stopped": "This recording can no longer be stopped.",
   "The_rule_is_in_use_by_a_running_recording": "This rule can't be deleted while a member is training with it.",
+  "The_role_is_in_use_by_members": "Este rol todavía está en uso por miembros.",
 
   "Attendance_Confirmation": "Attendance Confirmation",
   "Attendance_Information": "Attendance Information",

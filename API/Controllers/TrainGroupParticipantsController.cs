@@ -28,15 +28,18 @@ namespace API.Controllers
         //private readonly ILogger<TrainGroupDateController> _logger;
 
         private readonly ISubscriptionService _subscriptionService;
+        private readonly TimeProvider _timeProvider;
 
         public TrainGroupParticipantsController(
             IDataService dataService,
             IMapper mapper,
             IStringLocalizer localizer,
             IEmailService emailService,
-            ISubscriptionService subscriptionService) : base(dataService, mapper, localizer)
+            ISubscriptionService subscriptionService,
+            TimeProvider timeProvider) : base(dataService, mapper, localizer)
         {
             _subscriptionService = subscriptionService;
+            _timeProvider = timeProvider;
             _dataService = dataService;
             _mapper = mapper;
             _localizer = localizer;
@@ -72,7 +75,7 @@ namespace API.Controllers
                 return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.Select_at_least_one_date_to_book]));
 
             DateTime day = dto.SelectedDate.Date;
-            DateTime clientNow = BookingRules.ClientNow(dto.ClientTimezoneOffsetMinutes);
+            DateTime gymNow = BookingRules.GymNow(_timeProvider);
 
             using ApiDbContext context = _dataService.GetDbContext();
 
@@ -95,7 +98,7 @@ namespace API.Controllers
             if (sessionDate == null)
                 return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.Participant_selected_date_doesnt_match_any_of_the_train_group_dates]));
 
-            if (BookingRules.SessionStart(trainGroup, day) <= clientNow)
+            if (BookingRules.SessionStart(trainGroup, day) <= gymNow)
                 return BadRequest(new ApiResponse<List<DateTime>>().SetErrorResponse(_localizer[TranslationKeys.This_session_has_already_started]));
 
             List<TrainGroupDate> recurringDates = new List<TrainGroupDate>();
@@ -298,15 +301,15 @@ namespace API.Controllers
             if (!BookingRules.IsRecurring(participant))
                 return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Invalid_data_provided]));
 
-            DateTime clientNow = BookingRules.ClientNow(dto.ClientTimezoneOffsetMinutes);
-            DateTime fromDate = (dto.FromDate ?? clientNow).Date;
+            DateTime gymNow = BookingRules.GymNow(_timeProvider);
+            DateTime fromDate = (dto.FromDate ?? gymNow).Date;
 
             if (participant.RecurringEndOnDate != null && participant.RecurringEndOnDate.Value.Date <= fromDate)
                 return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.This_booking_has_already_ended]));
 
             if (!MayBypassWindow(dto.IsAdminPage))
             {
-                if (fromDate < clientNow.Date)
+                if (fromDate < gymNow.Date)
                     return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.This_session_has_already_started]));
 
                 // The first session the member gives up has to be more than 12 hours off.
@@ -314,10 +317,10 @@ namespace API.Controllers
                 if (firstLost != null)
                 {
                     DateTime sessionStart = BookingRules.SessionStart(participant.TrainGroup, firstLost.Value);
-                    if (sessionStart <= clientNow)
+                    if (sessionStart <= gymNow)
                         return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.This_session_has_already_started]));
 
-                    if (sessionStart <= clientNow.AddHours(BookingRules.MemberChangeWindowHours))
+                    if (sessionStart <= gymNow.AddHours(BookingRules.MemberChangeWindowHours))
                         return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]));
                 }
             }
@@ -355,14 +358,14 @@ namespace API.Controllers
 
             if (!MayBypassWindow(dto.IsAdminPage))
             {
-                DateTime clientNow = BookingRules.ClientNow(dto.ClientTimezoneOffsetMinutes);
+                DateTime gymNow = BookingRules.GymNow(_timeProvider);
                 DateTime day = (participant.SelectedDate ?? participant.TrainGroupDate.FixedDay ?? DateTime.MinValue).Date;
                 DateTime sessionStart = BookingRules.SessionStart(participant.TrainGroup, day);
 
-                if (sessionStart <= clientNow)
+                if (sessionStart <= gymNow)
                     return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.This_session_has_already_started]));
 
-                if (sessionStart <= clientNow.AddHours(BookingRules.MemberChangeWindowHours))
+                if (sessionStart <= gymNow.AddHours(BookingRules.MemberChangeWindowHours))
                     return BadRequest(new ApiResponse<bool>().SetErrorResponse(_localizer[TranslationKeys.Cannot_remove_a_session_starting_within_12_hours]));
             }
 
@@ -394,7 +397,7 @@ namespace API.Controllers
                 userId = requestedId;
             }
 
-            DateTime clientNow = BookingRules.ClientNow(dto.ClientTimezoneOffsetMinutes);
+            DateTime gymNow = BookingRules.GymNow(_timeProvider);
 
             using ApiDbContext context = _dataService.GetDbContext();
 
@@ -409,7 +412,7 @@ namespace API.Controllers
                 .ToListAsync();
 
             List<TrainGroupParticipantBookingDto> result = participants
-                .Select(x => ToBookingDto(x, clientNow))
+                .Select(x => ToBookingDto(x, gymNow))
                 .ToList();
 
             return new ApiResponse<List<TrainGroupParticipantBookingDto>>().SetSuccessResponse(result);
@@ -721,9 +724,9 @@ namespace API.Controllers
         private static DateTime? AsUtc(DateTime? value) =>
             value == null ? null : DateTime.SpecifyKind(value.Value, DateTimeKind.Utc);
 
-        private static TrainGroupParticipantBookingDto ToBookingDto(TrainGroupParticipant participant, DateTime clientNow)
+        private static TrainGroupParticipantBookingDto ToBookingDto(TrainGroupParticipant participant, DateTime gymNow)
         {
-            DateTime today = clientNow.Date;
+            DateTime today = gymNow.Date;
             bool isRecurring = BookingRules.IsRecurring(participant);
 
             TrainGroupParticipantBookingDto dto = new TrainGroupParticipantBookingDto()
@@ -746,7 +749,7 @@ namespace API.Controllers
                 DateTime? date = (participant.SelectedDate ?? participant.TrainGroupDate.FixedDay)?.Date;
                 dto.Date = AsUtc(date);
 
-                if (date != null && participant.RemovedOn == null && BookingRules.SessionStart(participant.TrainGroup, date.Value) > clientNow)
+                if (date != null && participant.RemovedOn == null && BookingRules.SessionStart(participant.TrainGroup, date.Value) > gymNow)
                     dto.NextSessionDate = AsUtc(date);
 
                 return dto;
@@ -763,7 +766,7 @@ namespace API.Controllers
             DateTime? day = BookingRules.NextOccurrence(participant.TrainGroupDate, today > start ? today : start);
             for (int i = 0; i < 400 && day != null && (end == null || day < end); i++)
             {
-                if (BookingRules.HoldsPlace(participant, day.Value) && BookingRules.SessionStart(participant.TrainGroup, day.Value) > clientNow)
+                if (BookingRules.HoldsPlace(participant, day.Value) && BookingRules.SessionStart(participant.TrainGroup, day.Value) > gymNow)
                 {
                     dto.NextSessionDate = AsUtc(day);
                     break;

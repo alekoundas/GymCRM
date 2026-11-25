@@ -27,7 +27,9 @@ namespace API.Tests.Controllers.TrainGroupParticipants
 
         private Task<ApiResult<List<TrainGroupParticipantBookingDto>>> BookingsAsync(Caller caller, DateTime now, string? userId = null)
         {
-            return PostAsync<List<TrainGroupParticipantBookingDto>>(caller, "api/TrainGroupParticipants/Bookings", new { userId, clientTimezoneOffsetMinutes = OffsetFor(now) });
+            AtTheGym(now);
+
+            return PostAsync<List<TrainGroupParticipantBookingDto>>(caller, "api/TrainGroupParticipants/Bookings", new { userId });
         }
 
         private async Task<TrainGroupParticipantBookingDto> BookingAsync(DateTime now)
@@ -120,7 +122,7 @@ namespace API.Tests.Controllers.TrainGroupParticipants
 
         // Upcoming until it starts.
         [Theory]
-        [InlineData(-2, true)]
+        [InlineData(-1, true)]
         [InlineData(0, false)]
         [InlineData(60 * 24, false)]
         public async Task A_single_session_is_next_until_it_starts(int minutesFromStart, bool isNext)

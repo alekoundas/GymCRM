@@ -1,18 +1,16 @@
+using System.Security.Claims;
 using API.Controllers;
 using API.Tests.Host;
-using Business.Repository;
-using Business.Services;
 using Core.Dtos;
 using Core.Dtos.DataTable;
 using Core.Dtos.Identity;
 using Core.Dtos.Lookup;
 using Core.Models;
 using Core.Translations;
-using DataAccess;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace API.Tests.Controllers
 {
@@ -282,6 +280,60 @@ namespace API.Tests.Controllers
             (await PutAsync<Role>(_editor, "api/Roles/not-an-id", new { name = "Trainer" })).ShouldBreak();
         }
 
+        // A dozen of them, each saved before the answer is given.
+        [Fact]
+        public async Task Everything_is_saved_by_the_time_it_is_answered()
+        {
+            Role role = RoleWith("Trainer", "Mails_View", "Mails_Add", "Mails_Edit", "Mails_Delete", "Users_View", "Users_Add");
+            SlowRoles slow = ActivatorUtilities.CreateInstance<SlowRoles>(Services.CreateScope().ServiceProvider);
+
+            ActionResult<ApiResponse<Role>> result = await Alone(slow).Put(role.Id.ToString(), new RoleDto
+            {
+                Name = "Trainer",
+                Claims = [new IdentityClaimDto { Controller = "Roles", View = true, Add = true, Edit = true, Delete = true }, new IdentityClaimDto { Controller = "Users", View = true, Delete = true }]
+            });
+
+            result.Value.ShouldNotBeNull().Messages["success"].ShouldBe([English.Updated("Role Trainer")]);
+            ClaimsOf("Trainer").ShouldBe(
+                ["Permission Users_View", "Permission Roles_View", "Permission Roles_Add", "Permission Roles_Edit", "Permission Roles_Delete", "Permission Users_Delete"], ignoreOrder: true);
+        }
+
+        // Somebody else changed the role in between, say. It is not called updated, and the rest is left.
+        [Theory]
+        [InlineData("Mails_View", "Mails_View Mails_Add")]
+        [InlineData("Mails_Add", "Mails_Add")]
+        [InlineData("Users_View", "")]
+        [InlineData("Users_Add", "Users_View")]
+        public async Task A_permission_that_cannot_be_saved_is_said_so(string refused, string left)
+        {
+            Role role = RoleWith("Trainer", "Mails_View", "Mails_Add");
+            RefusingRoles refusing = ActivatorUtilities.CreateInstance<RefusingRoles>(Services.CreateScope().ServiceProvider);
+            refusing.Refused = refused;
+
+            ActionResult<ApiResponse<Role>> result = await Alone(refusing).Put(role.Id.ToString(), new RoleDto { Name = "Trainer", Claims = [new IdentityClaimDto { Controller = "Users", View = true, Add = true }] });
+
+            result.Value.ShouldNotBeNull().IsSucceed.ShouldBeFalse();
+            result.Value.Messages.ShouldHaveSingleItem().Value.ShouldBe(["Changed meanwhile."]);
+            ClaimsOf("Trainer").ShouldBe(left.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => "Permission " + x), ignoreOrder: true);
+        }
+
+        // The database will not be written to. With nobody waiting for it there was nobody to catch it
+        // either, and the whole server was down.
+        [Theory]
+        [InlineData("Mails_View")]
+        [InlineData("Users_View")]
+        public async Task A_database_that_cannot_be_written_to_breaks_this_request_and_no_other(string broken)
+        {
+            Role role = RoleWith("Trainer", "Mails_View");
+            SlowRoles breaking = ActivatorUtilities.CreateInstance<SlowRoles>(Services.CreateScope().ServiceProvider);
+            breaking.Broken = broken;
+
+            await Should.ThrowAsync<InvalidOperationException>(() => Alone(breaking).Put(role.Id.ToString(), new RoleDto { Name = "Trainer", Claims = [new IdentityClaimDto { Controller = "Users", View = true }] }));
+
+            (await PutAsync<Role>(_editor, $"api/Roles/{role.Id}", new { id = role.Id, name = "Trainer", claims = new[] { Claims("Users", view: true) } })).ShouldSucceed(English.Updated("Role Trainer"));
+            ClaimsOf("Trainer").ShouldBe(["Permission Users_View"]);
+        }
+
         // A role is what everybody else is checked against.
         [Fact]
         public async Task A_member_cannot_give_their_own_role_any_permission()
@@ -333,16 +385,61 @@ namespace API.Tests.Controllers
             Database.Read(db => db.Roles.Count()).ShouldBe(1);
         }
 
-        // Looked for by its id in text, which an id is not, so no role can be deleted.
         [Fact]
-        public async Task Deleting_breaks()
+        public async Task A_role_nobody_has_is_deleted_with_what_it_allows()
         {
-            Role role = Seed.Role("Trainer");
+            Role role = RoleWith("Trainer", "Mails_View", "Mails_Add");
+            Seed.UserRole(_user, RoleWith("Administrator", "Mails_View"));
 
-            (await DeleteAsync<Role>(_deleter, $"api/Roles/{role.Id}")).ShouldBreak();
-            (await DeleteAsync<Role>(_deleter, "api/Roles/not-an-id")).ShouldBreak();
+            (await DeleteAsync<Role>(_deleter, $"api/Roles/{role.Id}")).ShouldSucceed(English.Deleted("Role Trainer"));
+
+            Database.Read(db => db.Roles.Single()).Name.ShouldBe("Administrator");
+            Database.Read(db => db.RoleClaims.Single()).ClaimValue.ShouldBe("Mails_View");
+            Database.Read(db => db.UserRoles.Count()).ShouldBe(1);
+        }
+
+        // They would be left with no role, and could do nothing at all.
+        [Fact]
+        public async Task A_role_somebody_has_is_not()
+        {
+            Role role = RoleWith("Trainer", "Mails_View");
+            UserRole theirs = Seed.UserRole(_user, role);
+
+            (await DeleteAsync<Role>(_deleter, $"api/Roles/{role.Id}")).ShouldFail(English.Of(TranslationKeys.The_role_is_in_use_by_members));
+
+            ClaimsOf("Trainer").ShouldBe(["Permission Mails_View"]);
+            Database.Read(db => db.UserRoles.Single()).RoleId.ShouldBe(role.Id);
+
+            // Until nobody has it any more.
+            Database.Change(db => db.UserRoles.Remove(theirs));
+
+            (await DeleteAsync<Role>(_deleter, $"api/Roles/{role.Id}")).ShouldSucceed(English.Deleted("Role Trainer"));
+        }
+
+        [Theory]
+        [InlineData("not-an-id")]
+        [InlineData("7")]
+        [InlineData("00000000-0000-0000-0000-000000000000")]
+        [InlineData("11111111-2222-3333-4444-555555555555")]
+        public async Task A_role_that_is_not_there_cannot_be_deleted(string id)
+        {
+            Seed.Role("Trainer");
+
+            (await DeleteAsync<Role>(_deleter, $"api/Roles/{id}")).ShouldFail(English.Of(TranslationKeys._0_not_found, "Role"));
 
             Database.Read(db => db.Roles.Count()).ShouldBe(1);
+        }
+
+        // Nobody finds out who has which role by deleting it.
+        [Fact]
+        public async Task Without_the_permission_every_role_is_answered_the_same()
+        {
+            Role role = Seed.Role("Trainer");
+            Seed.UserRole(_user, role);
+
+            (await DeleteAsync<Role>(_anybody, $"api/Roles/{role.Id}")).ShouldFail(English.NotAuthorized);
+            (await DeleteAsync<Role>(_anybody, $"api/Roles/{Guid.NewGuid()}")).ShouldFail(English.NotAuthorized);
+            (await DeleteAsync<Role>(_anybody, "api/Roles/not-an-id")).ShouldFail(English.NotAuthorized);
         }
 
 
@@ -427,11 +524,6 @@ namespace API.Tests.Controllers
             return Direct.Controller<RolesController>(Services, "Roles", ["Roles_Edit", "Roles_Delete"], _user, given);
         }
 
-        private DataService DataServiceWith(IGenericRepository<Role> roles)
-        {
-            return ActivatorUtilities.CreateInstance<DataService>(Services.CreateScope().ServiceProvider, roles);
-        }
-
         // The address always has an id in it.
         [Fact]
         public async Task Without_an_id_there_is_nothing_to_edit_or_delete()
@@ -443,57 +535,78 @@ namespace API.Tests.Controllers
             deleted.Value.ShouldNotBeNull().Messages["error"].ShouldBe([English.Required("RoleId")]);
         }
 
-        // What deleting would do if the role were found.
+        // Somebody else changed it in between.
         [Fact]
-        public async Task A_role_that_was_found_would_be_deleted()
+        public async Task A_role_that_could_not_be_deleted_is_said_so()
         {
             Role role = Seed.Role("Trainer");
+            RefusingRoles refusing = ActivatorUtilities.CreateInstance<RefusingRoles>(Services.CreateScope().ServiceProvider);
 
-            ActionResult<ApiResponse<Role>> deleted = await Alone(DataServiceWith(new RolesByText(Database.Factory))).Delete(role.Id.ToString());
+            ActionResult<ApiResponse<Role>> deleted = await Alone(refusing).Delete(role.Id.ToString());
 
-            deleted.Value.ShouldNotBeNull().IsSucceed.ShouldBeTrue();
-            deleted.Value.Messages["success"].ShouldBe([English.Deleted("Role Trainer")]);
-            Database.Read(db => db.Roles.Count()).ShouldBe(0);
-        }
-
-        [Fact]
-        public async Task A_role_that_was_not_found_would_be_said_so()
-        {
-            ActionResult<ApiResponse<Role>> deleted = await Alone(DataServiceWith(new RolesByText(Database.Factory))).Delete(Guid.NewGuid().ToString());
-
-            deleted.Value.ShouldNotBeNull().Messages["error"].ShouldBe([English.Of(TranslationKeys._0_not_found, "Role")]);
-        }
-
-        // Somebody else changed it in between. The reasons are not read out but the list they are in.
-        [Fact]
-        public async Task A_role_that_could_not_be_deleted_would_be_said_so_with_no_reason()
-        {
-            Role role = Seed.Role("Trainer");
-            RolesByText changed = new RolesByText(Database.Factory) { IsChangedMeanwhile = true };
-
-            ActionResult<ApiResponse<Role>> deleted = await Alone(DataServiceWith(changed)).Delete(role.Id.ToString());
-
-            deleted.Value.ShouldNotBeNull().Messages["error"].ShouldBe(["System.Collections.Generic.List`1[Microsoft.AspNetCore.Identity.IdentityError]"]);
+            deleted.Value.ShouldNotBeNull().Messages["error"].ShouldBe(["Changed meanwhile."]);
             Database.Read(db => db.Roles.Count()).ShouldBe(1);
         }
 
-        // Finds a role by its id in text.
-        private sealed class RolesByText : GenericRepository<Role>, IGenericRepository<Role>
+        // Takes its time over each permission, as a database does that is not on the same machine, and
+        // may break on one.
+        private sealed class SlowRoles : RoleManager<Role>
         {
-            public RolesByText(IDbContextFactory<ApiDbContext> factory) : base(factory)
+            public SlowRoles(IRoleStore<Role> store, IEnumerable<IRoleValidator<Role>> validators, ILookupNormalizer normalizer, IdentityErrorDescriber errors, ILogger<RoleManager<Role>> logger)
+                : base(store, validators, normalizer, errors, logger)
             {
             }
 
-            public bool IsChangedMeanwhile { get; set; }
+            public string? Broken { get; set; }
 
-            async Task<Role?> IGenericRepository<Role>.FindAsync(object? id)
+            public override async Task<IdentityResult> AddClaimAsync(Role role, Claim claim)
             {
-                Role? role = await FindAsync(Guid.Parse((string)id!));
+                await WaitAsync(claim);
 
-                if (role != null && IsChangedMeanwhile)
-                    role.ConcurrencyStamp = "older";
+                return await base.AddClaimAsync(role, claim);
+            }
 
-                return role;
+            public override async Task<IdentityResult> RemoveClaimAsync(Role role, Claim claim)
+            {
+                await WaitAsync(claim);
+
+                return await base.RemoveClaimAsync(role, claim);
+            }
+
+            private async Task WaitAsync(Claim claim)
+            {
+                await Task.Delay(20, TestContext.Current.CancellationToken);
+
+                if (claim.Value == Broken)
+                    throw new InvalidOperationException("database is locked");
+            }
+        }
+
+        // Saves everything but the one, and deletes nothing.
+        private sealed class RefusingRoles : RoleManager<Role>
+        {
+            private static readonly IdentityResult No = IdentityResult.Failed(new IdentityError { Description = "Changed meanwhile." }, new IdentityError { Description = "And more." });
+
+            public RefusingRoles(IRoleStore<Role> store, IEnumerable<IRoleValidator<Role>> validators, ILookupNormalizer normalizer, IdentityErrorDescriber errors, ILogger<RoleManager<Role>> logger)
+                : base(store, validators, normalizer, errors, logger)
+            {
+            }
+
+            public string? Refused { get; set; }
+
+            public override Task<IdentityResult> AddClaimAsync(Role role, Claim claim)
+            {
+                return claim.Value == Refused ? Task.FromResult(No) : base.AddClaimAsync(role, claim);
+            }
+
+            public override Task<IdentityResult> RemoveClaimAsync(Role role, Claim claim)
+            {
+                return claim.Value == Refused ? Task.FromResult(No) : base.RemoveClaimAsync(role, claim);
+            }
+
+            public override Task<IdentityResult> DeleteAsync(Role role)
+            {
+                return Task.FromResult(No);
             }
         }
 

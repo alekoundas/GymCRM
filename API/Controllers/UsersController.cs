@@ -167,9 +167,6 @@ namespace API.Controllers
             if (!roleExists)
                 return new ApiResponse<UserDto>().SetErrorResponse(_localizer[TranslationKeys._0_not_found, "Role"]);
 
-            // Update user role.
-            await _userService.AssignSingleRoleAsync(user, roleName!);
-
             // Update user properties.
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
@@ -181,13 +178,15 @@ namespace API.Controllers
             user.Address = request.Address;
             user.MedicalHistory = request.MedicalHistory;
 
-            UserDto userDto = _mapper.Map<UserDto>(user);
             IdentityResult response = await _userManager.UpdateAsync(user);
-
-            if (response.Succeeded)
-                return new ApiResponse<UserDto>().SetSuccessResponse(userDto, _localizer[TranslationKeys._0_updated_successfully, "User"]);
-            else
+            if (!response.Succeeded)
                 return new ApiResponse<UserDto>().SetErrorResponse(response.Errors.First().Description);
+
+            // Update user role. Last, so that a change that is refused - a name that is taken -
+            // is refused whole. The role used to be given first, and stayed given.
+            await _userService.AssignSingleRoleAsync(user, roleName!);
+
+            return new ApiResponse<UserDto>().SetSuccessResponse(_mapper.Map<UserDto>(user), _localizer[TranslationKeys._0_updated_successfully, "User"]);
         }
 
 
