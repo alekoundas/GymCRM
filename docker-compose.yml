@@ -17,7 +17,9 @@ services:
     build:
       context: .
       dockerfile: API/Dockerfile
-    ports:
+    # Only inside Docker, where nginx finds it. With "ports" Docker also opened it to the internet, on a
+    # random port of the server: past nginx, and without HTTPS.
+    expose:
       - "8080" # Internal HTTP port
     volumes:
         - /root/app/sqlite.db:/app/sqlite.db
@@ -39,7 +41,8 @@ services:
     # build:
     #   context: .
     #   dockerfile: Client/Dockerfile
-    ports:
+    # Only inside Docker, like the api.
+    expose:
       - "8080"  # Internal HTTP port
       # - "8081"  # Internal HTTPS port
     environment:

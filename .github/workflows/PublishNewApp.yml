@@ -43,6 +43,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}  
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 30m  # The default is 10m. Cut off half way, the site would stay down.
           script: |       
           
             # asdasd
@@ -107,6 +108,15 @@ jobs:
 
 
 
+
+
+            # The server goes on using the images it has: nginx was still the one of the first publish.
+            # The site is still up here. An image that can't be downloaded stays as it was.
+            echo "[INFO]: Downloading the newest nginx, certbot and .NET images."
+            docker-compose -f docker-compose.yml pull nginx certbot
+            for IMAGE in $(grep -o "^FROM mcr[^ ]*" API/Dockerfile | cut -d " " -f 2); do
+              docker pull $IMAGE
+            done
 
 
             # Close already running containers
@@ -223,6 +233,12 @@ jobs:
               docker logs Nginx
               exit 1
             fi
+
+            # What is running now
+            echo "[INFO]: Running now:"
+            git log -1 --format="%h %s"
+            docker exec Nginx nginx -v
+            docker exec Api dotnet --list-runtimes
 
 
 
